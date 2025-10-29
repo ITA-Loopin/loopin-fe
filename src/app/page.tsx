@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { setCredentials } from "@/store/slices/authSlice";
@@ -21,7 +22,7 @@ export default function Home() {
   }, []);
 
   const handleLoginSuccess = useCallback(
-    async (accessToken: string, _refreshToken: string) => {
+    async (accessToken: string) => {
       const sanitizedAccessToken = accessToken.replace(/\s/g, "+").trim();
 
       try {
@@ -89,10 +90,9 @@ export default function Home() {
   useEffect(() => {
     const status = searchParams.get("status");
     const accessToken = searchParams.get("accessToken");
-    const refreshToken = searchParams.get("refreshToken");
 
     if (status === "LOGIN_SUCCESS" && accessToken) {
-      handleLoginSuccess(accessToken, refreshToken || "");
+      handleLoginSuccess(accessToken);
       return;
     }
 
@@ -139,18 +139,21 @@ export default function Home() {
       }}
     >
       <div className="relative z-10 flex w-full flex-row items-center justify-center gap-6 text-center">
-        <img
+        <Image
           src="/loading-logo.svg"
           alt="Loopin loading emblem"
           width={70}
+          height={70}
           className="mb-6 drop-shadow-lg animate-[spin_10s_linear_infinite]"
+          priority
         />
-        <img
+        <Image
           src="/loopin-logo.svg"
           alt="Loopin logo"
           width={180}
           height={70}
           className="drop-shadow-lg"
+          priority
         />
       </div>
 
@@ -169,7 +172,13 @@ export default function Home() {
             className="flex w-full items-center justify-between rounded-full bg-[#FEE500] px-6 py-4 text-left font-semibold text-[#191919] shadow-lg shadow-black/10"
           >
             <span className="flex items-center gap-3">
-              <img src="/kakao-icon.svg" alt="Kakao" width={24} height={24} />
+              <Image
+                src="/kakao-icon.svg"
+                alt="Kakao"
+                width={24}
+                height={24}
+                className="h-6 w-6"
+              />
               카카오 로그인
             </span>
           </button>
