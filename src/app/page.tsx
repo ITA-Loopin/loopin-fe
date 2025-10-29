@@ -6,6 +6,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { setCredentials } from "@/store/slices/authSlice";
 
+export const dynamic = "force-dynamic";
+
 export default function Home() {
   const router = useRouter();
   const searchParams = useSearchParams();
