@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { apiFetch } from "@/lib/api";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { logout, setLoading } from "@/store/slices/authSlice";
 
@@ -27,10 +26,18 @@ export default function HomePage() {
         throw new Error("인증 정보가 없습니다. 다시 로그인해주세요.");
       }
 
-      await apiFetch("/rest-api/v1/member", {
+      const response = await fetch("/api-proxy/rest-api/v1/member", {
         method: "DELETE",
-        accessToken,
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
       });
+
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
+        throw new Error(errorBody.message || "회원 탈퇴에 실패했습니다.");
+      }
 
       dispatch(logout());
       alert("회원 탈퇴가 완료되었습니다.");
