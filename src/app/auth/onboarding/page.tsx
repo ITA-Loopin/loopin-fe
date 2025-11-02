@@ -3,10 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Modal from "@/components/common/Modal";
-import { apiFetch } from "@/lib/api";
 import { useAppDispatch } from "@/store/hooks";
 import { setCredentials } from "@/store/slices/authSlice";
-import type { User } from "@/types/auth";
 
 type SignupSession = {
   email: string;
@@ -84,13 +82,15 @@ export default function OnboardingPage() {
     setModalError(null);
 
     try {
-      const data = await apiFetch<{
-        success?: boolean;
-        data?: { available?: boolean };
-      }>("/rest-api/v1/member/available", {
-        searchParams: { nickname },
-      });
+      const response = await fetch(
+        `/api-proxy/rest-api/v1/member/available?nickname=${encodeURIComponent(nickname)}`
+      );
 
+      if (!response.ok) {
+        throw new Error("닉네임 중복 확인에 실패했습니다.");
+      }
+
+      const data = await response.json();
       const isAvailable =
         data?.success !== false &&
         (data?.data?.available === undefined || data?.data?.available === true);
@@ -127,31 +127,35 @@ export default function OnboardingPage() {
     setModalError(null);
 
     try {
-      const data = await apiFetch<{
-        user?: User;
-        accessToken: string;
-      }>("/rest-api/v1/auth/signup-login", {
+      const response = await fetch("/api-proxy/rest-api/v1/auth/signup-login", {
         method: "POST",
-        json: {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
           email: signupData.email,
           provider: signupData.provider,
           providerId: signupData.providerId,
           nickname,
-        },
+        }),
       });
 
-      const fallbackUser: User = {
-        id: signupData.providerId,
-        email: signupData.email,
-        nickname,
-        kakaoId: Number.isNaN(Number(signupData.providerId))
-          ? 0
-          : Number(signupData.providerId),
-      };
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "회원가입에 실패했습니다.");
+      }
+
+      const data = await response.json();
 
       dispatch(
         setCredentials({
-          user: data.user || fallbackUser,
+          user:
+            data.user ||
+            ({
+              id: signupData.providerId,
+              email: signupData.email,
+              nickname,
+            } as const),
           accessToken: data.accessToken,
         })
       );
