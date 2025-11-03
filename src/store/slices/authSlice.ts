@@ -34,7 +34,7 @@ const authSlice = createSlice({
           "loopin_user",
           JSON.stringify(action.payload.user)
         );
-        localStorage.setItem("loopin_access_token", action.payload.accessToken);
+        localStorage.setItem("loopin_auth", action.payload.accessToken);
       }
     },
     logout: (state) => {
@@ -43,9 +43,11 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.isLoading = false;
 
+      // localStorage 정리
       if (typeof window !== "undefined") {
         localStorage.removeItem("loopin_user");
-        localStorage.removeItem("loopin_access_token");
+        localStorage.removeItem("loopin_auth");
+        localStorage.removeItem("loopin_temp_kakao_data");
       }
     },
     loadFromStorage: (

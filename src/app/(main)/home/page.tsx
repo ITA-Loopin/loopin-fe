@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { apiFetch } from "@/lib/api";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { logout, setLoading } from "@/store/slices/authSlice";
 
@@ -27,10 +26,18 @@ export default function HomePage() {
         throw new Error("인증 정보가 없습니다. 다시 로그인해주세요.");
       }
 
-      await apiFetch("/rest-api/v1/member", {
+      const response = await fetch("/api-proxy/rest-api/v1/member", {
         method: "DELETE",
-        accessToken,
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
       });
+
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
+        throw new Error(errorBody.message || "회원 탈퇴에 실패했습니다.");
+      }
 
       dispatch(logout());
       alert("회원 탈퇴가 완료되었습니다.");
@@ -47,7 +54,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="flex min-h-screen w-full flex-col items-center justify-center gap-6 py-12 text-center">
+    <div className="flex min-h-[calc(100vh-220px)] flex-col items-center justify-center gap-6 px-6 text-center">
       <div className="space-y-2">
         <h1 className="text-3xl font-semibold text-foreground">Loopin 홈</h1>
       </div>
@@ -64,9 +71,7 @@ export default function HomePage() {
           </div>
 
           <div className="rounded-xl border border-destructive/40 bg-destructive/5 px-6 py-5 text-left">
-            <h2 className="text-base font-semibold text-destructive">
-              회원 탈퇴
-            </h2>
+            <h2 className="text-base font-semibold text-destructive">회원 탈퇴</h2>
             <p className="mt-1 text-sm text-destructive/70">
               탈퇴 시 계정과 모든 데이터가 영구적으로 삭제됩니다.
             </p>
@@ -95,3 +100,4 @@ export default function HomePage() {
     </div>
   );
 }
+

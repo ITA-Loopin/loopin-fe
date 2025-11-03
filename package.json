@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack -H 0.0.0.0 -p 80",
     "dev:3000": "next dev --turbopack -H 0.0.0.0",
+    "dev:https": "next dev --turbopack --hostname local.loopin.co.kr --port 443 --experimental-https --experimental-https-key ./certs/local-loopin-key.pem --experimental-https-cert ./certs/local-loopin-cert.pem",
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",

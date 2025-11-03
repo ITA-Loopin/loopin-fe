@@ -5,7 +5,6 @@ node: 22
 
 ```bash
 pnpm dev
-
 ```
 
 팀원에게 .env.local 요청

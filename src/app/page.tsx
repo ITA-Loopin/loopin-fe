@@ -6,8 +6,6 @@ import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { setCredentials } from "@/store/slices/authSlice";
-import { apiFetch } from "@/lib/api";
-import type { User } from "@/types/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -31,9 +29,20 @@ function HomeContent() {
       const sanitizedAccessToken = accessToken.replace(/\s/g, "+").trim();
 
       try {
-        const userData = await apiFetch<User>("/rest-api/v1/member", {
-          accessToken: sanitizedAccessToken,
+        const response = await fetch("/api-proxy/rest-api/v1/member", {
+          headers: {
+            Authorization: `Bearer ${sanitizedAccessToken}`,
+          },
+          cache: "no-store",
         });
+
+        if (!response.ok) {
+          const errorBody = await response.text();
+          console.error("사용자 정보 요청 실패", response.status, errorBody);
+          throw new Error(errorBody || "사용자 정보를 가져올 수 없습니다.");
+        }
+
+        const userData = await response.json();
 
         dispatch(
           setCredentials({
@@ -53,12 +62,15 @@ function HomeContent() {
 
   const handleKakaoLogin = async () => {
     try {
-      const data = await apiFetch<{
-        success?: boolean;
-        data?: string;
-        redirectUrl?: string;
-        url?: string;
-      }>("/rest-api/v1/oauth/redirect-url/kakao");
+      const response = await fetch(
+        "/api-proxy/rest-api/v1/oauth/redirect-url/kakao"
+      );
+
+      if (!response.ok) {
+        throw new Error("리다이렉션 URL을 가져올 수 없습니다.");
+      }
+
+      const data = await response.json();
       const redirectUrl = data.data || data.redirectUrl || data.url;
 
       if (redirectUrl) {
