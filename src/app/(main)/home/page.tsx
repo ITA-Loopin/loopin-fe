@@ -1,4 +1,4 @@
-"use client";
+/*"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -99,5 +99,117 @@ export default function HomePage() {
       )}
     </div>
   );
+} */
+
+"use client";
+
+import { useAppSelector } from "@/store/hooks";
+import { useMemo, useState, useEffect } from "react";
+import {
+  HomeHeader,
+  TodayLoopTitle,
+  EmptyLoopView,
+  LoopProgress,
+  LoopList,
+  type LoopItem,
+} from "@/components/home";
+
+export default function HomePage() {
+  const { accessToken } = useAppSelector((state) => state.auth);
+  const [loopList, setLoopList] = useState<LoopItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // 날짜 표시
+  const todayText = useMemo(() => {
+    const today = new Date();
+    return today.toLocaleDateString("ko-KR", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      weekday: "long",
+    });
+  }, []);
+
+  // API로 Loop 데이터 가져오기
+  useEffect(() => {
+    const fetchLoops = async () => {
+      if (!accessToken) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        // TODO: 실제 API 엔드포인트로 변경
+        // const response = await fetch("/api-proxy/rest-api/v1/loops", {
+        //   headers: {
+        //     Accept: "application/json",
+        //     Authorization: `Bearer ${accessToken}`,
+        //   },
+        // });
+        // if (response.ok) {
+        //   const data = await response.json();
+        //   setLoopList(data);
+        // }
+        
+        // 임시: 엠티뷰를 보기 위해 빈 배열로 설정
+        // 데이터가 있을 때 테스트하려면 아래 주석을 해제하세요:
+        // setLoopList([
+        //   { id: 1, title: "아침 운동", completed: 3, total: 5 },
+        //   { id: 2, title: "토익 스터디", completed: 3, total: 5 },
+        //   { id: 3, title: "마케팅 ch.7", completed: 3, total: 5 },
+        // ]);
+        setLoopList([]);
+      } catch (error) {
+        console.error("루프 데이터 로딩 실패", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchLoops();
+  }, [accessToken]);
+
+  const isEmpty = loopList.length === 0;
+
+  const totalDone = loopList.reduce((acc, cur) => acc + cur.completed, 0);
+  const totalCount = loopList.reduce((acc, cur) => acc + cur.total, 0);
+  const progress = totalCount > 0 ? Math.round((totalDone / totalCount) * 100) : 0;
+
+  return (
+    <div
+      className="min-h-screen flex flex-col"
+      style={{
+        background:
+          "linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 228, 224, 0.3) 100%)",
+      }}
+    >
+      <HomeHeader />
+
+      <div className="flex-1 px-4 pb-6 flex flex-col gap-6">
+        <TodayLoopTitle dateText={todayText} />
+
+        {isLoading ? (
+          <div className="flex-1 flex items-center justify-center">
+            <p className="text-sm text-gray-500">로딩 중...</p>
+          </div>
+        ) : isEmpty ? (
+          <EmptyLoopView />
+        ) : (
+          <>
+            <LoopProgress progress={progress} />
+
+            {/* 버튼 자리 */}
+            <button className="border rounded-lg py-2">
+              오늘 하루의 루프를 모두 채워보세요!
+            </button>
+
+            <LoopList loops={loopList} />
+          </>
+        )}
+      </div>
+    </div>
+  );
 }
+
 
