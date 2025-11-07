@@ -1,3 +1,4 @@
+// LoopItem 타입
 export type LoopItem = {
   id: number;
   title: string;
