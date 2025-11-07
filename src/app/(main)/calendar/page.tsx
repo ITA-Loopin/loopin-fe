@@ -3,10 +3,6 @@
 import { FormEvent, useMemo, useState } from "react";
 import { useAppSelector } from "@/store/hooks";
 
-const isDevHelperEnabled =
-  process.env.NEXT_PUBLIC_ENABLE_LOOP_DEV === "true" ||
-  process.env.NODE_ENV !== "production";
-
 const daysOfWeekOptions = [
   "MONDAY",
   "TUESDAY",
@@ -135,8 +131,7 @@ export default function CalendarPage() {
         </p>
       </div>
 
-      {isDevHelperEnabled && (
-        <div className="w-full max-w-xl rounded-xl border border-dashed border-primary/40 bg-primary/5 p-6 text-left">
+      <div className="w-full max-w-xl rounded-xl border border-dashed border-primary/40 bg-primary/5 p-6 text-left">
           <h2 className="text-lg font-semibold text-primary">
             개발용 루프 생성 도구
           </h2>
@@ -288,7 +283,6 @@ export default function CalendarPage() {
             </p>
           )}
         </div>
-      )}
     </section>
   );
 }
