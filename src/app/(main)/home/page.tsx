@@ -49,12 +49,12 @@ import dayjs from "dayjs";
 import "dayjs/locale/ko";
 import { useMemo } from "react";
 import {
-  HomeHeader,
   TodayLoopTitle,
   EmptyLoopView,
   LoopProgress,
   LoopList,
 } from "@/components/home";
+import Header from "@/components/common/Header";
 import { useDailyLoops } from "@/hooks/useDailyLoops";
 
 dayjs.locale("ko");
@@ -90,7 +90,7 @@ export default function HomePage() {
         }}
       />
       <div className="flex flex-col relative min-h-screen">
-      <HomeHeader />
+      <Header variant="home" />
 
       <div className="flex-1 px-4 pb-6 flex flex-col gap-6">
         <TodayLoopTitle dateText={todayText} />

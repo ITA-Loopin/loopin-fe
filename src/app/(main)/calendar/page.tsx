@@ -4,7 +4,8 @@ import { useMemo, useState } from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
 import type { Dayjs } from "dayjs";
-import { HomeHeader, LoopList, EmptyLoopView } from "@/components/home";
+import Header from "@/components/common/Header";
+import { LoopList } from "@/components/home";
 import { MonthCalendar, AddLoopButton } from "@/components/calendar";
 import { useDailyLoops } from "@/hooks/useDailyLoops";
 
@@ -41,7 +42,7 @@ export default function CalendarPage() {
         }}
       />
       <div className="relative flex min-h-screen flex-col">
-        <HomeHeader />
+        <Header variant="calendar" />
         <main className="flex w-full flex-1 flex-col items-center gap-6 px-4 pb-32 pt-2">
 
           <MonthCalendar
