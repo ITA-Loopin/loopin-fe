@@ -7,6 +7,10 @@ import { apiFetch } from "@/lib/api";
 import { useAppDispatch } from "@/store/hooks";
 import { setCredentials } from "@/store/slices/authSlice";
 import type { User } from "@/types/auth";
+import {
+  buildUserFromMemberProfile,
+  fetchMemberProfile,
+} from "@/lib/member";
 
 type SignupSession = {
   email: string;
@@ -149,9 +153,28 @@ export default function OnboardingPage() {
           : Number(signupData.providerId),
       };
 
+      const baseUser: User = data.user
+        ? {
+            ...data.user,
+            id: data.user.id || signupData.providerId,
+          }
+        : fallbackUser;
+
+      let finalUser = baseUser;
+
+      try {
+        const memberResponse = await fetchMemberProfile(data.accessToken);
+        finalUser = buildUserFromMemberProfile(memberResponse.data, {
+          ...baseUser,
+          id: baseUser.id || signupData.providerId,
+        });
+      } catch (memberError) {
+        console.error("회원 정보 동기화 실패", memberError);
+      }
+
       dispatch(
         setCredentials({
-          user: data.user || fallbackUser,
+          user: finalUser,
           accessToken: data.accessToken,
         })
       );
