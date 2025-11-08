@@ -1,7 +1,7 @@
 "use client";
 
-import dayjs from "dayjs/esm";
-import "dayjs/esm/locale/ko";
+import dayjs from "dayjs";
+import "dayjs/locale/ko";
 import { useMemo } from "react";
 import {
   HomeHeader,
