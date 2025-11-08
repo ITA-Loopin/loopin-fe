@@ -1,5 +1,7 @@
 "use client";
 
+import dayjs from "dayjs/esm";
+import "dayjs/esm/locale/ko";
 import { useMemo } from "react";
 import {
   HomeHeader,
@@ -10,25 +12,17 @@ import {
 } from "@/components/home";
 import { useDailyLoops } from "@/hooks/useDailyLoops";
 
+dayjs.locale("ko");
+
 export default function HomePage() {
   // 오늘 날짜 표시
   const todayText = useMemo(() => {
-    const today = new Date();
-    return today.toLocaleDateString("ko-KR", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      weekday: "long",
-    });
+    return dayjs().format("YYYY년 M월 D일 dddd");
   }, []);
 
   // 오늘 날짜를 YYYY-MM-DD 형식으로 변환
   const todayDateString = useMemo(() => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, "0");
-    const day = String(today.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
+    return dayjs().format("YYYY-MM-DD");
   }, []);
 
   // 오늘 날짜의 루프 목록 가져오기
