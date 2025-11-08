@@ -17,7 +17,7 @@ type ChecklistItem = {
   text: string;
 };
 
-type AddLoopModalProps = {
+type AddLoopSheetProps = {
   isOpen: boolean;
   onClose: () => void;
   /** ✅ 외부에서 초기값을 주입할 수 있게 함 (AI 추천 값도 여기에 들어감) */
@@ -30,7 +30,7 @@ type AddLoopModalProps = {
   };
 };
 
-export function AddLoopModal({ isOpen, onClose, defaultValues }: AddLoopModalProps) {
+export function AddLoopSheet({ isOpen, onClose, defaultValues }: AddLoopSheetProps) {
   const [loopName, setLoopName] = useState("");
   const [repeatOption, setRepeatOption] = useState("WEEKLY");
   const [startDate, setStartDate] = useState("");

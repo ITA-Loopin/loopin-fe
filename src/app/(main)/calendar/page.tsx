@@ -5,8 +5,9 @@ import dayjs from "dayjs";
 import "dayjs/locale/ko";
 import type { Dayjs } from "dayjs";
 import Header from "@/components/common/Header";
+import { AddLoopSheet } from "@/components/common/AddLoopSheet";
 import { LoopList } from "@/components/home";
-import { MonthCalendar, AddLoopButton, AddLoopModal } from "@/components/calendar";
+import { MonthCalendar, AddLoopButton} from "@/components/calendar";
 import { useDailyLoops } from "@/hooks/useDailyLoops";
 
 dayjs.locale("ko");
@@ -73,7 +74,7 @@ export default function CalendarPage() {
 
           <AddLoopButton onClick={handleOpenAddLoopModal} />
         </main>
-        <AddLoopModal
+        <AddLoopSheet
           isOpen={isAddLoopModalOpen}
           onClose={handleCloseAddLoopModal}
           defaultValues={{
