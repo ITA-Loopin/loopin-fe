@@ -1,3 +1,50 @@
+/*"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAppSelector, useAppDispatch } from "@/store/hooks";
+import { logout, setLoading } from "@/store/slices/authSlice";
+export default function HomePage() {
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+  const { user, accessToken } = useAppSelector((state) => state.auth);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const handleWithdraw = async () => {
+    if (!confirm("정말로 Loopin 회원을 탈퇴하시겠습니까?")) {
+      return;
+    }
+    setIsDeleting(true);
+    setError(null);
+    dispatch(setLoading(true));
+    try {
+      if (!accessToken) {
+        throw new Error("인증 정보가 없습니다. 다시 로그인해주세요.");
+      }
+      const response = await fetch("/api-proxy/rest-api/v1/member", {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
+        throw new Error(errorBody.message || "회원 탈퇴에 실패했습니다.");
+      }
+      dispatch(logout());
+      alert("회원 탈퇴가 완료되었습니다.");
+      router.replace("/");
+    } catch (err) {
+      console.error("회원 탈퇴 실패", err);
+      setError(
+        err instanceof Error ? err.message : "회원 탈퇴에 실패했습니다."
+      );
+    } finally {
+      setIsDeleting(false);
+      dispatch(setLoading(false));
+    }
+  }; */
+
 "use client";
 
 import dayjs from "dayjs";
