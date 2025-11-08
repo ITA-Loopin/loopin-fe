@@ -54,7 +54,7 @@ export class MissingAccessTokenError extends Error {
  * - 제네릭 <T> 지원 → 응답 타입 지정 가능
  * - 응답 JSON 자동 파싱 + 타입 안전성
  */
-export async function apiFetch<T = any>(
+export async function apiFetch<T = unknown>(
   input: ApiFetchInput,
   options: ApiFetchOptions = {}
 ): Promise<T> {
@@ -133,13 +133,17 @@ export async function apiFetch<T = any>(
 
   // 응답 상태 체크
   if (!response.ok) {
-    let errorBody: any = {};
+    let errorBody: Record<string, unknown> = {};
     try {
       errorBody = await response.json();
     } catch {
       // JSON 파싱 실패 시 무시
     }
-    throw new Error(errorBody.message || "API 요청 실패");
+    throw new Error(
+      typeof errorBody.message === "string"
+        ? errorBody.message
+        : "API 요청 실패"
+    );
   }
 
   if (!parseJson) {
