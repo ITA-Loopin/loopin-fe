@@ -28,19 +28,14 @@ export function useDailyLoops({ date }: UseDailyLoopsParams): UseDailyLoopsResul
           setIsLoading(true);
         }
         const apiUrl = `/api-proxy/rest-api/v1/loops/date/${date}`;
-        const response = await apiFetch(apiUrl);
-
-        if (!response.ok) {
-          throw new Error(
-            `루프 데이터를 불러오는데 실패했습니다. (${response.status})`
-          );
-        }
-
-        const result = await response.json();
+        const result = await apiFetch<{
+          success?: boolean;
+          data?: { loops?: LoopItem[]; totalProgress?: number };
+        }>(apiUrl);
 
         if (!cancelled) {
-          if (result.success && result.data) {
-            setLoopList(result.data.loops || []);
+          if (result?.success !== false && result?.data) {
+            setLoopList(result.data.loops ?? []);
             const apiProgress = result.data.totalProgress;
             setTotalProgress(
               typeof apiProgress === "number"
@@ -48,7 +43,7 @@ export function useDailyLoops({ date }: UseDailyLoopsParams): UseDailyLoopsResul
                 : 0
             );
           } else {
-          // TODO: 데이터 없음 처리(UI 메시지, 재시도 등) 로직 추가
+            // TODO: 데이터 없음 처리(UI 메시지, 재시도 등) 로직 추가
             setLoopList([]);
             setTotalProgress(0);
           }
