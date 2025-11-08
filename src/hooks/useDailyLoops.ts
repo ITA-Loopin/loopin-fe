@@ -1,5 +1,3 @@
-// 해당 날짜의 루프 목록 가져오는 훅
-// 루프 목록과 전체 진행률을 반환
 "use client";
 
 import { useEffect, useState } from "react";
@@ -30,28 +28,18 @@ export function useDailyLoops({ date }: UseDailyLoopsParams): UseDailyLoopsResul
           setIsLoading(true);
         }
         const apiUrl = `/api-proxy/rest-api/v1/loops/date/${date}`;
-        console.log("Loop API 요청:", apiUrl);
-        console.log("날짜:", date);
-
         const response = await apiFetch(apiUrl);
 
-        console.log("API 응답 상태:", response.status, response.statusText);
-
         if (!response.ok) {
-          const errorText = await response.text();
-          console.error("API 에러 응답:", errorText);
           throw new Error(
             `루프 데이터를 불러오는데 실패했습니다. (${response.status})`
           );
         }
 
         const result = await response.json();
-        console.log("API 응답 데이터:", result);
 
         if (!cancelled) {
           if (result.success && result.data) {
-            console.log("받은 루프 개수:", result.data.loops?.length || 0);
-            console.log("전체 진행률:", result.data.totalProgress);
             setLoopList(result.data.loops || []);
             const apiProgress = result.data.totalProgress;
             setTotalProgress(
@@ -60,21 +48,17 @@ export function useDailyLoops({ date }: UseDailyLoopsParams): UseDailyLoopsResul
                 : 0
             );
           } else {
-            console.warn("성공 응답이지만 데이터가 없습니다:", result);
+          // TODO: 데이터 없음 처리(UI 메시지, 재시도 등) 로직 추가
             setLoopList([]);
             setTotalProgress(0);
           }
         }
       } catch (error) {
         if (!cancelled) {
-          console.error("루프 데이터 로딩 실패:", error);
-          if (error instanceof Error) {
-            console.error("에러 메시지:", error.message);
-          }
           setLoopList([]);
           setTotalProgress(0);
           if (error instanceof MissingAccessTokenError) {
-            console.warn("accessToken이 없어 루프 데이터를 불러오지 못했습니다.");
+            // TODO: 토큰 만료 시 재발급 또는 로그인 페이지로 리디렉션 처리
           }
         }
       } finally {
