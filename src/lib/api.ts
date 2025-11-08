@@ -4,6 +4,13 @@ import { store } from "@/store/store";
 
 type ApiFetchInput = RequestInfo | URL;
 
+type SearchParamValue =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined;
+
 interface ApiFetchOptions extends RequestInit {
   /**
    * 직접 토큰을 전달하고 싶을 때 사용합니다.
@@ -14,6 +21,18 @@ interface ApiFetchOptions extends RequestInit {
    * true면 Authorization 헤더를 추가하지 않습니다.
    */
   skipAuth?: boolean;
+  /**
+   * 쿼리 파라미터를 객체 형태로 전달할 수 있습니다.
+   */
+  searchParams?: Record<string, SearchParamValue>;
+  /**
+   * JSON 바디를 간편하게 전달하기 위한 옵션입니다. 자동으로 직렬화하고 헤더를 설정합니다.
+   */
+  json?: unknown;
+  /**
+   * false로 설정하면 응답을 그대로 반환(Response)합니다.
+   */
+  parseJson?: boolean;
 }
 
 const AUTH_HEADER = "Authorization";
@@ -39,7 +58,46 @@ export async function apiFetch<T = any>(
   input: ApiFetchInput,
   options: ApiFetchOptions = {}
 ): Promise<T> {
-  const { accessToken, skipAuth = false, headers, ...restOptions } = options;
+  const {
+    accessToken,
+    skipAuth = false,
+    headers,
+    searchParams,
+    json,
+    parseJson = true,
+    ...restOptions
+  } = options;
+
+  let requestInput: ApiFetchInput = input;
+
+  if (searchParams && Object.keys(searchParams).length > 0) {
+    const createUrl = (value: ApiFetchInput) => {
+      if (typeof value === "string") {
+        return new URL(value, window.location.origin);
+      }
+      if (value instanceof URL) {
+        return new URL(value.toString());
+      }
+      return new URL(value.url);
+    };
+
+    const url = createUrl(requestInput);
+
+    for (const [key, value] of Object.entries(searchParams)) {
+      if (value === null || value === undefined) {
+        continue;
+      }
+      url.searchParams.set(key, String(value));
+    }
+
+    if (typeof requestInput === "string") {
+      requestInput = url.toString();
+    } else if (requestInput instanceof URL) {
+      requestInput = url;
+    } else {
+      requestInput = new Request(url, requestInput);
+    }
+  }
 
   // 기존 헤더 + 기본 헤더 병합
   const headerMap = new Headers(headers ?? {});
@@ -58,11 +116,20 @@ export async function apiFetch<T = any>(
     headerMap.set(AUTH_HEADER, `Bearer ${token}`);
   }
 
-  // 실제 fetch 요청
-  const response = await fetch(input, {
+  const fetchOptions: RequestInit = {
     ...restOptions,
     headers: headerMap,
-  });
+  };
+
+  if (json !== undefined) {
+    if (!headerMap.has("Content-Type")) {
+      headerMap.set("Content-Type", "application/json");
+    }
+    fetchOptions.body = JSON.stringify(json);
+  }
+
+  // 실제 fetch 요청
+  const response = await fetch(requestInput, fetchOptions);
 
   // 응답 상태 체크
   if (!response.ok) {
@@ -73,6 +140,10 @@ export async function apiFetch<T = any>(
       // JSON 파싱 실패 시 무시
     }
     throw new Error(errorBody.message || "API 요청 실패");
+  }
+
+  if (!parseJson) {
+    return response as unknown as T;
   }
 
   // 204(No Content) 같은 경우 대비

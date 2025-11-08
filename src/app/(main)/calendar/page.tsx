@@ -81,21 +81,17 @@ export default function CalendarPage() {
         payload.checklists = checklistItems;
       }
 
-      const response = await apiFetch("/api-proxy/rest-api/v1/loops", {
+      const data = await apiFetch<{
+        success?: boolean;
+        data?: { id?: string };
+      }>("/api-proxy/rest-api/v1/loops", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
+        json: payload,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || "루프 생성에 실패했습니다.");
-      }
-
-      const data = await response.json();
-      setResultMessage(`루프가 생성되었습니다. ID: ${data?.data?.id ?? "확인 필요"}`);
+      setResultMessage(
+        `루프가 생성되었습니다. ID: ${data?.data?.id ?? "확인 필요"}`
+      );
       setTitle("");
       setContent("");
       setScheduleType("NONE");
