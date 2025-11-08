@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
-import { useAppSelector } from "@/store/hooks";
+import { apiFetch, MissingAccessTokenError } from "@/lib/api";
 
 const daysOfWeekOptions = [
   "MONDAY",
@@ -14,7 +14,6 @@ const daysOfWeekOptions = [
 ];
 
 export default function CalendarPage() {
-  const accessToken = useAppSelector((state) => state.auth.accessToken);
   const today = useMemo(() => {
     const date = new Date();
     const year = date.getFullYear();
@@ -39,11 +38,6 @@ export default function CalendarPage() {
     event.preventDefault();
     setErrorMessage(null);
     setResultMessage(null);
-
-    if (!accessToken) {
-      setErrorMessage("accessToken이 없습니다. 다시 로그인해주세요.");
-      return;
-    }
 
     if (!title.trim()) {
       setErrorMessage("제목을 입력해주세요.");
@@ -87,12 +81,10 @@ export default function CalendarPage() {
         payload.checklists = checklistItems;
       }
 
-      const response = await fetch("/api-proxy/rest-api/v1/loops", {
+      const response = await apiFetch("/api-proxy/rest-api/v1/loops", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Accept: "application/json",
-          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(payload),
       });
@@ -115,7 +107,11 @@ export default function CalendarPage() {
     } catch (error) {
       console.error("루프 생성 실패", error);
       setErrorMessage(
-        error instanceof Error ? error.message : "루프 생성 도중 오류가 발생했습니다."
+        error instanceof MissingAccessTokenError
+          ? "accessToken이 없습니다. 다시 로그인해주세요."
+          : error instanceof Error
+            ? error.message
+            : "루프 생성 도중 오류가 발생했습니다."
       );
     } finally {
       setIsSubmitting(false);
