@@ -6,7 +6,7 @@ import "dayjs/locale/ko";
 import type { Dayjs } from "dayjs";
 import Header from "@/components/common/Header";
 import { LoopList } from "@/components/home";
-import { MonthCalendar, AddLoopButton } from "@/components/calendar";
+import { MonthCalendar, AddLoopButton, AddLoopModal } from "@/components/calendar";
 import { useDailyLoops } from "@/hooks/useDailyLoops";
 
 dayjs.locale("ko");
@@ -22,6 +22,7 @@ export default function CalendarPage() {
   );
   const { loopList, isLoading } = useDailyLoops({ date: selectedDateKey });
   const hasLoops = loopList.length > 0;
+  const [isAddLoopModalOpen, setIsAddLoopModalOpen] = useState(false);
 
   const handleChangeMonth = (offset: number) => {
     setVisibleMonth((prev) => prev.add(offset, "month"));
@@ -30,6 +31,14 @@ export default function CalendarPage() {
   const handleSelectDate = (date: Dayjs) => {
     setSelectedDate(date);
     setVisibleMonth(date.startOf("month"));
+  };
+
+  const handleOpenAddLoopModal = () => {
+    setIsAddLoopModalOpen(true);
+  };
+
+  const handleCloseAddLoopModal = () => {
+    setIsAddLoopModalOpen(false);
   };
 
   return (
@@ -66,8 +75,13 @@ export default function CalendarPage() {
             )}
           </div>
 
-          <AddLoopButton />
+          <AddLoopButton onClick={handleOpenAddLoopModal} />
         </main>
+        <AddLoopModal
+          isOpen={isAddLoopModalOpen}
+          onClose={handleCloseAddLoopModal}
+          defaultDate={selectedDateKey}
+        />
       </div>
     </>
   );
