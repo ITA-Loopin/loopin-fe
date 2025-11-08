@@ -90,7 +90,7 @@ export default function HomePage() {
         }}
       />
       <div className="flex flex-col relative min-h-screen">
-      <Header variant="home" />
+      <Header />
 
       <div className="flex-1 px-4 pb-6 flex flex-col gap-6">
         <TodayLoopTitle dateText={todayText} />

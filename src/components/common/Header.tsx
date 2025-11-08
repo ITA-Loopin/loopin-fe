@@ -1,81 +1,93 @@
+"use client";
+
 import Image from "next/image";
-import type { ReactNode } from "react";
+import { ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { IconButton } from "./IconButton";
 
-type HeaderVariant = "home" | "calendar" | "planner" | "analytics" | "party";
-
-type VariantConfig = {
-  showProfile: boolean;
-  showNotification: boolean;
-};
+type HeaderLeftType = "logo" | "back" | "none";
+type HeaderRightType = "user" | "menu" | "none";
 
 type HeaderProps = {
-  variant?: HeaderVariant;
-  className?: string;
+  leftType?: HeaderLeftType;
+  rightType?: HeaderRightType;
   leftSlot?: ReactNode;
   rightSlot?: ReactNode;
-  showProfile?: boolean;
-  showNotification?: boolean;
-};
-
-// TODO: 분기 처리 수정
-const VARIANT_CONFIG: Record<HeaderVariant, VariantConfig> = {
-  home: { showProfile: true, showNotification: true },
-  calendar: { showProfile: true, showNotification: true },
-  planner: { showProfile: false, showNotification: false },
-  analytics: { showProfile: true, showNotification: false },
-  party: { showProfile: true, showNotification: false },
+  onBack?: () => void;
+  onProfileClick?: () => void;
+  onNotificationClick?: () => void;
+  onMenuClick?: () => void;
+  className?: string;
 };
 
 export function Header({
-  variant = "home",
-  className,
+  leftType = "logo",
+  rightType = "user",
   leftSlot,
   rightSlot,
-  showProfile,
-  showNotification,
+  onBack,
+  onProfileClick,
+  onNotificationClick,
+  onMenuClick,
+  className,
 }: HeaderProps) {
-  const config = VARIANT_CONFIG[variant] ?? VARIANT_CONFIG.home;
-  const shouldShowProfile = showProfile ?? config.showProfile;
-  const shouldShowNotification = showNotification ?? config.showNotification;
+  const router = useRouter();
+
+  const renderLeft = () => {
+    if (leftSlot) return leftSlot;
+
+    switch (leftType) {
+      case "logo":
+        return <LogoIcon />;
+      case "back":
+        return (
+          <IconButton src="/header/header_back.svg" alt="뒤로가기" onClick={onBack ?? router.back} />
+        );
+      case "none":
+      default:
+        return null;
+    }
+  };
+
+  const renderRight = () => {
+    if (rightSlot) return rightSlot;
+
+    switch (rightType) {
+      case "user":
+        return (
+          <div className="flex items-center gap-3">
+            <IconButton src="/header/header_profile.svg" alt="프로필" onClick={onProfileClick} />
+            <IconButton src="/header/header_bell.svg" alt="알림" onClick={onNotificationClick} />
+          </div>
+        );
+      case "menu":
+        return <IconButton src="/header/header_menu.svg" alt="메뉴" onClick={onMenuClick} />;
+      case "none":
+      default:
+        return null;
+    }
+  };
 
   return (
-    <header className={cn("px-4 pt-4 pb-2", className)}>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center">
-          {leftSlot ?? (
-            <Image
-              src="/homeTab/homeTab_logo.svg"
-              alt="Loopin"
-              width={68}
-              height={30}
-              className="h-8 w-auto"
-            />
-          )}
-        </div>
-        <div className="flex items-center gap-3">
-          {shouldShowProfile ? (
-            <Image
-              src="/homeTab/homeTab_profile.svg"
-              alt="프로필"
-              width={24}
-              height={24}
-              className="h-6 w-6"
-            />
-          ) : null}
-          {shouldShowNotification ? (
-            <Image
-              src="/homeTab/homeTab_bell.svg"
-              alt="알림"
-              width={24}
-              height={24}
-              className="h-6 w-6"
-            />
-          ) : null}
-          {rightSlot ?? null}
-        </div>
-      </div>
+    <header className={cn("flex items-center justify-between px-4 pt-4 pb-2", className)}>
+      <div className="flex items-center">{renderLeft()}</div>
+      <div className="flex items-center gap-3">{renderRight()}</div>
     </header>
+  );
+}
+
+// 로고(클릭 동작 없음)
+function LogoIcon() {
+  return (
+    <Image
+      src="/header/header_logo.svg"
+      alt="Loopin"
+      width={68}
+      height={30}
+      className="h-8 w-auto"
+      priority
+    />
   );
 }
 
