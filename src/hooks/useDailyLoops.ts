@@ -4,10 +4,10 @@
 
 import { useEffect, useState } from "react";
 import type { LoopItem } from "@/components/home";
+import { apiFetch, MissingAccessTokenError } from "@/lib/api";
 
 interface UseDailyLoopsParams {
   date: string;
-  accessToken?: string | null;
 }
 
 interface UseDailyLoopsResult {
@@ -16,10 +16,7 @@ interface UseDailyLoopsResult {
   isLoading: boolean;
 }
 
-export function useDailyLoops({
-  date,
-  accessToken,
-}: UseDailyLoopsParams): UseDailyLoopsResult {
+export function useDailyLoops({ date }: UseDailyLoopsParams): UseDailyLoopsResult {
   const [loopList, setLoopList] = useState<LoopItem[]>([]);
   const [totalProgress, setTotalProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -28,15 +25,6 @@ export function useDailyLoops({
     let cancelled = false;
 
     const fetchLoops = async () => {
-      if (!accessToken) {
-        if (!cancelled) {
-          setLoopList([]);
-          setTotalProgress(0);
-          setIsLoading(false);
-        }
-        return;
-      }
-
       try {
         if (!cancelled) {
           setIsLoading(true);
@@ -45,12 +33,7 @@ export function useDailyLoops({
         console.log("Loop API 요청:", apiUrl);
         console.log("날짜:", date);
 
-        const response = await fetch(apiUrl, {
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
+        const response = await apiFetch(apiUrl);
 
         console.log("API 응답 상태:", response.status, response.statusText);
 
@@ -90,6 +73,9 @@ export function useDailyLoops({
           }
           setLoopList([]);
           setTotalProgress(0);
+          if (error instanceof MissingAccessTokenError) {
+            console.warn("accessToken이 없어 루프 데이터를 불러오지 못했습니다.");
+          }
         }
       } finally {
         if (!cancelled) {
@@ -103,7 +89,7 @@ export function useDailyLoops({
     return () => {
       cancelled = true;
     };
-  }, [accessToken, date]);
+  }, [date]);
 
   return { loopList, totalProgress, isLoading };
 }

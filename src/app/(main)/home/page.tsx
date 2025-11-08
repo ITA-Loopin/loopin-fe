@@ -1,6 +1,5 @@
 "use client";
 
-import { useAppSelector } from "@/store/hooks";
 import { useMemo } from "react";
 import {
   HomeHeader,
@@ -12,9 +11,6 @@ import {
 import { useDailyLoops } from "@/hooks/useDailyLoops";
 
 export default function HomePage() {
-  // store에서 가져온 accessToken
-  const accessToken = useAppSelector((state) => state.auth.accessToken);
-
   // 오늘 날짜 표시
   const todayText = useMemo(() => {
     const today = new Date();
@@ -38,7 +34,6 @@ export default function HomePage() {
   // 오늘 날짜의 루프 목록 가져오기
   const { loopList, totalProgress, isLoading } = useDailyLoops({
     date: todayDateString,
-    accessToken,
   });
 
   // 루프 목록이 비어있는지 확인
