@@ -1,6 +1,7 @@
 /*"use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { apiFetch } from "@/lib/api";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { logout, setLoading } from "@/store/slices/authSlice";
 export default function HomePage() {
@@ -22,10 +23,7 @@ export default function HomePage() {
       }
       const response = await fetch("/api-proxy/rest-api/v1/member", {
         method: "DELETE",
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
+        accessToken,
       });
       if (!response.ok) {
         const errorBody = await response.json().catch(() => ({}));
