@@ -58,7 +58,7 @@ export function MonthCalendar({
       <div className="mt-5 grid grid-cols-7 text-center text-sm font-medium text-[#B7BAC7]">
         {DAY_NAMES.map((day, index) => (
           <span
-            key={day}
+            key={`${index}-${day}`}
             className={index === 0 ? "text-[#FF7765]" : undefined}
           >
             {day}
@@ -97,5 +97,3 @@ export function MonthCalendar({
     </section>
   );
 }
-
-

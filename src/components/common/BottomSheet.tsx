@@ -1,7 +1,13 @@
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
-import { createPortal } from "react-dom";
+import { ReactNode, useCallback } from "react";
+import {
+  Sheet,
+  SheetContent,
+  SheetOverlay,
+  SheetPortal,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
 type BottomSheetProps = {
@@ -10,6 +16,7 @@ type BottomSheetProps = {
   children: ReactNode;
   className?: string;
   overlayClassName?: string;
+  title?: string;
 };
 
 export function BottomSheet({
@@ -18,70 +25,37 @@ export function BottomSheet({
   children,
   className,
   overlayClassName,
+  title = "Bottom sheet",
 }: BottomSheetProps) {
-  const [mounted, setMounted] = useState(false);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    if (isOpen) {
-      setMounted(true);
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          setVisible(true);
-        });
-      });
-    } else {
-      setVisible(false);
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleEsc = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      if (!open) {
         onClose?.();
       }
-    };
-
-    window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
-  }, [isOpen, onClose]);
-
-  if (!mounted) return null;
-
-  const handleTransitionEnd = () => {
-    if (!visible) {
-      setMounted(false);
-    }
-  };
-
-  const sheetContent = (
-    <div className="fixed inset-0 z-50 flex items-end justify-center">
-      <button
-        type="button"
-        aria-label="시트 닫기"
-        className={cn(
-          "absolute inset-0 bg-black/60 transition-opacity duration-300",
-          visible ? "opacity-100" : "opacity-0",
-          overlayClassName
-        )}
-        onClick={onClose}
-      />
-      <div
-        className={cn(
-          "relative w-full max-w-[480px] rounded-t-[32px] bg-white shadow-[0px_-20px_44px_rgba(0,0,0,0.16)] transition-transform duration-300",
-          visible ? "translate-y-0" : "translate-y-full",
-          className
-        )}
-        onTransitionEnd={handleTransitionEnd}
-      >
-        {children}
-      </div>
-    </div>
+    },
+    [onClose]
   );
 
-  return createPortal(sheetContent, document.body);
+  return (
+    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
+      <SheetPortal>
+        <SheetOverlay
+          className={cn("bg-black/60", overlayClassName)}
+          onClick={() => onClose?.()}
+        />
+        <SheetContent
+          side="bottom"
+          className={cn(
+            "mx-auto w-full max-w-[480px] gap-0 rounded-t-[32px] border-none px-6 pb-8 pt-4 shadow-[0px_-20px_44px_rgba(0,0,0,0.16)] [&_[data-slot=sheet-close]]:hidden",
+            className
+          )}
+        >
+          <SheetTitle className="sr-only">{title}</SheetTitle>
+          {children}
+        </SheetContent>
+      </SheetPortal>
+    </Sheet>
+  );
 }
 
 export default BottomSheet;

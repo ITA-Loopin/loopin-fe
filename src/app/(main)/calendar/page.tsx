@@ -62,16 +62,12 @@ export default function CalendarPage() {
           />
 
           <div className="w-full max-w-[420px]">
-            {isLoading ? (
-              <div className="rounded-[24px] bg-white/90 px-6 py-10 text-center text-sm text-gray-500 shadow-[0px_12px_32px_rgba(0,0,0,0.06)]">
-                로딩 중...
-              </div>
-            ) : hasLoops ? (
+            {isLoading ? null : hasLoops ? (
               <LoopList loops={loopList} />
             ) : (
-            <div>
-              <h2 className="font-semibold text-lg">Loop List · 0</h2>
-            </div>
+              <div>
+                <h2 className="font-semibold text-lg">Loop List · 0</h2>
+              </div>
             )}
           </div>
 
@@ -80,7 +76,9 @@ export default function CalendarPage() {
         <AddLoopModal
           isOpen={isAddLoopModalOpen}
           onClose={handleCloseAddLoopModal}
-          defaultDate={selectedDateKey}
+          defaultValues={{
+            startDate: selectedDateKey,
+          }}
         />
       </div>
     </>
