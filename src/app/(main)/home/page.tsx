@@ -62,25 +62,10 @@ export default function HomePage() {
 
             {/* 말풍선 형태의 메시지 */}
             <div className="relative flex items-center justify-center">
-              <div
-                className="relative rounded-lg px-4 py-3 text-sm font-semibold"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.9)",
-                  color: "#FF7765",
-                  boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
-                }}
-              >
+              <div className="relative rounded-lg bg-white/90 px-4 py-3 text-sm font-semibold text-[#FF7765] shadow-[0px_2px_8px_rgba(0,0,0,0.1)]">
                 <span>오늘 하루의 루프를 모두 채워보세요!</span>
                 {/* 위쪽 삼각형 포인터 */}
-                <div
-                  className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-0 h-0"
-                  style={{
-                    borderLeft: "8px solid transparent",
-                    borderRight: "8px solid transparent",
-                    borderBottom: "8px solid rgba(255, 255, 255, 0.9)",
-                    filter: "drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.1))",
-                  }}
-                ></div>
+                <div className="absolute -top-2 left-1/2 h-0 w-0 -translate-x-1/2 transform border-l-[8px] border-r-[8px] border-b-[8px] border-l-transparent border-r-transparent border-b-[rgba(255,255,255,0.9)] drop-shadow-[0px_2px_4px_rgba(0,0,0,0.1)]"></div>
               </div>
             </div>
 
