@@ -3,8 +3,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Modal from "@/components/common/Modal";
+import { apiFetch } from "@/lib/api";
 import { useAppDispatch } from "@/store/hooks";
 import { setCredentials } from "@/store/slices/authSlice";
+import type { User } from "@/types/auth";
 
 type SignupSession = {
   email: string;
@@ -82,15 +84,13 @@ export default function OnboardingPage() {
     setModalError(null);
 
     try {
-      const response = await fetch(
-        `/api-proxy/rest-api/v1/member/available?nickname=${encodeURIComponent(nickname)}`
-      );
+      const data = await apiFetch<{
+        success?: boolean;
+        data?: { available?: boolean };
+      }>("/rest-api/v1/member/available", {
+        searchParams: { nickname },
+      });
 
-      if (!response.ok) {
-        throw new Error("닉네임 중복 확인에 실패했습니다.");
-      }
-
-      const data = await response.json();
       const isAvailable =
         data?.success !== false &&
         (data?.data?.available === undefined || data?.data?.available === true);
@@ -127,35 +127,31 @@ export default function OnboardingPage() {
     setModalError(null);
 
     try {
-      const response = await fetch("/api-proxy/rest-api/v1/auth/signup-login", {
+      const data = await apiFetch<{
+        user?: User;
+        accessToken: string;
+      }>("/rest-api/v1/auth/signup-login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+        json: {
           email: signupData.email,
           provider: signupData.provider,
           providerId: signupData.providerId,
           nickname,
-        }),
+        },
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || "회원가입에 실패했습니다.");
-      }
-
-      const data = await response.json();
+      const fallbackUser: User = {
+        id: signupData.providerId,
+        email: signupData.email,
+        nickname,
+        kakaoId: Number.isNaN(Number(signupData.providerId))
+          ? 0
+          : Number(signupData.providerId),
+      };
 
       dispatch(
         setCredentials({
-          user:
-            data.user ||
-            ({
-              id: signupData.providerId,
-              email: signupData.email,
-              nickname,
-            } as const),
+          user: data.user || fallbackUser,
           accessToken: data.accessToken,
         })
       );
