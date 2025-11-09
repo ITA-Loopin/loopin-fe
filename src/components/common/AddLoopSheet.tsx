@@ -6,6 +6,7 @@ import type { Dayjs } from "dayjs";
 import { BottomSheet } from "@/components/common/BottomSheet";
 import { IconButton } from "@/components/common/IconButton";
 import { MonthCalendar } from "@/components/calendar/MonthCalendar";
+import { apiFetch } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 const REPEAT_OPTIONS = [
@@ -149,9 +150,32 @@ export function AddLoopSheet({ isOpen, onClose, defaultValues }: AddLoopSheetPro
     setChecklists((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    onClose();
+
+    const payload = {
+      title,
+      content: null as string | null,
+      scheduleType,
+      specificDate: null as string | null,
+      daysOfWeek: scheduleType === "WEEKLY" ? daysOfWeek : [],
+      startDate: startDate || null,
+      endDate: endDate || null,
+      checklists: checklists.map((item) => item.text).filter((text) => text.trim().length > 0),
+    };
+
+    try {
+      const apiUrl = "/api-proxy/rest-api/v1/loops";
+      await apiFetch(apiUrl, {
+        method: "POST",
+        skipAuth: true,
+        credentials: "include",
+        json: payload,
+      });
+      onClose();
+    } catch (error) {
+      // TODO: 에러 핸들링 추가
+    }
   };
 
   const formattedStartDate = startDate ? dayjs(startDate).format("YYYY.MM.DD") : "없음";
