@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/ko";
 import type { Dayjs } from "dayjs";
 import Header from "@/components/common/Header";
-import { AddLoopSheet } from "@/components/common/AddLoopSheet";
+import { AddLoopSheet } from "@/components/common/add-loop/AddLoopSheet";
 import { LoopList } from "@/components/home";
 import { MonthCalendar, AddLoopButton} from "@/components/calendar";
 import { useDailyLoops } from "@/hooks/useDailyLoops";
