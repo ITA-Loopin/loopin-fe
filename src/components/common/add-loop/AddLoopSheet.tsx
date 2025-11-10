@@ -11,9 +11,15 @@ type AddLoopSheetProps = {
   isOpen: boolean;
   onClose: () => void;
   defaultValues?: AddLoopDefaultValues;
+  onCreated?: () => void;
 };
 
-export function AddLoopSheet({ isOpen, onClose, defaultValues }: AddLoopSheetProps) {
+export function AddLoopSheet({
+  isOpen,
+  onClose,
+  defaultValues,
+  onCreated,
+}: AddLoopSheetProps) {
   const {
     title,
     scheduleType,
@@ -44,7 +50,7 @@ export function AddLoopSheet({ isOpen, onClose, defaultValues }: AddLoopSheetPro
     handleSelectEndDate,
     handleChangeStartMonth,
     handleChangeEndMonth,
-  } = useAddLoopForm({ isOpen, onClose, defaultValues });
+  } = useAddLoopForm({ isOpen, onClose, defaultValues, onCreated });
 
   return (
     <BottomSheet

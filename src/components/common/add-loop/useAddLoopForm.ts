@@ -12,6 +12,7 @@ interface UseAddLoopFormProps {
   isOpen: boolean;
   onClose: () => void;
   defaultValues?: AddLoopDefaultValues;
+  onCreated?: () => void;
 }
 
 interface ChecklistChangeHandler {
@@ -22,6 +23,7 @@ export function useAddLoopForm({
   isOpen,
   onClose,
   defaultValues,
+  onCreated,
 }: UseAddLoopFormProps) {
   const [title, setTitle] = useState("");
   const [scheduleType, setScheduleType] = useState("");
@@ -223,6 +225,7 @@ export function useAddLoopForm({
           credentials: "include",
           json: payload,
         });
+        onCreated?.();
         onClose();
       } catch (error) {
         console.error("루프 생성 실패:", error);
@@ -230,7 +233,7 @@ export function useAddLoopForm({
         setIsSubmitting(false);
       }
     },
-    [checklists, daysOfWeek, endDate, onClose, scheduleType, startDate, title]
+    [checklists, daysOfWeek, endDate, onClose, onCreated, scheduleType, startDate, title]
   );
 
   return {

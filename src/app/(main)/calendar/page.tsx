@@ -21,7 +21,12 @@ export default function CalendarPage() {
     () => selectedDate.format("YYYY-MM-DD"),
     [selectedDate]
   );
-  const { loopList, isLoading } = useDailyLoops({ date: selectedDateKey });
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const { loopList, isLoading } = useDailyLoops({
+    date: selectedDateKey,
+    refreshKey,
+  });
   const hasLoops = loopList.length > 0;
   const [isAddLoopModalOpen, setIsAddLoopModalOpen] = useState(false);
 
@@ -40,6 +45,10 @@ export default function CalendarPage() {
 
   const handleCloseAddLoopModal = () => {
     setIsAddLoopModalOpen(false);
+  };
+
+  const handleAddLoopSuccess = () => {
+    setRefreshKey((prev) => prev + 1);
   };
 
   return (
@@ -80,6 +89,7 @@ export default function CalendarPage() {
           defaultValues={{
             startDate: selectedDateKey,
           }}
+          onCreated={handleAddLoopSuccess}
         />
       </div>
     </>
