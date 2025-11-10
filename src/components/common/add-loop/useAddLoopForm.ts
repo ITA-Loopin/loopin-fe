@@ -204,12 +204,16 @@ export function useAddLoopForm({
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
 
+      const normalizedScheduleType = scheduleType || "NONE";
+      const isWeekly = normalizedScheduleType === "WEEKLY";
+
       const payload = {
         title,
         content: null as string | null,
-        scheduleType,
-        specificDate: null as string | null,
-        daysOfWeek: scheduleType === "WEEKLY" ? daysOfWeek : [],
+        scheduleType: normalizedScheduleType,
+        specificDate:
+          normalizedScheduleType === "NONE" ? (startDate || null) : null,
+        daysOfWeek: isWeekly ? daysOfWeek : [],
         startDate: startDate || null,
         endDate: endDate || null,
         checklists: checklists
