@@ -9,6 +9,7 @@ import { AddLoopSheet } from "@/components/common/add-loop/AddLoopSheet";
 import { LoopList } from "@/components/home";
 import { MonthCalendar, AddLoopButton} from "@/components/calendar";
 import { useDailyLoops } from "@/hooks/useDailyLoops";
+import { cn } from "@/lib/utils";
 
 dayjs.locale("ko");
 
@@ -71,16 +72,21 @@ export default function CalendarPage() {
             onChangeMonth={handleChangeMonth}
           />
 
-          <div className="w-full max-w-[420px] min-h-[184px]">
-            {isLoading ? (
-              <div className="h-[184px]" />
-            ) : hasLoops ? (
-              <LoopList loops={loopList} />
-            ) : (
-              <div>
-                <h2 className="font-semibold text-lg">Loop List · 0</h2>
-              </div>
-            )}
+          <div className="w-full max-w-[420px]">
+            <div
+              className={cn(
+                "min-h-[184px] transition-opacity duration-300 ease-in-out",
+                isLoading ? "opacity-0 pointer-events-none" : "opacity-100"
+              )}
+            >
+              {hasLoops ? (
+                <LoopList loops={loopList} />
+              ) : (
+                <div>
+                  <h2 className="font-semibold text-lg">Loop List · 0</h2>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="w-full max-w-[420px]">
