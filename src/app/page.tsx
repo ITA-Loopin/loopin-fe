@@ -31,7 +31,7 @@ function HomeContent() {
       const sanitizedAccessToken = accessToken.replace(/\s/g, "+").trim();
 
       try {
-        const userData = await apiFetch<User>("/rest-api/v1/member", {
+        const userData = await apiFetch<User>("/api-proxy/rest-api/v1/member", {
           accessToken: sanitizedAccessToken,
         });
 
@@ -58,7 +58,9 @@ function HomeContent() {
         data?: string;
         redirectUrl?: string;
         url?: string;
-      }>("/rest-api/v1/oauth/redirect-url/kakao");
+      }>("/api-proxy/rest-api/v1/oauth/redirect-url/kakao", {
+        skipAuth: true,
+      });
       const redirectUrl = data.data || data.redirectUrl || data.url;
 
       if (redirectUrl) {
@@ -80,8 +82,7 @@ function HomeContent() {
 
   useEffect(() => {
     const status = searchParams.get("status");
-    const accessToken = searchParams.get("accessToken");
-
+    const accessToken = searchParams.get("access_token");
     if (status === "LOGIN_SUCCESS" && accessToken) {
       handleLoginSuccess(accessToken);
       return;
