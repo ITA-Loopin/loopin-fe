@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { LoopItem } from "@/components/home";
 import { apiFetch, MissingAccessTokenError } from "@/lib/api";
+import { useAppSelector } from "@/store/hooks";
 
 interface UseDailyLoopsParams {
   date: string;
@@ -18,6 +19,9 @@ export function useDailyLoops({ date }: UseDailyLoopsParams): UseDailyLoopsResul
   const [loopList, setLoopList] = useState<LoopItem[]>([]);
   const [totalProgress, setTotalProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const { accessToken, isLoading: authLoading } = useAppSelector(
+    (state) => state.auth
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -63,12 +67,30 @@ export function useDailyLoops({ date }: UseDailyLoopsParams): UseDailyLoopsResul
       }
     };
 
+    if (authLoading) {
+      setIsLoading(true);
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    if (!accessToken) {
+      if (!cancelled) {
+        setLoopList([]);
+        setTotalProgress(0);
+        setIsLoading(false);
+      }
+      return () => {
+        cancelled = true;
+      };
+    }
+
     fetchLoops();
 
     return () => {
       cancelled = true;
     };
-  }, [date]);
+  }, [date, accessToken, authLoading]);
 
   return { loopList, totalProgress, isLoading };
 }
