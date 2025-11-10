@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
 import { useParams, useRouter } from "next/navigation";
 import Header from "@/components/common/Header";
-import type { LoopDetail } from "@/types/loop";
+import type { LoopDetail, LoopChecklist } from "@/types/loop";
 import { apiFetch, MissingAccessTokenError } from "@/lib/api";
+import { LoopProgress } from "@/components/home/LoopProgress";
+import { Checklist } from "@/components/loop/Checklist";
 
 dayjs.locale("ko");
 
@@ -98,6 +100,62 @@ export default function LoopDetailPage() {
   const completedCount =
     detail?.checklists.filter((item) => item.completed).length ?? 0;
 
+  const handleToggleChecklist = useCallback(async (updatedItem: LoopChecklist) => {
+    setDetail((prev) => {
+      if (!prev) return prev;
+
+      const nextChecklists = prev.checklists.map((item) =>
+        item.id === updatedItem.id
+          ? { ...item, completed: updatedItem.completed }
+          : item
+      );
+
+      const total = nextChecklists.length;
+      const completed = nextChecklists.filter((i) => i.completed).length;
+
+      return {
+        ...prev,
+        checklists: nextChecklists,
+        progress:
+          total > 0
+            ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
+            : 0,
+      };
+    });
+
+    try {
+      await apiFetch(`/api-proxy/rest-api/v1/checklists/${updatedItem.id}`, {
+        method: "PUT",
+        json: {
+          content: updatedItem.content,
+          completed: updatedItem.completed,
+        },
+      });
+    } catch (error) {
+      // console.error("체크리스트 완료 상태 업데이트 실패:", error);
+      // revert
+      setDetail((prev) => {
+        if (!prev) return prev;
+        const nextChecklists = prev.checklists.map((item) =>
+          item.id === updatedItem.id
+            ? { ...item, completed: !updatedItem.completed }
+            : item
+        );
+        const total = nextChecklists.length;
+        const completed = nextChecklists.filter((i) => i.completed).length;
+
+        return {
+          ...prev,
+          checklists: nextChecklists,
+          progress:
+            total > 0
+              ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
+              : 0,
+        };
+      });
+    }
+  }, []);
+
   return (
     <>
       <div
@@ -113,7 +171,6 @@ export default function LoopDetailPage() {
           leftType="back"
           rightType="user"
           onBack={() => router.back()}
-          className="px-4 pt-6 pb-4"
         />
 
         <main className="flex flex-1 flex-col gap-6 px-4 pb-32">
@@ -133,11 +190,11 @@ export default function LoopDetailPage() {
             </div>
           ) : detail ? (
             <>
-              <section className="flex flex-col gap-2">
-                <h1 className="text-2xl font-semibold text-[#2C2C2C]">
+              <section className="flex flex-col gap-2 pt-6">
+                <div className="text-sm text-[#8D91A1]">{formattedDate}</div>
+                <h1 className="text-xl font-semibold text-[#2C2C2C]">
                   {detail.title}
                 </h1>
-                <div className="text-sm text-[#8D91A1]">{formattedDate}</div>
                 {detail.content ? (
                   <p className="text-sm leading-relaxed text-[#676A79]">
                     {detail.content}
@@ -145,54 +202,19 @@ export default function LoopDetailPage() {
                 ) : null}
               </section>
 
-              <section className="flex flex-col items-center gap-4 rounded-3xl bg-white/90 px-6 py-8 shadow-[0px_12px_32px_rgba(0,0,0,0.08)]">
-                <CircularProgress percent={detail.progress} />
-                <div className="text-sm font-medium text-[#8D91A1]">
-                  Checklist · {checklistCount}
-                </div>
-
-                <ul className="flex w-full flex-col gap-2">
-                  {detail.checklists.map((checklist) => (
-                    <li
-                      key={checklist.id}
-                      className={`flex items-center justify-between rounded-xl px-4 py-3 ${
-                        checklist.completed
-                          ? "bg-[#FFE3DD]"
-                          : "bg-[#F5F6F8]"
-                      }`}
-                    >
-                      <span
-                        className={`text-sm font-medium ${
-                          checklist.completed
-                            ? "text-[#FF543F]"
-                            : "text-[#2C2C2C]"
-                        }`}
-                      >
-                        {checklist.content}
-                      </span>
-                      <span
-                        className={`grid h-6 w-6 place-items-center rounded-full border ${
-                          checklist.completed
-                            ? "border-[#FF543F] bg-[#FF543F]/10"
-                            : "border-[#D4D6E0]"
-                        }`}
-                      >
-                        {checklist.completed ? (
-                          <span className="h-3 w-3 rounded-full bg-[#FF543F]" />
-                        ) : null}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+              <section className="flex flex-col items-center gap-6 px-1">
+                <LoopProgress progress={detail.progress} />
+                <Checklist
+                  checklists={detail.checklists}
+                  onToggleItem={handleToggleChecklist}
+                  key={detail.id}
+                />
               </section>
 
               <div className="mt-auto flex flex-col gap-4 pb-8">
                 <button className="w-full rounded-3xl bg-[#2C2C2C] px-6 py-4 text-base font-semibold text-white shadow-[0px_20px_32px_rgba(0,0,0,0.12)]">
                   루프 완료하기
                 </button>
-                <p className="text-center text-sm text-[#8D91A1]">
-                  {completedCount}개 완료 · {checklistCount - completedCount}개 남음
-                </p>
               </div>
             </>
           ) : (
@@ -203,41 +225,6 @@ export default function LoopDetailPage() {
         </main>
       </div>
     </>
-  );
-}
-
-function CircularProgress({ percent }: { percent: number }) {
-  const radius = 80;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (percent / 100) * circumference;
-
-  return (
-    <div className="relative flex h-48 w-48 items-center justify-center">
-      <svg className="h-full w-full -rotate-90" viewBox="0 0 200 200">
-        <circle
-          cx="100"
-          cy="100"
-          r={radius}
-          fill="none"
-          stroke="#FFE5DF"
-          strokeWidth="16"
-        />
-        <circle
-          cx="100"
-          cy="100"
-          r={radius}
-          fill="none"
-          stroke="#FF7765"
-          strokeWidth="18"
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-        />
-      </svg>
-      <span className="absolute text-4xl font-semibold text-[#FF7765]">
-        {percent}%
-      </span>
-    </div>
   );
 }
 
