@@ -71,8 +71,10 @@ export default function CalendarPage() {
             onChangeMonth={handleChangeMonth}
           />
 
-          <div className="w-full max-w-[420px]">
-            {isLoading ? null : hasLoops ? (
+          <div className="w-full max-w-[420px] min-h-[184px]">
+            {isLoading ? (
+              <div className="h-[184px]" />
+            ) : hasLoops ? (
               <LoopList loops={loopList} />
             ) : (
               <div>
@@ -81,7 +83,9 @@ export default function CalendarPage() {
             )}
           </div>
 
-          <AddLoopButton onClick={handleOpenAddLoopModal} />
+          <div className="w-full max-w-[420px]">
+            <AddLoopButton onClick={handleOpenAddLoopModal} />
+          </div>
         </main>
         <AddLoopSheet
           isOpen={isAddLoopModalOpen}
