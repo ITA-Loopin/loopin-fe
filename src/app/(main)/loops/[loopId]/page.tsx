@@ -81,13 +81,28 @@ export default function LoopDetailPage() {
         }
 
         const data = response.data;
+        const checklists = data.checklists ?? [];
+        const totalChecklistCount = checklists.length;
+        const completedChecklistCount = checklists.filter(
+          (item) => item.completed
+        ).length;
+        const normalizedProgress =
+          totalChecklistCount > 0
+            ? Math.round(
+                Math.min(
+                  Math.max((completedChecklistCount / totalChecklistCount) * 100, 0),
+                  100
+                )
+              )
+            : 0;
+
         setDetail({
           id: data.id,
           title: data.title,
           content: data.content ?? null,
           loopDate: data.loopDate,
-          progress: Math.round(Math.min(Math.max(data.progress * 100, 0), 100)),
-          checklists: data.checklists ?? [],
+          progress: normalizedProgress,
+          checklists,
           scheduleType: data.scheduleType ?? undefined,
           daysOfWeek: data.daysOfWeek ?? undefined,
           startDate: data.startDate ?? null,

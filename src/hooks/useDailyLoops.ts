@@ -40,13 +40,11 @@ export function useDailyLoops({ date, refreshKey }: UseDailyLoopsParams): UseDai
 
         if (!cancelled) {
           if (result?.success !== false && result?.data) {
-            setLoopList(result.data.loops ?? []);
-            const apiProgress = result.data.totalProgress;
-            setTotalProgress(
-              typeof apiProgress === "number"
-                ? Math.round(Math.min(Math.max(apiProgress * 100, 0), 100))
-                : 0
-            );
+            const loops = result.data.loops ?? [];
+            const { totalProgress: calculatedProgress, normalizedLoops } =
+              normalizeDailyProgress(loops);
+            setLoopList(normalizedLoops);
+            setTotalProgress(calculatedProgress);
           } else {
             // TODO: 데이터 없음 처리(UI 메시지, 재시도 등) 로직 추가
             setLoopList([]);
@@ -96,3 +94,43 @@ export function useDailyLoops({ date, refreshKey }: UseDailyLoopsParams): UseDai
   return { loopList, totalProgress, isLoading };
 }
 
+function normalizeDailyProgress(loops: LoopItem[]): {
+  totalProgress: number;
+  normalizedLoops: LoopItem[];
+} {
+  if (!loops.length) {
+    return { totalProgress: 0, normalizedLoops: [] };
+  }
+
+  let totalChecklistCount = 0;
+  let totalCompletedCount = 0;
+
+  const normalizedLoops = loops.map((loop) => {
+    const safeTotal = Math.max(loop.totalChecklists, 0);
+    const safeCompleted = Math.min(
+      Math.max(loop.completedChecklists, 0),
+      safeTotal
+    );
+
+    totalChecklistCount += safeTotal;
+    totalCompletedCount += safeCompleted;
+
+    return {
+      ...loop,
+      totalChecklists: safeTotal,
+      completedChecklists: safeCompleted,
+    };
+  });
+
+  const progress =
+    totalChecklistCount > 0
+      ? Math.round(
+          Math.min(
+            Math.max((totalCompletedCount / totalChecklistCount) * 100, 0),
+            100
+          )
+        )
+      : 0;
+
+  return { totalProgress: progress, normalizedLoops };
+}
