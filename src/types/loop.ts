@@ -11,6 +11,9 @@ export interface LoopDetail {
   loopDate: string;
   progress: number;
   checklists: LoopChecklist[];
+  scheduleType?: string;
+  daysOfWeek?: string[];
+  endDate?: string | null;
 }
 
 

@@ -11,6 +11,7 @@ import { LoopProgress } from "@/components/home/LoopProgress";
 import { Checklist } from "@/components/loop/Checklist";
 import { IconButton } from "@/components/common/IconButton";
 import { LoopActionModal } from "@/components/loop/LoopActionModal";
+import { LoopEditSheet } from "@/components/loop/LoopEditSheet";
 
 dayjs.locale("ko");
 
@@ -45,6 +46,7 @@ export default function LoopDetailPage() {
     isOpen: boolean;
   }>({ type: "edit", isOpen: false });
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+  const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
 
   useEffect(() => {
     if (useMock) {
@@ -496,8 +498,18 @@ export default function LoopDetailPage() {
           if (actionModal.type === "delete") {
             // TODO: 이 루프만 삭제 로직
           } else {
-            // TODO: 단일 루프 수정 플로우로 이동
+            setIsEditSheetOpen(true);
           }
+        }}
+      />
+      <LoopEditSheet
+        isOpen={isEditSheetOpen}
+        loop={detail}
+        isMock={useMock}
+        onClose={() => setIsEditSheetOpen(false)}
+        onUpdated={(updatedLoop) => {
+          setDetail(updatedLoop);
+          setIsEditSheetOpen(false);
         }}
       />
     </>
