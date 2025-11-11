@@ -36,9 +36,17 @@ function HomeContent() {
       const sanitizedAccessToken = accessToken.replace(/\s/g, "+").trim();
 
       try {
-        const userData = await apiFetch<User>("/api-proxy/rest-api/v1/member", {
-          accessToken: sanitizedAccessToken,
-        });
+        const memberResponse = await fetchMemberProfile(sanitizedAccessToken);
+
+        const fallbackUser: User = {
+          id: sanitizedAccessToken,
+          nickname: "루프인",
+        };
+
+        const userData = buildUserFromMemberProfile(
+          memberResponse.data,
+          fallbackUser
+        );
 
         dispatch(
           setCredentials({
@@ -63,7 +71,7 @@ function HomeContent() {
         data?: string;
         redirectUrl?: string;
         url?: string;
-      }>("/api-proxy/rest-api/v1/oauth/redirect-url/kakao", {
+      }>("/rest-api/v1/oauth/redirect-url/kakao", {
         skipAuth: true,
       });
       const redirectUrl = data.data || data.redirectUrl || data.url;

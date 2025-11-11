@@ -86,6 +86,12 @@ export function usePlannerChat() {
   const previousChatRoomIdRef = useRef<number | null>(null);
   const socketRef = useRef<WebSocket | null>(null);
   const isSocketOpenRef = useRef(false);
+  const socketListenersRef = useRef<{
+    onOpen?: (event: Event) => void;
+    onMessage?: (event: MessageEvent) => void;
+    onClose?: (event: CloseEvent) => void;
+    onError?: (event: Event) => void;
+  }>({});
 
   const plannerChatRoomId = useMemo(() => {
     if (user?.chatRoomId === undefined || user.chatRoomId === null) {
@@ -263,19 +269,22 @@ export function usePlannerChat() {
       try {
         const parsed = JSON.parse(event.data) as
           | ChatMessageDto
-          | { data?: ChatMessageDto[] };
+          | { messageType?: string; data?: unknown };
 
-        if ("data" in parsed && Array.isArray(parsed.data)) {
-          const status = appendNewMessages(parsed.data);
-
-          if (status === "assistant" || status === "recommendations") {
-            setIsLoading(false);
-            setIsInputVisible(true);
-          }
+        if (
+          parsed &&
+          typeof parsed === "object" &&
+          "messageType" in parsed &&
+          parsed.messageType === "RECOMMENDATION_RESULT" &&
+          Array.isArray(parsed.data)
+        ) {
+          setRecommendations(parsed.data as RecommendationSchedule[]);
+          setIsLoading(false);
+          setIsInputVisible(true);
           return;
         }
 
-        const status = appendNewMessages([parsed as ChatMessageDto]);
+        const status = appendNewMessages(parsed);
 
         if (status === "assistant" || status === "recommendations") {
           setIsLoading(false);
@@ -287,6 +296,131 @@ export function usePlannerChat() {
     },
     [appendNewMessages]
   );
+
+  const cleanupSocket = useCallback(() => {
+    const socket = socketRef.current;
+    if (!socket) {
+      return;
+    }
+
+    const listeners = socketListenersRef.current;
+
+    if (listeners.onOpen) {
+      socket.removeEventListener("open", listeners.onOpen);
+    }
+    if (listeners.onMessage) {
+      socket.removeEventListener("message", listeners.onMessage);
+    }
+    if (listeners.onClose) {
+      socket.removeEventListener("close", listeners.onClose);
+    }
+    if (listeners.onError) {
+      socket.removeEventListener("error", listeners.onError);
+    }
+
+    socket.close();
+
+    socketRef.current = null;
+    isSocketOpenRef.current = false;
+    socketListenersRef.current = {};
+  }, []);
+
+  const attachSocketListeners = useCallback(
+    (socket: WebSocket) => {
+      const onOpen = () => {
+        console.info("웹소켓 연결 성공", {
+          url: socket.url,
+          readyState: socket.readyState,
+        });
+        isSocketOpenRef.current = true;
+      };
+
+      const onMessage = (event: MessageEvent) => {
+        console.debug("웹소켓 수신", event.data);
+        handleSocketMessage(event);
+      };
+
+      const onClose = (event: CloseEvent) => {
+        console.warn("웹소켓 종료", {
+          code: event.code,
+          reason: event.reason,
+          wasClean: event.wasClean,
+        });
+        isSocketOpenRef.current = false;
+        socketRef.current = null;
+      };
+
+      const onError = (event: Event) => {
+        console.error("웹소켓 오류", event);
+      };
+
+      const listeners = socketListenersRef.current;
+
+      if (listeners.onOpen) {
+        socket.removeEventListener("open", listeners.onOpen);
+      }
+      if (listeners.onMessage) {
+        socket.removeEventListener("message", listeners.onMessage);
+      }
+      if (listeners.onClose) {
+        socket.removeEventListener("close", listeners.onClose);
+      }
+      if (listeners.onError) {
+        socket.removeEventListener("error", listeners.onError);
+      }
+
+      socket.addEventListener("open", onOpen);
+      socket.addEventListener("message", onMessage);
+      socket.addEventListener("close", onClose);
+      socket.addEventListener("error", onError);
+
+      socketListenersRef.current = {
+        onOpen,
+        onMessage,
+        onClose,
+        onError,
+      };
+    },
+    [handleSocketMessage]
+  );
+
+  const initializeSocket = useCallback(() => {
+    if (!plannerChatRoomId || !accessToken || !currentUserQuery) {
+      return null;
+    }
+
+    const existing = socketRef.current;
+    if (
+      existing &&
+      (existing.readyState === WebSocket.OPEN ||
+        existing.readyState === WebSocket.CONNECTING)
+    ) {
+      return existing;
+    }
+
+    cleanupSocket();
+
+    try {
+      const socket = createChatSocket({
+        chatRoomId: plannerChatRoomId,
+        accessToken,
+      });
+
+      socketRef.current = socket;
+      attachSocketListeners(socket);
+
+      return socket;
+    } catch (error) {
+      console.error("웹소켓 연결 실패", error);
+      return null;
+    }
+  }, [
+    plannerChatRoomId,
+    accessToken,
+    currentUserQuery,
+    attachSocketListeners,
+    cleanupSocket,
+  ]);
 
   useEffect(() => {
     if (!plannerChatRoomId || !accessToken || !currentUserQuery) {
@@ -323,57 +457,12 @@ export function usePlannerChat() {
   }, [plannerChatRoomId, accessToken, currentUserQuery, appendNewMessages]);
 
   useEffect(() => {
-    if (!plannerChatRoomId || !accessToken || !currentUserQuery) {
-      return undefined;
-    }
-
-    try {
-      const socket = createChatSocket({
-        chatRoomId: plannerChatRoomId,
-        accessToken,
-      });
-
-      socketRef.current = socket;
-
-      socket.addEventListener("open", () => {
-        console.info("웹소켓 연결 성공", {
-          url: socket.url,
-          readyState: socket.readyState,
-        });
-        isSocketOpenRef.current = true;
-      });
-
-      socket.addEventListener("message", (event) => {
-        console.debug("웹소켓 수신", event.data);
-        handleSocketMessage(event);
-      });
-
-      socket.addEventListener("close", (event) => {
-        console.warn("웹소켓 종료", {
-          code: event.code,
-          reason: event.reason,
-          wasClean: event.wasClean,
-        });
-        isSocketOpenRef.current = false;
-        socketRef.current = null;
-      });
-
-      socket.addEventListener("error", (event) => {
-        console.error("웹소켓 오류", event);
-      });
-    } catch (error) {
-      console.error("웹소켓 연결 실패", error);
-    }
+    initializeSocket();
 
     return () => {
-      if (socketRef.current) {
-        socketRef.current.removeEventListener("message", handleSocketMessage);
-        socketRef.current.close();
-        socketRef.current = null;
-      }
-      isSocketOpenRef.current = false;
+      cleanupSocket();
     };
-  }, [plannerChatRoomId, accessToken, currentUserQuery, handleSocketMessage]);
+  }, [initializeSocket, cleanupSocket]);
 
   const handleInputChange = useCallback((value: string) => {
     setInputValue(value);
@@ -410,8 +499,12 @@ export function usePlannerChat() {
         return;
       }
 
-      const socket = socketRef.current;
+      let socket = socketRef.current;
       if (!socket || socket.readyState === WebSocket.CLOSING) {
+        socket = initializeSocket();
+      }
+
+      if (!socket) {
         setMessages((prev) => [
           ...prev,
           {
@@ -420,6 +513,17 @@ export function usePlannerChat() {
             content: "연결 상태를 확인한 뒤 다시 시도해주세요.",
           },
         ]);
+        const queueAfterFailure = pendingUserMessageIdsRef.current.get(trimmed);
+        if (queueAfterFailure) {
+          const updatedQueue = queueAfterFailure.filter(
+            (pendingId) => pendingId !== userMessage.id
+          );
+          if (updatedQueue.length > 0) {
+            pendingUserMessageIdsRef.current.set(trimmed, updatedQueue);
+          } else {
+            pendingUserMessageIdsRef.current.delete(trimmed);
+          }
+        }
         return;
       }
 
@@ -486,7 +590,13 @@ export function usePlannerChat() {
         setIsLoading(false);
       }
     },
-    [isLoading, accessToken, currentUserQuery, plannerChatRoomId]
+    [
+      isLoading,
+      accessToken,
+      currentUserQuery,
+      plannerChatRoomId,
+      initializeSocket,
+    ]
   );
 
   const handleSelectRecommendation = useCallback(

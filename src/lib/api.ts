@@ -63,18 +63,32 @@ export async function apiFetch<T = unknown>(
     ...restOptions
   } = options;
 
-  let requestInput: ApiFetchInput = input;
+  const toRawUrl = (value: ApiFetchInput) => {
+    if (typeof value === "string") {
+      return value;
+    }
+    if (typeof URL !== "undefined" && (value as any) instanceof URL) {
+      return (value as URL).toString();
+    }
+    if (typeof Request !== "undefined" && (value as any) instanceof Request) {
+      return (value as Request).url;
+    }
+    return String(value);
+  };
+
+  const withApiPrefix = (value: string) => {
+    if (/^https?:\/\//i.test(value)) {
+      return value;
+    }
+
+    const normalized = value.startsWith("/") ? value : `/${value}`;
+    return `/api-proxy${normalized}`;
+  };
+
+  let requestInput = withApiPrefix(toRawUrl(input));
 
   if (searchParams && Object.keys(searchParams).length > 0) {
-    const createUrl = (value: ApiFetchInput) => {
-      if (typeof value === "string") {
-        return new URL(value, window.location.origin);
-      }
-      if (value instanceof URL) {
-        return new URL(value.toString());
-      }
-      return new URL(value.url);
-    };
+    const createUrl = (value: string) => new URL(value, window.location.origin);
 
     const url = createUrl(requestInput);
 
@@ -85,13 +99,7 @@ export async function apiFetch<T = unknown>(
       url.searchParams.set(key, String(value));
     }
 
-    if (typeof requestInput === "string") {
-      requestInput = url.toString();
-    } else if (requestInput instanceof URL) {
-      requestInput = url;
-    } else {
-      requestInput = new Request(url, requestInput);
-    }
+    requestInput = url.toString();
   }
 
   // 기존 헤더 + 기본 헤더 병합
