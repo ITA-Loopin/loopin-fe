@@ -67,10 +67,10 @@ export async function apiFetch<T = unknown>(
     if (typeof value === "string") {
       return value;
     }
-    if (typeof URL !== "undefined" && (value as any) instanceof URL) {
+    if (typeof URL !== "undefined" && value instanceof URL) {
       return (value as URL).toString();
     }
-    if (typeof Request !== "undefined" && (value as any) instanceof Request) {
+    if (typeof Request !== "undefined" && value instanceof Request) {
       return (value as Request).url;
     }
     return String(value);
