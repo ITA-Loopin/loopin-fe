@@ -268,6 +268,47 @@ export default function LoopDetailPage() {
     }
   }, [detail, newChecklistContent, useMock]);
 
+  const handleCompleteLoop = useCallback(async () => {
+    if (!detail) {
+      return;
+    }
+
+    const previousState = detail;
+
+    setDetail((prev) => {
+      if (!prev) return prev;
+      const nextChecklists = prev.checklists.map((item) => ({
+        ...item,
+        completed: true,
+      }));
+      return {
+        ...prev,
+        checklists: nextChecklists,
+        progress: 100,
+      };
+    });
+
+    if (useMock) {
+      return;
+    }
+
+    try {
+      await Promise.all(
+        detail.checklists.map((item) =>
+          apiFetch(`/api-proxy/rest-api/v1/checklists/${item.id}`, {
+            method: "PUT",
+            json: {
+              content: item.content,
+              completed: true,
+            },
+          })
+        )
+      );
+    } catch (error) {
+      setDetail(previousState);
+    }
+  }, [detail, useMock]);
+
   return (
     <>
       <div
@@ -350,7 +391,11 @@ export default function LoopDetailPage() {
               </section>
 
               <div className="mt-auto flex flex-col gap-4 pb-8">
-                <button className="w-full rounded-3xl bg-[#FF7765] px-6 py-4 text-base font-semibold text-white transition-opacity active:opacity-90">
+                <button
+                  className="w-full rounded-3xl bg-[#FF7765] px-6 py-4 text-base font-semibold text-white transition-opacity active:opacity-90 disabled:opacity-60"
+                  onClick={handleCompleteLoop}
+                  disabled={!detail.checklists.length}
+                >
                   루프 완료하기
                 </button>
               </div>
