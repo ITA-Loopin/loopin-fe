@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Header from "@/components/common/Header";
 import type { LoopDetail, LoopChecklist } from "@/types/loop";
 import { apiFetch, MissingAccessTokenError } from "@/lib/api";
@@ -12,8 +12,23 @@ import { Checklist } from "@/components/loop/Checklist";
 
 dayjs.locale("ko");
 
+const MOCK_DETAIL: LoopDetail = {
+  id: 999,
+  title: "아침 루틴 점검",
+  content: "가볍게 스트레칭하고 하루를 시작해요.",
+  loopDate: dayjs().format("YYYY-MM-DD"),
+  progress: 45,
+  checklists: [
+    { id: 1, content: "기상 후 물 한 잔 마시기", completed: true },
+    { id: 2, content: "전신 스트레칭 10분", completed: false },
+    { id: 3, content: "아침 식단 준비", completed: false },
+  ],
+};
+
 export default function LoopDetailPage() {
   const params = useParams<{ loopId: string }>();
+  const searchParams = useSearchParams();
+  const useMock = searchParams?.get("mock") === "1";
   const router = useRouter();
   const loopId = Number(params?.loopId);
   const [detail, setDetail] = useState<LoopDetail | null>(null);
@@ -21,6 +36,16 @@ export default function LoopDetailPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    if (useMock) {
+      setDetail({
+        ...MOCK_DETAIL,
+        id: Number.isFinite(loopId) ? loopId : MOCK_DETAIL.id,
+      });
+      setIsLoading(false);
+      setErrorMessage(null);
+      return;
+    }
+
     if (!Number.isFinite(loopId)) {
       setErrorMessage("유효하지 않은 루프 ID입니다.");
       setIsLoading(false);
@@ -87,7 +112,7 @@ export default function LoopDetailPage() {
     return () => {
       cancelled = true;
     };
-  }, [loopId]);
+  }, [loopId, useMock]);
 
   const formattedDate = useMemo(() => {
     if (!detail?.loopDate) {
@@ -100,47 +125,17 @@ export default function LoopDetailPage() {
   const completedCount =
     detail?.checklists.filter((item) => item.completed).length ?? 0;
 
-  const handleToggleChecklist = useCallback(async (updatedItem: LoopChecklist) => {
-    setDetail((prev) => {
-      if (!prev) return prev;
-
-      const nextChecklists = prev.checklists.map((item) =>
-        item.id === updatedItem.id
-          ? { ...item, completed: updatedItem.completed }
-          : item
-      );
-
-      const total = nextChecklists.length;
-      const completed = nextChecklists.filter((i) => i.completed).length;
-
-      return {
-        ...prev,
-        checklists: nextChecklists,
-        progress:
-          total > 0
-            ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
-            : 0,
-      };
-    });
-
-    try {
-      await apiFetch(`/api-proxy/rest-api/v1/checklists/${updatedItem.id}`, {
-        method: "PUT",
-        json: {
-          content: updatedItem.content,
-          completed: updatedItem.completed,
-        },
-      });
-    } catch (error) {
-      // console.error("체크리스트 완료 상태 업데이트 실패:", error);
-      // revert
+  const handleToggleChecklist = useCallback(
+    async (updatedItem: LoopChecklist) => {
       setDetail((prev) => {
         if (!prev) return prev;
+
         const nextChecklists = prev.checklists.map((item) =>
           item.id === updatedItem.id
-            ? { ...item, completed: !updatedItem.completed }
+            ? { ...item, completed: updatedItem.completed }
             : item
         );
+
         const total = nextChecklists.length;
         const completed = nextChecklists.filter((i) => i.completed).length;
 
@@ -153,8 +148,43 @@ export default function LoopDetailPage() {
               : 0,
         };
       });
-    }
-  }, []);
+
+      if (useMock) {
+        return;
+      }
+
+      try {
+        await apiFetch(`/api-proxy/rest-api/v1/checklists/${updatedItem.id}`, {
+          method: "PUT",
+          json: {
+            content: updatedItem.content,
+            completed: updatedItem.completed,
+          },
+        });
+      } catch (error) {
+        setDetail((prev) => {
+          if (!prev) return prev;
+          const nextChecklists = prev.checklists.map((item) =>
+            item.id === updatedItem.id
+              ? { ...item, completed: !updatedItem.completed }
+              : item
+          );
+          const total = nextChecklists.length;
+          const completed = nextChecklists.filter((i) => i.completed).length;
+
+          return {
+            ...prev,
+            checklists: nextChecklists,
+            progress:
+              total > 0
+                ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
+                : 0,
+          };
+        });
+      }
+    },
+    [useMock]
+  );
 
   return (
     <>
