@@ -16,7 +16,11 @@ export interface User {
   email?: string;
   nickname: string;
   profileImage?: string;
-  kakaoId: number;
+  profileImageUrl?: string;
+  kakaoId?: number;
+  followMemberCount?: number;
+  followedMemberCount?: number;
+  chatRoomId?: number;
 }
 
 export interface AuthResponse {

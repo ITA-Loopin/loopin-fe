@@ -7,6 +7,11 @@ import { useSearchParams } from "next/navigation";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { setCredentials } from "@/store/slices/authSlice";
 import { apiFetch } from "@/lib/api";
+import {
+  buildUserFromMemberProfile,
+  fetchMemberProfile,
+  type MemberResponse,
+} from "@/lib/member";
 import type { User } from "@/types/auth";
 
 export const dynamic = "force-dynamic";
@@ -90,6 +95,7 @@ function HomeContent() {
 
   useEffect(() => {
     const status = searchParams.get("status");
+    const accessToken = searchParams.get("access_token");
     const accessToken = searchParams.get("access_token");
 
     if (status === "LOGIN_SUCCESS" && accessToken) {
