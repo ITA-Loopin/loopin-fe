@@ -4,12 +4,7 @@ import { store } from "@/store/store";
 
 type ApiFetchInput = RequestInfo | URL;
 
-type SearchParamValue =
-  | string
-  | number
-  | boolean
-  | null
-  | undefined;
+type SearchParamValue = string | number | boolean | null | undefined;
 
 interface ApiFetchOptions extends RequestInit {
   /**
@@ -107,8 +102,7 @@ export async function apiFetch<T = unknown>(
 
   // 인증 필요 시 Authorization 헤더 자동 추가
   if (!skipAuth) {
-    const token =
-      accessToken ?? store.getState().auth.accessToken ?? undefined;
+    const token = accessToken ?? store.getState().auth.accessToken ?? undefined;
 
     if (!token) {
       throw new MissingAccessTokenError();
@@ -157,9 +151,4 @@ export async function apiFetch<T = unknown>(
 
   // JSON 반환 + 타입 캐스팅
   return response.json() as Promise<T>;
-<<<<<<< HEAD
 }
-
-=======
-}
->>>>>>> fix/login-auth-flow
