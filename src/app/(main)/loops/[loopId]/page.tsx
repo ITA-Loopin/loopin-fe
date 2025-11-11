@@ -10,8 +10,11 @@ import { apiFetch, MissingAccessTokenError } from "@/lib/api";
 import { LoopProgress } from "@/components/home/LoopProgress";
 import { Checklist } from "@/components/loop/Checklist";
 import { IconButton } from "@/components/common/IconButton";
+import { LoopActionModal } from "@/components/loop/LoopActionModal";
 
 dayjs.locale("ko");
+
+const MENU_WIDTH = 160;
 
 const MOCK_DETAIL: LoopDetail = {
   id: 999,
@@ -36,6 +39,12 @@ export default function LoopDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [newChecklistContent, setNewChecklistContent] = useState("");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [actionModal, setActionModal] = useState<{
+    type: "edit" | "delete";
+    isOpen: boolean;
+  }>({ type: "edit", isOpen: false });
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
 
   useEffect(() => {
     if (useMock) {
@@ -345,9 +354,22 @@ export default function LoopDetailPage() {
             <>
               <section className="flex flex-col gap-2 pt-6">
                 <div className="text-sm text-[#8D91A1]">{formattedDate}</div>
-                <h1 className="text-xl font-semibold text-[#2C2C2C]">
-                  {detail.title}
-                </h1>
+                <div className="flex items-start justify-between gap-3">
+                  <h1 className="text-xl font-semibold text-[#2C2C2C]">{detail.title}</h1>
+                  <IconButton
+                    src="/loop/loop_kebab.svg"
+                    alt="메뉴"
+                    width={20}
+                    height={20}
+                    onClick={(event) => {
+                      const rect = event.currentTarget.getBoundingClientRect();
+                      const top = rect.bottom + window.scrollY + 8;
+                      const left = rect.right + window.scrollX - MENU_WIDTH;
+                      setMenuPosition({ top, left });
+                      setIsMenuOpen((prev) => !prev);
+                    }}
+                  />
+                </div>
                 {detail.content ? (
                   <p className="text-sm leading-relaxed text-[#676A79]">
                     {detail.content}
@@ -407,6 +429,77 @@ export default function LoopDetailPage() {
           )}
         </main>
       </div>
+
+      {isMenuOpen ? (
+        <div
+          className="fixed inset-0 z-40 bg-black/10"
+          onClick={() => setIsMenuOpen(false)}
+        >
+          <div
+            className="absolute z-50 rounded-3xl bg-white p-3 shadow-[0px_20px_40px_rgba(0,0,0,0.12)]"
+            style={{ top: menuPosition.top, left: menuPosition.left, width: MENU_WIDTH }}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex flex-col divide-y divide-[#F2F3F5] text-sm font-semibold">
+              <button
+                type="button"
+                className="flex items-center justify-between gap-4 px-2 py-3 text-[#2C2C2C]"
+                onClick={() => {
+                  setIsMenuOpen(false);
+              setActionModal({ type: "edit", isOpen: true });
+                }}
+              >
+                <span>수정하기</span>
+                <IconButton
+                  src="/loop/loop_edit.svg"
+                  alt="수정"
+                  width={20}
+                  height={20}
+                  className="text-[#8D91A1]"
+                />
+              </button>
+              <button
+                type="button"
+                className="flex items-center justify-between gap-4 px-2 py-3 text-[#FF5A45]"
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  setActionModal({ type: "delete", isOpen: true });
+                }}
+              >
+                <span>삭제하기</span>
+                <IconButton
+                  src="/loop/loop_delete.svg"
+                  alt="삭제"
+                  width={20}
+                  height={20}
+                />
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      <LoopActionModal
+        isOpen={actionModal.isOpen}
+        type={actionModal.type}
+        onClose={() => setActionModal((prev) => ({ ...prev, isOpen: false }))}
+        onPrimaryAction={() => {
+          setActionModal((prev) => ({ ...prev, isOpen: false }));
+          if (actionModal.type === "delete") {
+            // TODO: 모든 반복 루프 삭제 로직
+          } else {
+            // TODO: 모든 반복 루프 수정 플로우로 이동
+          }
+        }}
+        onSecondaryAction={() => {
+          setActionModal((prev) => ({ ...prev, isOpen: false }));
+          if (actionModal.type === "delete") {
+            // TODO: 이 루프만 삭제 로직
+          } else {
+            // TODO: 단일 루프 수정 플로우로 이동
+          }
+        }}
+      />
     </>
   );
 }
