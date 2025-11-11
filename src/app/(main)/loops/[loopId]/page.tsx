@@ -9,6 +9,7 @@ import type { LoopDetail, LoopChecklist } from "@/types/loop";
 import { apiFetch, MissingAccessTokenError } from "@/lib/api";
 import { LoopProgress } from "@/components/home/LoopProgress";
 import { Checklist } from "@/components/loop/Checklist";
+import { IconButton } from "@/components/common/IconButton";
 
 dayjs.locale("ko");
 
@@ -34,6 +35,7 @@ export default function LoopDetailPage() {
   const [detail, setDetail] = useState<LoopDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [newChecklistContent, setNewChecklistContent] = useState("");
 
   useEffect(() => {
     if (useMock) {
@@ -186,6 +188,86 @@ export default function LoopDetailPage() {
     [useMock]
   );
 
+  const handleAddChecklist = useCallback(async () => {
+    if (!detail) {
+      return;
+    }
+
+    const content = newChecklistContent.trim();
+    if (!content) {
+      return;
+    }
+
+    const tempId = Date.now();
+    const optimisticItem: LoopChecklist = {
+      id: tempId,
+      content,
+      completed: false,
+    };
+
+    setDetail((prev) => {
+      if (!prev) return prev;
+      const nextChecklists = [...prev.checklists, optimisticItem];
+      const total = nextChecklists.length;
+      const completed = nextChecklists.filter((i) => i.completed).length;
+
+      return {
+        ...prev,
+        checklists: nextChecklists,
+        progress:
+          total > 0
+            ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
+            : 0,
+      };
+    });
+    setNewChecklistContent("");
+
+    if (useMock) {
+      return;
+    }
+
+    try {
+      const response = await apiFetch<{
+        success?: boolean;
+        data?: { id: number; content: string; completed: boolean };
+      }>(`/api-proxy/rest-api/v1/loops/${detail.id}/checklists`, {
+        method: "POST",
+        json: { content },
+      });
+
+      if (response?.data?.id) {
+        setDetail((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            checklists: prev.checklists.map((item) =>
+              item.id === tempId ? { ...item, id: response.data!.id } : item
+            ),
+          };
+        });
+      }
+    } catch (error) {
+      setDetail((prev) => {
+        if (!prev) return prev;
+        const nextChecklists = prev.checklists.filter(
+          (item) => item.id !== tempId
+        );
+        const total = nextChecklists.length;
+        const completed = nextChecklists.filter((i) => i.completed).length;
+
+        return {
+          ...prev,
+          checklists: nextChecklists,
+          progress:
+            total > 0
+              ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
+              : 0,
+        };
+      });
+      setNewChecklistContent(content);
+    }
+  }, [detail, newChecklistContent, useMock]);
+
   return (
     <>
       <div
@@ -234,15 +316,41 @@ export default function LoopDetailPage() {
 
               <section className="flex flex-col items-center gap-6 px-1">
                 <LoopProgress progress={detail.progress} />
-                <Checklist
-                  checklists={detail.checklists}
-                  onToggleItem={handleToggleChecklist}
-                  key={detail.id}
-                />
+                <div className="w-full max-w-[420px] space-y-4">
+                  <Checklist
+                    checklists={detail.checklists}
+                    onToggleItem={handleToggleChecklist}
+                    key={detail.id}
+                  />
+
+                  <div className="flex h-14 w-full items-center gap-[10px] rounded-[10px] border border-[#E2E4EA] bg-white px-4 transition-colors focus-within:border-[#FF7765]">
+                    <input
+                      type="text"
+                      placeholder="새로운 루틴을 추가해보세요"
+                      value={newChecklistContent}
+                      onChange={(event) => setNewChecklistContent(event.target.value)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") {
+                          event.preventDefault();
+                          handleAddChecklist();
+                        }
+                      }}
+                      className="flex-1 border-none bg-transparent text-sm text-[#2C2C2C] placeholder:text-[#B7BAC7] focus:outline-none focus:ring-0"
+                    />
+                    <IconButton
+                      src="/addloopsheet/addloopsheet_add.svg"
+                      alt="루틴 추가"
+                      width={20}
+                      height={20}
+                      className="h-5 w-5"
+                      onClick={handleAddChecklist}
+                    />
+                  </div>
+                </div>
               </section>
 
               <div className="mt-auto flex flex-col gap-4 pb-8">
-                <button className="w-full rounded-3xl bg-[#2C2C2C] px-6 py-4 text-base font-semibold text-white shadow-[0px_20px_32px_rgba(0,0,0,0.12)]">
+                <button className="w-full rounded-3xl bg-[#FF7765] px-6 py-4 text-base font-semibold text-white transition-opacity active:opacity-90">
                   루프 완료하기
                 </button>
               </div>
