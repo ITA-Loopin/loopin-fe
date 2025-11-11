@@ -53,36 +53,40 @@ type BuildParamsOptions = {
   page?: number;
   size?: number;
   currentUser?: CurrentUserQuery;
-  accessToken?: string | null;
   chatRoomId?: number;
 };
 
 function buildQueryParams(options: BuildParamsOptions = {}) {
+  const { page, size, currentUser, chatRoomId } = options;
   const params: Record<string, Primitive> = {};
-  const { page, size, currentUser, accessToken, chatRoomId } = options;
 
+  const requestPayload: Record<string, Primitive> = {};
   if (page !== undefined) {
-    params["request.page"] = page;
+    requestPayload.page = page;
   }
-
   if (size !== undefined) {
-    params["request.size"] = size;
+    requestPayload.size = size;
   }
 
-  if (accessToken) {
-    params.accessToken = accessToken;
+  if (Object.keys(requestPayload).length > 0) {
+    params.request = JSON.stringify(requestPayload);
+  }
+
+  if (currentUser) {
+    const sanitizedCurrentUser: Record<string, Primitive> = {};
+    Object.entries(currentUser).forEach(([key, value]) => {
+      if (value !== null && value !== undefined && value !== "") {
+        sanitizedCurrentUser[key] = value;
+      }
+    });
+
+    if (Object.keys(sanitizedCurrentUser).length > 0) {
+      params.currentUser = JSON.stringify(sanitizedCurrentUser);
+    }
   }
 
   if (chatRoomId !== undefined) {
     params.chatRoomId = chatRoomId;
-  }
-
-  if (currentUser) {
-    Object.entries(currentUser).forEach(([key, value]) => {
-      if (value !== null && value !== undefined && value !== "") {
-        params[`currentUser.${key}`] = value;
-      }
-    });
   }
 
   return params;
@@ -102,21 +106,26 @@ export async function fetchChatMessages({
   currentUser,
 }: FetchChatMessagesParams) {
   return apiFetch<ChatRoomMessagesResponse>(
-    `/rest-api/v1/chat-room/message/${chatRoomId}`,
+    `/rest-api/v1/chatmessage/${chatRoomId}`,
     {
       accessToken: accessToken ?? undefined,
-      searchParams: buildQueryParams({ page, size, currentUser }),
+      searchParams: buildQueryParams({
+        page,
+        size,
+        currentUser,
+      }),
     }
   );
 }
 
 function resolveWsBaseUrl() {
-  const configured = process.env.NEXT_PUBLIC_CHAT_WS_URL;
-  if (configured && configured.length > 0) {
-    return configured;
-  }
-
   if (typeof window === "undefined") {
+    const configured = process.env.NEXT_PUBLIC_CHAT_WS_URL;
+
+    if (configured && configured.length > 0) {
+      return configured;
+    }
+
     return "";
   }
 
@@ -127,13 +136,11 @@ function resolveWsBaseUrl() {
 export type CreateChatSocketOptions = {
   chatRoomId: number;
   accessToken: string;
-  currentUser?: CurrentUserQuery;
 };
 
 export function createChatSocket({
   chatRoomId,
   accessToken,
-  currentUser,
 }: CreateChatSocketOptions) {
   const base = resolveWsBaseUrl();
 
@@ -141,13 +148,17 @@ export function createChatSocket({
     throw new Error("웹소켓 베이스 URL이 설정되지 않았습니다.");
   }
 
-  const rawParams = buildQueryParams({ chatRoomId, accessToken, currentUser });
+  const rawParams = buildQueryParams({ chatRoomId });
   const params = new URLSearchParams();
 
   Object.entries(rawParams).forEach(([key, value]) => {
     if (value === undefined || value === null) return;
     params.set(key, String(value));
   });
+
+  if (accessToken) {
+    params.set("accessToken", accessToken);
+  }
 
   const separator = base.includes("?") ? "&" : "?";
   const url = `${base}${separator}${params.toString()}`;

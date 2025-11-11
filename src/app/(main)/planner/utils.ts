@@ -62,4 +62,3 @@ export function formatSchedule(schedule: RecommendationSchedule) {
 
   return "일정 정보 없음";
 }
-

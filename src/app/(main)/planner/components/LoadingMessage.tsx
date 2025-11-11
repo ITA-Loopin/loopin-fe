@@ -22,4 +22,3 @@ export function LoadingMessage() {
 }
 
 export default LoadingMessage;
-

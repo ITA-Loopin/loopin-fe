@@ -7,10 +7,7 @@ import { apiFetch } from "@/lib/api";
 import { useAppDispatch } from "@/store/hooks";
 import { setCredentials } from "@/store/slices/authSlice";
 import type { User } from "@/types/auth";
-import {
-  buildUserFromMemberProfile,
-  fetchMemberProfile,
-} from "@/lib/member";
+import { buildUserFromMemberProfile, fetchMemberProfile } from "@/lib/member";
 
 type SignupSession = {
   email: string;

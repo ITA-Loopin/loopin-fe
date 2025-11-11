@@ -1,4 +1,4 @@
-export type MessageAuthor = "system" | "user" | "assistant";
+export type MessageAuthor = "user" | "assistant";
 
 export type RecommendationSchedule = {
   title: string;
@@ -16,4 +16,3 @@ export type ChatMessage = {
   author: MessageAuthor;
   content: string;
 };
-

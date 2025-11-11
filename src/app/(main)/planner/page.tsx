@@ -1,10 +1,18 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { MessageBubble } from "./components/MessageBubble";
 import { LoadingMessage } from "./components/LoadingMessage";
 import { RecommendationCard } from "./components/RecommendationCard";
+import { LoopinSpeakerIndicator } from "./components/LoopinSpeakerIndicator";
 import { usePlannerChat } from "./hooks/usePlannerChat";
+
+const BOTTOM_TAB_HEIGHT = 70;
+const BOTTOM_TAB_GAP = 24;
+const MESSAGE_EXTRA_SPACE = 32;
+const INPUT_CONTAINER_HEIGHT = 192;
 
 export default function PlannerPage() {
   const {
@@ -21,36 +29,45 @@ export default function PlannerPage() {
     handleRetry,
   } = usePlannerChat();
 
-  return (
-    <section className="flex min-h-[calc(100dvh-6rem)] flex-col bg-[#FFEFEA]/40">
-      <header className="px-6">
-        <div className="flex items-center gap-2 rounded-3xl bg-white px-4 py-3 shadow-sm">
-          <Image
-            src="/loopin-logo.svg"
-            alt="Loopin"
-            width={28}
-            height={28}
-            className="h-7 w-7"
-            priority
-          />
-          <div className="flex flex-col">
-            <span className="text-sm font-semibold text-[#FF5A45]">loopin</span>
-            <span className="text-xs text-[#8F8A87]">
-              당신의 루프 메이킹 파트너
-            </span>
-          </div>
-        </div>
-      </header>
+  type PlannerFormValues = { prompt: string };
 
+  const {
+    register,
+    handleSubmit: formHandleSubmit,
+    watch,
+    reset,
+  } = useForm<PlannerFormValues>({
+    defaultValues: { prompt: inputValue },
+  });
+
+  const watchedPrompt = watch("prompt", inputValue);
+
+  useEffect(() => {
+    handleInputChange(watchedPrompt ?? "");
+  }, [watchedPrompt, handleInputChange]);
+
+  const basePadding = BOTTOM_TAB_HEIGHT + BOTTOM_TAB_GAP + MESSAGE_EXTRA_SPACE;
+  const messageListPadding = isInputVisible
+    ? basePadding + INPUT_CONTAINER_HEIGHT
+    : basePadding;
+  const inputBottomOffset = BOTTOM_TAB_HEIGHT + BOTTOM_TAB_GAP;
+  const lastMessageAuthor = messages[messages.length - 1]?.author;
+  const isLoopinSpeaking = isLoading || lastMessageAuthor === "assistant";
+
+  return (
+    <section className="flex flex-1 min-h-0 flex-col bg-[#FFEFEA]/40">
       <div
         ref={messageListRef}
-        className="mt-6 flex-1 overflow-y-auto px-6 pb-32"
+        className="flex-1 overflow-y-auto px-6 pt-6"
+        style={{
+          paddingBottom: `calc(${messageListPadding}px )`,
+        }}
       >
         <div className="space-y-4">
+          {isLoopinSpeaking ? <LoopinSpeakerIndicator /> : null}
           {messages.map((message) => (
             <MessageBubble key={message.id} message={message} />
           ))}
-
           {isLoading ? <LoadingMessage /> : null}
         </div>
 
@@ -75,43 +92,42 @@ export default function PlannerPage() {
       </div>
 
       {isInputVisible ? (
-        <div className="sticky bottom-0 z-30 mt-auto w-full bg-gradient-to-t from-[#FFEFEA]/80 to-transparent px-6 pb-6 pt-6">
-          <div className="mx-auto w-full max-w-xl rounded-3xl bg-white p-4 shadow-[0px_20px_40px_rgba(0,0,0,0.08)]">
+        <div
+          className="pointer-events-none fixed inset-x-0 z-40 flex justify-center pb-6"
+          style={{
+            bottom: `calc(${inputBottomOffset}px)`,
+          }}
+        >
+          <div className="pointer-events-auto w-full max-w-xl bg-white p-4 ">
             {exampleLabel ? (
               <p className="mb-2 text-xs text-[#8F8A87]">{exampleLabel}</p>
             ) : null}
             <form
-              onSubmit={handleSubmit}
-              className="flex items-center gap-3 rounded-2xl border border-[#FFDBD3] bg-[#FFF6F4] px-3 py-2"
+              onSubmit={formHandleSubmit(async (values) => {
+                await handleSubmit(values.prompt);
+                reset({ prompt: "" });
+              })}
+              className="flex items-center  rounded-2xl px-3 py-2 bg-[#F8F8F9]"
             >
               <textarea
-                value={inputValue}
-                onChange={handleInputChange}
-                placeholder="만들고 싶은 루프를 입력해주세요.."
+                {...register("prompt")}
+                placeholder="만들고 싶은 루프를 입력해주세요."
                 rows={1}
-                className="max-h-32 flex-1 resize-none border-none bg-transparent text-sm text-[#2C2C2C] outline-none placeholder:text-[#C2B8B4]"
+                className="max-h-32 flex-1 border-none text-sm text-[#2C2C2C] outline-none"
                 aria-label="루프 생성 요청 입력란"
               />
               <button
                 type="submit"
-                disabled={!inputValue.trim()}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FF5A45] text-white transition hover:bg-[#ff432a] disabled:cursor-not-allowed disabled:bg-[#FFB7AB]"
+                disabled={!watchedPrompt?.trim()}
+                className="flex h-10 w-10 items-center justify-center text-white transition disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label="루프 생성 요청 보내기"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.8}
-                  stroke="currentColor"
-                  className="h-5 w-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 12H4.5m0 0l-1.5 4.5M4.5 12L3 7.5m0 0l18-4.5-4.5 18-6.35-6.35a1 1 0 00-.53-.28L3 7.5z"
-                  />
-                </svg>
+                <Image
+                  src="/ai-planner/arrows-up.svg"
+                  alt="send"
+                  width={24}
+                  height={24}
+                />
               </button>
             </form>
           </div>

@@ -48,8 +48,13 @@ export function BottomTab() {
   const pathname = usePathname();
 
   return (
-    <nav className="pointer-events-none sticky bottom-6 z-40 flex w-full justify-center px-4">
-      <div className="pointer-events-auto flex h-16 w-full max-w-[420px] items-center justify-between rounded-[38px] border border-white/60 bg-white/90 px-6 shadow-[0px_20px_40px_rgba(0,0,0,0.08)] backdrop-blur">
+    <nav
+      className="pointer-events-none fixed inset-x-0 z-40 flex justify-center px-6"
+      style={{
+        bottom: `calc(24px)`,
+      }}
+    >
+      <div className="pointer-events-auto relative z-10 flex h-[70px] w-full max-w-[420px] items-center justify-between rounded-[38px] border border-white/40 bg-white/90 px-6 shadow-[0px_16px_32px_rgba(32,32,32,0.16)] backdrop-blur-md">
         {TAB_ITEMS.map((item) => {
           const isActive =
             pathname === item.href ||

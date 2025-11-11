@@ -18,10 +18,61 @@ import {
 
 type AppendStatus = "none" | "assistant" | "recommendations";
 
+function isChatMessageDtoLike(value: Record<string, unknown>) {
+  return (
+    "tempId" in value ||
+    "id" in value ||
+    "authorType" in value ||
+    "content" in value ||
+    "recommendations" in value
+  );
+}
+
+function normalizeChatMessages(input: unknown): ChatMessageDto[] {
+  if (!input) {
+    return [];
+  }
+
+  if (Array.isArray(input)) {
+    return input.flatMap((item) => normalizeChatMessages(item));
+  }
+
+  if (typeof input === "object") {
+    const record = input as Record<string, unknown>;
+    let collected: ChatMessageDto[] = [];
+
+    if ("chatMessageDto" in record) {
+      const { chatMessageDto } = record as { chatMessageDto?: unknown };
+      if (chatMessageDto != null) {
+        collected = collected.concat(normalizeChatMessages(chatMessageDto));
+      }
+    }
+
+    if ("data" in record) {
+      const { data } = record as { data?: unknown };
+      if (data != null) {
+        collected = collected.concat(normalizeChatMessages(data));
+      }
+    }
+
+    if (collected.length > 0) {
+      return collected;
+    }
+
+    if (isChatMessageDtoLike(record)) {
+      return [record as ChatMessageDto];
+    }
+
+    return [];
+  }
+
+  return [];
+}
+
 export function usePlannerChat() {
   const { user, accessToken } = useAppSelector((state) => state.auth);
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { id: generateId(), author: "system", content: INITIAL_MESSAGE },
+    { id: generateId(), author: "assistant", content: INITIAL_MESSAGE },
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -31,6 +82,7 @@ export function usePlannerChat() {
   >([]);
   const messageListRef = useRef<HTMLDivElement | null>(null);
   const seenMessageIdsRef = useRef<Set<string>>(new Set());
+  const pendingUserMessageIdsRef = useRef<Map<string, string[]>>(new Map());
   const previousChatRoomIdRef = useRef<number | null>(null);
   const socketRef = useRef<WebSocket | null>(null);
   const isSocketOpenRef = useRef(false);
@@ -84,7 +136,7 @@ export function usePlannerChat() {
     previousChatRoomIdRef.current = plannerChatRoomId;
     seenMessageIdsRef.current.clear();
     setMessages([
-      { id: generateId(), author: "system", content: INITIAL_MESSAGE },
+      { id: generateId(), author: "assistant", content: INITIAL_MESSAGE },
     ]);
     setRecommendations([]);
   }, [plannerChatRoomId]);
@@ -94,8 +146,10 @@ export function usePlannerChat() {
     return `ex. ${EXAMPLE_PROMPTS.join(" / ")}`;
   }, [inputValue, isInputVisible]);
 
-  const appendNewMessages = useCallback((apiMessages?: ChatMessageDto[]) => {
-    if (!apiMessages?.length) {
+  const appendNewMessages = useCallback((rawMessages?: unknown) => {
+    const apiMessages = normalizeChatMessages(rawMessages);
+
+    if (!apiMessages.length) {
       return "none" as AppendStatus;
     }
 
@@ -128,6 +182,24 @@ export function usePlannerChat() {
         message.recommendations.length > 0;
       const isUser = message.authorType === "USER";
       const trimmedContent = (message.content ?? "").trim();
+
+      if (isUser && trimmedContent) {
+        const queue = pendingUserMessageIdsRef.current.get(trimmedContent);
+        if (queue && queue.length > 0) {
+          const localId = queue.shift();
+
+          if (queue.length === 0) {
+            pendingUserMessageIdsRef.current.delete(trimmedContent);
+          }
+
+          if (localId) {
+            seenMessageIdsRef.current.add(localId);
+          }
+
+          seenMessageIdsRef.current.add(dedupeKey);
+          return;
+        }
+      }
 
       if (!hasRecommendations && !trimmedContent) {
         seenMessageIdsRef.current.add(dedupeKey);
@@ -259,18 +331,29 @@ export function usePlannerChat() {
       const socket = createChatSocket({
         chatRoomId: plannerChatRoomId,
         accessToken,
-        currentUser: currentUserQuery,
       });
 
       socketRef.current = socket;
 
       socket.addEventListener("open", () => {
+        console.info("웹소켓 연결 성공", {
+          url: socket.url,
+          readyState: socket.readyState,
+        });
         isSocketOpenRef.current = true;
       });
 
-      socket.addEventListener("message", handleSocketMessage);
+      socket.addEventListener("message", (event) => {
+        console.debug("웹소켓 수신", event.data);
+        handleSocketMessage(event);
+      });
 
-      socket.addEventListener("close", () => {
+      socket.addEventListener("close", (event) => {
+        console.warn("웹소켓 종료", {
+          code: event.code,
+          reason: event.reason,
+          wasClean: event.wasClean,
+        });
         isSocketOpenRef.current = false;
         socketRef.current = null;
       });
@@ -290,19 +373,15 @@ export function usePlannerChat() {
       }
       isSocketOpenRef.current = false;
     };
-  }, [plannerChatRoomId, currentUserQuery, handleSocketMessage]);
+  }, [plannerChatRoomId, accessToken, currentUserQuery, handleSocketMessage]);
 
-  const handleInputChange = useCallback(
-    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-      setInputValue(event.target.value);
-    },
-    []
-  );
+  const handleInputChange = useCallback((value: string) => {
+    setInputValue(value);
+  }, []);
 
   const handleSubmit = useCallback(
-    async (event: React.FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
-      const trimmed = inputValue.trim();
+    async (value: string) => {
+      const trimmed = value.trim();
       if (!trimmed || isLoading) return;
 
       const userMessage: ChatMessage = {
@@ -315,6 +394,9 @@ export function usePlannerChat() {
       setInputValue("");
       setRecommendations([]);
       seenMessageIdsRef.current.add(userMessage.id);
+
+      const queue = pendingUserMessageIdsRef.current.get(trimmed) ?? [];
+      pendingUserMessageIdsRef.current.set(trimmed, [...queue, userMessage.id]);
 
       if (!accessToken || !currentUserQuery || !plannerChatRoomId) {
         setMessages((prev) => [
@@ -329,7 +411,6 @@ export function usePlannerChat() {
       }
 
       const socket = socketRef.current;
-
       if (!socket || socket.readyState === WebSocket.CLOSING) {
         setMessages((prev) => [
           ...prev,
@@ -347,10 +428,12 @@ export function usePlannerChat() {
 
       try {
         const payload = JSON.stringify({
+          messageType: "MESSAGE",
           chatRoomId: plannerChatRoomId,
-          content: trimmed,
-          tempId: userMessage.id,
-          authorType: "USER",
+          chatMessageDto: {
+            tempId: userMessage.id,
+            content: trimmed,
+          },
         });
 
         if (socket.readyState === WebSocket.OPEN) {
@@ -403,7 +486,7 @@ export function usePlannerChat() {
         setIsLoading(false);
       }
     },
-    [inputValue, isLoading, accessToken, currentUserQuery, plannerChatRoomId]
+    [isLoading, accessToken, currentUserQuery, plannerChatRoomId]
   );
 
   const handleSelectRecommendation = useCallback(
@@ -422,7 +505,7 @@ export function usePlannerChat() {
       ...prev,
       {
         id: generateId(),
-        author: "system",
+        author: "assistant",
         content: LOOP_RETRY_PROMPT,
       },
     ]);

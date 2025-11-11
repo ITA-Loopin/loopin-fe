@@ -93,7 +93,7 @@ function HomeContent() {
 
   useEffect(() => {
     const status = searchParams.get("status");
-    const accessToken = searchParams.get("accessToken");
+    const accessToken = searchParams.get("access_token");
 
     if (status === "LOGIN_SUCCESS" && accessToken) {
       handleLoginSuccess(accessToken);

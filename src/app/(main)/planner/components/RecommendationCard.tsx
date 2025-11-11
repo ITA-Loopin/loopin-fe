@@ -49,4 +49,3 @@ export function RecommendationCard({
 }
 
 export default RecommendationCard;
-

@@ -6,7 +6,9 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
   const isUser = message.author === "user";
 
   return (
-    <div className={`flex ${isUser ? "justify-end" : "justify-start"} text-left`}>
+    <div
+      className={`flex ${isUser ? "justify-end" : "justify-start"} text-left`}
+    >
       <div
         className={`max-w-[80%] whitespace-pre-line rounded-2xl px-4 py-3 text-sm leading-relaxed ${
           isUser
@@ -21,4 +23,3 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
 }
 
 export default MessageBubble;
-
