@@ -35,6 +35,7 @@ export default function LoopDetailPage() {
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
   const [isGroupEditSheetOpen, setIsGroupEditSheetOpen] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (!Number.isFinite(loopId)) {
@@ -294,6 +295,25 @@ export default function LoopDetailPage() {
     }
   }, [detail]);
 
+  const handleDeleteLoop = useCallback(async () => {
+    if (!Number.isFinite(loopId) || isDeleting) {
+      return;
+    }
+
+    try {
+      setIsDeleting(true);
+      await apiFetch(`/api-proxy/rest-api/v1/loops/${loopId}`, {
+        method: "DELETE",
+      });
+      router.back();
+    } catch (error) {
+      console.error("루프 삭제 실패:", error);
+      setErrorMessage("루프를 삭제하지 못했습니다. 다시 시도해 주세요.");
+    } finally {
+      setIsDeleting(false);
+    }
+  }, [loopId, isDeleting, router]);
+
   return (
     <>
       <div
@@ -470,7 +490,7 @@ export default function LoopDetailPage() {
         onSecondaryAction={() => {
           setActionModal((prev) => ({ ...prev, isOpen: false }));
           if (actionModal.type === "delete") {
-            // TODO: 이 루프만 삭제 로직
+            handleDeleteLoop();
           } else {
             setIsEditSheetOpen(true);
           }
