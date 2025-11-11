@@ -36,6 +36,7 @@ export default function LoopDetailPage() {
   const [isGroupEditSheetOpen, setIsGroupEditSheetOpen] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeletingGroup, setIsDeletingGroup] = useState(false);
 
   useEffect(() => {
     if (!Number.isFinite(loopId)) {
@@ -314,6 +315,25 @@ export default function LoopDetailPage() {
     }
   }, [loopId, isDeleting, router]);
 
+  const handleDeleteGroup = useCallback(async () => {
+    if (!Number.isFinite(loopId) || isDeletingGroup) {
+      return;
+    }
+
+    try {
+      setIsDeletingGroup(true);
+      await apiFetch(`/api-proxy/rest-api/v1/loops/group/${loopId}`, {
+        method: "DELETE",
+      });
+      router.back();
+    } catch (error) {
+      console.error("반복 루프 삭제 실패:", error);
+      setErrorMessage("반복 루프를 삭제하지 못했습니다. 다시 시도해 주세요.");
+    } finally {
+      setIsDeletingGroup(false);
+    }
+  }, [loopId, isDeletingGroup, router]);
+
   return (
     <>
       <div
@@ -482,7 +502,7 @@ export default function LoopDetailPage() {
         onPrimaryAction={() => {
           setActionModal((prev) => ({ ...prev, isOpen: false }));
           if (actionModal.type === "delete") {
-            // TODO: 모든 반복 루프 삭제 로직
+            handleDeleteGroup();
           } else {
             setIsGroupEditSheetOpen(true);
           }
