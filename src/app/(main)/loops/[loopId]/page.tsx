@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Header from "@/components/common/Header";
 import type { LoopDetail, LoopChecklist } from "@/types/loop";
 import { apiFetch, MissingAccessTokenError } from "@/lib/api";
@@ -17,23 +17,8 @@ dayjs.locale("ko");
 
 const MENU_WIDTH = 160;
 
-const MOCK_DETAIL: LoopDetail = {
-  id: 999,
-  title: "아침 루틴 점검",
-  content: "가볍게 스트레칭하고 하루를 시작해요.",
-  loopDate: dayjs().format("YYYY-MM-DD"),
-  progress: 45,
-  checklists: [
-    { id: 1, content: "기상 후 물 한 잔 마시기", completed: true },
-    { id: 2, content: "전신 스트레칭 10분", completed: false },
-    { id: 3, content: "아침 식단 준비", completed: false },
-  ],
-};
-
 export default function LoopDetailPage() {
   const params = useParams<{ loopId: string }>();
-  const searchParams = useSearchParams();
-  const useMock = searchParams?.get("mock") === "1";
   const router = useRouter();
   const loopId = Number(params?.loopId);
   const [detail, setDetail] = useState<LoopDetail | null>(null);
@@ -47,18 +32,9 @@ export default function LoopDetailPage() {
   }>({ type: "edit", isOpen: false });
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
-    if (useMock) {
-      setDetail({
-        ...MOCK_DETAIL,
-        id: Number.isFinite(loopId) ? loopId : MOCK_DETAIL.id,
-      });
-      setIsLoading(false);
-      setErrorMessage(null);
-      return;
-    }
-
     if (!Number.isFinite(loopId)) {
       setErrorMessage("유효하지 않은 루프 ID입니다.");
       setIsLoading(false);
@@ -125,7 +101,7 @@ export default function LoopDetailPage() {
     return () => {
       cancelled = true;
     };
-  }, [loopId, useMock]);
+  }, [loopId, reloadKey]);
 
   const formattedDate = useMemo(() => {
     if (!detail?.loopDate) {
@@ -162,10 +138,6 @@ export default function LoopDetailPage() {
         };
       });
 
-      if (useMock) {
-        return;
-      }
-
       try {
         await apiFetch(`/api-proxy/rest-api/v1/checklists/${updatedItem.id}`, {
           method: "PUT",
@@ -196,7 +168,7 @@ export default function LoopDetailPage() {
         });
       }
     },
-    [useMock]
+    []
   );
 
   const handleAddChecklist = useCallback(async () => {
@@ -232,10 +204,6 @@ export default function LoopDetailPage() {
       };
     });
     setNewChecklistContent("");
-
-    if (useMock) {
-      return;
-    }
 
     try {
       const response = await apiFetch<{
@@ -277,7 +245,7 @@ export default function LoopDetailPage() {
       });
       setNewChecklistContent(content);
     }
-  }, [detail, newChecklistContent, useMock]);
+  }, [detail, newChecklistContent]);
 
   const handleCompleteLoop = useCallback(async () => {
     if (!detail) {
@@ -299,10 +267,6 @@ export default function LoopDetailPage() {
       };
     });
 
-    if (useMock) {
-      return;
-    }
-
     try {
       await Promise.all(
         detail.checklists.map((item) =>
@@ -318,7 +282,7 @@ export default function LoopDetailPage() {
     } catch (error) {
       setDetail(previousState);
     }
-  }, [detail, useMock]);
+  }, [detail]);
 
   return (
     <>
@@ -505,11 +469,9 @@ export default function LoopDetailPage() {
       <LoopEditSheet
         isOpen={isEditSheetOpen}
         loop={detail}
-        isMock={useMock}
         onClose={() => setIsEditSheetOpen(false)}
-        onUpdated={(updatedLoop) => {
-          setDetail(updatedLoop);
-          setIsEditSheetOpen(false);
+        onUpdated={() => {
+          setReloadKey((prev) => prev + 1);
         }}
       />
     </>

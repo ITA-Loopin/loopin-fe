@@ -7,7 +7,7 @@ import { TitleInput } from "@/components/common/add-loop/TitleInput";
 import { ChecklistEditor } from "@/components/common/add-loop/ChecklistEditor";
 import { DateRangePicker } from "@/components/common/add-loop/DateRangePicker";
 import { apiFetch } from "@/lib/api";
-import type { LoopChecklist, LoopDetail } from "@/types/loop";
+import type { LoopDetail } from "@/types/loop";
 
 type EditableChecklist = {
   id: string;
@@ -19,15 +19,13 @@ type EditableChecklist = {
 type LoopEditSheetProps = {
   isOpen: boolean;
   loop: LoopDetail | null;
-  isMock?: boolean;
   onClose: () => void;
-  onUpdated?: (updatedLoop: LoopDetail) => void;
+  onUpdated?: () => Promise<void> | void;
 };
 
 export function LoopEditSheet({
   isOpen,
   loop,
-  isMock = false,
   onClose,
   onUpdated,
 }: LoopEditSheetProps) {
@@ -105,38 +103,93 @@ export function LoopEditSheet({
     event.preventDefault();
     if (!loop) return;
 
+    const trimmedItems = checklists
+      .map((item) => ({
+        ...item,
+        text: item.text.trim(),
+      }))
+      .filter((item) => item.text.length > 0);
+
+    const originalChecklists = loop.checklists ?? [];
+    const originalMap = new Map(
+      originalChecklists.map((item) => [item.id, item])
+    );
+
+    const keptIds = new Set(
+      trimmedItems
+        .map((item) => item.originId)
+        .filter((id): id is number => typeof id === "number")
+    );
+    const removedIds = originalChecklists
+      .filter((item) => !keptIds.has(item.id))
+      .map((item) => item.id);
+
+    const updatedExistingItems = trimmedItems.filter((item) => {
+      if (typeof item.originId !== "number") return false;
+      const original = originalMap.get(item.originId);
+      if (!original) return false;
+      return (
+        original.content !== item.text ||
+        (typeof item.completed === "boolean" &&
+          original.completed !== item.completed)
+      );
+    });
+
+    const newItems = trimmedItems.filter(
+      (item) => typeof item.originId !== "number"
+    );
+
     const payload = {
       title,
-      startDate: startDate || null,
-      endDate: endDate || null,
-      checklists: checklists.map((item) => item.text),
+      content: loop.content ?? null,
+      specificDate: startDate || loop.loopDate || null,
     };
 
     try {
       setIsSubmitting(true);
-      if (!isMock) {
-        await apiFetch(`/api-proxy/rest-api/v1/loops/${loop.id}`, {
-          method: "PUT",
-          json: payload,
-        });
+      await apiFetch(`/api-proxy/rest-api/v1/loops/${loop.id}`, {
+        method: "PUT",
+        json: payload,
+      });
+
+      await Promise.all([
+        ...removedIds.map((id) =>
+          apiFetch(`/api-proxy/rest-api/v1/checklists/${id}`, {
+            method: "DELETE",
+          }).catch((error) => {
+            console.error("체크리스트 삭제 실패:", id, error);
+          })
+        ),
+        ...updatedExistingItems.map((item) =>
+          apiFetch(`/api-proxy/rest-api/v1/checklists/${item.originId}`, {
+            method: "PUT",
+            json: {
+              content: item.text,
+              completed: item.completed ?? false,
+            },
+          }).catch((error) => {
+            console.error("체크리스트 수정 실패:", item.originId, error);
+          })
+        ),
+      ]);
+
+      for (const item of newItems) {
+        try {
+          await apiFetch(
+            `/api-proxy/rest-api/v1/loops/${loop.id}/checklists`,
+            {
+              method: "POST",
+              json: {
+                content: item.text,
+              },
+            }
+          );
+        } catch (error) {
+          console.error("체크리스트 추가 실패:", error);
+        }
       }
 
-      const updatedLoop: LoopDetail = {
-        ...loop,
-        title,
-        loopDate: startDate || loop.loopDate,
-        endDate: endDate || null,
-      checklists: checklists.map<LoopChecklist>((item, index) => {
-        const parsedId = Number(item.id);
-        return {
-          id: Number.isNaN(parsedId) ? index : parsedId,
-          content: item.text,
-          completed: item.completed ?? false,
-        };
-      }),
-      };
-
-      onUpdated?.(updatedLoop);
+      await onUpdated?.();
       onClose();
     } catch (error) {
       console.error("루프 수정 실패:", error);
