@@ -12,6 +12,7 @@ import { Checklist } from "@/components/loop/Checklist";
 import { IconButton } from "@/components/common/IconButton";
 import { LoopActionModal } from "@/components/loop/LoopActionModal";
 import { LoopEditSheet } from "@/components/loop/LoopEditSheet";
+import { LoopGroupEditSheet } from "@/components/loop/LoopGroupEditSheet";
 
 dayjs.locale("ko");
 
@@ -32,6 +33,7 @@ export default function LoopDetailPage() {
   }>({ type: "edit", isOpen: false });
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
+  const [isGroupEditSheetOpen, setIsGroupEditSheetOpen] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
@@ -56,6 +58,10 @@ export default function LoopDetailPage() {
             content?: string | null;
             loopDate: string;
             progress: number;
+            scheduleType?: string | null;
+            daysOfWeek?: string[] | null;
+            startDate?: string | null;
+            endDate?: string | null;
             checklists?: Array<{
               id: number;
               content: string;
@@ -80,6 +86,10 @@ export default function LoopDetailPage() {
           loopDate: data.loopDate,
           progress: Math.round(Math.min(Math.max(data.progress * 100, 0), 100)),
           checklists: data.checklists ?? [],
+          scheduleType: data.scheduleType ?? undefined,
+          daysOfWeek: data.daysOfWeek ?? undefined,
+          startDate: data.startDate ?? null,
+          endDate: data.endDate ?? null,
         });
       } catch (error) {
         if (cancelled) return;
@@ -454,7 +464,7 @@ export default function LoopDetailPage() {
           if (actionModal.type === "delete") {
             // TODO: 모든 반복 루프 삭제 로직
           } else {
-            // TODO: 모든 반복 루프 수정 플로우로 이동
+            setIsGroupEditSheetOpen(true);
           }
         }}
         onSecondaryAction={() => {
@@ -470,6 +480,14 @@ export default function LoopDetailPage() {
         isOpen={isEditSheetOpen}
         loop={detail}
         onClose={() => setIsEditSheetOpen(false)}
+        onUpdated={() => {
+          setReloadKey((prev) => prev + 1);
+        }}
+      />
+      <LoopGroupEditSheet
+        isOpen={isGroupEditSheetOpen}
+        loop={detail}
+        onClose={() => setIsGroupEditSheetOpen(false)}
         onUpdated={() => {
           setReloadKey((prev) => prev + 1);
         }}

@@ -13,6 +13,7 @@ export interface LoopDetail {
   checklists: LoopChecklist[];
   scheduleType?: string;
   daysOfWeek?: string[];
+  startDate?: string | null;
   endDate?: string | null;
 }
 
