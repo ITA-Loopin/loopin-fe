@@ -118,18 +118,12 @@ export async function fetchChatMessages({
 }
 
 function resolveWsBaseUrl() {
-  if (typeof window === "undefined") {
-    const configured = process.env.NEXT_PUBLIC_CHAT_WS_URL;
+  // const configured = process.env.NEXT_PUBLIC_CHAT_WS_URL?.trim();
+  // if (configured && configured.length > 0) {
+  //   return configured;
+  // }
 
-    if (configured && configured.length > 0) {
-      return configured;
-    }
-
-    return "";
-  }
-
-  const origin = window.location.origin.replace(/^http/, "ws");
-  return `${origin}/api-proxy/ws/chat`;
+  return "wss://api.loopin.co.kr/ws/chat";
 }
 
 export type CreateChatSocketOptions = {
