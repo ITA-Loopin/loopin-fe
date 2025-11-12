@@ -91,7 +91,6 @@ export default function OnboardingPage() {
       }>("/api-proxy/rest-api/v1/member/available", {
         skipAuth: true,
         searchParams: { nickname },
-        skipAuth: true,
       });
 
       const isAvailable =
@@ -142,7 +141,6 @@ export default function OnboardingPage() {
           providerId: signupData.providerId,
           nickname,
         },
-        skipAuth: true,
       });
 
       const fallbackUser: User = {
