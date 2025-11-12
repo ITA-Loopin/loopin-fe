@@ -118,6 +118,10 @@ export async function fetchChatMessages({
   );
 }
 
+console.log(
+  "process.env.NEXT_PUBLIC_CHAT_WS_URL",
+  process.env.NEXT_PUBLIC_CHAT_WS_URL
+);
 function resolveWsBaseUrl() {
   if (typeof window === "undefined") {
     const configured = process.env.NEXT_PUBLIC_CHAT_WS_URL;
