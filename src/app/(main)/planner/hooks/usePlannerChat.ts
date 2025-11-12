@@ -403,7 +403,7 @@ export function usePlannerChat() {
     try {
       const socket = createChatSocket({
         chatRoomId: plannerChatRoomId,
-        accessToken,
+        access_token: accessToken,
       });
 
       socketRef.current = socket;
@@ -433,7 +433,7 @@ export function usePlannerChat() {
       try {
         const response = await fetchChatMessages({
           chatRoomId: plannerChatRoomId,
-          accessToken,
+          access_token: accessToken,
           currentUser: currentUserQuery,
           page: 0,
           size: 20,

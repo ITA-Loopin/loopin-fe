@@ -94,13 +94,13 @@ function buildQueryParams(options: BuildParamsOptions = {}) {
 
 export type FetchChatMessagesParams = PageInfo & {
   chatRoomId: number;
-  accessToken?: string | null;
+  access_token?: string | null;
   currentUser?: CurrentUserQuery;
 };
 
 export async function fetchChatMessages({
   chatRoomId,
-  accessToken,
+  access_token,
   page,
   size,
   currentUser,
@@ -108,7 +108,6 @@ export async function fetchChatMessages({
   return apiFetch<ChatRoomMessagesResponse>(
     `/rest-api/v1/chatmessage/${chatRoomId}`,
     {
-      accessToken: accessToken ?? undefined,
       searchParams: buildQueryParams({
         page,
         size,
@@ -118,10 +117,6 @@ export async function fetchChatMessages({
   );
 }
 
-console.log(
-  "process.env.NEXT_PUBLIC_CHAT_WS_URL",
-  process.env.NEXT_PUBLIC_CHAT_WS_URL
-);
 function resolveWsBaseUrl() {
   if (typeof window === "undefined") {
     const configured = process.env.NEXT_PUBLIC_CHAT_WS_URL;
@@ -133,18 +128,18 @@ function resolveWsBaseUrl() {
     return "";
   }
 
-  // const origin = window.location.origin.replace(/^http/, "ws");
-  // return `${origin}/api-proxy/ws/chat`;
+  const origin = window.location.origin.replace(/^http/, "ws");
+  return `${origin}/api-proxy/ws/chat`;
 }
 
 export type CreateChatSocketOptions = {
   chatRoomId: number;
-  accessToken: string;
+  access_token: string;
 };
 
 export function createChatSocket({
   chatRoomId,
-  accessToken,
+  access_token,
 }: CreateChatSocketOptions) {
   const base = resolveWsBaseUrl();
 
@@ -160,8 +155,8 @@ export function createChatSocket({
     params.set(key, String(value));
   });
 
-  if (accessToken) {
-    params.set("accessToken", accessToken);
+  if (access_token) {
+    params.set("access_token", access_token);
   }
 
   const separator = base.includes("?") ? "&" : "?";
