@@ -129,8 +129,8 @@ function resolveWsBaseUrl() {
     return "";
   }
 
-  const origin = window.location.origin.replace(/^http/, "ws");
-  return `${origin}/api-proxy/ws/chat`;
+  // const origin = window.location.origin.replace(/^http/, "ws");
+  // return `${origin}/api-proxy/ws/chat`;
 }
 
 export type CreateChatSocketOptions = {
