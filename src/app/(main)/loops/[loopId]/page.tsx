@@ -85,7 +85,7 @@ export default function LoopDetailPage() {
         }
 
         const data = response.data;
-        const checklists = data.checklists ?? [];
+        const checklists = (data.checklists ?? []).sort((a, b) => a.id - b.id);
         const totalChecklistCount = checklists.length;
         const completedChecklistCount = checklists.filter(
           (item) => item.completed
