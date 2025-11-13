@@ -232,7 +232,7 @@ export function useAddLoopForm({
         onCreated?.();
         onClose();
       } catch (error) {
-        console.error("루프 생성 실패:", error);
+        // 루프 생성 실패
       } finally {
         setIsSubmitting(false);
       }

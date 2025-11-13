@@ -4,6 +4,14 @@ export interface LoopChecklist {
   completed: boolean;
 }
 
+export interface LoopRule {
+  ruleId: number;
+  scheduleType: string;
+  daysOfWeek?: string[];
+  startDate?: string | null;
+  endDate?: string | null;
+}
+
 export interface LoopDetail {
   id: number;
   title: string;
@@ -11,10 +19,13 @@ export interface LoopDetail {
   loopDate: string;
   progress: number;
   checklists: LoopChecklist[];
+  loopRule?: LoopRule;
+  // 하위 호환성을 위해 유지
   scheduleType?: string;
   daysOfWeek?: string[];
   startDate?: string | null;
   endDate?: string | null;
+  loopRuleId?: number;
 }
 
 

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
 import { useParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import Header from "@/components/common/Header";
 import type { LoopDetail, LoopChecklist } from "@/types/loop";
 import { apiFetch, MissingAccessTokenError } from "@/lib/api";
@@ -60,15 +61,18 @@ export default function LoopDetailPage() {
             content?: string | null;
             loopDate: string;
             progress: number;
-            scheduleType?: string | null;
-            daysOfWeek?: string[] | null;
-            startDate?: string | null;
-            endDate?: string | null;
             checklists?: Array<{
               id: number;
               content: string;
               completed: boolean;
             }>;
+            loopRule?: {
+              ruleId: number;
+              scheduleType: string;
+              daysOfWeek?: string[];
+              startDate?: string | null;
+              endDate?: string | null;
+            };
           };
         }>(`/api-proxy/rest-api/v1/loops/${loopId}`);
 
@@ -96,6 +100,16 @@ export default function LoopDetailPage() {
               )
             : 0;
 
+        const loopRule = data.loopRule
+          ? {
+              ruleId: data.loopRule.ruleId,
+              scheduleType: data.loopRule.scheduleType,
+              daysOfWeek: data.loopRule.daysOfWeek,
+              startDate: data.loopRule.startDate ?? null,
+              endDate: data.loopRule.endDate ?? null,
+            }
+          : undefined;
+
         setDetail({
           id: data.id,
           title: data.title,
@@ -103,10 +117,13 @@ export default function LoopDetailPage() {
           loopDate: data.loopDate,
           progress: normalizedProgress,
           checklists,
-          scheduleType: data.scheduleType ?? undefined,
-          daysOfWeek: data.daysOfWeek ?? undefined,
-          startDate: data.startDate ?? null,
-          endDate: data.endDate ?? null,
+          loopRule,
+          // 하위 호환성
+          scheduleType: loopRule?.scheduleType,
+          daysOfWeek: loopRule?.daysOfWeek,
+          startDate: loopRule?.startDate,
+          endDate: loopRule?.endDate,
+          loopRuleId: loopRule?.ruleId,
         });
       } catch (error) {
         if (cancelled) return;
@@ -312,42 +329,43 @@ export default function LoopDetailPage() {
   }, [detail]);
 
   const handleDeleteLoop = useCallback(async () => {
-    if (!Number.isFinite(loopId) || isDeleting) {
+    if (!detail?.id || isDeleting) {
       return;
     }
 
     try {
       setIsDeleting(true);
-      await apiFetch(`/api-proxy/rest-api/v1/loops/${loopId}`, {
+      await apiFetch(`/api-proxy/rest-api/v1/loops/${detail.id}`, {
         method: "DELETE",
       });
       router.back();
     } catch (error) {
-      console.error("루프 삭제 실패:", error);
-      setErrorMessage("루프를 삭제하지 못했습니다. 다시 시도해 주세요.");
+      const errorMessage =
+        error instanceof Error ? error.message : "루프를 삭제하지 못했습니다. 다시 시도해 주세요.";
+      setErrorMessage(errorMessage);
     } finally {
       setIsDeleting(false);
     }
-  }, [loopId, isDeleting, router]);
+  }, [detail?.id, isDeleting, router]);
 
   const handleDeleteGroup = useCallback(async () => {
-    if (!Number.isFinite(loopId) || isDeletingGroup) {
+    const ruleId = detail?.loopRule?.ruleId ?? detail?.loopRuleId;
+    if (!ruleId || isDeletingGroup) {
       return;
     }
 
     try {
       setIsDeletingGroup(true);
-      await apiFetch(`/api-proxy/rest-api/v1/loops/group/${loopId}`, {
+      await apiFetch(`/api-proxy/rest-api/v1/loops/group/${ruleId}`, {
         method: "DELETE",
       });
       router.back();
     } catch (error) {
-      console.error("반복 루프 삭제 실패:", error);
       setErrorMessage("반복 루프를 삭제하지 못했습니다. 다시 시도해 주세요.");
     } finally {
       setIsDeletingGroup(false);
     }
-  }, [loopId, isDeletingGroup, router]);
+  }, [detail?.loopRule?.ruleId, detail?.loopRuleId, isDeletingGroup, router]);
 
   return (
     <>
@@ -481,7 +499,7 @@ export default function LoopDetailPage() {
                 }}
               >
                 <span>수정하기</span>
-                <IconButton
+                <Image
                   src="/loop/loop_edit.svg"
                   alt="수정"
                   width={20}
@@ -498,7 +516,7 @@ export default function LoopDetailPage() {
                 }}
               >
                 <span>삭제하기</span>
-                <IconButton
+                <Image
                   src="/loop/loop_delete.svg"
                   alt="삭제"
                   width={20}
@@ -543,8 +561,14 @@ export default function LoopDetailPage() {
         isOpen={isGroupEditSheetOpen}
         loop={detail}
         onClose={() => setIsGroupEditSheetOpen(false)}
-        onUpdated={() => {
-          setReloadKey((prev) => prev + 1);
+        onUpdated={async (newLoopId) => {
+          if (newLoopId) {
+            // 새로 생성된 루프 ID로 리다이렉트 (히스토리에 남기지 않음)
+            router.replace(`/loops/${newLoopId}`);
+          } else {
+            // 새 루프 ID를 찾지 못하면 캘린더로 리다이렉트
+            router.replace("/calendar");
+          }
         }}
       />
     </>

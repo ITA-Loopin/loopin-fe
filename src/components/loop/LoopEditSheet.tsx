@@ -156,8 +156,8 @@ export function LoopEditSheet({
         ...removedIds.map((id) =>
           apiFetch(`/api-proxy/rest-api/v1/checklists/${id}`, {
             method: "DELETE",
-          }).catch((error) => {
-            console.error("체크리스트 삭제 실패:", id, error);
+          }).catch(() => {
+            // 체크리스트 삭제 실패
           })
         ),
         ...updatedExistingItems.map((item) =>
@@ -167,8 +167,8 @@ export function LoopEditSheet({
               content: item.text,
               completed: item.completed ?? false,
             },
-          }).catch((error) => {
-            console.error("체크리스트 수정 실패:", item.originId, error);
+          }).catch(() => {
+            // 체크리스트 수정 실패
           })
         ),
       ]);
@@ -185,14 +185,14 @@ export function LoopEditSheet({
             }
           );
         } catch (error) {
-          console.error("체크리스트 추가 실패:", error);
+          // 체크리스트 추가 실패
         }
       }
 
       await onUpdated?.();
       onClose();
     } catch (error) {
-      console.error("루프 수정 실패:", error);
+      // 루프 수정 실패
     } finally {
       setIsSubmitting(false);
     }

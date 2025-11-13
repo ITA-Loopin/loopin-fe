@@ -19,7 +19,7 @@ type LoopGroupEditSheetProps = {
   isOpen: boolean;
   loop: LoopDetail | null;
   onClose: () => void;
-  onUpdated?: () => Promise<void> | void;
+  onUpdated?: (newLoopId?: number) => Promise<void> | void;
 };
 
 export function LoopGroupEditSheet({
@@ -48,15 +48,19 @@ export function LoopGroupEditSheet({
       return;
     }
 
-    const normalizedScheduleType = loop.scheduleType ?? "NONE";
+    const loopRule = loop.loopRule;
+    
+    // loopRule이 있으면 그것을 우선 사용, 없으면 기본값
+    const normalizedScheduleType = loopRule?.scheduleType ?? "NONE";
     const initialStart =
-      loop.startDate ?? loop.loopDate ?? dayjs().format("YYYY-MM-DD");
+      loopRule?.startDate ?? loop.loopDate ?? dayjs().format("YYYY-MM-DD");
+    const initialEnd = loopRule?.endDate ?? null;
 
     setTitle(loop.title ?? "");
     setScheduleType(normalizedScheduleType);
-    setDaysOfWeek(loop.daysOfWeek ?? []);
+    setDaysOfWeek(loopRule?.daysOfWeek ?? []);
     setStartDate(initialStart);
-    setEndDate(loop.endDate ?? "");
+    setEndDate(initialEnd ?? "");
     setChecklists(
       (loop.checklists ?? []).map((item, index) => ({
         id: `check-${item.id ?? index}`,
@@ -70,7 +74,7 @@ export function LoopGroupEditSheet({
     setIsEndCalendarOpen(false);
 
     const startMonth = initialStart ? dayjs(initialStart) : dayjs();
-    const endMonth = loop.endDate ? dayjs(loop.endDate) : startMonth;
+    const endMonth = initialEnd ? dayjs(initialEnd) : startMonth;
     setStartCalendarMonth(startMonth);
     setEndCalendarMonth(endMonth);
   }, [isOpen, loop]);
@@ -237,15 +241,55 @@ export function LoopGroupEditSheet({
 
     try {
       setIsSubmitting(true);
-      await apiFetch(`/api-proxy/rest-api/v1/loops/group/${loop.id}`, {
+      const ruleId = loop.loopRule?.ruleId ?? loop.loopRuleId;
+      if (!ruleId) {
+        throw new Error("루프 그룹 ID가 없습니다.");
+      }
+      await apiFetch(`/api-proxy/rest-api/v1/loops/group/${ruleId}`, {
         method: "PUT",
         json: payload,
       });
 
-      await onUpdated?.();
+      // 그룹 수정 후 현재 날짜의 루프 목록을 조회해서 해당 그룹의 새 루프 ID 찾기
+      const currentLoopDate = loop.loopDate ?? dayjs().format("YYYY-MM-DD");
+      const today = dayjs().format("YYYY-MM-DD");
+      // 그룹 수정은 오늘 날짜 기준으로 미래 루프를 생성하므로, 현재 날짜가 오늘 이후인지 확인
+      const searchDate = dayjs(currentLoopDate).isAfter(dayjs(), "day")
+        ? currentLoopDate
+        : today;
+
+      let newLoopId: number | undefined;
+      try {
+        const loopsResponse = await apiFetch<{
+          success?: boolean;
+          data?: {
+            loops?: Array<{
+              id: number;
+              title: string;
+              loopDate: string;
+              loopRule?: {
+                ruleId: number;
+              };
+            }>;
+          };
+        }>(`/api-proxy/rest-api/v1/loops/date/${searchDate}`);
+
+        // 같은 ruleId를 가진 루프 찾기 (또는 제목으로 매칭)
+        const updatedLoop = loopsResponse?.data?.loops?.find(
+          (item) =>
+            item.loopRule?.ruleId === ruleId ||
+            (item.title === title && item.loopDate === searchDate)
+        );
+
+        newLoopId = updatedLoop?.id;
+      } catch (error) {
+        // 새 루프 ID 조회 실패
+      }
+
+      await onUpdated?.(newLoopId);
       onClose();
     } catch (error) {
-      console.error("반복 루프 수정 실패:", error);
+      // 반복 루프 수정 실패
     } finally {
       setIsSubmitting(false);
     }

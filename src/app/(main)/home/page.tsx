@@ -33,7 +33,6 @@ export default function HomePage() {
       alert("회원 탈퇴가 완료되었습니다.");
       router.replace("/");
     } catch (err) {
-      console.error("회원 탈퇴 실패", err);
       setError(
         err instanceof Error ? err.message : "회원 탈퇴에 실패했습니다."
       );
