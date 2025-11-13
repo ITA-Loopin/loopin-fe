@@ -20,10 +20,7 @@ export function LoopProgress({ progress }: LoopProgressProps) {
           width={size}
           height={size}
           viewBox={`0 0 ${size} ${size}`}
-          className="w-80 h-80"
-          style={{
-            filter: "drop-shadow(0px 4px 12px rgba(0, 0, 0, 0.1))",
-          }}
+          className="h-80 w-80 drop-shadow-[0px_4px_12px_rgba(0,0,0,0.1)]"
         >
           <defs>
             {/* 외곽 링 그라데이션 - 빨강-오렌지 */}
@@ -70,14 +67,12 @@ export function LoopProgress({ progress }: LoopProgressProps) {
             strokeDashoffset={offset}
             strokeLinecap="round"
             transform={`rotate(-90 ${center} ${center})`}
+            className="transition-[stroke-dashoffset] duration-[3000ms] ease-out"
           />
         </svg>
         
         {/* 중앙 퍼센트 텍스트 */}
-        <span
-          className="absolute w-[81px] h-[45px] text-2xl font-bold flex items-center justify-center"
-          style={{ color: "#FF543F" }}
-        >
+        <span className="absolute flex h-[45px] w-[81px] items-center justify-center text-2xl font-bold text-[#FF543F]">
           {progress}%
         </span>
       </div>

@@ -33,7 +33,6 @@ export default function HomePage() {
       alert("회원 탈퇴가 완료되었습니다.");
       router.replace("/");
     } catch (err) {
-      console.error("회원 탈퇴 실패", err);
       setError(
         err instanceof Error ? err.message : "회원 탈퇴에 실패했습니다."
       );
@@ -49,12 +48,12 @@ import dayjs from "dayjs";
 import "dayjs/locale/ko";
 import { useMemo } from "react";
 import {
-  HomeHeader,
   TodayLoopTitle,
   EmptyLoopView,
   LoopProgress,
   LoopList,
 } from "@/components/home";
+import Header from "@/components/common/Header";
 import { useDailyLoops } from "@/hooks/useDailyLoops";
 
 dayjs.locale("ko");
@@ -90,7 +89,7 @@ export default function HomePage() {
         }}
       />
       <div className="flex flex-col relative min-h-screen">
-      <HomeHeader />
+      <Header />
 
       <div className="flex-1 px-4 pb-6 flex flex-col gap-6">
         <TodayLoopTitle dateText={todayText} />

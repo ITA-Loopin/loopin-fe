@@ -132,7 +132,7 @@ export default function OnboardingPage() {
       const data = await apiFetch<{
         user?: User;
         accessToken: string;
-      }>("/rest-api/v1/auth/signup-login", {
+      }>("/api-proxy/rest-api/v1/auth/signup-login", {
         method: "POST",
         skipAuth: true,
         json: {

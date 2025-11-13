@@ -72,6 +72,7 @@ function HomeContent() {
         redirectUrl?: string;
         url?: string;
       }>("/rest-api/v1/oauth/redirect-url/kakao", {
+
         skipAuth: true,
       });
       const redirectUrl = data.data || data.redirectUrl || data.url;
