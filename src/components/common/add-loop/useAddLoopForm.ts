@@ -80,6 +80,11 @@ export function useAddLoopForm({
       setScheduleType(value);
       setIsWeeklyDropdownOpen(false);
       setDaysOfWeek([]);
+      // 반복 주기가 "안함"일 때 종료일 초기화
+      if (value === "NONE") {
+        setEndDate("");
+        setIsEndCalendarOpen(false);
+      }
     },
     [scheduleType]
   );
@@ -141,10 +146,13 @@ export function useAddLoopForm({
     [startDate]
   );
 
-  const formattedEndDate = useMemo(
-    () => (endDate ? dayjs(endDate).format("YYYY.MM.DD") : "없음"),
-    [endDate]
-  );
+  const formattedEndDate = useMemo(() => {
+    // 반복 주기가 "안함"일 때는 "종료일 없음" 표시
+    if (scheduleType === "NONE") {
+      return "없음";
+    }
+    return endDate ? dayjs(endDate).format("YYYY.MM.DD") : "없음";
+  }, [endDate, scheduleType]);
 
   const selectedStartDate = useMemo(
     () => (startDate ? dayjs(startDate) : startCalendarMonth),

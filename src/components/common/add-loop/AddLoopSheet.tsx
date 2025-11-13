@@ -88,6 +88,7 @@ export function AddLoopSheet({
           onSelectEndDate={handleSelectEndDate}
           onChangeStartMonth={handleChangeStartMonth}
           onChangeEndMonth={handleChangeEndMonth}
+          disableEndDate={scheduleType === "NONE"}
         />
 
         <ChecklistEditor

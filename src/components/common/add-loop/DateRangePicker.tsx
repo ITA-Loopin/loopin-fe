@@ -114,7 +114,7 @@ export function DateRangePicker({
               )}
             />
           </div>
-          {isEndCalendarOpen && (
+          {isEndCalendarOpen && !disableEndDate && (
             <div className="mt-3">
               <MonthCalendar
                 visibleMonth={endCalendarMonth}

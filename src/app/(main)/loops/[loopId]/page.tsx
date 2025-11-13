@@ -85,7 +85,7 @@ export default function LoopDetailPage() {
         }
 
         const data = response.data;
-        const checklists = data.checklists ?? [];
+        const checklists = (data.checklists ?? []).sort((a, b) => a.id - b.id);
         const totalChecklistCount = checklists.length;
         const completedChecklistCount = checklists.filter(
           (item) => item.completed
@@ -258,16 +258,9 @@ export default function LoopDetailPage() {
         json: { content },
       });
 
-      if (response?.data?.id) {
-        setDetail((prev) => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            checklists: prev.checklists.map((item) =>
-              item.id === tempId ? { ...item, id: response.data!.id } : item
-            ),
-          };
-        });
+      // 체크리스트 추가 성공 후 상세 조회를 다시 호출하여 최신 상태 가져오기
+      if (response?.success !== false) {
+        setReloadKey((prev) => prev + 1);
       }
     } catch (error) {
       setDetail((prev) => {
