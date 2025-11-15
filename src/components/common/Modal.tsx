@@ -6,9 +6,10 @@ type ModalProps = {
   isOpen: boolean;
   onClose?: () => void;
   children: ReactNode;
+  className?: string;
 };
 
-export default function Modal({ isOpen, onClose, children }: ModalProps) {
+export default function Modal({ isOpen, onClose, children, className }: ModalProps) {
   if (!isOpen) {
     return null;
   }
@@ -21,7 +22,7 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-sm"
+        className={`relative w-full max-w-sm ${className ?? ""}`}
         onClick={(event) => event.stopPropagation()}
       >
         {children}

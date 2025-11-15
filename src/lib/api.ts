@@ -82,6 +82,10 @@ export async function apiFetch<T = unknown>(
     }
 
     const normalized = value.startsWith("/") ? value : `/${value}`;
+    // 이미 /api-proxy로 시작하는 경우 중복 추가하지 않음
+    if (normalized.startsWith("/api-proxy")) {
+      return normalized;
+    }
     return `/api-proxy${normalized}`;
   };
 

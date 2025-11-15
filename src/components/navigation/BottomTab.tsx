@@ -58,7 +58,8 @@ export function BottomTab() {
         {TAB_ITEMS.map((item) => {
           const isActive =
             pathname === item.href ||
-            (item.href !== "/home" && pathname.startsWith(`${item.href}/`));
+            (item.href !== "/home" && pathname.startsWith(`${item.href}/`)) ||
+            (item.href === "/calendar" && pathname.startsWith("/loops/"));
 
           return (
             <Link
