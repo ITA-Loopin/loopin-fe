@@ -162,7 +162,6 @@ function HomeContent() {
           priority
         />
       </div>
-
       <div
         className={`relative z-10 mt-16 w-full max-w-sm transition-all duration-700 ${
           showContent ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
@@ -212,6 +211,7 @@ function HomeContent() {
           </button> */}
         </div>
       </div>
+      z
     </div>
   );
 }
