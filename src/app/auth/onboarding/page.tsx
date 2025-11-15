@@ -13,7 +13,6 @@ type SignupSession = {
   email: string;
   provider: string;
   providerId: string;
-  accessToken?: string;
 };
 
 type AlertState = {
@@ -130,10 +129,10 @@ export default function OnboardingPage() {
     setModalError(null);
 
     try {
-      // 1. 회원가입 API 호출
-      await apiFetch<{
+      // SIGNUP_REQUIRED일 때 signup-login API 호출해서 토큰 받기
+      const signupResponse = await apiFetch<{
         user?: User;
-        access_token?: string;
+        access_token: string;
       }>("/rest-api/v1/auth/signup-login", {
         method: "POST",
         skipAuth: true,
@@ -145,37 +144,7 @@ export default function OnboardingPage() {
         },
       });
 
-      let accessToken: string | undefined;
-
-      // 2. SIGNUP_REQUIRED일 때는 다시 로그인 API 호출 필요
-      if (signupData.accessToken) {
-        // access_token이 있으면 로그인 API 호출
-        try {
-          const loginData = await apiFetch<{
-            user?: User;
-            access_token: string;
-          }>("/rest-api/v1/auth/login", {
-            method: "POST",
-            skipAuth: true,
-            searchParams: {
-              access_token: signupData.accessToken,
-            },
-            json: {
-              email: signupData.email,
-              provider: signupData.provider,
-              providerId: signupData.providerId,
-            },
-          });
-          accessToken = loginData.access_token;
-        } catch (loginError) {
-          console.error("로그인 API 호출 실패", loginError);
-          throw new Error("로그인에 실패했습니다. 다시 시도해주세요.");
-        }
-      } else {
-        // access_token이 없으면 signup-login의 응답에서 토큰 사용
-        // (이 경우는 일반적으로 발생하지 않지만 안전장치)
-        throw new Error("로그인 토큰을 받을 수 없습니다.");
-      }
+      const accessToken = signupResponse.access_token;
 
       if (!accessToken) {
         throw new Error("액세스 토큰을 받을 수 없습니다.");

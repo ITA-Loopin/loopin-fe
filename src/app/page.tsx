@@ -72,7 +72,6 @@ function HomeContent() {
         redirectUrl?: string;
         url?: string;
       }>("/rest-api/v1/oauth/redirect-url/kakao", {
-
         skipAuth: true,
       });
       const redirectUrl = data.data || data.redirectUrl || data.url;
@@ -107,24 +106,13 @@ function HomeContent() {
       const email = searchParams.get("email");
       const provider = searchParams.get("provider");
       const providerId = searchParams.get("providerId");
-      const signupAccessToken = searchParams.get("access_token");
 
       if (email && provider && providerId) {
-        const signupData: {
-          email: string;
-          provider: string;
-          providerId: string;
-          accessToken?: string;
-        } = {
+        const signupData = {
           email,
           provider,
           providerId,
         };
-
-        // access_token이 있으면 함께 저장
-        if (signupAccessToken) {
-          signupData.accessToken = signupAccessToken;
-        }
 
         sessionStorage.setItem("signup_data", JSON.stringify(signupData));
         router.push("/auth/onboarding");
