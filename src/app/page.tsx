@@ -106,12 +106,26 @@ function HomeContent() {
       const email = searchParams.get("email");
       const provider = searchParams.get("provider");
       const providerId = searchParams.get("providerId");
+      const signupAccessToken = searchParams.get("access_token");
 
       if (email && provider && providerId) {
-        sessionStorage.setItem(
-          "signup_data",
-          JSON.stringify({ email, provider, providerId })
-        );
+        const signupData: {
+          email: string;
+          provider: string;
+          providerId: string;
+          accessToken?: string;
+        } = {
+          email,
+          provider,
+          providerId,
+        };
+
+        // access_token이 있으면 함께 저장
+        if (signupAccessToken) {
+          signupData.accessToken = signupAccessToken;
+        }
+
+        sessionStorage.setItem("signup_data", JSON.stringify(signupData));
         router.push("/auth/onboarding");
       }
 
