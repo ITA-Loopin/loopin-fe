@@ -20,6 +20,27 @@ function generateCalendarDays(startDate: Dayjs, endDate: Dayjs): Dayjs[] {
   return days;
 }
 
+/**
+ * 날짜의 상태를 판단하여 객체로 반환하는 함수
+ * @param date 판단할 날짜
+ * @param visibleMonth 현재 표시 중인 월
+ * @param selectedDate 선택된 날짜
+ * @param today 오늘 날짜
+ * @returns 날짜 상태 객체
+ */
+function getDateState(
+  date: Dayjs,
+  visibleMonth: Dayjs,
+  selectedDate: Dayjs,
+  today: Dayjs
+) {
+  return {
+    isCurrentMonth: date.isSame(visibleMonth, "month"),
+    isSelected: date.isSame(selectedDate, "day"),
+    isToday: date.isSame(today, "day"),
+  };
+}
+
 type MonthCalendarProps = {
   visibleMonth: Dayjs;
   selectedDate: Dayjs;
@@ -78,9 +99,12 @@ export function MonthCalendar({
 
       <div className="mt-3 grid grid-cols-7 gap-y-4 text-sm font-medium">
         {days.map((date) => {
-          const isCurrentMonth = date.isSame(visibleMonth, "month");
-          const isSelected = date.isSame(selectedDate, "day");
-          const isToday = date.isSame(today, "day");
+          const { isCurrentMonth, isSelected, isToday } = getDateState(
+            date,
+            visibleMonth,
+            selectedDate,
+            today
+          );
 
           return (
             <button
