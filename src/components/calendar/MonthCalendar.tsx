@@ -4,6 +4,22 @@ import { cn } from "@/lib/utils";
 
 const DAY_NAMES = ["S", "M", "T", "W", "T", "F", "S"];
 
+/**
+ * 캘린더에 표시할 날짜 배열을 생성하는 함수
+ * @param startDate 시작 날짜
+ * @param endDate 종료 날짜
+ * @returns Dayjs 객체 배열
+ */
+function generateCalendarDays(startDate: Dayjs, endDate: Dayjs): Dayjs[] {
+  const days: Dayjs[] = [];
+  let current = startDate;
+  while (current.isBefore(endDate) || current.isSame(endDate, "day")) {
+    days.push(current);
+    current = current.add(1, "day");
+  }
+  return days;
+}
+
 type MonthCalendarProps = {
   visibleMonth: Dayjs;
   selectedDate: Dayjs;
@@ -23,13 +39,7 @@ export function MonthCalendar({
   const startOfCalendar = startOfMonth.startOf("week");
   const endOfCalendar = endOfMonth.endOf("week");
   const today = dayjs();
-
-  const days: Dayjs[] = [];
-  let current = startOfCalendar;
-  while (current.isBefore(endOfCalendar) || current.isSame(endOfCalendar, "day")) {
-    days.push(current);
-    current = current.add(1, "day");
-  }
+  const days = generateCalendarDays(startOfCalendar, endOfCalendar);
 
   return (
     <section className="w-full max-w-[420px] rounded-[30px] border border-[#F4F4F6] bg-white px-6 pb-6 pt-5">
