@@ -41,7 +41,6 @@ export function BottomSheet({
       <SheetPortal>
         <SheetOverlay
           className={cn("bg-black/60", overlayClassName)}
-          onClick={() => onClose?.()}
         />
         <SheetContent
           side="bottom"
