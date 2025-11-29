@@ -22,34 +22,10 @@ export function AddLoopSheet({
 }: AddLoopSheetProps) {
   const {
     title,
-    scheduleType,
-    daysOfWeek,
-    checklists,
-    newChecklistItem,
-    isWeeklyDropdownOpen,
-    isStartCalendarOpen,
-    isEndCalendarOpen,
-    startCalendarMonth,
-    endCalendarMonth,
-    formattedStartDate,
-    formattedEndDate,
-    selectedStartDate,
-    selectedEndDate,
-    isSubmitting,
-    handleTitleChange,
-    handleScheduleTypeClick,
-    handleDayClick,
-    handleAddChecklist,
-    handleChecklistChange,
-    handleRemoveChecklist,
-    handleNewChecklistChange,
-    handleSubmit,
-    toggleStartCalendar,
-    toggleEndCalendar,
-    handleSelectStartDate,
-    handleSelectEndDate,
-    handleChangeStartMonth,
-    handleChangeEndMonth,
+    schedule,
+    dateRange,
+    checklist,
+    submit,
   } = useAddLoopForm({ isOpen, onClose, defaultValues, onCreated });
 
   return (
@@ -62,50 +38,50 @@ export function AddLoopSheet({
       <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-gray-200" />
       <h2 className="text-center text-lg font-semibold text-[#2C2C2C]">루프 추가하기</h2>
 
-      <form className="mt-6 space-y-6" onSubmit={handleSubmit}>
-        <TitleInput value={title} onChange={handleTitleChange} />
+      <form className="mt-6 space-y-6" onSubmit={submit.onSubmit}>
+        <TitleInput value={title.value} onChange={title.onChange} />
 
         <ScheduleSelector
-          scheduleType={scheduleType}
-          isWeeklyDropdownOpen={isWeeklyDropdownOpen}
-          daysOfWeek={daysOfWeek}
-          onSelectSchedule={handleScheduleTypeClick}
-          onToggleDay={handleDayClick}
+          scheduleType={schedule.scheduleType}
+          isWeeklyDropdownOpen={schedule.isWeeklyDropdownOpen}
+          daysOfWeek={schedule.daysOfWeek}
+          onSelectSchedule={schedule.onSelectSchedule}
+          onToggleDay={schedule.onToggleDay}
         />
 
         <DateRangePicker
-          formattedStartDate={formattedStartDate}
-          formattedEndDate={formattedEndDate}
-          isStartCalendarOpen={isStartCalendarOpen}
-          isEndCalendarOpen={isEndCalendarOpen}
-          startCalendarMonth={startCalendarMonth}
-          endCalendarMonth={endCalendarMonth}
-          selectedStartDate={selectedStartDate}
-          selectedEndDate={selectedEndDate}
-          onToggleStartCalendar={toggleStartCalendar}
-          onToggleEndCalendar={toggleEndCalendar}
-          onSelectStartDate={handleSelectStartDate}
-          onSelectEndDate={handleSelectEndDate}
-          onChangeStartMonth={handleChangeStartMonth}
-          onChangeEndMonth={handleChangeEndMonth}
-          disableEndDate={scheduleType === "NONE"}
+          formattedStartDate={dateRange.formattedStartDate}
+          formattedEndDate={dateRange.formattedEndDate}
+          isStartCalendarOpen={dateRange.isStartCalendarOpen}
+          isEndCalendarOpen={dateRange.isEndCalendarOpen}
+          startCalendarMonth={dateRange.startCalendarMonth}
+          endCalendarMonth={dateRange.endCalendarMonth}
+          selectedStartDate={dateRange.selectedStartDate}
+          selectedEndDate={dateRange.selectedEndDate}
+          onToggleStartCalendar={dateRange.onToggleStartCalendar}
+          onToggleEndCalendar={dateRange.onToggleEndCalendar}
+          onSelectStartDate={dateRange.onSelectStartDate}
+          onSelectEndDate={dateRange.onSelectEndDate}
+          onChangeStartMonth={dateRange.onChangeStartMonth}
+          onChangeEndMonth={dateRange.onChangeEndMonth}
+          disableEndDate={schedule.scheduleType === "NONE"}
         />
 
         <ChecklistEditor
-          checklists={checklists}
-          onChangeChecklist={handleChecklistChange}
-          onRemoveChecklist={handleRemoveChecklist}
-          newChecklistItem={newChecklistItem}
-          onChangeNewChecklist={handleNewChecklistChange}
-          onAddChecklist={handleAddChecklist}
+          checklists={checklist.checklists}
+          onChangeChecklist={checklist.onChangeChecklist}
+          onRemoveChecklist={checklist.onRemoveChecklist}
+          newChecklistItem={checklist.newChecklistItem}
+          onChangeNewChecklist={checklist.onChangeNewChecklist}
+          onAddChecklist={checklist.onAddChecklist}
         />
 
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={submit.isSubmitting}
           className={cn(
             "w-full rounded-[24px] px-6 py-4 text-base font-semibold text-white transition-opacity",
-            isSubmitting ? "bg-[#2C2C2C]/60" : "bg-[#2C2C2C]"
+            submit.isSubmitting ? "bg-[#2C2C2C]/60" : "bg-[#2C2C2C]"
           )}
         >
           루프 추가하기

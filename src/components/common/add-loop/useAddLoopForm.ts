@@ -1,12 +1,10 @@
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
-import dayjs, { Dayjs } from "dayjs";
+import { FormEvent, useCallback, useState } from "react";
 import { apiFetch } from "@/lib/api";
-import {
-  AddLoopDefaultValues,
-  Checklist,
-  DayOption,
-  WEEKDAY_OPTIONS,
-} from "./constants";
+import { AddLoopDefaultValues } from "./constants";
+import { useLoopTitle } from "./useLoopTitle";
+import { useLoopSchedule } from "./useLoopSchedule";
+import { useLoopDateRange } from "./useLoopDateRange";
+import { useLoopChecklist } from "./useLoopChecklist";
 
 interface UseAddLoopFormProps {
   isOpen: boolean;
@@ -15,204 +13,53 @@ interface UseAddLoopFormProps {
   onCreated?: () => void;
 }
 
-interface ChecklistChangeHandler {
-  (index: number, text: string): void;
-}
-
 export function useAddLoopForm({
   isOpen,
   onClose,
   defaultValues,
   onCreated,
 }: UseAddLoopFormProps) {
-  const [title, setTitle] = useState("");
-  const [scheduleType, setScheduleType] = useState("");
-  const [daysOfWeek, setDaysOfWeek] = useState<string[]>([]);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [checklists, setChecklists] = useState<Checklist[]>([]);
-  const [newChecklistItem, setNewChecklistItem] = useState("");
-
-  const [isWeeklyDropdownOpen, setIsWeeklyDropdownOpen] = useState(false);
-  const [isStartCalendarOpen, setIsStartCalendarOpen] = useState(false);
-  const [isEndCalendarOpen, setIsEndCalendarOpen] = useState(false);
-  const [startCalendarMonth, setStartCalendarMonth] = useState(dayjs());
-  const [endCalendarMonth, setEndCalendarMonth] = useState(dayjs());
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (!isOpen) return;
+  const { title, handleTitleChange } = useLoopTitle({
+    isOpen,
+    defaultValue: defaultValues?.title,
+  });
 
-    setTitle(defaultValues?.title ?? "");
-    setScheduleType(defaultValues?.scheduleType ?? "");
-    setDaysOfWeek(defaultValues?.daysOfWeek ?? []);
-    setStartDate(defaultValues?.startDate ?? dayjs().format("YYYY-MM-DD"));
-    setEndDate(defaultValues?.endDate ?? "");
-    setChecklists(defaultValues?.checklists ?? []);
-    setNewChecklistItem("");
+  const schedule = useLoopSchedule({
+    isOpen,
+    defaultScheduleType: defaultValues?.scheduleType,
+    defaultDaysOfWeek: defaultValues?.daysOfWeek,
+  });
 
-    const shouldOpenWeeklyDropdown = (defaultValues?.scheduleType ?? "") === "WEEKLY";
-    setIsWeeklyDropdownOpen(shouldOpenWeeklyDropdown);
-    setIsStartCalendarOpen(false);
-    setIsEndCalendarOpen(false);
+  const dateRange = useLoopDateRange({
+    isOpen,
+    defaultStartDate: defaultValues?.startDate,
+    defaultEndDate: defaultValues?.endDate,
+    scheduleType: schedule.scheduleType,
+  });
 
-    const initialStart = defaultValues?.startDate ? dayjs(defaultValues.startDate) : dayjs();
-    const initialEnd = defaultValues?.endDate ? dayjs(defaultValues.endDate) : dayjs();
-    setStartCalendarMonth(initialStart);
-    setEndCalendarMonth(initialEnd);
-  }, [isOpen, defaultValues]);
-
-  const handleTitleChange = useCallback((value: string) => {
-    setTitle(value);
-  }, []);
-
+  // scheduleType이 "NONE"으로 변경될 때 종료일 초기화
   const handleScheduleTypeClick = useCallback(
     (value: string) => {
-      if (value === "WEEKLY") {
-        if (scheduleType === "WEEKLY") {
-          setIsWeeklyDropdownOpen((prev) => !prev);
-        } else {
-          setScheduleType("WEEKLY");
-          setIsWeeklyDropdownOpen(true);
-        }
-        return;
-      }
-      setScheduleType(value);
-      setIsWeeklyDropdownOpen(false);
-      setDaysOfWeek([]);
-      // 반복 주기가 "안함"일 때 종료일 초기화
+      schedule.handleScheduleTypeClick(value);
       if (value === "NONE") {
-        setEndDate("");
-        setIsEndCalendarOpen(false);
+        dateRange.resetEndDate();
       }
     },
-    [scheduleType]
+    [schedule, dateRange]
   );
 
-  const handleDayClick = useCallback(
-    (day: DayOption) => {
-      const allSelected = daysOfWeek.length === WEEKDAY_OPTIONS.length;
-
-      if (day === "EVERYDAY") {
-        setDaysOfWeek(allSelected ? [] : [...WEEKDAY_OPTIONS]);
-        return;
-      }
-
-      if (allSelected) {
-        setDaysOfWeek([day]);
-        return;
-      }
-
-      setDaysOfWeek((prev) => {
-        if (prev.includes(day)) {
-          return prev.filter((item) => item !== day);
-        }
-
-        const next = [...prev, day];
-        if (next.length === WEEKDAY_OPTIONS.length) {
-          return [...WEEKDAY_OPTIONS];
-        }
-        return next;
-      });
-    },
-    [daysOfWeek]
-  );
-
-  const handleAddChecklist = useCallback(() => {
-    const trimmed = newChecklistItem.trim();
-    if (!trimmed) return;
-    setChecklists((prev) => [...prev, { id: `check-${prev.length + 1}`, text: trimmed }]);
-    setNewChecklistItem("");
-  }, [newChecklistItem]);
-
-  const handleChecklistChange: ChecklistChangeHandler = useCallback((index, text) => {
-    setChecklists((prev) => {
-      const next = [...prev];
-      next[index] = { ...next[index], text };
-      return next;
-    });
-  }, []);
-
-  const handleRemoveChecklist = useCallback((id: string) => {
-    setChecklists((prev) => prev.filter((item) => item.id !== id));
-  }, []);
-
-  const handleNewChecklistChange = useCallback((value: string) => {
-    setNewChecklistItem(value);
-  }, []);
-
-  const formattedStartDate = useMemo(
-    () => (startDate ? dayjs(startDate).format("YYYY.MM.DD") : "없음"),
-    [startDate]
-  );
-
-  const formattedEndDate = useMemo(() => {
-    // 반복 주기가 "안함"일 때는 "종료일 없음" 표시
-    if (scheduleType === "NONE") {
-      return "없음";
-    }
-    return endDate ? dayjs(endDate).format("YYYY.MM.DD") : "없음";
-  }, [endDate, scheduleType]);
-
-  const selectedStartDate = useMemo(
-    () => (startDate ? dayjs(startDate) : startCalendarMonth),
-    [startDate, startCalendarMonth]
-  );
-
-  const selectedEndDate = useMemo(
-    () => (endDate ? dayjs(endDate) : endCalendarMonth),
-    [endDate, endCalendarMonth]
-  );
-
-  const toggleStartCalendar = useCallback(() => {
-    setIsStartCalendarOpen((prev) => {
-      const next = !prev;
-      if (next) {
-        const base = startDate ? dayjs(startDate) : dayjs();
-        setStartCalendarMonth(base);
-        setIsEndCalendarOpen(false);
-      }
-      return next;
-    });
-  }, [startDate]);
-
-  const toggleEndCalendar = useCallback(() => {
-    setIsEndCalendarOpen((prev) => {
-      const next = !prev;
-      if (next) {
-        const base = endDate ? dayjs(endDate) : startDate ? dayjs(startDate) : dayjs();
-        setEndCalendarMonth(base);
-        setIsStartCalendarOpen(false);
-      }
-      return next;
-    });
-  }, [endDate, startDate]);
-
-  const handleSelectStartDate = useCallback((date: Dayjs) => {
-    setStartDate(date.format("YYYY-MM-DD"));
-    setStartCalendarMonth(date);
-    setIsStartCalendarOpen(false);
-  }, []);
-
-  const handleSelectEndDate = useCallback((date: Dayjs) => {
-    setEndDate(date.format("YYYY-MM-DD"));
-    setEndCalendarMonth(date);
-    setIsEndCalendarOpen(false);
-  }, []);
-
-  const handleChangeStartMonth = useCallback((offset: number) => {
-    setStartCalendarMonth((prev) => prev.add(offset, "month"));
-  }, []);
-
-  const handleChangeEndMonth = useCallback((offset: number) => {
-    setEndCalendarMonth((prev) => prev.add(offset, "month"));
-  }, []);
+  const checklist = useLoopChecklist({
+    isOpen,
+    defaultChecklists: defaultValues?.checklists,
+  });
 
   const handleSubmit = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
 
-      const normalizedScheduleType = scheduleType || "NONE";
+      const normalizedScheduleType = schedule.scheduleType || "NONE";
       const isWeekly = normalizedScheduleType === "WEEKLY";
 
       const payload = {
@@ -220,11 +67,11 @@ export function useAddLoopForm({
         content: null as string | null,
         scheduleType: normalizedScheduleType,
         specificDate:
-          normalizedScheduleType === "NONE" ? (startDate || null) : null,
-        daysOfWeek: isWeekly ? daysOfWeek : [],
-        startDate: startDate || null,
-        endDate: endDate || null,
-        checklists: checklists
+          normalizedScheduleType === "NONE" ? (dateRange.startDate || null) : null,
+        daysOfWeek: isWeekly ? schedule.daysOfWeek : [],
+        startDate: dateRange.startDate || null,
+        endDate: dateRange.endDate || null,
+        checklists: checklist.checklists
           .map((item) => item.text)
           .filter((text) => text.trim().length > 0),
       };
@@ -245,41 +92,60 @@ export function useAddLoopForm({
         setIsSubmitting(false);
       }
     },
-    [checklists, daysOfWeek, endDate, onClose, onCreated, scheduleType, startDate, title]
+    [
+      checklist.checklists,
+      dateRange.endDate,
+      dateRange.startDate,
+      onClose,
+      onCreated,
+      schedule.daysOfWeek,
+      schedule.scheduleType,
+      title,
+      schedule.handleScheduleTypeClick,
+      dateRange.resetEndDate,
+    ]
   );
 
   return {
-    title,
-    scheduleType,
-    daysOfWeek,
-    startDate,
-    endDate,
-    checklists,
-    newChecklistItem,
-    isWeeklyDropdownOpen,
-    isStartCalendarOpen,
-    isEndCalendarOpen,
-    startCalendarMonth,
-    endCalendarMonth,
-    formattedStartDate,
-    formattedEndDate,
-    selectedStartDate,
-    selectedEndDate,
-    isSubmitting,
-    handleTitleChange,
-    handleScheduleTypeClick,
-    handleDayClick,
-    handleAddChecklist,
-    handleChecklistChange,
-    handleRemoveChecklist,
-    handleNewChecklistChange,
-    handleSubmit,
-    toggleStartCalendar,
-    toggleEndCalendar,
-    handleSelectStartDate,
-    handleSelectEndDate,
-    handleChangeStartMonth,
-    handleChangeEndMonth,
+    title: {
+      value: title,
+      onChange: handleTitleChange,
+    },
+    schedule: {
+      scheduleType: schedule.scheduleType,
+      daysOfWeek: schedule.daysOfWeek,
+      isWeeklyDropdownOpen: schedule.isWeeklyDropdownOpen,
+      onSelectSchedule: handleScheduleTypeClick,
+      onToggleDay: schedule.handleDayClick,
+    },
+    dateRange: {
+      formattedStartDate: dateRange.formattedStartDate,
+      formattedEndDate: dateRange.formattedEndDate,
+      isStartCalendarOpen: dateRange.isStartCalendarOpen,
+      isEndCalendarOpen: dateRange.isEndCalendarOpen,
+      startCalendarMonth: dateRange.startCalendarMonth,
+      endCalendarMonth: dateRange.endCalendarMonth,
+      selectedStartDate: dateRange.selectedStartDate,
+      selectedEndDate: dateRange.selectedEndDate,
+      onToggleStartCalendar: dateRange.toggleStartCalendar,
+      onToggleEndCalendar: dateRange.toggleEndCalendar,
+      onSelectStartDate: dateRange.handleSelectStartDate,
+      onSelectEndDate: dateRange.handleSelectEndDate,
+      onChangeStartMonth: dateRange.handleChangeStartMonth,
+      onChangeEndMonth: dateRange.handleChangeEndMonth,
+    },
+    checklist: {
+      checklists: checklist.checklists,
+      newChecklistItem: checklist.newChecklistItem,
+      onAddChecklist: checklist.handleAddChecklist,
+      onChangeChecklist: checklist.handleChecklistChange,
+      onRemoveChecklist: checklist.handleRemoveChecklist,
+      onChangeNewChecklist: checklist.handleNewChecklistChange,
+    },
+    submit: {
+      isSubmitting,
+      onSubmit: handleSubmit,
+    },
   };
 }
 
