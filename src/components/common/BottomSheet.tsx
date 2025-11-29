@@ -51,4 +51,3 @@ export function BottomSheet({
   );
 }
 
-export default BottomSheet;
