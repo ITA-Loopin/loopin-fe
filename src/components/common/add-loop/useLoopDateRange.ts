@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
 
 interface UseLoopDateRangeProps {
@@ -34,28 +34,14 @@ export function useLoopDateRange({
     setEndCalendarMonth(initialEnd ?? initialStart);
   }, [isOpen, defaultStartDate, defaultEndDate]);
 
-  const formattedStartDate = useMemo(
-    () => (startDate ? startDate.format("YYYY.MM.DD") : "없음"),
-    [startDate]
-  );
+  const formattedStartDate = startDate ? startDate.format("YYYY.MM.DD") : "없음";
 
-  const formattedEndDate = useMemo(() => {
-    // 반복 주기가 "안함"일 때는 "종료일 없음" 표시
-    if (scheduleType === "NONE") {
-      return "없음";
-    }
-    return endDate ? endDate.format("YYYY.MM.DD") : "없음";
-  }, [endDate, scheduleType]);
+  // 반복 주기가 "안함"일 때는 "종료일 없음" 표시
+  const formattedEndDate =
+    scheduleType === "NONE" ? "없음" : endDate ? endDate.format("YYYY.MM.DD") : "없음";
 
-  const selectedStartDate = useMemo(
-    () => startDate ?? startCalendarMonth,
-    [startDate, startCalendarMonth]
-  );
-
-  const selectedEndDate = useMemo(
-    () => endDate ?? endCalendarMonth,
-    [endDate, endCalendarMonth]
-  );
+  const selectedStartDate = startDate ?? startCalendarMonth;
+  const selectedEndDate = endDate ?? endCalendarMonth;
 
   const toggleStartCalendar = useCallback(() => {
     setIsStartCalendarOpen((prev) => {
