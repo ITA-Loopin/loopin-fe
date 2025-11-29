@@ -43,41 +43,45 @@ export function useLoopDateRange({
   const selectedStartDate = startDate ?? startCalendarMonth;
   const selectedEndDate = endDate ?? endCalendarMonth;
 
-  const toggleStartCalendar = useCallback(() => {
-    setIsStartCalendarOpen((prev) => {
-      const next = !prev;
-      if (next) {
-        const base = startDate ?? dayjs();
-        setStartCalendarMonth(base);
-        setIsEndCalendarOpen(false);
-      }
-      return next;
-    });
+  const openStartCalendar = useCallback(() => {
+    const base = startDate ?? dayjs();
+    setStartCalendarMonth(base);
+    setIsStartCalendarOpen(true);
+    setIsEndCalendarOpen(false);
   }, [startDate]);
 
-  const toggleEndCalendar = useCallback(() => {
-    setIsEndCalendarOpen((prev) => {
-      const next = !prev;
-      if (next) {
-        const base = endDate ?? startDate ?? dayjs();
-        setEndCalendarMonth(base);
-        setIsStartCalendarOpen(false);
-      }
-      return next;
-    });
-  }, [endDate, startDate]);
-
-  const handleSelectStartDate = useCallback((date: Dayjs) => {
-    setStartDate(date);
-    setStartCalendarMonth(date);
+  const closeStartCalendar = useCallback(() => {
     setIsStartCalendarOpen(false);
   }, []);
 
-  const handleSelectEndDate = useCallback((date: Dayjs) => {
-    setEndDate(date);
-    setEndCalendarMonth(date);
+  const openEndCalendar = useCallback(() => {
+    const base = endDate ?? startDate ?? dayjs();
+    setEndCalendarMonth(base);
+    setIsEndCalendarOpen(true);
+    setIsStartCalendarOpen(false);
+  }, [endDate, startDate]);
+
+  const closeEndCalendar = useCallback(() => {
     setIsEndCalendarOpen(false);
   }, []);
+
+  const handleSelectStartDate = useCallback(
+    (date: Dayjs) => {
+      setStartDate(date);
+      setStartCalendarMonth(date);
+      closeStartCalendar();
+    },
+    [closeStartCalendar]
+  );
+
+  const handleSelectEndDate = useCallback(
+    (date: Dayjs) => {
+      setEndDate(date);
+      setEndCalendarMonth(date);
+      closeEndCalendar();
+    },
+    [closeEndCalendar]
+  );
 
   const handleChangeStartMonth = useCallback((offset: number) => {
     setStartCalendarMonth((prev) => prev.add(offset, "month"));
@@ -89,8 +93,8 @@ export function useLoopDateRange({
 
   const resetEndDate = useCallback(() => {
     setEndDate(null);
-    setIsEndCalendarOpen(false);
-  }, []);
+    closeEndCalendar();
+  }, [closeEndCalendar]);
 
   return {
     startDate,
@@ -103,8 +107,10 @@ export function useLoopDateRange({
     formattedEndDate,
     selectedStartDate,
     selectedEndDate,
-    toggleStartCalendar,
-    toggleEndCalendar,
+    openStartCalendar,
+    closeStartCalendar,
+    openEndCalendar,
+    closeEndCalendar,
     handleSelectStartDate,
     handleSelectEndDate,
     handleChangeStartMonth,

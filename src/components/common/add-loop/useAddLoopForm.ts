@@ -129,8 +129,20 @@ export function useAddLoopForm({
       endCalendarMonth: dateRange.endCalendarMonth,
       selectedStartDate: dateRange.selectedStartDate,
       selectedEndDate: dateRange.selectedEndDate,
-      onToggleStartCalendar: dateRange.toggleStartCalendar,
-      onToggleEndCalendar: dateRange.toggleEndCalendar,
+      onToggleStartCalendar: () => {
+        if (dateRange.isStartCalendarOpen) {
+          dateRange.closeStartCalendar();
+        } else {
+          dateRange.openStartCalendar();
+        }
+      },
+      onToggleEndCalendar: () => {
+        if (dateRange.isEndCalendarOpen) {
+          dateRange.closeEndCalendar();
+        } else {
+          dateRange.openEndCalendar();
+        }
+      },
       onSelectStartDate: dateRange.handleSelectStartDate,
       onSelectEndDate: dateRange.handleSelectEndDate,
       onChangeStartMonth: dateRange.handleChangeStartMonth,
