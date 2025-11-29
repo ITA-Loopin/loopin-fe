@@ -67,10 +67,12 @@ export function useAddLoopForm({
         content: null as string | null,
         scheduleType: normalizedScheduleType,
         specificDate:
-          normalizedScheduleType === "NONE" ? (dateRange.startDate || null) : null,
+          normalizedScheduleType === "NONE"
+            ? (dateRange.startDate?.format("YYYY-MM-DD") || null)
+            : null,
         daysOfWeek: isWeekly ? schedule.daysOfWeek : [],
-        startDate: dateRange.startDate || null,
-        endDate: dateRange.endDate || null,
+        startDate: dateRange.startDate?.format("YYYY-MM-DD") || null,
+        endDate: dateRange.endDate?.format("YYYY-MM-DD") || null,
         checklists: checklist.checklists
           .map((item) => item.text)
           .filter((text) => text.trim().length > 0),

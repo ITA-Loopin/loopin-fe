@@ -14,8 +14,8 @@ export function useLoopDateRange({
   defaultEndDate,
   scheduleType,
 }: UseLoopDateRangeProps) {
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [startDate, setStartDate] = useState<Dayjs | null>(null);
+  const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const [isStartCalendarOpen, setIsStartCalendarOpen] = useState(false);
   const [isEndCalendarOpen, setIsEndCalendarOpen] = useState(false);
   const [startCalendarMonth, setStartCalendarMonth] = useState(dayjs());
@@ -24,19 +24,18 @@ export function useLoopDateRange({
   useEffect(() => {
     if (!isOpen) return;
 
-    setStartDate(defaultStartDate ?? dayjs().format("YYYY-MM-DD"));
-    setEndDate(defaultEndDate ?? "");
+    const initialStart = defaultStartDate ? dayjs(defaultStartDate) : dayjs();
+    const initialEnd = defaultEndDate ? dayjs(defaultEndDate) : null;
+    setStartDate(initialStart);
+    setEndDate(initialEnd);
     setIsStartCalendarOpen(false);
     setIsEndCalendarOpen(false);
-
-    const initialStart = defaultStartDate ? dayjs(defaultStartDate) : dayjs();
-    const initialEnd = defaultEndDate ? dayjs(defaultEndDate) : dayjs();
     setStartCalendarMonth(initialStart);
-    setEndCalendarMonth(initialEnd);
+    setEndCalendarMonth(initialEnd ?? initialStart);
   }, [isOpen, defaultStartDate, defaultEndDate]);
 
   const formattedStartDate = useMemo(
-    () => (startDate ? dayjs(startDate).format("YYYY.MM.DD") : "없음"),
+    () => (startDate ? startDate.format("YYYY.MM.DD") : "없음"),
     [startDate]
   );
 
@@ -45,16 +44,16 @@ export function useLoopDateRange({
     if (scheduleType === "NONE") {
       return "없음";
     }
-    return endDate ? dayjs(endDate).format("YYYY.MM.DD") : "없음";
+    return endDate ? endDate.format("YYYY.MM.DD") : "없음";
   }, [endDate, scheduleType]);
 
   const selectedStartDate = useMemo(
-    () => (startDate ? dayjs(startDate) : startCalendarMonth),
+    () => startDate ?? startCalendarMonth,
     [startDate, startCalendarMonth]
   );
 
   const selectedEndDate = useMemo(
-    () => (endDate ? dayjs(endDate) : endCalendarMonth),
+    () => endDate ?? endCalendarMonth,
     [endDate, endCalendarMonth]
   );
 
@@ -62,7 +61,7 @@ export function useLoopDateRange({
     setIsStartCalendarOpen((prev) => {
       const next = !prev;
       if (next) {
-        const base = startDate ? dayjs(startDate) : dayjs();
+        const base = startDate ?? dayjs();
         setStartCalendarMonth(base);
         setIsEndCalendarOpen(false);
       }
@@ -74,7 +73,7 @@ export function useLoopDateRange({
     setIsEndCalendarOpen((prev) => {
       const next = !prev;
       if (next) {
-        const base = endDate ? dayjs(endDate) : startDate ? dayjs(startDate) : dayjs();
+        const base = endDate ?? startDate ?? dayjs();
         setEndCalendarMonth(base);
         setIsStartCalendarOpen(false);
       }
@@ -83,13 +82,13 @@ export function useLoopDateRange({
   }, [endDate, startDate]);
 
   const handleSelectStartDate = useCallback((date: Dayjs) => {
-    setStartDate(date.format("YYYY-MM-DD"));
+    setStartDate(date);
     setStartCalendarMonth(date);
     setIsStartCalendarOpen(false);
   }, []);
 
   const handleSelectEndDate = useCallback((date: Dayjs) => {
-    setEndDate(date.format("YYYY-MM-DD"));
+    setEndDate(date);
     setEndCalendarMonth(date);
     setIsEndCalendarOpen(false);
   }, []);
@@ -103,7 +102,7 @@ export function useLoopDateRange({
   }, []);
 
   const resetEndDate = useCallback(() => {
-    setEndDate("");
+    setEndDate(null);
     setIsEndCalendarOpen(false);
   }, []);
 
