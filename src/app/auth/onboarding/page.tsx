@@ -88,10 +88,9 @@ export default function OnboardingPage() {
       const data = await apiFetch<{
         success?: boolean;
         data?: { available?: boolean };
-      }>("/api-proxy/rest-api/v1/member/available", {
-        skipAuth: true,
+      }>("/rest-api/v1/member/available", {
         searchParams: { nickname },
-        skipAuth: true,
+        skipCredentials: true, // 인증이 필요 없는 공개 엔드포인트
       });
 
       const isAvailable =
@@ -132,17 +131,15 @@ export default function OnboardingPage() {
     try {
       const data = await apiFetch<{
         user?: User;
-        accessToken: string;
-      }>("/api-proxy/rest-api/v1/auth/signup-login", {
+      }>("/rest-api/v1/auth/signup-login", {
         method: "POST",
-        skipAuth: true,
         json: {
           email: signupData.email,
           provider: signupData.provider,
           providerId: signupData.providerId,
           nickname,
         },
-        skipAuth: true,
+        skipCredentials: true, // 회원가입 시에는 쿠키가 아직 없음
       });
 
       const fallbackUser: User = {
@@ -164,7 +161,7 @@ export default function OnboardingPage() {
       let finalUser = baseUser;
 
       try {
-        const memberResponse = await fetchMemberProfile(data.accessToken);
+        const memberResponse = await fetchMemberProfile();
         finalUser = buildUserFromMemberProfile(memberResponse.data, {
           ...baseUser,
           id: baseUser.id || signupData.providerId,
@@ -176,7 +173,6 @@ export default function OnboardingPage() {
       dispatch(
         setCredentials({
           user: finalUser,
-          accessToken: data.accessToken,
         })
       );
 

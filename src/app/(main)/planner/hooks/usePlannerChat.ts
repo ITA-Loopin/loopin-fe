@@ -70,7 +70,7 @@ function normalizeChatMessages(input: unknown): ChatMessageDto[] {
 }
 
 export function usePlannerChat() {
-  const { user, accessToken } = useAppSelector((state) => state.auth);
+  const { user } = useAppSelector((state) => state.auth);
   const [messages, setMessages] = useState<ChatMessage[]>([
     { id: generateId(), author: "assistant", content: INITIAL_MESSAGE },
   ]);
@@ -385,7 +385,7 @@ export function usePlannerChat() {
   );
 
   const initializeSocket = useCallback(() => {
-    if (!plannerChatRoomId || !accessToken || !currentUserQuery) {
+    if (!plannerChatRoomId || !currentUserQuery) {
       return null;
     }
 
@@ -403,7 +403,6 @@ export function usePlannerChat() {
     try {
       const socket = createChatSocket({
         chatRoomId: plannerChatRoomId,
-        accessToken,
       });
 
       socketRef.current = socket;
@@ -416,14 +415,13 @@ export function usePlannerChat() {
     }
   }, [
     plannerChatRoomId,
-    accessToken,
     currentUserQuery,
     attachSocketListeners,
     cleanupSocket,
   ]);
 
   useEffect(() => {
-    if (!plannerChatRoomId || !accessToken || !currentUserQuery) {
+    if (!plannerChatRoomId || !currentUserQuery) {
       return;
     }
 
@@ -433,7 +431,6 @@ export function usePlannerChat() {
       try {
         const response = await fetchChatMessages({
           chatRoomId: plannerChatRoomId,
-          accessToken,
           currentUser: currentUserQuery,
           page: 0,
           size: 20,
@@ -454,7 +451,7 @@ export function usePlannerChat() {
     return () => {
       isCancelled = true;
     };
-  }, [plannerChatRoomId, accessToken, currentUserQuery, appendNewMessages]);
+  }, [plannerChatRoomId, currentUserQuery, appendNewMessages]);
 
   useEffect(() => {
     initializeSocket();
@@ -487,7 +484,7 @@ export function usePlannerChat() {
       const queue = pendingUserMessageIdsRef.current.get(trimmed) ?? [];
       pendingUserMessageIdsRef.current.set(trimmed, [...queue, userMessage.id]);
 
-      if (!accessToken || !currentUserQuery || !plannerChatRoomId) {
+      if (!currentUserQuery || !plannerChatRoomId) {
         setMessages((prev) => [
           ...prev,
           {
@@ -532,7 +529,7 @@ export function usePlannerChat() {
 
       try {
         const payload = JSON.stringify({
-          messageType: "MESSAGE",
+          messageType: "CREATE_LOOP",
           chatRoomId: plannerChatRoomId,
           chatMessageDto: {
             tempId: userMessage.id,
@@ -590,13 +587,7 @@ export function usePlannerChat() {
         setIsLoading(false);
       }
     },
-    [
-      isLoading,
-      accessToken,
-      currentUserQuery,
-      plannerChatRoomId,
-      initializeSocket,
-    ]
+    [isLoading, currentUserQuery, plannerChatRoomId, initializeSocket]
   );
 
   const handleSelectRecommendation = useCallback(

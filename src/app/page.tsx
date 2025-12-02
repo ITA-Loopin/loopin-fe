@@ -31,38 +31,32 @@ function HomeContent() {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleLoginSuccess = useCallback(
-    async (accessToken: string) => {
-      const sanitizedAccessToken = accessToken.replace(/\s/g, "+").trim();
+  const handleLoginSuccess = useCallback(async () => {
+    try {
+      const memberResponse = await fetchMemberProfile();
 
-      try {
-        const memberResponse = await fetchMemberProfile(sanitizedAccessToken);
+      const fallbackUser: User = {
+        id: "user",
+        nickname: "루프인",
+      };
 
-        const fallbackUser: User = {
-          id: sanitizedAccessToken,
-          nickname: "루프인",
-        };
+      const userData = buildUserFromMemberProfile(
+        memberResponse.data,
+        fallbackUser
+      );
 
-        const userData = buildUserFromMemberProfile(
-          memberResponse.data,
-          fallbackUser
-        );
+      dispatch(
+        setCredentials({
+          user: userData,
+        })
+      );
 
-        dispatch(
-          setCredentials({
-            user: userData,
-            accessToken: sanitizedAccessToken,
-          })
-        );
-
-        router.replace("/home");
-      } catch (error) {
-        console.error("로그인 처리 실패:", error);
-        alert("로그인 처리 중 오류가 발생했습니다.");
-      }
-    },
-    [dispatch, router]
-  );
+      router.replace("/home");
+    } catch (error) {
+      console.error("로그인 처리 실패:", error);
+      alert("로그인 처리 중 오류가 발생했습니다.");
+    }
+  }, [dispatch, router]);
 
   const handleKakaoLogin = async () => {
     try {
@@ -71,9 +65,7 @@ function HomeContent() {
         data?: string;
         redirectUrl?: string;
         url?: string;
-      }>("/rest-api/v1/oauth/redirect-url/kakao", {
-        skipAuth: true,
-      });
+      }>("rest-api/v1/oauth/redirect-url/kakao");
       const redirectUrl = data.data || data.redirectUrl || data.url;
 
       if (redirectUrl) {
@@ -95,10 +87,9 @@ function HomeContent() {
 
   useEffect(() => {
     const status = searchParams.get("status");
-    const accessToken = searchParams.get("access_token");
 
-    if (status === "LOGIN_SUCCESS" && accessToken) {
-      handleLoginSuccess(accessToken);
+    if (status === "LOGIN_SUCCESS") {
+      handleLoginSuccess();
       return;
     }
 
@@ -211,7 +202,6 @@ function HomeContent() {
           </button> */}
         </div>
       </div>
-      z
     </div>
   );
 }

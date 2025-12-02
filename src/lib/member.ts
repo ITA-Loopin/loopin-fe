@@ -50,8 +50,6 @@ export function buildUserFromMemberProfile(
   };
 }
 
-export async function fetchMemberProfile(accessToken: string) {
-  return apiFetch<MemberResponse>("/rest-api/v1/member", {
-    accessToken,
-  });
+export async function fetchMemberProfile() {
+  return apiFetch<MemberResponse>("/rest-api/v1/member");
 }
