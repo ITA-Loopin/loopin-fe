@@ -94,13 +94,11 @@ function buildQueryParams(options: BuildParamsOptions = {}) {
 
 export type FetchChatMessagesParams = PageInfo & {
   chatRoomId: number;
-  accessToken?: string | null;
   currentUser?: CurrentUserQuery;
 };
 
 export async function fetchChatMessages({
   chatRoomId,
-  accessToken,
   page,
   size,
   currentUser,
@@ -108,7 +106,6 @@ export async function fetchChatMessages({
   return apiFetch<ChatRoomMessagesResponse>(
     `/rest-api/v1/chatmessage/${chatRoomId}`,
     {
-      accessToken: accessToken ?? undefined,
       searchParams: buildQueryParams({
         page,
         size,
@@ -126,22 +123,17 @@ function resolveWsBaseUrl() {
       return configured;
     }
 
-    return "";
+    return "wss://api.loopin.co.kr/ws/chat";
   }
 
-  const origin = window.location.origin.replace(/^http/, "ws");
-  return `${origin}/api-proxy/ws/chat`;
+  return "wss://api.loopin.co.kr/ws/chat";
 }
 
 export type CreateChatSocketOptions = {
   chatRoomId: number;
-  accessToken: string;
 };
 
-export function createChatSocket({
-  chatRoomId,
-  accessToken,
-}: CreateChatSocketOptions) {
+export function createChatSocket({ chatRoomId }: CreateChatSocketOptions) {
   const base = resolveWsBaseUrl();
 
   if (!base) {
@@ -156,11 +148,11 @@ export function createChatSocket({
     params.set(key, String(value));
   });
 
-  if (accessToken) {
-    params.set("accessToken", accessToken);
-  }
-
   const separator = base.includes("?") ? "&" : "?";
   const url = `${base}${separator}${params.toString()}`;
+
+  // WebSocket은 같은 도메인(또는 서브도메인)이면 쿠키가 자동으로 전송됩니다.
+  // 쿠키의 Domain 속성이 .loopin.co.kr로 설정되어 있다면,
+  // local.loopin.co.kr에서 api.loopin.co.kr로 연결할 때도 쿠키가 자동 전송됩니다.
   return new WebSocket(url);
 }
