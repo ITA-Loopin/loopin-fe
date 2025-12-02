@@ -4,10 +4,10 @@ const API_BASE_URL = "https://api.loopin.co.kr";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { provider: string } }
+  { params }: { params: Promise<{ provider: string }> }
 ) {
   try {
-    const { provider } = params;
+    const { provider } = await params;
 
     const response = await fetch(
       `${API_BASE_URL}/rest-api/v1/oauth/redirect-url/${provider}`,
@@ -42,6 +42,3 @@ export async function GET(
     );
   }
 }
-
-
-
