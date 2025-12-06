@@ -7,6 +7,11 @@ import { useSearchParams } from "next/navigation";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { setCredentials } from "@/store/slices/authSlice";
 import { apiFetch } from "@/lib/api";
+import {
+  buildUserFromMemberProfile,
+  fetchMemberProfile,
+  type MemberResponse,
+} from "@/lib/member";
 import type { User } from "@/types/auth";
 
 export const dynamic = "force-dynamic";
@@ -26,30 +31,32 @@ function HomeContent() {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleLoginSuccess = useCallback(
-    async (accessToken: string) => {
-      const sanitizedAccessToken = accessToken.replace(/\s/g, "+").trim();
+  const handleLoginSuccess = useCallback(async () => {
+    try {
+      const memberResponse = await fetchMemberProfile();
 
-      try {
-        const userData = await apiFetch<User>("/api-proxy/rest-api/v1/member", {
-          accessToken: sanitizedAccessToken,
-        });
+      const fallbackUser: User = {
+        id: "user",
+        nickname: "루프인",
+      };
 
-        dispatch(
-          setCredentials({
-            user: userData,
-            accessToken: sanitizedAccessToken,
-          })
-        );
+      const userData = buildUserFromMemberProfile(
+        memberResponse.data,
+        fallbackUser
+      );
 
-        router.replace("/home");
-      } catch (error) {
-        console.error("로그인 처리 실패:", error);
-        alert("로그인 처리 중 오류가 발생했습니다.");
-      }
-    },
-    [dispatch, router]
-  );
+      dispatch(
+        setCredentials({
+          user: userData,
+        })
+      );
+
+      router.replace("/home");
+    } catch (error) {
+      console.error("로그인 처리 실패:", error);
+      alert("로그인 처리 중 오류가 발생했습니다.");
+    }
+  }, [dispatch, router]);
 
   const handleKakaoLogin = async () => {
     try {
@@ -58,9 +65,7 @@ function HomeContent() {
         data?: string;
         redirectUrl?: string;
         url?: string;
-      }>("/api-proxy/rest-api/v1/oauth/redirect-url/kakao", {
-        skipAuth: true,
-      });
+      }>("rest-api/v1/oauth/redirect-url/kakao");
       const redirectUrl = data.data || data.redirectUrl || data.url;
 
       if (redirectUrl) {
@@ -82,10 +87,9 @@ function HomeContent() {
 
   useEffect(() => {
     const status = searchParams.get("status");
-    const accessToken = searchParams.get("access_token");
 
-    if (status === "LOGIN_SUCCESS" && accessToken) {
-      handleLoginSuccess(accessToken);
+    if (status === "LOGIN_SUCCESS") {
+      handleLoginSuccess();
       return;
     }
 
@@ -149,7 +153,6 @@ function HomeContent() {
           priority
         />
       </div>
-
       <div
         className={`relative z-10 mt-16 w-full max-w-sm transition-all duration-700 ${
           showContent ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"

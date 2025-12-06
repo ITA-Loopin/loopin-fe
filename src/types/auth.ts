@@ -16,11 +16,9 @@ export interface User {
   email?: string;
   nickname: string;
   profileImage?: string;
-  kakaoId: number;
-}
-
-export interface AuthResponse {
-  user: User;
-  accessToken: string;
-  refreshToken?: string;
+  profileImageUrl?: string;
+  kakaoId?: number;
+  followMemberCount?: number;
+  followedMemberCount?: number;
+  chatRoomId?: number;
 }

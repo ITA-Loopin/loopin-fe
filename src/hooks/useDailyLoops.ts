@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { LoopItem } from "@/components/home";
-import { apiFetch, MissingAccessTokenError } from "@/lib/api";
+import { apiFetch } from "@/lib/api";
 
 interface UseDailyLoopsParams {
   date: string;
@@ -27,7 +27,7 @@ export function useDailyLoops({ date }: UseDailyLoopsParams): UseDailyLoopsResul
         if (!cancelled) {
           setIsLoading(true);
         }
-        const apiUrl = `/api-proxy/rest-api/v1/loops/date/${date}`;
+        const apiUrl = `/rest-api/v1/loops/date/${date}`;
         const result = await apiFetch<{
           success?: boolean;
           data?: { loops?: LoopItem[]; totalProgress?: number };
@@ -52,9 +52,7 @@ export function useDailyLoops({ date }: UseDailyLoopsParams): UseDailyLoopsResul
         if (!cancelled) {
           setLoopList([]);
           setTotalProgress(0);
-          if (error instanceof MissingAccessTokenError) {
-            // TODO: 토큰 만료 시 재발급 또는 로그인 페이지로 리디렉션 처리
-          }
+          console.error("루프 목록 조회 실패", error);
         }
       } finally {
         if (!cancelled) {
