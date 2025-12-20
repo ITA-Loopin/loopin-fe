@@ -59,30 +59,8 @@ function HomeContent() {
   }, [dispatch, router]);
 
   const handleKakaoLogin = async () => {
-    try {
-      const data = await apiFetch<{
-        success?: boolean;
-        data?: string;
-        redirectUrl?: string;
-        url?: string;
-      }>("rest-api/v1/oauth/redirect-url/kakao");
-      const redirectUrl = data.data || data.redirectUrl || data.url;
-
-      if (redirectUrl) {
-        window.location.href = redirectUrl;
-      } else {
-        throw new Error(
-          `리다이렉션 URL을 찾을 수 없습니다. 응답: ${JSON.stringify(data)}`
-        );
-      }
-    } catch (error) {
-      console.error("카카오 로그인 실패:", error);
-      alert(
-        `카카오 로그인에 실패했습니다.\n${
-          error instanceof Error ? error.message : "다시 시도해주세요."
-        }`
-      );
-    }
+    window.location.href =
+      "https://api.loopin.co.kr/oauth2/authorization/kakao";
   };
 
   useEffect(() => {
@@ -94,15 +72,10 @@ function HomeContent() {
     }
 
     if (status === "SIGNUP_REQUIRED") {
-      const email = searchParams.get("email");
-      const provider = searchParams.get("provider");
-      const providerId = searchParams.get("providerId");
+      const ticket = searchParams.get("ticket");
 
-      if (email && provider && providerId) {
-        sessionStorage.setItem(
-          "signup_data",
-          JSON.stringify({ email, provider, providerId })
-        );
+      if (ticket) {
+        sessionStorage.setItem("signup_data", JSON.stringify({ ticket }));
         router.push("/auth/onboarding");
       }
 
