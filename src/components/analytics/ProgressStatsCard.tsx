@@ -1,10 +1,8 @@
 "use client";
 
-import type { ReportMessages } from "./reportMessages";
 import type { LoopReportData } from "./LoopReport";
 
 type ProgressStatsCardProps = {
-  messages: ReportMessages;
   data: LoopReportData;
 };
 
@@ -23,7 +21,6 @@ function StatCard({ label, value }: StatCardProps) {
 }
 
 export function ProgressStatsCard({
-  messages,
   data,
 }: ProgressStatsCardProps) {
   return (
