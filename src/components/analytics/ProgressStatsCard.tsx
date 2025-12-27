@@ -26,36 +26,28 @@ export function ProgressStatsCard({
   status,
   data,
 }: ProgressStatsCardProps) {
-  const isEmpty = status === "EMPTY";
+  const isEmpty = status === "NONE";
 
   return (
     <div className="space-y-3 w-full">
       {/* 두 개의 작은 카드 - 나란히 배치 */}
       <div className="flex items-stretch gap-8 -mx-6 px-10 w-[calc(100%+48px)]">
         {isEmpty ? (
-          <>
-            <StatCard
-              label="최근 일주일 동안은"
-              value="루프가 설정되지 않았어요"
-              isSmallText
-            />
-            <StatCard
-              label="최근 10일 동안"
-              value="0%"
-            />
-          </>
+          <StatCard
+            label=""
+            value="최근 일주일 동안은 루프가 설정되지 않았어요"
+            isSmallText
+          />
         ) : (
-          <>
-            <StatCard
-              label="일주일 동안"
-              value={`${data.weekLoopCount}/${data.totalLoopCount}개`}
-            />
-            <StatCard
-              label="최근 10일 동안"
-              value={`${data.tenDayProgress}%`}
-            />
-          </>
+          <StatCard
+            label="일주일 동안"
+            value={`${data.weekLoopCount}/${data.totalLoopCount}개`}
+          />
         )}
+        <StatCard
+          label="최근 10일 동안"
+          value={`${data.tenDayProgress}%`}
+        />
       </div>
     </div>
   );
