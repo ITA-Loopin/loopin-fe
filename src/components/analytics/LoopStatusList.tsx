@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReportLoopItem, ReportStatus } from "./LoopReport";
+import type { ReportLoopItem, ReportStatus } from "@/types/report";
 
 type CalendarViewType = "week" | "month";
 
@@ -9,6 +9,8 @@ type LoopStatusListProps = {
   stableLoops: ReportLoopItem[];
   unstableLoops: ReportLoopItem[];
   status: ReportStatus;
+  goodProgressMessage: string | null;
+  badProgressMessage: string | null;
   onActionClick?: () => void;
 };
 
@@ -110,7 +112,7 @@ function LoopGroup({ title, loops, emptyMessage, showSuggestion, onActionClick, 
       {!hasLoops ? (
         <>
           <div className="rounded-xl bg-white px-4 py-3 shadow-sm">
-            <p className="text-center text-sm text-[#8F8A87]">{emptyMessage}</p>
+            <p className="text-left text-sm text-[#8F8A87]">{emptyMessage}</p>
           </div>
           {shouldShowSuggestion && (
             <div className="rounded-xl bg-white px-4 py-3 shadow-sm">
@@ -145,23 +147,25 @@ export function LoopStatusList({
   stableLoops,
   unstableLoops,
   status,
+  goodProgressMessage,
+  badProgressMessage,
   onActionClick,
 }: LoopStatusListProps) {
   const periodText = viewType === "week" ? "이번주" : "이번달";
-  const isEmpty = status === "EMPTY";
+  const isEmpty = status === "NONE";
 
   return (
     <div className="space-y-6 -mx-6 px-10 w-[calc(100%+48px)]">
       <LoopGroup
         title={`${periodText} 안정적으로 이어진 루프예요`}
         loops={stableLoops}
-        emptyMessage="이번 주에는 완성된 루프가 없었어요"
+        emptyMessage={goodProgressMessage || "이번 주에는 완성된 루프가 없었어요"}
         isEmpty={isEmpty}
       />
       <LoopGroup
         title={`${periodText} 잘 이어지지 않았던 루프예요`}
         loops={unstableLoops}
-        emptyMessage="아직 평가할 수 있는 반복 루프가 없어요"
+        emptyMessage={badProgressMessage || "아직 평가할 수 있는 반복 루프가 없어요"}
         showSuggestion
         onActionClick={onActionClick}
         isEmpty={isEmpty}
