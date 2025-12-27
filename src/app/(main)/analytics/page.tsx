@@ -1,53 +1,90 @@
 "use client";
 
-import { useState } from "react";
-import { LoopReport, type ReportStatus, type LoopReportData } from "@/components/analytics/LoopReport";
+import { useState, useEffect } from "react";
+import { LoopReport } from "@/components/analytics/LoopReport";
+import type { LoopReportData, ReportStatus } from "@/types/report";
+import { fetchLoopReport } from "@/lib/report";
 
 export default function AnalyticsPage() {
-  // 테스트용: 상태 변경 가능하도록
-  const [status, setStatus] = useState<ReportStatus>("GOOD");
-
-  // 더미 데이터
-  const dummyData: LoopReportData = {
-    weekLoopCount: 4,
-    totalLoopCount: 5,
-    tenDayProgress: 85,
-    weekAverageProgress: 80,
-    completedDates: [
-      "2024-01-07",
-      "2024-01-09",
-      "2024-01-12",
-    ],
-    stableLoops: [
-      {
-        id: 1,
-        title: "아침 운동",
-        schedule: "매주 월수금",
-        completionRate: 100,
-      },
-    ],
-    unstableLoops: [
-      {
-        id: 2,
-        title: "토익 공부",
-        schedule: "매주 월수금",
-        completionRate: 0,
-      },
-    ],
-  };
-
-  // EMPTY 상태용 더미 데이터
-  const emptyData: LoopReportData = {
+  const [status, setStatus] = useState<ReportStatus>("NONE");
+  const [data, setData] = useState<LoopReportData>({
     weekLoopCount: 0,
     totalLoopCount: 0,
     tenDayProgress: 0,
-    weekAverageProgress: 0,
-    completedDates: [],
-    stableLoops: [],
-    unstableLoops: [],
-  };
+    reportStateMessage: "",
+    weekData: {
+      detailReportState: "",
+      averageProgress: 0,
+      completedDates: [],
+      stableLoops: [],
+      unstableLoops: [],
+      goodProgressMessage: null,
+      badProgressMessage: null,
+    },
+    monthData: {
+      detailReportState: "",
+      completedDates: [],
+      stableLoops: [],
+      unstableLoops: [],
+      goodProgressMessage: null,
+      badProgressMessage: null,
+    },
+  });
+  const [isLoading, setIsLoading] = useState(true);
 
-  const data = status === "EMPTY" ? emptyData : dummyData;
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadReport = async () => {
+      try {
+        setIsLoading(true);
+        const result = await fetchLoopReport();
+
+        if (!cancelled) {
+          setStatus(result.status);
+          setData(result.data);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error("루프 리포트 조회 실패", error);
+          setStatus("NONE");
+          setData({
+            weekLoopCount: 0,
+            totalLoopCount: 0,
+            tenDayProgress: 0,
+            reportStateMessage: "최근에는 루프가 설정되지 않았어요 \n 루프를 추가하러 가볼까요?",
+            weekData: {
+              detailReportState: "",
+              averageProgress: 0,
+              completedDates: [],
+              stableLoops: [],
+              unstableLoops: [],
+              goodProgressMessage: null,
+              badProgressMessage: null,
+            },
+            monthData: {
+              detailReportState: "",
+              completedDates: [],
+              stableLoops: [],
+              unstableLoops: [],
+              goodProgressMessage: null,
+              badProgressMessage: null,
+            },
+          });
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadReport();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <div className="flex flex-col">
@@ -60,27 +97,16 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      {/* 테스트용 상태 변경 버튼 */}
-      <div className="flex gap-2 p-4 bg-gray-100">
-        {(["GOOD", "OK", "HARD", "EMPTY"] as ReportStatus[]).map((s) => (
-          <button
-            key={s}
-            onClick={() => setStatus(s)}
-            className={`px-3 py-1 rounded text-sm ${
-              status === s
-                ? "bg-blue-500 text-white"
-                : "bg-white text-gray-700"
-            }`}
-          >
-            {s}
-          </button>
-        ))}
-      </div>
-
-      <LoopReport
-        status={status}
-        data={data}
-      />
+      {isLoading ? (
+        <div className="flex items-center justify-center py-12">
+          <p className="text-sm text-[#8F8A87]">로딩 중...</p>
+        </div>
+      ) : (
+        <LoopReport
+          status={status}
+          data={data}
+        />
+      )}
     </div>
   );
 }
