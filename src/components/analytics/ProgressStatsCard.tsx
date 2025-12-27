@@ -1,6 +1,6 @@
 "use client";
 
-import type { LoopReportData, ReportStatus } from "./LoopReport";
+import type { LoopReportData, ReportStatus } from "@/types/report";
 
 type ProgressStatsCardProps = {
   status: ReportStatus;
