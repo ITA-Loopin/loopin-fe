@@ -53,6 +53,7 @@ export function LoopReport({
             : data.monthData.completedDates
         }
         weekAverageProgress={data.weekData.averageProgress}
+        status={status}
         onViewTypeChange={setCalendarViewType}
       />
 

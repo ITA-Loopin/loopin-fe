@@ -2,12 +2,14 @@
 
 import { useMemo, useState, useCallback } from "react";
 import dayjs, { type Dayjs } from "dayjs";
+import type { ReportStatus } from "@/types/report";
 
 type CalendarViewType = "week" | "month";
 
 type CalendarViewProps = {
   completedDates: string[]; // YYYY-MM-DD
   weekAverageProgress: number;
+  status?: ReportStatus;
   onViewTypeChange?: (viewType: CalendarViewType) => void;
 };
 
@@ -31,7 +33,7 @@ function inRange(dateStr: string, startStr: string, endStr: string) {
   return dateStr >= startStr && dateStr <= endStr;
 }
 
-export function CalendarView({ completedDates, weekAverageProgress, onViewTypeChange }: CalendarViewProps) {
+export function CalendarView({ completedDates, weekAverageProgress, status, onViewTypeChange }: CalendarViewProps) {
   const [viewType, setViewType] = useState<CalendarViewType>("week");
   const [visibleMonth, setVisibleMonth] = useState(dayjs());
 
@@ -172,8 +174,10 @@ export function CalendarView({ completedDates, weekAverageProgress, onViewTypeCh
 
           {viewType === "week" && (
             <>
-              <p className="mb-4 text-sm font-semibold text-[#2C2C2C]">
-                일주일동안 평균 {weekAverageProgress}% 루프를 채웠어요!
+              <p className="mb-4 ml-3 text-base font-semibold leading-[150%] tracking-[-0.32px] text-[var(--gray-800,#3A3D40)]">
+                {status === "NONE" 
+                  ? "최근 7일간 루프가 설정되지 않았어요"
+                  : `일주일동안 평균 ${weekAverageProgress}% 루프를 채웠어요!`}
               </p>
               <div className="flex justify-between">
                {dates.map((date) => renderDateCell(date))}
