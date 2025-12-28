@@ -24,14 +24,10 @@ type LoopItemCardProps = {
 function LoopItemCard({ loop, variant = "default" }: LoopItemCardProps) {
   const content = (
     <>
-      <p className="text-sm font-medium text-[#2C2C2C]">{loop.title}</p>
+      <p className="text-base font-semibold leading-[150%] tracking-[-0.32px] text-[var(--gray-800,#3A3D40)]">{loop.title}</p>
       <div className="flex items-center gap-2">
-        <p className="text-xs text-[#8F8A87]">{loop.schedule}</p>
-        <p
-          className={`text-sm font-semibold ${
-            loop.completionRate > 0 ? "text-[#FF543F]" : "text-[#8F8A87]"
-          }`}
-        >
+        <p className="text-sm font-medium leading-[150%] tracking-[-0.28px] text-[var(--gray-600,#737980)]">{loop.schedule}</p>
+        <p className="text-base font-semibold leading-[150%] tracking-[-0.32px] text-[var(--primary-main,#FF543F)]">
           {loop.completionRate}%
         </p>
       </div>
@@ -76,7 +72,7 @@ function SuggestionButton({ onActionClick }: SuggestionButtonProps) {
     <button
       type="button"
       onClick={onActionClick}
-      className="flex items-center justify-center gap-1 rounded-[5px] bg-[var(--gray-300,#DDE0E3)] py-1.5 px-2 text-sm font-semibold leading-[150%] tracking-[-0.28px] text-[var(--gray-600,#737980)] transition"
+      className="flex items-center justify-center gap-2 rounded-[5px] bg-[var(--gray-300,#DDE0E3)] py-1.5 px-2 text-sm font-semibold leading-[150%] tracking-[-0.28px] text-[var(--gray-600,#737980)] transition"
     >
       <EditIcon />
       루프 수정하기
@@ -90,10 +86,10 @@ type LoopSuggestionCardProps = {
 
 function LoopSuggestionCard({ onActionClick }: LoopSuggestionCardProps) {
   return (
-    <>
-      <p className="mb-2 text-sm text-[#2C2C2C]">루프를 조금 가볍게 만들어볼까요?</p>
+    <div className="flex flex-col items-center justify-center gap-[10px]">
+      <p className="text-xs font-medium leading-[140%] tracking-[-0.24px] text-[var(--gray-600,#737980)]">루프를 조금 가볍게 만들어볼까요?</p>
       <SuggestionButton onActionClick={onActionClick} />
-    </>
+    </div>
   );
 }
 
