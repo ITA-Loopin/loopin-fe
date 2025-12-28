@@ -7,7 +7,7 @@ import type { ReportStatus } from "@/types/report";
 type CalendarViewType = "week" | "month";
 
 type CalendarViewProps = {
-  completedDates: string[]; // YYYY-MM-DD
+  dateProgressMap: Record<string, number>; // 날짜별 진행률 맵 (YYYY-MM-DD: 0-100)
   weekAverageProgress: number;
   status?: ReportStatus;
   onViewTypeChange?: (viewType: CalendarViewType) => void;
@@ -33,7 +33,7 @@ function inRange(dateStr: string, startStr: string, endStr: string) {
   return dateStr >= startStr && dateStr <= endStr;
 }
 
-export function CalendarView({ completedDates, weekAverageProgress, status, onViewTypeChange }: CalendarViewProps) {
+export function CalendarView({ dateProgressMap, weekAverageProgress, status, onViewTypeChange }: CalendarViewProps) {
   const [viewType, setViewType] = useState<CalendarViewType>("week");
   const [visibleMonth, setVisibleMonth] = useState(dayjs());
 
@@ -72,15 +72,13 @@ export function CalendarView({ completedDates, weekAverageProgress, status, onVi
     };
   }, [viewType, visibleMonth, today]);
 
-  // 현재 뷰 범위에 해당하는 완료 날짜 Set
-  const completedDatesSet = useMemo(() => {
-    const filtered = completedDates.filter((d) => inRange(d, rangeStartKey, rangeEndKey));
-    return new Set(filtered);
-  }, [completedDates, rangeStartKey, rangeEndKey]);
-
-  const isCompleted = useCallback(
-    (date: Dayjs) => completedDatesSet.has(formatDateKey(date)),
-    [completedDatesSet]
+  // 날짜별 진행률 가져오기
+  const getProgress = useCallback(
+    (date: Dayjs) => {
+      const dateKey = formatDateKey(date);
+      return dateProgressMap[dateKey] ?? 0;
+    },
+    [dateProgressMap]
   );
 
   const isCurrentMonth = useCallback(
@@ -94,10 +92,45 @@ export function CalendarView({ completedDates, weekAverageProgress, status, onVi
     setVisibleMonth((prev) => prev.add(offset, "month"));
   };
 
+  // 원형 진행률 컴포넌트
+  const CircularProgress = ({ progress, size = 32 }: { progress: number; size?: number }) => {
+    const radius = (size - 4) / 2;
+    const circumference = 2 * Math.PI * radius;
+    const offset = circumference - (progress / 100) * circumference;
+
+    return (
+      <svg width={size} height={size} className="transform -rotate-90">
+        {/* 배경 원 */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="#E5E5E5"
+          strokeWidth="2"
+        />
+        {/* 진행률 원 */}
+        {progress > 0 && (
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="none"
+            stroke="#FF543F"
+            strokeWidth="2"
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            strokeLinecap="round"
+          />
+        )}
+      </svg>
+    );
+  };
+
   // 공통 날짜 셀 렌더 함수
   const renderDateCell = (date: Dayjs, options?: { dimOutOfMonth?: boolean; showTodayStyle?: boolean }) => {
     const dateKey = formatDateKey(date);
-    const completed = isCompleted(date);
+    const progress = getProgress(date);
     const day = date.date();
 
     const dimOutOfMonth = options?.dimOutOfMonth ?? false;
@@ -106,19 +139,30 @@ export function CalendarView({ completedDates, weekAverageProgress, status, onVi
     const currentMonth = dimOutOfMonth ? isCurrentMonth(date) : true;
     const todayFlag = showTodayStyle ? isToday(date) : false;
 
-    const className = `flex h-8 w-8 items-center justify-center rounded-full text-xs ${
-      dimOutOfMonth && !currentMonth
-        ? "text-[#B7BAC7]"
-        : completed
-          ? "border-2 border-[#FF543F] text-[#2C2C2C]"
-          : todayFlag
-            ? "text-[#2C2C2C]"
-            : "text-[#8F8A87]"
-    }`;
+    const textColor = dimOutOfMonth && !currentMonth
+      ? "text-[#B7BAC7]"
+      : todayFlag
+        ? "text-[#2C2C2C]"
+        : "text-[#8F8A87]";
 
+    // 진행률이 0이면 원형 진행률 없이 숫자만 표시
+    if (progress === 0) {
+      return (
+        <div key={dateKey} className="flex h-8 w-8 items-center justify-center mx-auto">
+          <span className={`text-xs ${textColor}`}>
+            {day}
+          </span>
+        </div>
+      );
+    }
+
+    // 진행률이 0보다 크면 원형 진행률과 함께 표시
     return (
-      <div key={dateKey} className={`${className} mx-auto`}>
-        {day}
+      <div key={dateKey} className="relative flex items-center justify-center mx-auto" style={{ width: 32, height: 32 }}>
+        <CircularProgress progress={progress} size={32} />
+        <span className={`absolute text-xs ${textColor}`}>
+          {day}
+        </span>
       </div>
     );
   };
@@ -166,7 +210,7 @@ export function CalendarView({ completedDates, weekAverageProgress, status, onVi
             </div>
 
             {/* 날짜 그리드 */}
-            <div className="grid grid-cols-7 text-sm font-medium">
+            <div className="grid grid-cols-7 gap-4 text-sm font-medium">
               {dates.map((date) => renderDateCell(date, { dimOutOfMonth: true, showTodayStyle: true }))}
             </div>
           </>
@@ -179,7 +223,7 @@ export function CalendarView({ completedDates, weekAverageProgress, status, onVi
                   ? "최근 7일간 루프가 설정되지 않았어요"
                   : `일주일동안 평균 ${weekAverageProgress}% 루프를 채웠어요!`}
               </p>
-              <div className="flex justify-between">
+              <div className="flex gap-4">
                {dates.map((date) => renderDateCell(date))}
               </div>
             </>

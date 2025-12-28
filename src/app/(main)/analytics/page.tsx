@@ -15,15 +15,15 @@ export default function AnalyticsPage() {
     weekData: {
       detailReportState: "",
       averageProgress: 0,
-      completedDates: [],
+      dateProgressMap: {},
       stableLoops: [],
       unstableLoops: [],
       goodProgressMessage: null,
       badProgressMessage: null,
-    },
+    },  
     monthData: {
       detailReportState: "",
-      completedDates: [],
+      dateProgressMap: {},
       stableLoops: [],
       unstableLoops: [],
       goodProgressMessage: null,
@@ -55,7 +55,7 @@ export default function AnalyticsPage() {
             weekData: {
               detailReportState: "",
               averageProgress: 0,
-              completedDates: [],
+              dateProgressMap: {},
               stableLoops: [],
               unstableLoops: [],
               goodProgressMessage: null,
@@ -63,7 +63,7 @@ export default function AnalyticsPage() {
             },
             monthData: {
               detailReportState: "",
-              completedDates: [],
+              dateProgressMap: {},
               stableLoops: [],
               unstableLoops: [],
               goodProgressMessage: null,

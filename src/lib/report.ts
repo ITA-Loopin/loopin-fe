@@ -100,25 +100,23 @@ function mapLoopDto(loopDto: LoopDto, index: number): ReportLoopItem | null {
 }
 
 /**
- * weekCard/monthCard에서 완료된 날짜 추출
- * card 구조: { "2025-12-27": 0, "2025-12-29": 0, ... }
- * 값이 0보다 크면 완료된 날짜로 간주
+ * weekCard/monthCard에서 날짜별 진행률 맵 추출
+ * card 구조: { "2025-12-27": 0, "2025-12-29": 50, ... }
+ * 값은 0-100 사이의 퍼센테이지
  */
-function extractCompletedDates(card: WeekCard): string[] {
-  const dates: string[] = [];
+function extractDateProgressMap(card: WeekCard): Record<string, number> {
+  const progressMap: Record<string, number> = {};
   
   for (const [date, value] of Object.entries(card)) {
     // 날짜 형식 확인 (YYYY-MM-DD)
     if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-      // 값이 0보다 크면 완료된 날짜
       const numValue = typeof value === "number" ? value : parseFloat(String(value));
-      if (numValue > 0) {
-        dates.push(date);
-      }
+      // 0-100 사이의 값으로 제한
+      progressMap[date] = Math.max(0, Math.min(100, numValue));
     }
   }
   
-  return dates.sort();
+  return progressMap;
 }
 
 /**
@@ -143,14 +141,14 @@ export async function fetchLoopReport(): Promise<{
   const weekUnstableLoop = mapLoopDto(weekReport.badProgressLoopDto, 1);
   const weekStableLoops = weekStableLoop ? [weekStableLoop] : [];
   const weekUnstableLoops = weekUnstableLoop ? [weekUnstableLoop] : [];
-  const weekCompletedDates = extractCompletedDates(weekReport.weekCard);
+  const weekDateProgressMap = extractDateProgressMap(weekReport.weekCard);
 
   // 월간 리포트 데이터 추출
   const monthStableLoop = mapLoopDto(monthReport.goodProgressLoopDto, 0);
   const monthUnstableLoop = mapLoopDto(monthReport.badProgressLoopDto, 1);
   const monthStableLoops = monthStableLoop ? [monthStableLoop] : [];
   const monthUnstableLoops = monthUnstableLoop ? [monthUnstableLoop] : [];
-  const monthCompletedDates = extractCompletedDates(monthReport.monthCard);
+  const monthDateProgressMap = extractDateProgressMap(monthReport.monthCard);
 
   const totalCount = data.sevenDayTotalCount ?? 0;
   const status = data.loopReportState as ReportStatus;
@@ -165,7 +163,7 @@ export async function fetchLoopReport(): Promise<{
       weekData: {
         detailReportState: weekReport.detailReportState,
         averageProgress: weekReport.weekAvgPercent ?? 0,
-        completedDates: weekCompletedDates,
+        dateProgressMap: weekDateProgressMap,
         stableLoops: weekStableLoops,
         unstableLoops: weekUnstableLoops,
         goodProgressMessage: weekReport.goodProgressLoopDto.message,
@@ -173,7 +171,7 @@ export async function fetchLoopReport(): Promise<{
       },
       monthData: {
         detailReportState: monthReport.detailReportState,
-        completedDates: monthCompletedDates,
+        dateProgressMap: monthDateProgressMap,
         stableLoops: monthStableLoops,
         unstableLoops: monthUnstableLoops,
         goodProgressMessage: monthReport.goodProgressLoopDto.message,

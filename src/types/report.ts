@@ -22,7 +22,7 @@ export type LoopReportData = {
   weekData: {
     detailReportState: string; // 주간 리포트 상세 상태
     averageProgress: number; // 일주일 동안 평균 진행률 (0-100)
-    completedDates: string[]; // 완료한 날짜들 (YYYY-MM-DD 형식)
+    dateProgressMap: Record<string, number>; // 날짜별 진행률 맵 (YYYY-MM-DD: 0-100)
     stableLoops: ReportLoopItem[]; // 안정적으로 이어진 루프
     unstableLoops: ReportLoopItem[]; // 잘 이어지지 않은 루프
     goodProgressMessage: string | null; // 안정적으로 이어진 루프 메시지 (루프가 없을 때)
@@ -32,7 +32,7 @@ export type LoopReportData = {
   // 월간 리포트 데이터
   monthData: {
     detailReportState: string; // 월간 리포트 상세 상태
-    completedDates: string[]; // 완료한 날짜들 (YYYY-MM-DD 형식)
+    dateProgressMap: Record<string, number>; // 날짜별 진행률 맵 (YYYY-MM-DD: 0-100)
     stableLoops: ReportLoopItem[]; // 안정적으로 이어진 루프
     unstableLoops: ReportLoopItem[]; // 잘 이어지지 않은 루프
     goodProgressMessage: string | null; // 안정적으로 이어진 루프 메시지 (루프가 없을 때)

@@ -47,10 +47,10 @@ export function LoopReport({
         <ProgressStatsCard status={status} data={data} />
 
       <CalendarView
-        completedDates={
+        dateProgressMap={
           calendarViewType === "week"
-            ? data.weekData.completedDates
-            : data.monthData.completedDates
+            ? data.weekData.dateProgressMap
+            : data.monthData.dateProgressMap
         }
         weekAverageProgress={data.weekData.averageProgress}
         status={status}
