@@ -62,7 +62,7 @@ export function ProgressStatsCard({ status, data }: ProgressStatsCardProps) {
   );
 
   return (
-    <div className="px-6">
+    <div className="-mx-6 px-10 w-[calc(100%+48px)]">
       <div className="grid grid-cols-2 gap-4">
         {leftCard}
         {rightCard}
