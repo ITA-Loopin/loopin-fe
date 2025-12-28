@@ -115,10 +115,16 @@ export default function AnalyticsPage() {
       {status !== "NONE" && (
         <>
           <div
-            className="absolute pointer-events-none rounded-[379.346px] opacity-20 bg-[#E7FFBA] blur-[67px] w-[379.346px] h-[379.018px] rotate-[-57.544deg] top-1/2 left-1/2"
+            className="absolute pointer-events-none rounded-[379.346px] bg-[#E7FFBA] blur-[67px] w-[379.346px] h-[379.018px] rotate-[-57.544deg] top-1/2 left-1/2"
+            style={{
+              opacity: status === "GOOD" ? 0.3 : 0.2,
+            }}
           />
           <div
-            className="absolute pointer-events-none rounded-[379.346px] opacity-20 bg-[#E7FFBA] blur-[67px] w-[379.346px] h-[219.725px] rotate-[-31.55deg] top-0 left-0"
+            className="absolute pointer-events-none rounded-[379.346px] bg-[#E7FFBA] blur-[67px] w-[379.346px] h-[219.725px] rotate-[-31.55deg] top-0 left-0"
+            style={{
+              opacity: status === "GOOD" ? 0.3 : 0.2,
+            }}
           />
         </>
       )}
