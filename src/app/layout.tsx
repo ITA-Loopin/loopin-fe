@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
+import { FontLoader } from "@/components/FontLoader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +28,9 @@ export default function RootLayout({
     <html lang="ko">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        style={{ fontFamily: "'SUIT Variable', sans-serif" }}
       >
+        <FontLoader />
         <Providers>
           <main className="mx-auto flex min-h-screen w-full max-w-[500px] flex-col">
             {children}
