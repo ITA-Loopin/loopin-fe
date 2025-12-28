@@ -107,12 +107,12 @@ function LoopGroup({ title, loops, emptyMessage, showSuggestion, onActionClick, 
 
   return (
     <div className="space-y-3">
-      <h3 className="text-sm font-semibold text-[#2C2C2C]">{title}</h3>
+      <h3 className="text-base font-semibold leading-[150%] tracking-[-0.32px] text-[var(--gray-black,#121212)]">{title}</h3>
       
       {!hasLoops ? (
         <>
           <div className="rounded-xl bg-white px-4 py-3 shadow-sm">
-            <p className="text-left text-sm text-[#8F8A87]">{emptyMessage}</p>
+            <p className="text-left text-base font-semibold leading-[150%] tracking-[-0.32px] text-[var(--gray-400,#C6CCD1)]">{emptyMessage}</p>
           </div>
           {shouldShowSuggestion && (
             <div className="rounded-xl bg-white px-4 py-3 shadow-sm">
