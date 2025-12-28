@@ -46,7 +46,6 @@ export default function AnalyticsPage() {
         }
       } catch (error) {
         if (!cancelled) {
-          console.error("루프 리포트 조회 실패", error);
           setStatus("NONE");
           setData({
             weekLoopCount: 0,
@@ -86,10 +85,46 @@ export default function AnalyticsPage() {
     };
   }, []);
 
+  // 상태에 따른 배경색 설정
+  const getBackgroundStyle = (status: ReportStatus) => {
+    switch (status) {
+      case "GOOD":
+        return {
+          background: "linear-gradient(180deg, #FFE4E0 1.89%, #FF9A8D 100%)",
+        };
+      case "OK":
+        return {
+          background: "linear-gradient(180deg, #FFECE9 0%, #FFD5CF 99.24%)",
+        };
+      case "HARD":
+        return {
+          background: "radial-gradient(174.4% 50% at 50% 50%, #F8F8F9 0%, #FFF2F0 55.77%)",
+        };
+      case "NONE":
+        return {
+          background: "var(--gray-100, #F8F8F9)",
+        };
+      default:
+        return {};
+    }
+  };
+
   return (
-    <div className="flex flex-col">
+    <div className="relative flex flex-col min-h-screen -mt-6" style={getBackgroundStyle(status)}>
+      {/* NONE 상태를 제외한 모든 경우에 초록색 원형 오버레이 */}
+      {status !== "NONE" && (
+        <>
+          <div
+            className="absolute pointer-events-none rounded-[379.346px] opacity-20 bg-[#E7FFBA] blur-[67px] w-[379.346px] h-[379.018px] rotate-[-57.544deg] top-1/2 left-1/2"
+          />
+          <div
+            className="absolute pointer-events-none rounded-[379.346px] opacity-20 bg-[#E7FFBA] blur-[67px] w-[379.346px] h-[219.725px] rotate-[-31.55deg] top-0 left-0"
+          />
+        </>
+      )}
+
       {/* 페이지 헤더 - 고정 */}
-      <div className="flex w-full items-center justify-center px-6 pt-6 pb-4">
+      <div className="relative flex w-full items-center justify-center px-6 pt-6 pb-4 border border-white bg-white/30 backdrop-blur-[7px]">
         <div className="flex w-[328px] items-center justify-center">
           <h1 className="text-center text-base font-semibold leading-[150%] tracking-[-0.32px] text-[#3A3D40]">
             루프 리포트
@@ -98,14 +133,16 @@ export default function AnalyticsPage() {
       </div>
 
       {isLoading ? (
-        <div className="flex items-center justify-center py-12">
+        <div className="relative flex items-center justify-center py-12">
           <p className="text-sm text-[#8F8A87]">로딩 중...</p>
         </div>
       ) : (
-        <LoopReport
-          status={status}
-          data={data}
-        />
+        <div className="relative">
+          <LoopReport
+            status={status}
+            data={data}
+          />
+        </div>
       )}
     </div>
   );
