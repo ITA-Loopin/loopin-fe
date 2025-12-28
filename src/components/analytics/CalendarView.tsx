@@ -199,10 +199,12 @@ export function CalendarView({ dateProgressMap, weekAverageProgress, status, onV
         {viewType === "month" && (
           <>
             {/* 요일 헤더 */}
-            <div className="mb-3 grid grid-cols-7 text-sm font-medium text-[#B7BAC7]">
+            <div className="mb-3 grid grid-cols-7 gap-4">
               {DAY_NAMES.map((day, index) => (
-                <div key={`${index}-${day}`} className="flex h-8 w-8 items-center justify-center mx-auto">
-                  <span className={index === 0 ? "text-[#FF7765]" : undefined}>
+                <div key={`${index}-${day}`} className="flex items-center justify-center">
+                  <span className={`text-xs font-semibold leading-[140%] tracking-[-0.24px] text-center ${
+                    index === 0 ? "text-[var(--primary-main,#FF543F)]" : "text-[var(--gray-800,#3A3D40)]"
+                  }`}>
                     {day}
                   </span>
                 </div>
