@@ -125,12 +125,14 @@ export function CalendarView({ completedDates, weekAverageProgress, onViewTypeCh
     <div className="-mx-6 px-10 w-[calc(100%+48px)]">
       <div className="rounded-xl bg-white px-4 py-6 shadow-sm">
         {/* 주간/월간 토글 */}
-        <div className="mb-4 flex gap-2">
+        <div className="mb-4 flex items-start gap-[10px] rounded-[86px] bg-[var(--gray-200,#F0F2F3)] p-1.5">
           <button
             type="button"
             onClick={() => handleViewTypeChange("week")}
-            className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition ${
-              viewType === "week" ? "bg-[#2C2C2C] text-white" : "bg-white text-[#8F8A87]"
+            className={`flex-1 px-4 py-2 transition ${
+              viewType === "week" 
+                ? "rounded-[86px] bg-[var(--gray-600,#737980)] text-xs font-semibold leading-[140%] tracking-[-0.24px] text-[var(--gray-white,#FFF)]" 
+                : "text-xs font-semibold leading-[140%] tracking-[-0.24px] text-[var(--gray-400,#C6CCD1)]"
             }`}
           >
             주간
@@ -138,8 +140,10 @@ export function CalendarView({ completedDates, weekAverageProgress, onViewTypeCh
           <button
             type="button"
             onClick={() => handleViewTypeChange("month")}
-            className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition ${
-              viewType === "month" ? "bg-[#2C2C2C] text-white" : "bg-white text-[#8F8A87]"
+            className={`flex-1 px-4 py-2 transition ${
+              viewType === "month" 
+                ? "rounded-[86px] bg-[var(--gray-600,#737980)] text-xs font-semibold leading-[140%] tracking-[-0.24px] text-[var(--gray-white,#FFF)]" 
+                : "text-xs font-semibold leading-[140%] tracking-[-0.24px] text-[var(--gray-400,#C6CCD1)]"
             }`}
           >
             월간
