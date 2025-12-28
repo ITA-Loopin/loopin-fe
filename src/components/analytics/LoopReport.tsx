@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { ReportHeader } from "./ReportHeader";
 import { ProgressStatsCard } from "./ProgressStatsCard";
 import { CalendarView } from "./CalendarView";
@@ -22,14 +23,28 @@ export function LoopReport({
   data,
 }: LoopReportProps) {
   const [calendarViewType, setCalendarViewType] = useState<CalendarViewType>("week");
+  const router = useRouter();
   
   return (
-    <section className="flex flex-col gap-6 px-6 py-6">
+    <>
       <ReportHeader
         message={data.reportStateMessage}
       />
 
-      <ProgressStatsCard status={status} data={data} />
+      {/* NONE 상태일 때만 루프 추가하기 버튼 표시 */}
+      {status === "NONE" && (
+        <div className="flex justify-center px-6 mt-8 mb-4">
+          <button
+            onClick={() => router.push("/calendar")}
+            className="flex h-12 w-[328px] items-center justify-center whitespace-nowrap rounded-[30px] bg-[var(--gray-800,#3A3D40)] py-[15px] px-[221px] text-base font-semibold text-white transition-colors"
+          >
+            루프 추가하기
+          </button>
+        </div>
+      )}
+
+      <section className="flex flex-col gap-6">
+        <ProgressStatsCard status={status} data={data} />
 
       <CalendarView
         completedDates={
@@ -65,7 +80,8 @@ export function LoopReport({
             : data.monthData.badProgressMessage
         }
       />
-    </section>
+      </section>
+    </>
   );
 }
 
