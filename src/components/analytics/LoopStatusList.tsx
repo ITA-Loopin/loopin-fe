@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import type { ReportLoopItem, ReportStatus } from "@/types/report";
 
 type CalendarViewType = "week" | "month";
@@ -47,19 +49,22 @@ function LoopItemCard({ loop, variant = "default" }: LoopItemCardProps) {
   );
 }
 
-const EditIcon = ({ fill = "#FF543F" }: { fill?: string }) => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 16 16"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M11.3333 1.99998C11.5084 1.82487 11.7163 1.68698 11.9441 1.59431C12.1719 1.50164 12.4151 1.45605 12.66 1.46031C12.9049 1.46457 13.1464 1.51858 13.3707 1.61898C13.595 1.71938 13.7978 1.86408 13.9671 2.04431C14.1364 2.22454 14.2687 2.43669 14.3568 2.66845C14.4449 2.90021 14.4869 3.14699 14.4804 3.39465C14.4739 3.64231 14.419 3.88599 14.3187 4.11131C14.2184 4.33663 14.0747 4.53899 13.8953 4.70665L12.8333 5.76865L10.2313 3.16665L11.2933 2.10465L11.3333 1.99998ZM9.77133 3.62665L12.3733 6.22865L5.66666 12.9353L3.06466 10.3333L9.77133 3.62665ZM2.33333 13.3333H5.33333L13.6667 5L10.6667 2L2.33333 10.3333V13.3333Z"
-      fill={fill}
-    />
-  </svg>
+const PlusIcon = () => (
+  <Image
+    src="/analytics/icon_add.png"
+    alt="추가"
+    width={15}
+    height={15}
+  />
+);
+
+const EditIcon = () => (
+  <Image
+    src="/analytics/icon_edit.png"
+    alt="수정"
+    width={15}
+    height={15}
+  />
 );
 
 type SuggestionButtonProps = {
@@ -71,7 +76,7 @@ function SuggestionButton({ onActionClick }: SuggestionButtonProps) {
     <button
       type="button"
       onClick={onActionClick}
-      className="flex w-full items-center justify-center gap-1 rounded-lg border border-[#FF543F] bg-white px-4 py-2 text-sm font-semibold text-[#FF543F] transition hover:bg-[#FFF5F3]"
+      className="flex items-center justify-center gap-1 rounded-[5px] bg-[var(--gray-300,#DDE0E3)] py-1.5 px-2 text-sm font-semibold leading-[150%] tracking-[-0.28px] text-[var(--gray-600,#737980)] transition"
     >
       <EditIcon />
       루프 수정하기
@@ -97,11 +102,13 @@ type LoopGroupProps = {
   loops: ReportLoopItem[];
   emptyMessage: string;
   showSuggestion?: boolean;
+  showAddButton?: boolean;
   onActionClick?: () => void;
   isEmpty: boolean;
+  onAddClick?: () => void;
 };
 
-function LoopGroup({ title, loops, emptyMessage, showSuggestion, onActionClick, isEmpty }: LoopGroupProps) {
+function LoopGroup({ title, loops, emptyMessage, showSuggestion, showAddButton, onActionClick, isEmpty, onAddClick }: LoopGroupProps) {
   const shouldShowSuggestion = showSuggestion && !isEmpty;
   const hasLoops = loops.length > 0;
 
@@ -111,8 +118,22 @@ function LoopGroup({ title, loops, emptyMessage, showSuggestion, onActionClick, 
       
       {!hasLoops ? (
         <>
-          <div className="rounded-xl bg-white px-4 py-3 shadow-sm">
-            <p className="text-left text-base font-semibold leading-[150%] tracking-[-0.32px] text-[var(--gray-400,#C6CCD1)]">{emptyMessage}</p>
+          <div className="flex flex-col items-center justify-center gap-[10px] rounded-xl bg-white px-4 py-3 shadow-sm">
+            <p className="text-base font-semibold leading-[150%] tracking-[-0.32px] text-[var(--gray-400,#C6CCD1)]">{emptyMessage}</p>
+            {showAddButton && (
+              <>
+                <div className="w-full border-t border-[#E5E5E5]"></div>
+                <p className="text-xs font-medium leading-[140%] tracking-[-0.24px] text-[var(--gray-600,#737980)]">루프를 추가해볼까요?</p>
+                <button
+                  type="button"
+                  onClick={onAddClick}
+                  className="flex items-center justify-center gap-2 rounded-[5px] bg-[var(--gray-300,#DDE0E3)] py-1.5 px-2 text-sm font-semibold leading-[150%] tracking-[-0.28px] text-[var(--gray-600,#737980)] transition"
+                >
+                  <PlusIcon />
+                  루프 추가하기
+                </button>
+              </>
+            )}
           </div>
           {shouldShowSuggestion && (
             <div className="rounded-xl bg-white px-4 py-3 shadow-sm">
@@ -153,6 +174,7 @@ export function LoopStatusList({
 }: LoopStatusListProps) {
   const periodText = viewType === "week" ? "이번주" : "이번달";
   const isEmpty = status === "NONE";
+  const router = useRouter();
 
   return (
     <div className="space-y-6 -mx-6 px-10 w-[calc(100%+48px)]">
@@ -167,7 +189,9 @@ export function LoopStatusList({
         loops={unstableLoops}
         emptyMessage={badProgressMessage || "아직 평가할 수 있는 반복 루프가 없어요"}
         showSuggestion
+        showAddButton={isEmpty}
         onActionClick={onActionClick}
+        onAddClick={() => router.push("/calendar")}
         isEmpty={isEmpty}
       />
     </div>
