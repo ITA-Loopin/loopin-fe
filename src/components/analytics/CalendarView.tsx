@@ -187,7 +187,7 @@ export function CalendarView({ dateProgressMap, weekAverageProgress, status, onV
 
   return (
     <div className="-mx-6 px-10 w-[calc(100%+48px)]">
-      <div className="rounded-xl px-4 py-6 shadow-sm" style={{ backgroundColor: `rgba(255, 255, 255, ${opacity / 100})` }}>
+      <div className="rounded-xl px-4 py-6" style={{ backgroundColor: `rgba(255, 255, 255, ${opacity / 100})` }}>
         {/* 주간/월간 토글 */}
         <div className="mb-4 flex items-start gap-[10px] rounded-[86px] bg-[var(--gray-200,#F0F2F3)] p-1.5">
           <button

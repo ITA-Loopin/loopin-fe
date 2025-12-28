@@ -24,7 +24,7 @@ type StatCardProps =
 function StatCard(props: StatCardProps) {
   const opacity = props.opacity ?? 100;
   const base =
-    "flex h-[108px] flex-col items-start gap-3 rounded-xl p-4 shadow-sm min-w-0";
+    "flex h-[108px] flex-col items-start gap-3 rounded-xl p-4 min-w-0";
 
   if (props.variant === "message") {
     return (

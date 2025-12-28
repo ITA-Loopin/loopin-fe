@@ -40,7 +40,7 @@ function LoopItemCard({ loop, variant = "default", opacity = 100 }: LoopItemCard
   }
 
   return (
-    <div className="rounded-xl px-4 py-3 shadow-sm" style={{ backgroundColor: `rgba(255, 255, 255, ${opacity / 100})` }}>
+    <div className="rounded-xl px-4 py-3" style={{ backgroundColor: `rgba(255, 255, 255, ${opacity / 100})` }}>
       <div className="flex items-center justify-between">{content}</div>
     </div>
   );
@@ -116,7 +116,7 @@ function LoopGroup({ title, loops, emptyMessage, showSuggestion, showAddButton, 
       
       {!hasLoops ? (
         <>
-          <div className="flex flex-col items-center justify-center gap-[10px] rounded-xl px-4 py-3 shadow-sm" style={{ backgroundColor: `rgba(255, 255, 255, ${opacity / 100})` }}>
+          <div className="flex flex-col items-center justify-center gap-[10px] rounded-xl px-4 py-3" style={{ backgroundColor: `rgba(255, 255, 255, ${opacity / 100})` }}>
             <p className="text-base font-semibold leading-[150%] tracking-[-0.32px] text-[var(--gray-400,#C6CCD1)]">{emptyMessage}</p>
             {showAddButton && (
               <>
@@ -134,13 +134,13 @@ function LoopGroup({ title, loops, emptyMessage, showSuggestion, showAddButton, 
             )}
           </div>
           {shouldShowSuggestion && (
-            <div className="rounded-xl px-4 py-3 shadow-sm" style={{ backgroundColor: `rgba(255, 255, 255, ${opacity / 100})` }}>
+            <div className="rounded-xl px-4 py-3" style={{ backgroundColor: `rgba(255, 255, 255, ${opacity / 100})` }}>
               <LoopSuggestionCard onActionClick={onActionClick} />
             </div>
           )}
         </>
       ) : shouldShowSuggestion ? (
-        <div className="rounded-xl px-4 py-3 shadow-sm" style={{ backgroundColor: `rgba(255, 255, 255, ${opacity / 100})` }}>
+        <div className="rounded-xl px-4 py-3" style={{ backgroundColor: `rgba(255, 255, 255, ${opacity / 100})` }}>
           <div className="space-y-3">
             {loops.map((loop) => (
               <LoopItemCard key={loop.id} loop={loop} variant="inline" opacity={opacity} />
