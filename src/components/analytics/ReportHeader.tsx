@@ -11,7 +11,7 @@ export function ReportHeader({ message }: ReportHeaderProps) {
   const defaultTextStyle = "text-base font-semibold leading-[150%] tracking-[-0.32px] text-[var(--gray-800,#3A3D40)]";
 
   return (
-    <div className="flex flex-col px-6 pt-6">
+    <div className="flex flex-col px-6 pt-6 mb-8">
       <div className="flex flex-col items-start w-[216px]">
         {messageLines.map((line, index) => (
           <p 

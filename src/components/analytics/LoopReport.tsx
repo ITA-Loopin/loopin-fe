@@ -33,7 +33,7 @@ export function LoopReport({
 
       {/* NONE 상태일 때만 루프 추가하기 버튼 표시 */}
       {status === "NONE" && (
-        <div className="flex justify-center px-6 mt-8 mb-4">
+        <div className="flex justify-center px-6 mb-4">
           <button
             onClick={() => router.push("/calendar")}
             className="flex h-12 w-[328px] items-center justify-center whitespace-nowrap rounded-[30px] bg-[var(--gray-800,#3A3D40)] py-[15px] px-[221px] text-base font-semibold text-white transition-colors"
@@ -43,7 +43,7 @@ export function LoopReport({
         </div>
       )}
 
-      <section className="flex flex-col gap-6">
+      <section className="flex flex-col gap-6 mb-8">
         <ProgressStatsCard status={status} data={data} />
 
       <CalendarView
