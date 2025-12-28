@@ -19,9 +19,10 @@ type LoopStatusListProps = {
 type LoopItemCardProps = {
   loop: ReportLoopItem;
   variant?: "default" | "inline";
+  opacity?: number;
 };
 
-function LoopItemCard({ loop, variant = "default" }: LoopItemCardProps) {
+function LoopItemCard({ loop, variant = "default", opacity = 100 }: LoopItemCardProps) {
   const content = (
     <>
       <p className="text-base font-semibold leading-[150%] tracking-[-0.32px] text-[var(--gray-800,#3A3D40)]">{loop.title}</p>
@@ -39,7 +40,7 @@ function LoopItemCard({ loop, variant = "default" }: LoopItemCardProps) {
   }
 
   return (
-    <div className="rounded-xl bg-white px-4 py-3 shadow-sm">
+    <div className="rounded-xl px-4 py-3 shadow-sm" style={{ backgroundColor: `rgba(255, 255, 255, ${opacity / 100})` }}>
       <div className="flex items-center justify-between">{content}</div>
     </div>
   );
@@ -102,9 +103,10 @@ type LoopGroupProps = {
   onActionClick?: () => void;
   isEmpty: boolean;
   onAddClick?: () => void;
+  opacity?: number;
 };
 
-function LoopGroup({ title, loops, emptyMessage, showSuggestion, showAddButton, onActionClick, isEmpty, onAddClick }: LoopGroupProps) {
+function LoopGroup({ title, loops, emptyMessage, showSuggestion, showAddButton, onActionClick, isEmpty, onAddClick, opacity = 100 }: LoopGroupProps) {
   const shouldShowSuggestion = showSuggestion && !isEmpty;
   const hasLoops = loops.length > 0;
 
@@ -114,7 +116,7 @@ function LoopGroup({ title, loops, emptyMessage, showSuggestion, showAddButton, 
       
       {!hasLoops ? (
         <>
-          <div className="flex flex-col items-center justify-center gap-[10px] rounded-xl bg-white px-4 py-3 shadow-sm">
+          <div className="flex flex-col items-center justify-center gap-[10px] rounded-xl px-4 py-3 shadow-sm" style={{ backgroundColor: `rgba(255, 255, 255, ${opacity / 100})` }}>
             <p className="text-base font-semibold leading-[150%] tracking-[-0.32px] text-[var(--gray-400,#C6CCD1)]">{emptyMessage}</p>
             {showAddButton && (
               <>
@@ -132,16 +134,16 @@ function LoopGroup({ title, loops, emptyMessage, showSuggestion, showAddButton, 
             )}
           </div>
           {shouldShowSuggestion && (
-            <div className="rounded-xl bg-white px-4 py-3 shadow-sm">
+            <div className="rounded-xl px-4 py-3 shadow-sm" style={{ backgroundColor: `rgba(255, 255, 255, ${opacity / 100})` }}>
               <LoopSuggestionCard onActionClick={onActionClick} />
             </div>
           )}
         </>
       ) : shouldShowSuggestion ? (
-        <div className="rounded-xl bg-white px-4 py-3 shadow-sm">
+        <div className="rounded-xl px-4 py-3 shadow-sm" style={{ backgroundColor: `rgba(255, 255, 255, ${opacity / 100})` }}>
           <div className="space-y-3">
             {loops.map((loop) => (
-              <LoopItemCard key={loop.id} loop={loop} variant="inline" />
+              <LoopItemCard key={loop.id} loop={loop} variant="inline" opacity={opacity} />
             ))}
           </div>
           <div className="mt-3 border-t border-[#E5E5E5] pt-3">
@@ -151,7 +153,7 @@ function LoopGroup({ title, loops, emptyMessage, showSuggestion, showAddButton, 
       ) : (
         <div className="space-y-2">
           {loops.map((loop) => (
-            <LoopItemCard key={loop.id} loop={loop} />
+            <LoopItemCard key={loop.id} loop={loop} opacity={opacity} />
           ))}
         </div>
       )}
@@ -172,6 +174,23 @@ export function LoopStatusList({
   const isEmpty = status === "NONE";
   const router = useRouter();
 
+  const getOpacity = () => {
+    switch (status) {
+      case "NONE":
+        return 100;
+      case "HARD":
+        return 70;
+      case "OK":
+        return 50;
+      case "GOOD":
+        return 50;
+      default:
+        return 100;
+    }
+  };
+
+  const opacity = getOpacity();
+
   return (
     <div className="space-y-6 -mx-6 px-10 w-[calc(100%+48px)]">
       <LoopGroup
@@ -179,6 +198,7 @@ export function LoopStatusList({
         loops={stableLoops}
         emptyMessage={goodProgressMessage || "이번 주에는 완성된 루프가 없었어요"}
         isEmpty={isEmpty}
+        opacity={opacity}
       />
       <LoopGroup
         title={`${periodText} 잘 이어지지 않았던 루프예요`}
@@ -189,6 +209,7 @@ export function LoopStatusList({
         onActionClick={onActionClick}
         onAddClick={() => router.push("/calendar")}
         isEmpty={isEmpty}
+        opacity={opacity}
       />
     </div>
   );

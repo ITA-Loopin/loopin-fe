@@ -13,19 +13,22 @@ type StatCardProps =
       variant?: "metric";
       label: string;
       value: ReactNode;
+      opacity?: number;
     }
   | {
       variant: "message";
       message: ReactNode;
+      opacity?: number;
     };
 
 function StatCard(props: StatCardProps) {
+  const opacity = props.opacity ?? 100;
   const base =
-    "flex h-[108px] flex-col items-start gap-3 rounded-xl bg-white p-4 shadow-sm min-w-0";
+    "flex h-[108px] flex-col items-start gap-3 rounded-xl p-4 shadow-sm min-w-0";
 
   if (props.variant === "message") {
     return (
-      <div className={base}>
+      <div className={base} style={{ backgroundColor: `rgba(255, 255, 255, ${opacity / 100})` }}>
         <p className="text-sm font-medium leading-[150%] tracking-[-0.28px] text-[var(--gray-500,#A0A9B1)] whitespace-pre-line">
           {props.message}
         </p>
@@ -34,7 +37,7 @@ function StatCard(props: StatCardProps) {
   }
 
   return (
-    <div className={base}>
+    <div className={base} style={{ backgroundColor: `rgba(255, 255, 255, ${opacity / 100})` }}>
       <p className="text-sm font-medium leading-[150%] tracking-[-0.28px] text-[var(--gray-700,#4D5155)]">
         {props.label}
       </p>
@@ -47,18 +50,36 @@ function StatCard(props: StatCardProps) {
 
 export function ProgressStatsCard({ status, data }: ProgressStatsCardProps) {
   const isEmpty = status === "NONE";
+  
+  const getOpacity = () => {
+    switch (status) {
+      case "NONE":
+        return 100;
+      case "HARD":
+        return 70;
+      case "OK":
+        return 50;
+      case "GOOD":
+        return 50;
+      default:
+        return 100;
+    }
+  };
+  
+  const opacity = getOpacity();
 
   const leftCard = isEmpty ? (
-    <StatCard variant="message" message={`최근 일주일 동안은\n루프가 설정되지\n않았어요`} />
+    <StatCard variant="message" message={`최근 일주일 동안은\n루프가 설정되지\n않았어요`} opacity={opacity} />
   ) : (
     <StatCard
       label="일주일 동안"
       value={`${data.weekLoopCount}/${data.totalLoopCount}개`}
+      opacity={opacity}
     />
   );
 
   const rightCard = (
-    <StatCard label="최근 10일 동안" value={`${data.tenDayProgress}%`} />
+    <StatCard label="최근 10일 동안" value={`${data.tenDayProgress}%`} opacity={opacity} />
   );
 
   return (
