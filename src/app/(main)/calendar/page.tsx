@@ -28,7 +28,6 @@ export default function CalendarPage() {
   const { loopList, isLoading } = useDailyLoops({
     date: selectedDateKey,
   });
-  const hasLoops = loopList.length > 0;
   const [isAddLoopModalOpen, setIsAddLoopModalOpen] = useState(false);
 
   const handleChangeMonth = (offset: number) => {
@@ -62,9 +61,9 @@ export default function CalendarPage() {
             "linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,228,224,0.35) 100%)",
         }}
       />
-      <div className="relative flex min-h-screen flex-col">
+      <div className="relative flex flex-col">
         <Header />
-        <main className="flex w-full flex-1 flex-col items-center gap-4 px-4 pb-32 pt-2">
+        <main className="flex w-full flex-1 flex-col items-center gap-4 px-4 pb-8 pt-2">
 
           <MonthCalendar
             visibleMonth={visibleMonth}
@@ -73,26 +72,13 @@ export default function CalendarPage() {
             onChangeMonth={handleChangeMonth}
           />
 
-          <div className="w-full max-w-[420px]">
-            <div
-              className={cn(
-                "min-h-[184px] transition-opacity duration-300 ease-in-out",
-                isLoading ? "opacity-0 pointer-events-none" : "opacity-100"
-              )}
-            >
-              {hasLoops ? (
-                <LoopList loops={loopList} />
-              ) : (
-                <div>
-                  <h2 className="font-semibold text-lg">Loop List · 0</h2>
-                </div>
-              )}
-            </div>
-          </div>
+          <LoopList
+            loops={loopList}
+            isLoading={isLoading}
+            addButton={<AddLoopButton onClick={handleOpenAddLoopModal} />}
+          />
+          {loopList.length > 0 && <AddLoopButton onClick={handleOpenAddLoopModal} />}
 
-          <div className="w-full max-w-[420px]">
-            <AddLoopButton onClick={handleOpenAddLoopModal} />
-          </div>
         </main>
         <AddLoopSheet
           isOpen={isAddLoopModalOpen}
