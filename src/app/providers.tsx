@@ -9,14 +9,12 @@ function AuthLoader({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const userStr = localStorage.getItem("loopin_user");
-      const accessToken = localStorage.getItem("loopin_access_token");
 
       const user = userStr ? JSON.parse(userStr) : null;
 
       store.dispatch(
         loadFromStorage({
           user,
-          accessToken,
         })
       );
     }

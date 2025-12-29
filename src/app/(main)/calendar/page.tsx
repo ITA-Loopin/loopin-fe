@@ -24,9 +24,9 @@ export default function CalendarPage() {
   );
   const [refreshKey, setRefreshKey] = useState(0);
 
+
   const { loopList, isLoading } = useDailyLoops({
     date: selectedDateKey,
-    refreshKey,
   });
   const hasLoops = loopList.length > 0;
   const [isAddLoopModalOpen, setIsAddLoopModalOpen] = useState(false);
@@ -47,6 +47,7 @@ export default function CalendarPage() {
   const handleCloseAddLoopModal = () => {
     setIsAddLoopModalOpen(false);
   };
+
 
   const handleAddLoopSuccess = () => {
     setRefreshKey((prev) => prev + 1);
@@ -105,5 +106,4 @@ export default function CalendarPage() {
     </>
   );
 }
-
 
