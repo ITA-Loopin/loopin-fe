@@ -7,7 +7,7 @@ import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Header from "@/components/common/Header";
 import type { LoopDetail, LoopChecklist } from "@/types/loop";
-import { apiFetch, MissingAccessTokenError } from "@/lib/api";
+import { apiFetch } from "@/lib/api";
 import { LoopProgress } from "@/components/home/LoopProgress";
 import { Checklist } from "@/components/loop/Checklist";
 import { IconButton } from "@/components/common/IconButton";
@@ -74,7 +74,7 @@ export default function LoopDetailPage() {
               endDate?: string | null;
             };
           };
-        }>(`/api-proxy/rest-api/v1/loops/${loopId}`);
+        }>(`/rest-api/v1/loops/${loopId}`);
 
         if (cancelled) return;
 
@@ -127,11 +127,7 @@ export default function LoopDetailPage() {
         });
       } catch (error) {
         if (cancelled) return;
-        if (error instanceof MissingAccessTokenError) {
-          setErrorMessage("로그인 정보가 필요합니다. 다시 로그인해 주세요.");
-        } else {
-          setErrorMessage("루프 상세 정보를 불러오지 못했습니다.");
-        }
+        setErrorMessage("루프 상세 정보를 불러오지 못했습니다.");
         setDetail(null);
       } finally {
         if (!cancelled) {
@@ -183,7 +179,7 @@ export default function LoopDetailPage() {
       });
 
       try {
-        await apiFetch(`/api-proxy/rest-api/v1/checklists/${updatedItem.id}`, {
+        await apiFetch(`/rest-api/v1/checklists/${updatedItem.id}`, {
           method: "PUT",
           json: {
             content: updatedItem.content,
@@ -253,7 +249,7 @@ export default function LoopDetailPage() {
       const response = await apiFetch<{
         success?: boolean;
         data?: { id: number; content: string; completed: boolean };
-      }>(`/api-proxy/rest-api/v1/loops/${detail.id}/checklists`, {
+      }>(`/rest-api/v1/loops/${detail.id}/checklists`, {
         method: "POST",
         json: { content },
       });
@@ -307,7 +303,7 @@ export default function LoopDetailPage() {
     try {
       await Promise.all(
         detail.checklists.map((item) =>
-          apiFetch(`/api-proxy/rest-api/v1/checklists/${item.id}`, {
+          apiFetch(`/rest-api/v1/checklists/${item.id}`, {
             method: "PUT",
             json: {
               content: item.content,
@@ -328,7 +324,7 @@ export default function LoopDetailPage() {
 
     try {
       setIsDeleting(true);
-      await apiFetch(`/api-proxy/rest-api/v1/loops/${detail.id}`, {
+      await apiFetch(`/rest-api/v1/loops/${detail.id}`, {
         method: "DELETE",
       });
       router.back();
@@ -349,7 +345,7 @@ export default function LoopDetailPage() {
 
     try {
       setIsDeletingGroup(true);
-      await apiFetch(`/api-proxy/rest-api/v1/loops/group/${ruleId}`, {
+      await apiFetch(`/rest-api/v1/loops/group/${ruleId}`, {
         method: "DELETE",
       });
       router.back();
