@@ -63,7 +63,7 @@ export function MonthCalendar({
   const days = generateCalendarDays(startOfCalendar, endOfCalendar);
 
   return (
-    <section className="flex flex-col items-center gap-[24px] self-stretch w-full px-[10px]">
+    <section className="flex flex-col items-center gap-[24px] self-stretch w-full px-[10px] pb-6">
       {/* 달력 헤더 */}
       <header className="flex items-center justify-between w-[150px] text-[#7E828F]">
         <button
