@@ -56,7 +56,7 @@ export function Header({
     switch (rightType) {
       case "user":
         return (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <IconButton src="/header/header_profile.svg" alt="프로필" onClick={onProfileClick} />
             <IconButton src="/header/header_bell.svg" alt="알림" onClick={onNotificationClick} />
           </div>
@@ -70,7 +70,7 @@ export function Header({
   };
 
   return (
-    <header className={cn("flex items-center justify-between px-4 pt-4 pb-2", className)}>
+    <header className={cn("flex items-center justify-between px-4 pt-3 pb-6", className)}>
       <div className="flex items-center">{renderLeft()}</div>
       <div className="flex items-center gap-3">{renderRight()}</div>
     </header>
