@@ -37,9 +37,11 @@ export function LoopDetailContent({
   return (
     <>
       <section className="flex flex-col gap-2 pt-6">
-        <div className="text-sm text-[#8D91A1]">{formattedDate}</div>
-        <div className="flex items-start justify-between gap-3">
-          <h1 className="text-xl font-semibold text-[#2C2C2C]">{detail.title}</h1>
+        <div className="flex items-end justify-between self-stretch">
+          <div className="flex flex-col items-start gap-1.5">
+            <div className="text-sm font-medium leading-[150%] tracking-[-0.28px] text-[var(--gray-600,#737980)]">{formattedDate}</div>
+            <h1 className="text-[20px] font-bold leading-[140%] tracking-[-0.4px] text-[var(--gray-black,#121212)]">{detail.title}</h1>
+          </div>
           <IconButton
             src="/loop/loop_kebab.svg"
             alt="메뉴"
@@ -48,11 +50,11 @@ export function LoopDetailContent({
             onClick={onMenuClick}
           />
         </div>
-        {detail.content ? (
+        {/* {detail.content ? (
           <p className="text-sm leading-relaxed text-[#676A79]">
             {detail.content}
           </p>
-        ) : null}
+        ) : null} */}
       </section>
 
       <section className="flex flex-col items-center gap-6 px-1">
