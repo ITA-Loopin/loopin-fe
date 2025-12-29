@@ -63,8 +63,8 @@ export function MonthCalendar({
   const days = generateCalendarDays(startOfCalendar, endOfCalendar);
 
   return (
-    <section className="w-full max-w-[420px] rounded-[30px] border border-[#F4F4F6] bg-white px-6 pb-6 pt-5">
-      <header className="flex items-center justify-center gap-4 text-[#7E828F]">
+    <section className="flex flex-col items-center gap-[24px] self-stretch w-full max-w-[420px] rounded-[30px] border border-[#F4F4F6] bg-white px-6 pb-6 pt-5">
+      <header className="flex items-center justify-between w-[150px] text-[#7E828F]">
         <button
           type="button"
           onClick={() => onChangeMonth(-1)}
@@ -86,7 +86,14 @@ export function MonthCalendar({
         </button>
       </header>
 
-      <div className="mt-5 grid grid-cols-7 text-center text-sm font-medium text-[#B7BAC7]">
+      <div 
+        className="grid text-center text-sm font-medium text-[#B7BAC7]"
+        style={{
+          width: '295px',
+          columnGap: '25px',
+          gridTemplateColumns: 'repeat(7, minmax(0, 1fr))'
+        }}
+      >
         {DAY_NAMES.map((day, index) => (
           <span
             key={`${index}-${day}`}
@@ -97,7 +104,17 @@ export function MonthCalendar({
         ))}
       </div>
 
-      <div className="mt-3 grid grid-cols-7 gap-y-4 text-sm font-medium">
+      <div 
+        className="grid text-sm font-medium"
+        style={{
+          width: '295px',
+          height: '246px',
+          rowGap: '24px',
+          columnGap: '25px',
+          gridTemplateRows: '21px 21px 21px 21px 21px minmax(0, 1fr)',
+          gridTemplateColumns: 'repeat(7, minmax(0, 1fr))'
+        }}
+      >
         {days.map((date) => {
           const { isCurrentMonth, isSelected, isToday } = getDateState(
             date,
