@@ -9,15 +9,17 @@ export default function MainLayout({ children }: { children: ReactNode }) {
   const isHomePage = pathname === "/home";
 
   return (
-    <div
-      className={`relative flex min-h-screen flex-col ${isHomePage ? "" : "bg-[#F9FAFB]"}`}
-    >
+    <>
       <div
-        className={`${isHomePage ? "flex-auto" : "flex-1"} pb-24 pt-6 w-full`}
+        className={`relative flex min-h-screen flex-col ${isHomePage ? "" : "bg-[#F9FAFB]"}`}
       >
-        {children}
+        <div
+          className={`${isHomePage ? "flex-auto" : "flex-1"} pb-24 pt-6 w-full`}
+        >
+          {children}
+        </div>
       </div>
       <BottomTab />
-    </div>
+    </>
   );
 }
