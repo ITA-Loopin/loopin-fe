@@ -21,18 +21,29 @@ export function DayButton({
       type="button"
       onClick={() => onSelectDate(date)}
       className={cn(
-        "relative flex h-9 w-9 items-center justify-center justify-self-center rounded-full transition-all",
+        "relative flex h-8 w-8 items-center justify-center justify-self-center rounded-full transition-all",
         isSelected
-          ? "bg-[#FF7765] text-white shadow-[0px_8px_18px_rgba(255,119,101,0.32)]"
+          ? "bg-[var(--primary-500,#FF7765)]"
           : isCurrentMonth
-            ? "text-[#3B3B45] hover:bg-[#FFE5DF]"
-            : "text-[#D4D6E0]"
+            ? "hover:bg-[#FFE5DF]"
+            : ""
       )}
     >
       {isToday && !isSelected ? (
-        <span className="absolute -z-[1] h-9 w-9 rounded-full border border-dashed border-[#FFB7AB]" />
+        <span className="absolute -z-[1] h-8 w-8 rounded-full border border-dashed border-[#FFB7AB]" />
       ) : null}
-      <span>{date.date()}</span>
+      <span
+        className={cn(
+          "text-center text-sm font-semibold leading-[150%] tracking-[-0.28px]",
+          isSelected
+            ? "text-[var(--gray-100,#F8F8F9)]"
+            : isCurrentMonth
+              ? "text-[var(--gray-800,#3A3D40)]"
+              : "text-[var(--gray-300,#DDE0E3)]"
+        )}
+      >
+        {date.date()}
+      </span>
     </button>
   );
 }

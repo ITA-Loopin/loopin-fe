@@ -63,77 +63,71 @@ export function MonthCalendar({
   const days = generateCalendarDays(startOfCalendar, endOfCalendar);
 
   return (
-    <section className="flex flex-col items-center gap-[24px] self-stretch w-full max-w-[420px] rounded-[30px] border border-[#F4F4F6] bg-white px-6 pb-6 pt-5">
+    <section className="flex flex-col items-center gap-[24px] self-stretch w-full px-[10px]">
+      {/* 달력 헤더 */}
       <header className="flex items-center justify-between w-[150px] text-[#7E828F]">
         <button
           type="button"
           onClick={() => onChangeMonth(-1)}
-          className="grid h-7 w-7 place-items-center text-base font-semibold transition-colors hover:text-[#4F525E]"
+          className="flex w-[25px] h-[25px] py-[9px] px-[10px] items-center gap-[10px] shrink-0 rounded-[12.5px] bg-[var(--gray-white,#FFF)]"
           aria-label="이전 달"
         >
           ‹
         </button>
-        <div className="text-center text-[#2C2C2C]">
-          <p className="text-base font-semibold">{monthLabel}</p>
+        <div className="text-center">
+          <p className="text-base font-bold leading-[150%] tracking-[-0.32px] text-[var(--gray-800,#3A3D40)]">
+            {monthLabel}
+          </p>
         </div>
         <button
           type="button"
           onClick={() => onChangeMonth(1)}
-          className="grid h-7 w-7 place-items-center text-base font-semibold transition-colors hover:text-[#4F525E]"
+          className="flex w-[25px] h-[25px] py-[9px] px-[10px] items-center gap-[10px] shrink-0 rounded-[12.5px] bg-[var(--gray-white,#FFF)]"
           aria-label="다음 달"
         >
           ›
         </button>
       </header>
 
-      <div 
-        className="grid text-center text-sm font-medium text-[#B7BAC7]"
-        style={{
-          width: '295px',
-          columnGap: '25px',
-          gridTemplateColumns: 'repeat(7, minmax(0, 1fr))'
-        }}
-      >
-        {DAY_NAMES.map((day, index) => (
-          <span
-            key={`${index}-${day}`}
-            className={index === 0 ? "text-[#FF7765]" : undefined}
-          >
-            {day}
-          </span>
-        ))}
-      </div>
+      {/* 겉 레이아웃 */}
+      <div className="flex flex-col items-start w-full max-w-[328px] sm:max-w-[328px] min-h-[286px] p-3 sm:p-4 gap-[10px]">
+        {/* 안 레이아웃 - 요일과 날짜를 함께 감싸는 grid */}
+        <div className="grid text-sm font-medium w-full max-w-[295px] sm:max-w-[295px] min-h-[246px] gap-y-4 sm:gap-y-6 gap-x-4 sm:gap-x-[25px] grid-cols-7 grid-rows-[21px_21px_21px_21px_21px_minmax(0,1fr)]">
+          {/* 요일 */}
+          {DAY_NAMES.map((day, index) => (
+            <span
+              key={`${index}-${day}`}
+              className={`text-center text-sm font-semibold leading-[150%] tracking-[-0.28px] ${
+                index === 0 
+                  ? "text-[#FF7765]" 
+                  : "text-[var(--gray-800,#3A3D40)]"
+              }`}
+            >
+              {day}
+            </span>
+          ))}
+          
+          {/* 날짜 */}
+          {days.map((date) => {
+            const { isCurrentMonth, isSelected, isToday } = getDateState(
+              date,
+              visibleMonth,
+              selectedDate,
+              today
+            );
 
-      <div 
-        className="grid text-sm font-medium"
-        style={{
-          width: '295px',
-          height: '246px',
-          rowGap: '24px',
-          columnGap: '25px',
-          gridTemplateRows: '21px 21px 21px 21px 21px minmax(0, 1fr)',
-          gridTemplateColumns: 'repeat(7, minmax(0, 1fr))'
-        }}
-      >
-        {days.map((date) => {
-          const { isCurrentMonth, isSelected, isToday } = getDateState(
-            date,
-            visibleMonth,
-            selectedDate,
-            today
-          );
-
-          return (
-            <DayButton
-              key={date.toString()}
-              date={date}
-              isCurrentMonth={isCurrentMonth}
-              isSelected={isSelected}
-              isToday={isToday}
-              onSelectDate={onSelectDate}
-            />
-          );
-        })}
+            return (
+              <DayButton
+                key={date.toString()}
+                date={date}
+                isCurrentMonth={isCurrentMonth}
+                isSelected={isSelected}
+                isToday={isToday}
+                onSelectDate={onSelectDate}
+              />
+            );
+          })}
+        </div>
       </div>
     </section>
   );
