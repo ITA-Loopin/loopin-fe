@@ -245,7 +245,7 @@ export function LoopGroupEditSheet({
       if (!ruleId) {
         throw new Error("루프 그룹 ID가 없습니다.");
       }
-      await apiFetch(`/api-proxy/rest-api/v1/loops/group/${ruleId}`, {
+      await apiFetch(`/rest-api/v1/loops/group/${ruleId}`, {
         method: "PUT",
         json: payload,
       });
@@ -272,7 +272,7 @@ export function LoopGroupEditSheet({
               };
             }>;
           };
-        }>(`/api-proxy/rest-api/v1/loops/date/${searchDate}`);
+        }>(`/rest-api/v1/loops/date/${searchDate}`);
 
         // 같은 ruleId를 가진 루프 찾기 (또는 제목으로 매칭)
         const updatedLoop = loopsResponse?.data?.loops?.find(
