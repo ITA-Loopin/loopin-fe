@@ -33,10 +33,22 @@ export default function LoopDetailPage() {
   };
 
   const handleEditClick = () => {
+    // 단일루프 (loopRule이 null)인 경우 바로 바텀시트 열기
+    if (!detail?.loopRule) {
+      setIsEditSheetOpen(true);
+      return;
+    }
+    // 반복루프인 경우 모달 열기
     setActionModal({ type: "edit", isOpen: true });
   };
 
-  const handleDeleteClick = () => {
+  const handleDeleteClick = async () => {
+    // 단일루프 (loopRule이 null)인 경우 바로 삭제
+    if (!detail?.loopRule) {
+      await actions.handleDeleteLoop();
+      return;
+    }
+    // 반복루프인 경우 모달 열기
     setActionModal({ type: "delete", isOpen: true });
   };
 
