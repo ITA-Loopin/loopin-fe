@@ -1,5 +1,5 @@
 import type { LoopChecklist } from "@/types/loop";
-import { ChecklistToggleButton } from "./ChecklistToggleButton";
+import { IconButton } from "@/components/common/IconButton";
 
 type ChecklistItemProps = {
   item: LoopChecklist;
@@ -13,9 +13,14 @@ export function ChecklistItem({ item, onToggle }: ChecklistItemProps) {
           <span className="text-base font-semibold leading-[150%] tracking-[-0.32px] text-[#3A3D40]">
             {item.content}
           </span>
-          <ChecklistToggleButton
-            checked={item.completed}
+          <IconButton
+            src={item.completed ? "/loop/loop_btn_complete.svg" : "/loop/loop_btn.svg"}
+            alt={item.completed ? "체크리스트 완료" : "체크리스트 미완료"}
+            width={24}
+            height={24}
             onClick={() => onToggle?.(item)}
+            className="h-6 w-6"
+            imageClassName="h-6 w-6"
           />
       </div>
     </li>
