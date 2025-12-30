@@ -5,6 +5,7 @@ import type { LoopDetail, LoopChecklist } from "@/types/loop";
 import { LoopProgress } from "@/components/home/LoopProgress";
 import { Checklist } from "@/components/loop/Checklist";
 import { IconButton } from "@/components/common/IconButton";
+import { PrimaryButton } from "@/components/common/PrimaryButton";
 
 dayjs.locale("ko");
 
@@ -72,12 +73,9 @@ export function LoopDetailContent({
       </section>
 
       <div className="flex justify-center">
-        <button
-          className="flex w-full max-w-[420px] h-[48px] rounded-[30px] bg-[var(--primary-500,#FF7765)] px-[121px] py-[15px] justify-center items-center gap-[10px] text-base font-semibold leading-[150%] tracking-[-0.32px] text-[var(--gray-white,#FFF)]"
-          onClick={onCompleteLoop}
-        >
+        <PrimaryButton variant="primary" onClick={onCompleteLoop}>
           루프 완료하기
-        </button>
+        </PrimaryButton>
       </div>
 
     </>
