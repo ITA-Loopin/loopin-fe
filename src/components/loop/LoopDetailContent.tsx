@@ -63,32 +63,11 @@ export function LoopDetailContent({
           <Checklist
             checklists={detail.checklists}
             onToggleItem={onToggleChecklist}
+            newChecklistContent={newChecklistContent}
+            onNewChecklistContentChange={onNewChecklistContentChange}
+            onAddChecklist={onAddChecklist}
             key={detail.id}
           />
-
-          <div className="flex h-14 w-full items-center gap-[10px] rounded-[10px] border border-[#E2E4EA] bg-white px-4 transition-colors focus-within:border-[#FF7765]">
-            <input
-              type="text"
-              placeholder="새로운 루틴을 추가해보세요"
-              value={newChecklistContent}
-              onChange={(event) => onNewChecklistContentChange(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  event.preventDefault();
-                  onAddChecklist();
-                }
-              }}
-              className="flex-1 border-none bg-transparent text-sm text-[#2C2C2C] placeholder:text-[#B7BAC7] focus:outline-none focus:ring-0"
-            />
-            <IconButton
-              src="/addloopsheet/addloopsheet_add.svg"
-              alt="루틴 추가"
-              width={20}
-              height={20}
-              className="h-5 w-5"
-              onClick={onAddChecklist}
-            />
-          </div>
         </div>
       </section>
 
