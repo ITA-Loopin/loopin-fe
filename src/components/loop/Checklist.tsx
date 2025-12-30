@@ -15,7 +15,6 @@ type ChecklistProps = {
 
 export function Checklist({
   checklists,
-  title = "Checklist",
   onToggleItem,
   newChecklistContent,
   onNewChecklistContentChange,
@@ -39,14 +38,17 @@ export function Checklist({
 
   return (
     <section className="w-full">
-      <h2 className="mb-2 text-[20px] font-bold text-[#2C2C2C]">
-        {title}{" "}
-        <span className="text-[16px] text-gray-500">· {items.length}</span>
+      {/* 체크리스트 개수 */}
+      <h2 className="mb-2 text-[20px] font-bold leading-[140%] tracking-[-0.4px] text-black">
+        {"Checklist"}
+        <span className="text-center text-sm font-semibold leading-[150%] tracking-[-0.28px] text-[#737980]">· {items.length}</span>
       </h2>
+      {/* 체크리스트 목록 */}
       <ul className="flex flex-col items-end justify-center gap-[10px]">
         {items.map((item) => (
           <ChecklistItem key={item.id} item={item} onToggle={handleToggle} />
         ))}
+        {/* 체크리스트 추가 입력 */}
         {showAddInput && (
           <li className="flex w-full items-start justify-between rounded-[10px] bg-white p-4">
             <div className="flex w-full items-center justify-between">
