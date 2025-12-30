@@ -71,15 +71,15 @@ export function LoopDetailContent({
         </div>
       </section>
 
-      <div className="mt-auto flex flex-col gap-4 pb-8">
+      <div className="flex justify-center">
         <button
-          className="w-full rounded-3xl bg-[#FF7765] px-6 py-4 text-base font-semibold text-white transition-opacity active:opacity-90 disabled:opacity-60"
+          className="flex w-full max-w-[420px] h-[48px] rounded-[30px] bg-[var(--primary-500,#FF7765)] px-[121px] py-[15px] justify-center items-center gap-[10px] text-base font-semibold leading-[150%] tracking-[-0.32px] text-[var(--gray-white,#FFF)]"
           onClick={onCompleteLoop}
-          disabled={!detail.checklists.length}
         >
           루프 완료하기
         </button>
       </div>
+
     </>
   );
 }

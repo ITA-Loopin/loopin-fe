@@ -58,20 +58,20 @@ export default function LoopDetailPage() {
         }}
       />
 
-      <div className="relative flex min-h-dvh flex-col">
+      <div className="relative flex flex-col">
         <Header
           leftType="back"
           rightType="user"
           onBack={() => router.back()}
         />
 
-        <main className="flex flex-1 flex-col gap-6 px-4 pb-32">
+        <main className="flex flex-col gap-6 px-4 pb-8">
           {isLoading ? (
-            <div className="flex flex-1 items-center justify-center">
+            <div className="flex items-center justify-center min-h-[calc(100dvh-120px)]">
               <p className="text-sm text-gray-500">루프 정보를 불러오는 중...</p>
             </div>
           ) : errorMessage || actions.errorMessage ? (
-            <div className="flex flex-1 flex-col items-center justify-center gap-4">
+            <div className="flex flex-col items-center justify-center gap-4 min-h-[calc(100dvh-120px)]">
               <p className="text-sm text-red-500">{errorMessage || actions.errorMessage}</p>
               <button
                 className="rounded-3xl bg-[#2C2C2C] px-4 py-2 text-sm font-semibold text-white"
@@ -91,7 +91,7 @@ export default function LoopDetailPage() {
               onMenuClick={handleMenuClick}
             />
           ) : (
-            <div className="flex flex-1 items-center justify-center">
+            <div className="flex items-center justify-center min-h-[calc(100dvh-120px)]">
               <p className="text-sm text-gray-500">루프 정보를 불러오는 중...</p>
             </div>
           )}
