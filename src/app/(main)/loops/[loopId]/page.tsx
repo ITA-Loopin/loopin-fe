@@ -7,12 +7,9 @@ import { useLoopDetail } from "@/hooks/useLoopDetail";
 import { useChecklist } from "@/hooks/useChecklist";
 import { useLoopActions } from "@/hooks/useLoopActions";
 import { LoopDetailContent } from "@/components/loop/LoopDetailContent";
-import { LoopDetailMenu } from "@/components/loop/LoopDetailMenu";
 import { LoopActionModal } from "@/components/loop/LoopActionModal";
 import { LoopEditSheet } from "@/components/loop/LoopEditSheet";
 import { LoopGroupEditSheet } from "@/components/loop/LoopGroupEditSheet";
-
-const MENU_WIDTH = 160;
 
 export default function LoopDetailPage() {
   const params = useParams<{ loopId: string }>();
@@ -28,15 +25,10 @@ export default function LoopDetailPage() {
     type: "edit" | "delete";
     isOpen: boolean;
   }>({ type: "edit", isOpen: false });
-  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
   const [isGroupEditSheetOpen, setIsGroupEditSheetOpen] = useState(false);
 
-  const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    const top = rect.bottom + window.scrollY + 8;
-    const left = rect.right + window.scrollX - MENU_WIDTH;
-    setMenuPosition({ top, left });
+  const handleMenuClick = () => {
     setIsMenuOpen((prev) => !prev);
   };
 
@@ -88,7 +80,11 @@ export default function LoopDetailPage() {
               onToggleChecklist={checklist.handleToggleChecklist}
               onAddChecklist={checklist.handleAddChecklist}
               onCompleteLoop={checklist.handleCompleteLoop}
+              isMenuOpen={isMenuOpen}
               onMenuClick={handleMenuClick}
+              onMenuClose={() => setIsMenuOpen(false)}
+              onEdit={handleEditClick}
+              onDelete={handleDeleteClick}
             />
           ) : (
             <div className="flex items-center justify-center min-h-[calc(100dvh-120px)]">
@@ -98,13 +94,6 @@ export default function LoopDetailPage() {
         </main>
       </div>
 
-      <LoopDetailMenu
-        isOpen={isMenuOpen}
-        menuPosition={menuPosition}
-        onClose={() => setIsMenuOpen(false)}
-        onEdit={handleEditClick}
-        onDelete={handleDeleteClick}
-      />
 
       <LoopActionModal
         isOpen={actionModal.isOpen}

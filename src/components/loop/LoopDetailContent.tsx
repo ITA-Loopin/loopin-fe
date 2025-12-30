@@ -6,6 +6,7 @@ import { LoopProgress } from "@/components/home/LoopProgress";
 import { Checklist } from "@/components/loop/Checklist";
 import { IconButton } from "@/components/common/IconButton";
 import { PrimaryButton } from "@/components/common/PrimaryButton";
+import { DropdownEditDelete } from "@/components/loop/DropdownEditDelete";
 
 dayjs.locale("ko");
 
@@ -16,7 +17,11 @@ interface LoopDetailContentProps {
   onToggleChecklist: (item: LoopChecklist) => Promise<void>;
   onAddChecklist: () => Promise<void>;
   onCompleteLoop: () => Promise<void>;
+  isMenuOpen: boolean;
   onMenuClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  onMenuClose: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
 }
 
 export function LoopDetailContent({
@@ -26,7 +31,11 @@ export function LoopDetailContent({
   onToggleChecklist,
   onAddChecklist,
   onCompleteLoop,
+  isMenuOpen,
   onMenuClick,
+  onMenuClose,
+  onEdit,
+  onDelete,
 }: LoopDetailContentProps) {
   const formattedDate = useMemo(() => {
     if (!detail?.loopDate) {
@@ -43,13 +52,22 @@ export function LoopDetailContent({
             <div className="text-sm font-medium leading-[150%] tracking-[-0.28px] text-[var(--gray-600,#737980)]">{formattedDate}</div>
             <h1 className="text-[20px] font-bold leading-[140%] tracking-[-0.4px] text-[var(--gray-black,#121212)]">{detail.title}</h1>
           </div>
-          <IconButton
-            src="/loop/loop_kebab.svg"
-            alt="메뉴"
-            width={20}
-            height={20}
-            onClick={onMenuClick}
-          />
+          <div className="relative">
+            <IconButton
+              src="/loop/loop_kebab.svg"
+              alt="메뉴"
+              width={20}
+              height={20}
+              onClick={onMenuClick}
+            />
+            {isMenuOpen && (
+              <DropdownEditDelete
+                onClose={onMenuClose}
+                onEdit={onEdit}
+                onDelete={onDelete}
+              />
+            )}
+          </div>
         </div>
         {/* {detail.content ? (
           <p className="text-sm leading-relaxed text-[#676A79]">
