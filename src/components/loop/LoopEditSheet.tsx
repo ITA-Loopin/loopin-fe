@@ -147,21 +147,21 @@ export function LoopEditSheet({
 
     try {
       setIsSubmitting(true);
-      await apiFetch(`/api-proxy/rest-api/v1/loops/${loop.id}`, {
+      await apiFetch(`/rest-api/v1/loops/${loop.id}`, {
         method: "PUT",
         json: payload,
       });
 
       await Promise.all([
         ...removedIds.map((id) =>
-          apiFetch(`/api-proxy/rest-api/v1/checklists/${id}`, {
+          apiFetch(`/rest-api/v1/checklists/${id}`, {
             method: "DELETE",
           }).catch(() => {
             // 체크리스트 삭제 실패
           })
         ),
         ...updatedExistingItems.map((item) =>
-          apiFetch(`/api-proxy/rest-api/v1/checklists/${item.originId}`, {
+          apiFetch(`/rest-api/v1/checklists/${item.originId}`, {
             method: "PUT",
             json: {
               content: item.text,
@@ -176,7 +176,7 @@ export function LoopEditSheet({
       for (const item of newItems) {
         try {
           await apiFetch(
-            `/api-proxy/rest-api/v1/loops/${loop.id}/checklists`,
+            `/rest-api/v1/loops/${loop.id}/checklists`,
             {
               method: "POST",
               json: {
