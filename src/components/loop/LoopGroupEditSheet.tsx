@@ -1,20 +1,12 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
-import dayjs, { Dayjs } from "dayjs";
 import { BottomSheet } from "@/components/common/BottomSheet";
 import { TitleInput } from "@/components/common/add-loop/TitleInput";
 import { ScheduleSelector } from "@/components/common/add-loop/ScheduleSelector";
 import { DateRangePicker } from "@/components/common/add-loop/DateRangePicker";
 import { ChecklistEditor } from "@/components/common/add-loop/ChecklistEditor";
-import {
-  Checklist,
-  DayOption,
-  WEEKDAY_OPTIONS,
-} from "@/components/common/add-loop/constants";
-import { apiFetch } from "@/lib/api";
 import type { LoopDetail } from "@/types/loop";
-import { useEditChecklist } from "@/hooks/useEditChecklist";
+import { useLoopGroupEditForm } from "./useLoopGroupEditForm";
 
 type LoopGroupEditSheetProps = {
   isOpen: boolean;
@@ -29,260 +21,13 @@ export function LoopGroupEditSheet({
   onClose,
   onUpdated,
 }: LoopGroupEditSheetProps) {
-  const [title, setTitle] = useState("");
-  const [scheduleType, setScheduleType] = useState("");
-  const [daysOfWeek, setDaysOfWeek] = useState<string[]>([]);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const {
-    checklists,
-    setChecklists,
-    newChecklistItem,
-    setNewChecklistItem,
-    handleAddChecklist: baseHandleAddChecklist,
-    handleChecklistChange,
-    handleRemoveChecklist,
-  } = useEditChecklist<Checklist>();
-
-  const [isWeeklyDropdownOpen, setIsWeeklyDropdownOpen] = useState(false);
-  const [isStartCalendarOpen, setIsStartCalendarOpen] = useState(false);
-  const [isEndCalendarOpen, setIsEndCalendarOpen] = useState(false);
-  const [startCalendarMonth, setStartCalendarMonth] = useState(dayjs());
-  const [endCalendarMonth, setEndCalendarMonth] = useState(dayjs());
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    if (!isOpen || !loop) {
-      return;
-    }
-
-    const loopRule = loop.loopRule;
-    
-    // loopRule이 있으면 그것을 우선 사용, 없으면 기본값
-    const normalizedScheduleType = loopRule?.scheduleType ?? "NONE";
-    const initialStart =
-      loopRule?.startDate ?? loop.loopDate ?? dayjs().format("YYYY-MM-DD");
-    const initialEnd = loopRule?.endDate ?? null;
-
-    setTitle(loop.title ?? "");
-    setScheduleType(normalizedScheduleType);
-    setDaysOfWeek(loopRule?.daysOfWeek ?? []);
-    setStartDate(initialStart);
-    setEndDate(initialEnd ?? "");
-    setChecklists(
-      (loop.checklists ?? []).map((item, index) => ({
-        id: `check-${item.id ?? index}`,
-        text: item.content,
-      }))
-    );
-    setNewChecklistItem("");
-
-    setIsWeeklyDropdownOpen(normalizedScheduleType === "WEEKLY");
-    setIsStartCalendarOpen(false);
-    setIsEndCalendarOpen(false);
-
-    const startMonth = initialStart ? dayjs(initialStart) : dayjs();
-    const endMonth = initialEnd ? dayjs(initialEnd) : startMonth;
-    setStartCalendarMonth(startMonth);
-    setEndCalendarMonth(endMonth);
-  }, [isOpen, loop, setChecklists, setNewChecklistItem]);
-
-  const formattedStartDate = useMemo(
-    () => (startDate ? dayjs(startDate).format("YYYY.MM.DD") : "없음"),
-    [startDate]
-  );
-
-  const formattedEndDate = useMemo(
-    () => (endDate ? dayjs(endDate).format("YYYY.MM.DD") : "없음"),
-    [endDate]
-  );
-
-  const selectedStartDate = useMemo<Dayjs>(
-    () => (startDate ? dayjs(startDate) : startCalendarMonth),
-    [startDate, startCalendarMonth]
-  );
-
-  const selectedEndDate = useMemo<Dayjs>(
-    () => (endDate ? dayjs(endDate) : endCalendarMonth),
-    [endDate, endCalendarMonth]
-  );
-
-  const handleTitleChange = (value: string) => {
-    setTitle(value);
-  };
-
-  const handleScheduleTypeClick = (value: string) => {
-    if (value === "WEEKLY") {
-      if (scheduleType === "WEEKLY") {
-        setIsWeeklyDropdownOpen((prev) => !prev);
-      } else {
-        setScheduleType("WEEKLY");
-        setIsWeeklyDropdownOpen(true);
-      }
-      return;
-    }
-    setScheduleType(value);
-    setIsWeeklyDropdownOpen(false);
-    setDaysOfWeek([]);
-  };
-
-  const handleDayClick = (day: DayOption) => {
-    const allSelected = daysOfWeek.length === WEEKDAY_OPTIONS.length;
-
-    if (day === "EVERYDAY") {
-      setDaysOfWeek(allSelected ? [] : [...WEEKDAY_OPTIONS]);
-      return;
-    }
-
-    if (allSelected) {
-      setDaysOfWeek([day]);
-      return;
-    }
-
-    setDaysOfWeek((prev) => {
-      if (prev.includes(day)) {
-        return prev.filter((item) => item !== day);
-      }
-
-      const next = [...prev, day];
-      if (next.length === WEEKDAY_OPTIONS.length) {
-        return [...WEEKDAY_OPTIONS];
-      }
-      return next;
+  const { title, schedule, dateRange, checklist, submit } =
+    useLoopGroupEditForm({
+      isOpen,
+      loop,
+      onClose,
+      onUpdated,
     });
-  };
-
-  const handleAddChecklist = () => {
-    baseHandleAddChecklist((id, text) => ({
-      id,
-      text,
-    }));
-  };
-
-  const toggleStartCalendar = () => {
-    setIsStartCalendarOpen((prev) => {
-      const next = !prev;
-      if (next) {
-        const base = startDate ? dayjs(startDate) : dayjs();
-        setStartCalendarMonth(base);
-        setIsEndCalendarOpen(false);
-      }
-      return next;
-    });
-  };
-
-  const toggleEndCalendar = () => {
-    setIsEndCalendarOpen((prev) => {
-      const next = !prev;
-      if (next) {
-        const base = endDate
-          ? dayjs(endDate)
-          : startDate
-          ? dayjs(startDate)
-          : dayjs();
-        setEndCalendarMonth(base);
-        setIsStartCalendarOpen(false);
-      }
-      return next;
-    });
-  };
-
-  const handleSelectStartDate = (date: Dayjs) => {
-    setStartDate(date.format("YYYY-MM-DD"));
-    setStartCalendarMonth(date);
-    setIsStartCalendarOpen(false);
-  };
-
-  const handleSelectEndDate = (date: Dayjs) => {
-    setEndDate(date.format("YYYY-MM-DD"));
-    setEndCalendarMonth(date);
-    setIsEndCalendarOpen(false);
-  };
-
-  const handleChangeStartMonth = (offset: number) => {
-    setStartCalendarMonth((prev) => prev.add(offset, "month"));
-  };
-
-  const handleChangeEndMonth = (offset: number) => {
-    setEndCalendarMonth((prev) => prev.add(offset, "month"));
-  };
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!loop) return;
-
-    const normalizedScheduleType = scheduleType || "NONE";
-    const isWeekly = normalizedScheduleType === "WEEKLY";
-
-    const payload = {
-      title,
-      content: loop.content ?? null,
-      scheduleType: normalizedScheduleType,
-      specificDate:
-        normalizedScheduleType === "NONE" ? startDate || null : null,
-      daysOfWeek: isWeekly ? daysOfWeek : [],
-      startDate: startDate || null,
-      endDate: endDate || null,
-      checklists: checklists
-        .map((item) => item.text.trim())
-        .filter((text) => text.length > 0),
-    };
-
-    try {
-      setIsSubmitting(true);
-      const ruleId = loop.loopRule?.ruleId ?? loop.loopRuleId;
-      if (!ruleId) {
-        throw new Error("루프 그룹 ID가 없습니다.");
-      }
-      await apiFetch(`/rest-api/v1/loops/group/${ruleId}`, {
-        method: "PUT",
-        json: payload,
-      });
-
-      // 그룹 수정 후 현재 날짜의 루프 목록을 조회해서 해당 그룹의 새 루프 ID 찾기
-      const currentLoopDate = loop.loopDate ?? dayjs().format("YYYY-MM-DD");
-      const today = dayjs().format("YYYY-MM-DD");
-      // 그룹 수정은 오늘 날짜 기준으로 미래 루프를 생성하므로, 현재 날짜가 오늘 이후인지 확인
-      const searchDate = dayjs(currentLoopDate).isAfter(dayjs(), "day")
-        ? currentLoopDate
-        : today;
-
-      let newLoopId: number | undefined;
-      try {
-        const loopsResponse = await apiFetch<{
-          success?: boolean;
-          data?: {
-            loops?: Array<{
-              id: number;
-              title: string;
-              loopDate: string;
-              loopRule?: {
-                ruleId: number;
-              };
-            }>;
-          };
-        }>(`/rest-api/v1/loops/date/${searchDate}`);
-
-        // 같은 ruleId를 가진 루프 찾기 (또는 제목으로 매칭)
-        const updatedLoop = loopsResponse?.data?.loops?.find(
-          (item) =>
-            item.loopRule?.ruleId === ruleId ||
-            (item.title === title && item.loopDate === searchDate)
-        );
-
-        newLoopId = updatedLoop?.id;
-      } catch (error) {
-        // 새 루프 ID 조회 실패
-      }
-
-      await onUpdated?.(newLoopId);
-      onClose();
-    } catch (error) {
-      // 반복 루프 수정 실패
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   return (
     <BottomSheet
@@ -296,46 +41,46 @@ export function LoopGroupEditSheet({
         루프 수정하기
       </h2>
 
-      <form className="mt-6 space-y-6" onSubmit={handleSubmit}>
-        <TitleInput value={title} onChange={handleTitleChange} />
+      <form className="mt-6 space-y-6" onSubmit={submit.onSubmit}>
+        <TitleInput value={title.value} onChange={title.onChange} />
 
         <ScheduleSelector
-          scheduleType={scheduleType}
-          isWeeklyDropdownOpen={isWeeklyDropdownOpen}
-          daysOfWeek={daysOfWeek}
-          onSelectSchedule={handleScheduleTypeClick}
-          onToggleDay={handleDayClick}
+          scheduleType={schedule.scheduleType}
+          isWeeklyDropdownOpen={schedule.isWeeklyDropdownOpen}
+          daysOfWeek={schedule.daysOfWeek}
+          onSelectSchedule={schedule.onSelectSchedule}
+          onToggleDay={schedule.onToggleDay}
         />
 
         <DateRangePicker
-          formattedStartDate={formattedStartDate}
-          formattedEndDate={formattedEndDate}
-          isStartCalendarOpen={isStartCalendarOpen}
-          isEndCalendarOpen={isEndCalendarOpen}
-          startCalendarMonth={startCalendarMonth}
-          endCalendarMonth={endCalendarMonth}
-          selectedStartDate={selectedStartDate}
-          selectedEndDate={selectedEndDate}
-          onToggleStartCalendar={toggleStartCalendar}
-          onToggleEndCalendar={toggleEndCalendar}
-          onSelectStartDate={handleSelectStartDate}
-          onSelectEndDate={handleSelectEndDate}
-          onChangeStartMonth={handleChangeStartMonth}
-          onChangeEndMonth={handleChangeEndMonth}
+          formattedStartDate={dateRange.formattedStartDate}
+          formattedEndDate={dateRange.formattedEndDate}
+          isStartCalendarOpen={dateRange.isStartCalendarOpen}
+          isEndCalendarOpen={dateRange.isEndCalendarOpen}
+          startCalendarMonth={dateRange.startCalendarMonth}
+          endCalendarMonth={dateRange.endCalendarMonth}
+          selectedStartDate={dateRange.selectedStartDate}
+          selectedEndDate={dateRange.selectedEndDate}
+          onToggleStartCalendar={dateRange.onToggleStartCalendar}
+          onToggleEndCalendar={dateRange.onToggleEndCalendar}
+          onSelectStartDate={dateRange.onSelectStartDate}
+          onSelectEndDate={dateRange.onSelectEndDate}
+          onChangeStartMonth={dateRange.onChangeStartMonth}
+          onChangeEndMonth={dateRange.onChangeEndMonth}
         />
 
         <ChecklistEditor
-          checklists={checklists}
-          onChangeChecklist={handleChecklistChange}
-          onRemoveChecklist={handleRemoveChecklist}
-          newChecklistItem={newChecklistItem}
-          onChangeNewChecklist={setNewChecklistItem}
-          onAddChecklist={handleAddChecklist}
+          checklists={checklist.checklists}
+          onChangeChecklist={checklist.onChangeChecklist}
+          onRemoveChecklist={checklist.onRemoveChecklist}
+          newChecklistItem={checklist.newChecklistItem}
+          onChangeNewChecklist={checklist.onChangeNewChecklist}
+          onAddChecklist={checklist.onAddChecklist}
         />
 
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={submit.isSubmitting}
           className="w-full rounded-[24px] bg-[#FF7765] px-6 py-4 text-base font-semibold text-white transition-opacity active:opacity-90 disabled:opacity-50"
         >
           수정 완료하기
@@ -344,5 +89,3 @@ export function LoopGroupEditSheet({
     </BottomSheet>
   );
 }
-
-
