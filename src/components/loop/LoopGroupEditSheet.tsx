@@ -6,7 +6,7 @@ import { ScheduleSelector } from "@/components/common/add-loop/ScheduleSelector"
 import { DateRangePicker } from "@/components/common/add-loop/DateRangePicker";
 import { ChecklistEditor } from "@/components/common/add-loop/ChecklistEditor";
 import type { LoopDetail } from "@/types/loop";
-import { useLoopGroupEditForm } from "./useLoopGroupEditForm";
+import { useLoopGroupEditForm } from "../../hooks/useLoopGroupEditForm";
 
 type LoopGroupEditSheetProps = {
   isOpen: boolean;

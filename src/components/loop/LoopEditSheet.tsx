@@ -5,7 +5,7 @@ import { TitleInput } from "@/components/common/add-loop/TitleInput";
 import { ChecklistEditor } from "@/components/common/add-loop/ChecklistEditor";
 import { DateRangePicker } from "@/components/common/add-loop/DateRangePicker";
 import type { LoopDetail } from "@/types/loop";
-import { useLoopEditForm } from "./useLoopEditForm";
+import { useLoopEditForm } from "../../hooks/useLoopEditForm";
 
 type LoopEditSheetProps = {
   isOpen: boolean;
