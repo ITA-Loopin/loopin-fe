@@ -8,6 +8,7 @@ import { ChecklistEditor } from "@/components/common/add-loop/ChecklistEditor";
 import { DateRangePicker } from "@/components/common/add-loop/DateRangePicker";
 import { apiFetch } from "@/lib/api";
 import type { LoopDetail } from "@/types/loop";
+import { useEditChecklist } from "@/hooks/useEditChecklist";
 
 type EditableChecklist = {
   id: string;
@@ -32,8 +33,15 @@ export function LoopEditSheet({
   const [title, setTitle] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [checklists, setChecklists] = useState<EditableChecklist[]>([]);
-  const [newChecklistItem, setNewChecklistItem] = useState("");
+  const {
+    checklists,
+    setChecklists,
+    newChecklistItem,
+    setNewChecklistItem,
+    handleAddChecklist: baseHandleAddChecklist,
+    handleChecklistChange,
+    handleRemoveChecklist,
+  } = useEditChecklist<EditableChecklist>();
   const [isStartCalendarOpen, setIsStartCalendarOpen] = useState(false);
   const [startCalendarMonth, setStartCalendarMonth] = useState(dayjs());
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -58,7 +66,7 @@ export function LoopEditSheet({
       }))
     );
     setNewChecklistItem("");
-  }, [isOpen, loop]);
+  }, [isOpen, loop, setChecklists, setNewChecklistItem]);
 
   const formattedStartDate = useMemo(
     () => (startDate ? dayjs(startDate).format("YYYY.MM.DD") : "없음"),
@@ -74,29 +82,11 @@ export function LoopEditSheet({
   );
 
   const handleAddChecklist = () => {
-    const trimmed = newChecklistItem.trim();
-    if (!trimmed) return;
-    setChecklists((prev) => [
-      ...prev,
-      {
-        id: `temp-${Date.now()}`,
-        text: trimmed,
-        completed: false,
-      },
-    ]);
-    setNewChecklistItem("");
-  };
-
-  const handleChecklistChange = (index: number, text: string) => {
-    setChecklists((prev) => {
-      const next = [...prev];
-      next[index] = { ...next[index], text };
-      return next;
-    });
-  };
-
-  const handleRemoveChecklist = (id: string) => {
-    setChecklists((prev) => prev.filter((item) => item.id !== id));
+    baseHandleAddChecklist((id, text) => ({
+      id,
+      text,
+      completed: false,
+    }));
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {

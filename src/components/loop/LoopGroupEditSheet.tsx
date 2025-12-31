@@ -14,6 +14,7 @@ import {
 } from "@/components/common/add-loop/constants";
 import { apiFetch } from "@/lib/api";
 import type { LoopDetail } from "@/types/loop";
+import { useEditChecklist } from "@/hooks/useEditChecklist";
 
 type LoopGroupEditSheetProps = {
   isOpen: boolean;
@@ -33,8 +34,15 @@ export function LoopGroupEditSheet({
   const [daysOfWeek, setDaysOfWeek] = useState<string[]>([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [checklists, setChecklists] = useState<Checklist[]>([]);
-  const [newChecklistItem, setNewChecklistItem] = useState("");
+  const {
+    checklists,
+    setChecklists,
+    newChecklistItem,
+    setNewChecklistItem,
+    handleAddChecklist: baseHandleAddChecklist,
+    handleChecklistChange,
+    handleRemoveChecklist,
+  } = useEditChecklist<Checklist>();
 
   const [isWeeklyDropdownOpen, setIsWeeklyDropdownOpen] = useState(false);
   const [isStartCalendarOpen, setIsStartCalendarOpen] = useState(false);
@@ -77,7 +85,7 @@ export function LoopGroupEditSheet({
     const endMonth = initialEnd ? dayjs(initialEnd) : startMonth;
     setStartCalendarMonth(startMonth);
     setEndCalendarMonth(endMonth);
-  }, [isOpen, loop]);
+  }, [isOpen, loop, setChecklists, setNewChecklistItem]);
 
   const formattedStartDate = useMemo(
     () => (startDate ? dayjs(startDate).format("YYYY.MM.DD") : "없음"),
@@ -145,29 +153,10 @@ export function LoopGroupEditSheet({
   };
 
   const handleAddChecklist = () => {
-    const trimmed = newChecklistItem.trim();
-    if (!trimmed) return;
-    setChecklists((prev) => [
-      ...prev,
-      { id: `temp-${Date.now()}`, text: trimmed },
-    ]);
-    setNewChecklistItem("");
-  };
-
-  const handleChecklistChange = (index: number, text: string) => {
-    setChecklists((prev) => {
-      const next = [...prev];
-      next[index] = { ...next[index], text };
-      return next;
-    });
-  };
-
-  const handleRemoveChecklist = (id: string) => {
-    setChecklists((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const handleNewChecklistChange = (value: string) => {
-    setNewChecklistItem(value);
+    baseHandleAddChecklist((id, text) => ({
+      id,
+      text,
+    }));
   };
 
   const toggleStartCalendar = () => {
@@ -340,7 +329,7 @@ export function LoopGroupEditSheet({
           onChangeChecklist={handleChecklistChange}
           onRemoveChecklist={handleRemoveChecklist}
           newChecklistItem={newChecklistItem}
-          onChangeNewChecklist={handleNewChecklistChange}
+          onChangeNewChecklist={setNewChecklistItem}
           onAddChecklist={handleAddChecklist}
         />
 
