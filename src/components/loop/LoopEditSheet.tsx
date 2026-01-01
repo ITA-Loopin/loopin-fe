@@ -34,49 +34,57 @@ export function LoopEditSheet({
       className="max-h-[90vh] overflow-y-auto"
       title="루프 수정하기"
     >
-      <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-gray-200" />
-      <h2 className="text-center text-lg font-semibold text-[#2C2C2C]">
-        루프 수정하기
-      </h2>
+      <div className="inline-flex items-center gap-2.5 px-4 py-5">
+        <div className="flex w-full flex-col items-center gap-6">
+          {/* 바텀시트 제목 */}
+          <h2 className="text-center text-base font-semibold text-[#737980] leading-[150%] tracking-[-0.32px]">
+            루프 수정하기
+          </h2>
 
-      <form className="mt-6 space-y-6" onSubmit={submit.onSubmit}>
-        <TitleInput value={title.value} onChange={title.onChange} />
+          {/* 루프 수정 폼 */}
+          <form className="w-full space-y-10" onSubmit={submit.onSubmit}>
+            {/* 루프 제목 */}
+            <TitleInput value={title.value} onChange={title.onChange} />
 
-        <DateRangePicker
-          formattedStartDate={dateRange.formattedStartDate}
-          formattedEndDate={dateRange.formattedEndDate}
-          isStartCalendarOpen={dateRange.isStartCalendarOpen}
-          isEndCalendarOpen={dateRange.isEndCalendarOpen}
-          startCalendarMonth={dateRange.startCalendarMonth}
-          endCalendarMonth={dateRange.endCalendarMonth}
-          selectedStartDate={dateRange.selectedStartDate}
-          selectedEndDate={dateRange.selectedEndDate}
-          onToggleStartCalendar={dateRange.onToggleStartCalendar}
-          onToggleEndCalendar={dateRange.onToggleEndCalendar}
-          onSelectStartDate={dateRange.onSelectStartDate}
-          onSelectEndDate={dateRange.onSelectEndDate}
-          onChangeStartMonth={dateRange.onChangeStartMonth}
-          onChangeEndMonth={dateRange.onChangeEndMonth}
-          disableEndDate
-        />
+            {/* 루프 기간 */}
+            <DateRangePicker
+              formattedStartDate={dateRange.formattedStartDate}
+              formattedEndDate={dateRange.formattedEndDate}
+              isStartCalendarOpen={dateRange.isStartCalendarOpen}
+              isEndCalendarOpen={dateRange.isEndCalendarOpen}
+              startCalendarMonth={dateRange.startCalendarMonth}
+              endCalendarMonth={dateRange.endCalendarMonth}
+              selectedStartDate={dateRange.selectedStartDate}
+              selectedEndDate={dateRange.selectedEndDate}
+              onToggleStartCalendar={dateRange.onToggleStartCalendar}
+              onToggleEndCalendar={dateRange.onToggleEndCalendar}
+              onSelectStartDate={dateRange.onSelectStartDate}
+              onSelectEndDate={dateRange.onSelectEndDate}
+              onChangeStartMonth={dateRange.onChangeStartMonth}
+              onChangeEndMonth={dateRange.onChangeEndMonth}
+              disableEndDate
+            />
 
-        <ChecklistEditor
-          checklists={checklist.checklists}
-          onChangeChecklist={checklist.onChangeChecklist}
-          onRemoveChecklist={checklist.onRemoveChecklist}
-          newChecklistItem={checklist.newChecklistItem}
-          onChangeNewChecklist={checklist.onChangeNewChecklist}
-          onAddChecklist={checklist.onAddChecklist}
-        />
+            {/* 루프 체크리스트 */}
+            <ChecklistEditor
+              checklists={checklist.checklists}
+              onChangeChecklist={checklist.onChangeChecklist}
+              onRemoveChecklist={checklist.onRemoveChecklist}
+              newChecklistItem={checklist.newChecklistItem}
+              onChangeNewChecklist={checklist.onChangeNewChecklist}
+              onAddChecklist={checklist.onAddChecklist}
+            />
 
-        <button
-          type="submit"
-          disabled={submit.isSubmitting}
-          className="w-full rounded-[24px] bg-[#FF7765] px-6 py-4 text-base font-semibold text-white transition-opacity active:opacity-90 disabled:opacity-50"
-        >
-          수정 완료하기
-        </button>
-      </form>
+            <button
+              type="submit"
+              disabled={submit.isSubmitting}
+              className="w-full rounded-[24px] bg-[#FF7765] px-6 py-4 text-base font-semibold text-white transition-opacity active:opacity-90 disabled:opacity-50"
+            >
+              수정 완료하기
+            </button>
+          </form>
+        </div>
+      </div>
     </BottomSheet>
   );
 }

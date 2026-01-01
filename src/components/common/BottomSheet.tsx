@@ -34,7 +34,7 @@ export function BottomSheet({
     >
       <SheetPortal>
         <SheetOverlay
-          className={cn("bg-black/60", overlayClassName)}
+          className={cn("bg-[rgba(18,18,18,0.70)]", overlayClassName)}
         />
         <SheetContent
           side="bottom"
