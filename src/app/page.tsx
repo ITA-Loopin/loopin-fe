@@ -58,9 +58,19 @@ function HomeContent() {
     }
   }, [dispatch, router]);
 
-  const handleKakaoLogin = async () => {
+  const handleKakaoLogin = () => {
     window.location.href =
       "https://api.loopin.co.kr/oauth2/authorization/kakao";
+  };
+
+  const handleNaverLogin = () => {
+    window.location.href =
+      "https://api.loopin.co.kr/oauth2/authorization/naver";
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href =
+      "https://api.loopin.co.kr/oauth2/authorization/google";
   };
 
   useEffect(() => {
@@ -152,15 +162,13 @@ function HomeContent() {
             </span>
           </button>
 
-          {/* <button
+          <button
             onClick={handleNaverLogin}
             className="flex w-full items-center justify-between rounded-full bg-[#03C75A] px-6 py-4 text-left font-semibold text-white shadow-lg shadow-black/10"
           >
             <span className="flex items-center gap-3">
-              <img src="/naver-icon.svg" alt="Naver" width={24} height={24} />
               네이버 로그인
             </span>
-            <span className="text-sm text-white/70">준비중</span>
           </button>
 
           <button
@@ -168,11 +176,9 @@ function HomeContent() {
             className="flex w-full items-center justify-between rounded-full bg-white px-6 py-4 text-left font-semibold text-[#1F1F1F] shadow-lg shadow-black/10"
           >
             <span className="flex items-center gap-3">
-              <img src="/google-icon.svg" alt="Google" width={24} height={24} />
               구글 로그인
             </span>
-            <span className="text-sm text-[#1F1F1F]/60">준비중</span>
-          </button> */}
+          </button>
         </div>
       </div>
     </div>
