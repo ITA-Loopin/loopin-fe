@@ -10,13 +10,13 @@ export function TeamListSection({
   children,
 }: TeamListSectionProps) {
   return (
-    <section className="px-6">
+    <section className="w-full">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-[#3A3D40]">{title}</h2>
+        <h2 className="text-base font-semibold leading-[150%] tracking-[-0.32px] text-[#3A3D40]">{title}</h2>
         {viewAllHref && (
           <a
             href={viewAllHref}
-            className="text-sm font-medium text-[#A0A9B1] transition-colors hover:text-[#737980]"
+            className="text-center text-xs font-medium leading-[140%] tracking-[-0.24px] text-[#A0A9B1]"
           >
             전체보기 &gt;
           </a>
