@@ -63,9 +63,9 @@ export default function TeamLoopPage() {
           팀과 함께 루프를 완성해보세요!</p>
       </div>
 
-      <main className="flex-1 space-y-8 py-6">
+      <main className="flex-1 space-y-8 py-6 px-[16px]">
         {/* 내 팀 목록 */}
-        <div className="flex w-full flex-col items-start gap-4 px-[16px]">
+        <div className="flex w-full flex-col items-start gap-4">
           <TeamListSection title="내 팀 목록" viewAllHref="/teamloop/my">
             <div className="overflow-x-auto">
               <div className="flex gap-4">
@@ -82,7 +82,7 @@ export default function TeamLoopPage() {
           title="다른 팀에 참여해보세요!"
           viewAllHref="/teamloop/recommended"
         >
-          <div className="flex flex-col">
+          <div className="flex w-full flex-col items-start gap-4">
             {mockRecommendedTeams.map((team) => (
               <TeamCard key={team.id} team={team} variant="recommended" />
             ))}
