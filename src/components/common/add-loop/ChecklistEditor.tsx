@@ -46,6 +46,7 @@ export function ChecklistEditor({
               height={24}
               onClick={() => onRemoveChecklist(item.id)}
               imageClassName="h-6 w-6"
+              className="h-6 w-6"
             />
           </div>
         ))}
@@ -65,6 +66,7 @@ export function ChecklistEditor({
             height={24}
             onClick={onAddChecklist}
             imageClassName="h-6 w-6"
+            className="h-6 w-6"
           />
         </div>
       </div>

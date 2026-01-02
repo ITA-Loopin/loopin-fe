@@ -80,7 +80,7 @@ export function ScheduleSelector({
 
       {/* 매주 선택 시 요일 선택 영역 */}
       {scheduleType === "WEEKLY" && isWeeklyDropdownOpen && (
-        <div className="flex w-full items-center justify-between">
+        <div className="flex w-full items-center justify-between gap-1">
           {DAY_OPTIONS.map((day) => {
             const isEveryday = day === "EVERYDAY";
             const isEverydaySelected = daysOfWeek.length === WEEKDAY_OPTIONS.length;
@@ -94,7 +94,7 @@ export function ScheduleSelector({
                 type="button"
                 onClick={() => onToggleDay(day)}
                 className={cn(
-                  "flex h-[48px] w-[48px] shrink-0 flex-col items-center justify-center gap-[10px] px-3 py-2 text-sm font-semibold",
+                  "flex h-[40px] flex-1 flex-col items-center justify-center gap-[10px] px-1 py-2 text-sm font-semibold rounded-[5px]",
                   isSelected ? activeButtonStyles : inactiveButtonStyles
                 )}
               >
