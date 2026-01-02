@@ -6,6 +6,7 @@ import { apiFetch } from "@/lib/api";
 
 interface UseDailyLoopsParams {
   date: string;
+  refreshKey?: number;
 }
 
 interface UseDailyLoopsResult {
@@ -14,7 +15,7 @@ interface UseDailyLoopsResult {
   isLoading: boolean;
 }
 
-export function useDailyLoops({ date }: UseDailyLoopsParams): UseDailyLoopsResult {
+export function useDailyLoops({ date, refreshKey }: UseDailyLoopsParams): UseDailyLoopsResult {
   const [loopList, setLoopList] = useState<LoopItem[]>([]);
   const [totalProgress, setTotalProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -66,7 +67,7 @@ export function useDailyLoops({ date }: UseDailyLoopsParams): UseDailyLoopsResul
     return () => {
       cancelled = true;
     };
-  }, [date]);
+  }, [date, refreshKey]);
 
   return { loopList, totalProgress, isLoading };
 }

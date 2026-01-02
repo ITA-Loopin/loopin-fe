@@ -28,6 +28,7 @@ export default function CalendarPage() {
 
   const { loopList, isLoading } = useDailyLoops({
     date: selectedDateKey,
+    refreshKey,
   });
   const [isAddLoopModalOpen, setIsAddLoopModalOpen] = useState(false);
 

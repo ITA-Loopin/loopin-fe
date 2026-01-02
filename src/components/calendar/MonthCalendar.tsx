@@ -92,7 +92,7 @@ export function MonthCalendar({
       {/* 겉 레이아웃 */}
       <div className="flex flex-col items-start w-full max-w-[328px] sm:max-w-[500px] p-3 sm:p-4 gap-[10px] rounded-[10px] bg-[var(--gray-white,#FFF)]">
         {/* 안 레이아웃 - 요일과 날짜를 함께 감싸는 grid */}
-        <div className="grid text-sm font-medium w-full max-w-[295px] sm:max-w-[500px] gap-y-4 sm:gap-y-6 gap-x-4 sm:gap-x-[25px] grid-cols-7 auto-rows-[21px]">
+        <div className="grid text-sm font-medium w-full max-w-[295px] sm:max-w-[500px] gap-y-4 sm:gap-y-6 gap-x-4 sm:gap-x-[25px] grid-cols-7 auto-rows-[21px] pb-4">
           {/* 요일 */}
           {DAY_NAMES.map((day, index) => (
             <span
