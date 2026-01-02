@@ -6,6 +6,13 @@ import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { setCredentials } from "@/store/slices/authSlice";
+import { apiFetch } from "@/lib/api";
+import {
+  buildUserFromMemberProfile,
+  fetchMemberProfile,
+  type MemberResponse,
+} from "@/lib/member";
+import type { User } from "@/types/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -24,91 +31,51 @@ function HomeContent() {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleLoginSuccess = useCallback(
-    async (accessToken: string) => {
-      const sanitizedAccessToken = accessToken.replace(/\s/g, "+").trim();
+  const handleLoginSuccess = useCallback(async () => {
+    try {
+      const memberResponse = await fetchMemberProfile();
 
-      try {
-        const response = await fetch("/api-proxy/rest-api/v1/member", {
-          headers: {
-            Authorization: `Bearer ${sanitizedAccessToken}`,
-          },
-          cache: "no-store",
-        });
+      const fallbackUser: User = {
+        id: "user",
+        nickname: "루프인",
+      };
 
-        if (!response.ok) {
-          const errorBody = await response.text();
-          console.error("사용자 정보 요청 실패", response.status, errorBody);
-          throw new Error(errorBody || "사용자 정보를 가져올 수 없습니다.");
-        }
+      const userData = buildUserFromMemberProfile(
+        memberResponse.data,
+        fallbackUser
+      );
 
-        const userData = await response.json();
+      dispatch(
+        setCredentials({
+          user: userData,
+        })
+      );
 
-        dispatch(
-          setCredentials({
-            user: userData,
-            accessToken: sanitizedAccessToken,
-          })
-        );
-
-        router.replace("/home");
-      } catch (error) {
-        console.error("로그인 처리 실패:", error);
-        alert("로그인 처리 중 오류가 발생했습니다.");
-      }
-    },
-    [dispatch, router]
-  );
+      router.replace("/home");
+    } catch (error) {
+      console.error("로그인 처리 실패:", error);
+      alert("로그인 처리 중 오류가 발생했습니다.");
+    }
+  }, [dispatch, router]);
 
   const handleKakaoLogin = async () => {
-    try {
-      const response = await fetch(
-        "/api-proxy/rest-api/v1/oauth/redirect-url/kakao"
-      );
-
-      if (!response.ok) {
-        throw new Error("리다이렉션 URL을 가져올 수 없습니다.");
-      }
-
-      const data = await response.json();
-      const redirectUrl = data.data || data.redirectUrl || data.url;
-
-      if (redirectUrl) {
-        window.location.href = redirectUrl;
-      } else {
-        throw new Error(
-          `리다이렉션 URL을 찾을 수 없습니다. 응답: ${JSON.stringify(data)}`
-        );
-      }
-    } catch (error) {
-      console.error("카카오 로그인 실패:", error);
-      alert(
-        `카카오 로그인에 실패했습니다.\n${
-          error instanceof Error ? error.message : "다시 시도해주세요."
-        }`
-      );
-    }
+    window.location.href =
+      "https://api.loopin.co.kr/oauth2/authorization/kakao";
   };
 
   useEffect(() => {
     const status = searchParams.get("status");
-    const accessToken = searchParams.get("accessToken");
 
-    if (status === "LOGIN_SUCCESS" && accessToken) {
-      handleLoginSuccess(accessToken);
+    if (status === "LOGIN_SUCCESS") {
+      handleLoginSuccess();
       return;
     }
 
     if (status === "SIGNUP_REQUIRED") {
-      const email = searchParams.get("email");
-      const provider = searchParams.get("provider");
-      const providerId = searchParams.get("providerId");
+      const ticket = searchParams.get("ticket");
 
-      if (email && provider && providerId) {
-        sessionStorage.setItem(
-          "signup_data",
-          JSON.stringify({ email, provider, providerId })
-        );
+      if (ticket) {
+        sessionStorage.setItem("signup_data", JSON.stringify({ ticket }));
         router.push("/auth/onboarding");
       }
 
@@ -159,7 +126,6 @@ function HomeContent() {
           priority
         />
       </div>
-
       <div
         className={`relative z-10 mt-16 w-full max-w-sm transition-all duration-700 ${
           showContent ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"

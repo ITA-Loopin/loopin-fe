@@ -3,13 +3,14 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Modal from "@/components/common/Modal";
+import { apiFetch } from "@/lib/api";
 import { useAppDispatch } from "@/store/hooks";
 import { setCredentials } from "@/store/slices/authSlice";
+import type { User } from "@/types/auth";
+import { buildUserFromMemberProfile, fetchMemberProfile } from "@/lib/member";
 
 type SignupSession = {
-  email: string;
-  provider: string;
-  providerId: string;
+  ticket: string;
 };
 
 type AlertState = {
@@ -82,15 +83,14 @@ export default function OnboardingPage() {
     setModalError(null);
 
     try {
-      const response = await fetch(
-        `/api-proxy/rest-api/v1/member/available?nickname=${encodeURIComponent(nickname)}`
-      );
+      const data = await apiFetch<{
+        success?: boolean;
+        data?: { available?: boolean };
+      }>("/rest-api/v1/member/available", {
+        searchParams: { nickname },
+        skipCredentials: true, // 인증이 필요 없는 공개 엔드포인트
+      });
 
-      if (!response.ok) {
-        throw new Error("닉네임 중복 확인에 실패했습니다.");
-      }
-
-      const data = await response.json();
       const isAvailable =
         data?.success !== false &&
         (data?.data?.available === undefined || data?.data?.available === true);
@@ -127,36 +127,44 @@ export default function OnboardingPage() {
     setModalError(null);
 
     try {
-      const response = await fetch("/api-proxy/rest-api/v1/auth/signup-login", {
+      const data = await apiFetch<{
+        user?: User;
+      }>("/rest-api/v1/auth/signup-login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: signupData.email,
-          provider: signupData.provider,
-          providerId: signupData.providerId,
+        json: {
           nickname,
-        }),
+          ticket: signupData.ticket,
+        },
+        skipCredentials: true, // 회원가입 시에는 쿠키가 아직 없음
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || "회원가입에 실패했습니다.");
-      }
+      const fallbackUser: User = {
+        id: "user",
+        nickname,
+      };
 
-      const data = await response.json();
+      const baseUser: User = data.user
+        ? {
+            ...data.user,
+            id: data.user.id || "user",
+          }
+        : fallbackUser;
+
+      let finalUser = baseUser;
+
+      try {
+        const memberResponse = await fetchMemberProfile();
+        finalUser = buildUserFromMemberProfile(memberResponse.data, {
+          ...baseUser,
+          id: baseUser.id || "user",
+        });
+      } catch (memberError) {
+        console.error("회원 정보 동기화 실패", memberError);
+      }
 
       dispatch(
         setCredentials({
-          user:
-            data.user ||
-            ({
-              id: signupData.providerId,
-              email: signupData.email,
-              nickname,
-            } as const),
-          accessToken: data.accessToken,
+          user: finalUser,
         })
       );
 
