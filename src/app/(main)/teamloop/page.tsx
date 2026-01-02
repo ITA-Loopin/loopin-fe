@@ -104,10 +104,12 @@ export default function TeamLoopPage() {
                 <p className="text-sm text-[#A0A9B1]">참여한 팀이 없습니다</p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="w-full overflow-x-auto scroll-smooth snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 <div className="flex gap-4">
                   {myTeams.map((team) => (
-                    <TeamCard key={team.id} team={team} variant="my" />
+                    <div key={team.id} className="shrink-0 w-[calc(100vw-64px)] w-full snap-start">
+                      <TeamCard team={team} variant="my" />
+                    </div>
                   ))}
                 </div>
               </div>
