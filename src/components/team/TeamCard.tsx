@@ -9,50 +9,58 @@ export function TeamCard({ team, variant }: TeamCardProps) {
   if (variant === "my") {
     // 가로 스크롤용 카드 (원형 프로그레스 포함)
     const progress = team.progress ?? 0;
-    const radius = 28; // 이미지 기준으로 더 큰 원
+    const radius = 40; // 90x90 원형, 반지름 40 (strokeWidth 6 고려)
     const circumference = 2 * Math.PI * radius;
     const offset = circumference - (progress / 100) * circumference;
 
     return (
-      <div className="flex w-[280px] shrink-0 flex-col rounded-2xl bg-white p-4 shadow-sm">
-        <div className="mb-3">
-          <span className="inline-block rounded-md bg-[#FFE4E0] px-2 py-1 text-xs font-medium text-[#FF543F]">
-            {team.category}
-          </span>
-        </div>
-        <h3 className="mb-1 text-base font-semibold text-[#3A3D40]">
-          {team.title}
-        </h3>
-        <p className="mb-2 text-sm text-[#737980]">{team.description}</p>
-        <p className="mb-4 text-xs text-[#A0A9B1]">
-          {team.startDate} ~ {team.endDate}
-        </p>
-        <div className="flex items-center justify-end">
-          <div className="relative h-16 w-16">
-            <svg className="h-16 w-16 -rotate-90">
+      <div className="flex w-full flex-col items-start gap-[10px] rounded-[10px] bg-white p-4">
+        {/* 안 레이아웃 */}
+        <div className="flex w-full items-start gap-5">
+          {/* 왼쪽 레이아웃 */}
+          <div className="flex w-full h-[126px] flex-col items-start justify-between">
+            <div>
+              <span className="inline-block rounded-[30px] bg-[#FF9A8D] px-[7px] py-[5px] text-[10px] gap-[10px] font-medium leading-[140%] tracking-[-0.2px] text-white">
+                {team.category}
+              </span>
+            </div>
+            <div className="flex flex-col items-start self-stretch gap-1">
+              <h3 className="text-base font-bold leading-[150%] tracking-[-0.32px] text-[#121212]">
+                {team.title}
+              </h3>
+              <p className="text-sm font-medium leading-[150%] tracking-[-0.28px] text-[#737980]">{team.description}</p>
+            </div>
+            <p className="text-xs font-medium leading-[140%] tracking-[-0.24px] text-[#A0A9B1]">
+              {team.startDate} ~ {team.endDate}
+            </p>
+          </div>
+
+          {/* 오른쪽 레이아웃 - 90x90 원형 진행률 */}
+          <div className="relative h-[90px] w-[90px] shrink-0">
+            <svg className="h-[90px] w-[90px] -rotate-90">
               {/* 배경 원 */}
               <circle
-                cx="32"
-                cy="32"
+                cx="45"
+                cy="45"
                 r={radius}
                 fill="none"
                 stroke="#F0F2F3"
-                strokeWidth="6"
+                strokeWidth="7"
               />
               {/* 진행률 원 */}
               <circle
-                cx="32"
-                cy="32"
+                cx="45"
+                cy="45"
                 r={radius}
                 fill="none"
-                stroke="#FF543F"
-                strokeWidth="6"
+                stroke="#FF7765"
+                strokeWidth="7" 
                 strokeDasharray={circumference}
                 strokeDashoffset={offset}
                 strokeLinecap="round"
               />
             </svg>
-            <span className="absolute inset-0 flex items-center justify-center text-sm font-semibold text-[#3A3D40]">
+            <span className="absolute inset-0 flex items-center justify-center text-base font-bold leading-[150%] tracking-[-0.32px] text-[#121212]">
               {progress}%
             </span>
           </div>
