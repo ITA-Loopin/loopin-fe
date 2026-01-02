@@ -9,6 +9,8 @@ export function LoopListItem({ item }: LoopListItemProps) {
   const progress =
     item.totalChecklists > 0
       ? Math.round((item.completedChecklists / item.totalChecklists) * 100)
+      : item.completed
+      ? 100
       : 0;
 
   // SVG 원형 진행률 표시기 (radius = 20, circumference ≈ 125.66)

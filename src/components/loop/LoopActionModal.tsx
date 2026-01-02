@@ -40,7 +40,7 @@ export function LoopActionModal({
           <br />
           이 루프만 {isDelete ? "삭제" : "수정"}할까요?
         </p>
-        <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:gap-3">
+        <div className="mt-5 flex flex-row gap-2">
           <button
             type="button"
             className="flex w-[148px] h-[42px] px-[10px] py-[9px] justify-center items-center gap-[10px] rounded-[5px] bg-[var(--gray-100,#F8F8F9)] text-sm font-semibold leading-[150%] tracking-[-0.28px] text-center text-[var(--primary-main,#FF543F)]"

@@ -76,6 +76,8 @@ export function useLoopDetail(loopId: number): UseLoopDetailResult {
                   100
                 )
               )
+            : typeof data.progress === "number"
+            ? Math.round(Math.min(Math.max(data.progress, 0), 100))
             : 0;
 
         const loopRule = data.loopRule
