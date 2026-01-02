@@ -1,6 +1,6 @@
 import { FormEvent, useCallback, useState } from "react";
 import { apiFetch } from "@/lib/api";
-import { AddLoopDefaultValues } from "./constants";
+import { AddLoopDefaultValues, Checklist } from "@/components/common/add-loop/constants";
 import { useLoopTitle } from "./useLoopTitle";
 import { useLoopSchedule } from "./useLoopSchedule";
 import { useLoopDateRange } from "./useLoopDateRange";
@@ -74,8 +74,8 @@ export function useAddLoopForm({
         startDate: dateRange.startDate?.format("YYYY-MM-DD") || null,
         endDate: dateRange.endDate?.format("YYYY-MM-DD") || null,
         checklists: checklist.checklists
-          .map((item) => item.text)
-          .filter((text) => text.trim().length > 0),
+          .map((item: Checklist) => item.text)
+          .filter((text: string) => text.trim().length > 0),
       };
 
       try {

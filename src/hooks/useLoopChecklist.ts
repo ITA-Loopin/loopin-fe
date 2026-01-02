@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Checklist } from "./constants";
+import { Checklist } from "@/components/common/add-loop/constants";
 
 interface UseLoopChecklistProps {
   isOpen: boolean;

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { DayOption, WEEKDAY_OPTIONS } from "./constants";
+import { DayOption, WEEKDAY_OPTIONS } from "@/components/common/add-loop/constants";
 
 interface UseLoopScheduleProps {
   isOpen: boolean;
