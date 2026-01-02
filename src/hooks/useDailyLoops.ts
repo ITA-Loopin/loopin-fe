@@ -40,7 +40,7 @@ export function useDailyLoops({ date, refreshKey }: UseDailyLoopsParams): UseDai
             const apiProgress = result.data.totalProgress;
             setTotalProgress(
               typeof apiProgress === "number"
-                ? Math.round(Math.min(Math.max(apiProgress * 100, 0), 100))
+                ? Math.round(Math.min(Math.max(apiProgress, 0), 100))
                 : 0
             );
           } else {
