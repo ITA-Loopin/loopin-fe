@@ -1,5 +1,6 @@
 "use client";
 
+import Header from "@/components/common/Header";
 import { TeamListSection } from "@/components/team/TeamListSection";
 import { TeamCard } from "@/components/team/TeamCard";
 import { TeamLoopFAB } from "@/components/team/TeamLoopFAB";
@@ -48,6 +49,12 @@ const mockRecommendedTeams: TeamItem[] = [
 export default function TeamLoopPage() {
   return (
     <div className="flex min-h-screen flex-col">
+      <div className="relative">
+        <Header leftType="none" rightType="user" />
+        <h1 className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-base font-semibold leading-[150%] tracking-[-0.32px] text-[#3A3D40]">
+          팀 루프
+        </h1>
+      </div>
 
       <main className="flex-1 space-y-8 py-6">
         {/* 내 팀 목록 */}
