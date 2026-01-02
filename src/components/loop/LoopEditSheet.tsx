@@ -1,6 +1,7 @@
 "use client";
 
 import { BottomSheet } from "@/components/common/BottomSheet";
+import { PrimaryButton } from "@/components/common/PrimaryButton";
 import { TitleInput } from "@/components/common/add-loop/TitleInput";
 import { ChecklistEditor } from "@/components/common/add-loop/ChecklistEditor";
 import { DateRangePicker } from "@/components/common/add-loop/DateRangePicker";
@@ -75,13 +76,13 @@ export function LoopEditSheet({
               onAddChecklist={checklist.onAddChecklist}
             />
 
-            <button
+            <PrimaryButton
               type="submit"
               disabled={submit.isSubmitting}
-              className="w-full rounded-[24px] bg-[#FF7765] px-6 py-4 text-base font-semibold text-white transition-opacity active:opacity-90 disabled:opacity-50"
+              className="primary"
             >
               수정 완료하기
-            </button>
+            </PrimaryButton>
           </form>
         </div>
       </div>

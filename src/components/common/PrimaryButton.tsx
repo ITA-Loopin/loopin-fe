@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 type PrimaryButtonProps = {
   children: React.ReactNode;
   onClick?: () => void;
+  type?: "button" | "submit" | "reset";
   variant?: "primary" | "secondary";
   disabled?: boolean;
   className?: string;
@@ -11,6 +12,7 @@ type PrimaryButtonProps = {
 export function PrimaryButton({
   children,
   onClick,
+  type = "button",
   variant = "primary",
   disabled = false,
   className,
@@ -22,7 +24,7 @@ export function PrimaryButton({
 
   return (
     <button
-      type="button"
+      type={type}
       onClick={onClick}
       disabled={disabled}
       className={cn(
