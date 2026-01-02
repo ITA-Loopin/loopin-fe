@@ -14,15 +14,11 @@ export default function MainLayout({ children }: { children: ReactNode }) {
       className={`relative flex min-h-screen flex-col ${isHomePage || isAnalyticsPage ? "" : "bg-[#F9FAFB]"}`}
     >
       <div
-        className={`relative flex min-h-screen flex-col ${isHomePage ? "" : "bg-[#F9FAFB]"}`}
+        className={`${isHomePage ? "flex-auto" : "flex-1"} pb-24 pt-6 w-full`}
       >
-        <div
-          className={`${isHomePage ? "flex-auto" : "flex-1"} pb-24 pt-6 w-full`}
-        >
-          {children}
-        </div>
+        {children}
       </div>
       <BottomTab />
-    </>
+    </div>
   );
 }
