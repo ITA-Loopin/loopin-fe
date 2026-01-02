@@ -56,6 +56,13 @@ export default function TeamLoopPage() {
         </h1>
       </div>
 
+      <div className="flex w-full flex-col items-start gap-[6px] px-[16px] pb-6 pt-6">
+        <h2 className="text-[14px] font-medium leading-[150%] tracking-[-0.28px] text-[var(--primary-main,#FF543F)]">
+          TEAM LOOP</h2>
+        <p className="text-[20px] font-bold leading-[140%] tracking-[-0.4px] text-[var(--gray-black,#121212)]">
+          팀과 함께 루프를 완성해보세요!</p>
+      </div>
+
       <main className="flex-1 space-y-8 py-6">
         {/* 내 팀 목록 */}
         <TeamListSection title="내 팀 목록" viewAllHref="/teamloop/my">
