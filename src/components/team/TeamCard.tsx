@@ -71,19 +71,26 @@ export function TeamCard({ team, variant }: TeamCardProps) {
 
   // 세로 리스트용 카드 (원형 프로그레스 없음)
   return (
-    <div className="mb-3 rounded-2xl bg-white p-4 shadow-sm last:mb-0">
-      <div className="mb-2 flex items-center justify-between">
-        <span className="inline-block rounded-md bg-[#FFE4E0] px-2 py-1 text-xs font-medium text-[#FF543F]">
-          {team.category}
-        </span>
-        <span className="text-xs text-[#A0A9B1]">
-          {team.startDate} ~ {team.endDate}
-        </span>
+    <div className="flex w-full flex-col items-start gap-[10px] self-stretch rounded-[10px] bg-white px-4 py-2.5">
+      {/* 안 레이아웃 */}
+      <div className="flex flex-col items-start gap-[10px]">
+        <div className="flex items-center gap-[10px]">
+          <span className="inline-block rounded-[30px] bg-[#FF9A8D] px-[7px] py-[5px] text-[10px] font-medium leading-[140%] tracking-[-0.2px] text-white">
+            {team.category}
+          </span>
+          <span className="text-xs font-medium leading-[140%] tracking-[-0.24px] text-[#A0A9B1]">
+            {team.startDate} ~ {team.endDate}
+          </span>
+        </div>
+        <div className="flex items-center gap-4">
+          <h3 className="text-base font-bold leading-[150%] tracking-[-0.32px] text-[#121212]">
+            {team.title}
+          </h3>
+          <p className="text-xs font-medium leading-[140%] tracking-[-0.24px] text-[#737980]">
+            {team.description}
+          </p>
+        </div>
       </div>
-      <h3 className="mb-1 text-base font-semibold text-[#3A3D40]">
-        {team.title}
-      </h3>
-      <p className="text-sm text-[#737980]">{team.description}</p>
     </div>
   );
 }
