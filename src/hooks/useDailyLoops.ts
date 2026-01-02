@@ -70,4 +70,3 @@ export function useDailyLoops({ date }: UseDailyLoopsParams): UseDailyLoopsResul
 
   return { loopList, totalProgress, isLoading };
 }
-
