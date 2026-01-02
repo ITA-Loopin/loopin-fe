@@ -1,4 +1,5 @@
 import type { TeamItem } from "./types";
+import { getTeamCategoryLabel } from "./types";
 
 type TeamCardProps = {
   team: TeamItem;
@@ -21,7 +22,7 @@ export function TeamCard({ team, variant }: TeamCardProps) {
           <div className="flex w-full h-[126px] flex-col items-start justify-between">
             <div>
               <span className="inline-block rounded-[30px] bg-[#FF9A8D] px-[7px] py-[5px] text-[10px] gap-[10px] font-medium leading-[140%] tracking-[-0.2px] text-white">
-                {team.category}
+                {getTeamCategoryLabel(team.category)}
               </span>
             </div>
             <div className="flex flex-col items-start self-stretch gap-1">
@@ -76,7 +77,7 @@ export function TeamCard({ team, variant }: TeamCardProps) {
       <div className="flex flex-col items-start gap-[10px]">
         <div className="flex items-center gap-[10px]">
           <span className="inline-block rounded-[30px] bg-[#FF9A8D] px-[7px] py-[5px] text-[10px] font-medium leading-[140%] tracking-[-0.2px] text-white">
-            {team.category}
+            {getTeamCategoryLabel(team.category)}
           </span>
           <span className="text-xs font-medium leading-[140%] tracking-[-0.24px] text-[#A0A9B1]">
             {team.startDate} ~ {team.endDate}
