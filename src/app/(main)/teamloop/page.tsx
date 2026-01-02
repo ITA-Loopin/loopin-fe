@@ -65,15 +65,17 @@ export default function TeamLoopPage() {
 
       <main className="flex-1 space-y-8 py-6">
         {/* 내 팀 목록 */}
-        <TeamListSection title="내 팀 목록" viewAllHref="/teamloop/my">
-          <div className="overflow-x-auto">
-            <div className="flex gap-4">
-              {mockMyTeams.map((team) => (
-                <TeamCard key={team.id} team={team} variant="my" />
-              ))}
+        <div className="flex w-full flex-col items-start gap-4 px-[16px]">
+          <TeamListSection title="내 팀 목록" viewAllHref="/teamloop/my">
+            <div className="overflow-x-auto">
+              <div className="flex gap-4">
+                {mockMyTeams.map((team) => (
+                  <TeamCard key={team.id} team={team} variant="my" />
+                ))}
+              </div>
             </div>
-          </div>
-        </TeamListSection>
+          </TeamListSection>
+        </div>
 
         {/* 다른 팀에 참여해보세요! */}
         <TeamListSection
