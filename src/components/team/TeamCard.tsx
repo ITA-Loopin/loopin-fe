@@ -19,21 +19,18 @@ export function TeamCard({ team, variant }: TeamCardProps) {
         {/* 안 레이아웃 */}
         <div className="flex w-full items-start gap-5">
           {/* 왼쪽 레이아웃 */}
-          <div className="flex w-full h-[126px] flex-col items-start justify-between">
+          <div className="flex w-full flex-col items-start justify-between">
             <div>
               <span className="inline-block rounded-[30px] bg-[#FF9A8D] px-[7px] py-[5px] text-[10px] gap-[10px] font-medium leading-[140%] tracking-[-0.2px] text-white">
                 {getTeamCategoryLabel(team.category)}
               </span>
             </div>
-            <div className="flex flex-col items-start self-stretch gap-1">
+            <div className="flex flex-col items-start self-stretch gap-1 pt-2">
               <h3 className="text-base font-bold leading-[150%] tracking-[-0.32px] text-[#121212]">
                 {team.title}
               </h3>
               <p className="text-sm font-medium leading-[150%] tracking-[-0.28px] text-[#737980]">{team.description}</p>
             </div>
-            <p className="text-xs font-medium leading-[140%] tracking-[-0.24px] text-[#A0A9B1]">
-              {team.startDate} ~ {team.endDate}
-            </p>
           </div>
 
           {/* 오른쪽 레이아웃 - 90x90 원형 진행률 */}
@@ -78,9 +75,6 @@ export function TeamCard({ team, variant }: TeamCardProps) {
         <div className="flex items-center gap-[10px]">
           <span className="inline-block rounded-[30px] bg-[#FF9A8D] px-[7px] py-[5px] text-[10px] font-medium leading-[140%] tracking-[-0.2px] text-white">
             {getTeamCategoryLabel(team.category)}
-          </span>
-          <span className="text-xs font-medium leading-[140%] tracking-[-0.24px] text-[#A0A9B1]">
-            {team.startDate} ~ {team.endDate}
           </span>
         </div>
         <div className="flex items-center gap-4">
