@@ -70,3 +70,39 @@ export async function fetchMyTeamList(params?: {
   };
 }
 
+/**
+ * 팀 생성 API 요청 타입
+ */
+export type CreateTeamRequest = {
+  category: TeamCategoryString;
+  name: string;
+  goal: string;
+  invitedNicknames: string[];
+};
+
+/**
+ * 팀 생성 API
+ */
+export async function createTeam(
+  data: CreateTeamRequest
+): Promise<{ success: boolean; message?: string }> {
+  const response = await apiFetch<{
+    success: boolean;
+    code: string;
+    message: string;
+    data?: unknown;
+  }>("/rest-api/v1/teams", {
+    method: "POST",
+    json: data,
+  });
+
+  if (!response.success) {
+    throw new Error(response.message || "팀 생성에 실패했습니다");
+  }
+
+  return {
+    success: true,
+    message: response.message,
+  };
+}
+
