@@ -35,10 +35,12 @@ function HomeContent() {
     try {
       const memberResponse = await fetchMemberProfile();
 
+
       const fallbackUser: User = {
         id: "user",
         nickname: "루프인",
       };
+
 
       const userData = buildUserFromMemberProfile(
         memberResponse.data,

@@ -1,3 +1,4 @@
+@import url("https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2/fonts/static/woff2/SUIT.css");
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -118,5 +119,6 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: 'SUIT', sans-serif;
   }
 }
