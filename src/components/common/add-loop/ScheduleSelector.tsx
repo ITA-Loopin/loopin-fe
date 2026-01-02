@@ -23,67 +23,64 @@ export function ScheduleSelector({
   onSelectSchedule,
   onToggleDay,
 }: ScheduleSelectorProps) {
+  const baseButtonStyles =
+    "flex h-[38px] w-full items-center justify-center gap-[10px] px-[42px] py-[9px] text-sm font-semibold transition-colors";
+  const activeButtonStyles =
+    "rounded-[5px] bg-[#FFE4E0] leading-[150%] tracking-[-0.28px] text-[#FF543F]";
+  const inactiveButtonStyles =
+    "rounded-[5px] bg-[#F0F2F3] leading-[150%] tracking-[-0.28px] text-[#C6CCD1]";
+  const buttonRowStyles = "flex w-full items-start gap-2";
+
+  const renderScheduleButton = (option: (typeof REPEAT_OPTIONS)[number]) => {
+    const isActive = scheduleType === option.value;
+    const isWeekly = option.value === "WEEKLY";
+
+    return (
+      <div key={option.value} className="relative flex-1">
+        <button
+          type="button"
+          onClick={() => onSelectSchedule(option.value)}
+          className={cn(
+            baseButtonStyles,
+            isActive ? activeButtonStyles : inactiveButtonStyles
+          )}
+        >
+          {option.label}
+        </button>
+        {isWeekly && (
+          <IconButton
+            src="/addloopsheet/addloopsheet_dropdown.svg"
+            alt="요일 선택"
+            width={14}
+            height={14}
+            onClick={(event) => {
+              event.stopPropagation();
+              onSelectSchedule(option.value);
+            }}
+            className={cn(
+              "absolute right-3 top-1/2 -translate-y-1/2 transition-transform",
+              isActive && isWeeklyDropdownOpen ? "rotate-180" : ""
+            )}
+          />
+        )}
+      </div>
+    );
+  };
+
   return (
-    <div className="space-y-3">
-      <p className="text-sm font-medium text-[#676A79]">반복 주기</p>
+    <div className="flex flex-col items-start gap-2 self-stretch">
+      <p className="text-xs font-medium leading-[140%] tracking-[-0.24px] text-[#A0A9B1]">
+        반복 주기
+      </p>
 
-      <div className="grid grid-cols-2 gap-2">
-        {REPEAT_OPTIONS.slice(0, 2).map((option) => {
-          const isActive = scheduleType === option.value;
-
-          if (option.value === "WEEKLY") {
-            return (
-              <div key={option.value} className="relative">
-                <button
-                  type="button"
-                  onClick={() => onSelectSchedule(option.value)}
-                  className={cn(
-                    "flex w-full items-center justify-center rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors",
-                    isActive
-                      ? "border-[#FFADA1] bg-[#FFF4F2] text-[#FF7765]"
-                      : "border-[#F0F2F3] bg-[#F0F2F3] text-[#8D91A1]"
-                  )}
-                >
-                  {option.label}
-                </button>
-                <IconButton
-                  src="/addloopsheet/addloopsheet_dropdown.svg"
-                  alt="요일 선택"
-                  width={14}
-                  height={14}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    onSelectSchedule(option.value);
-                  }}
-                  className={cn(
-                    "absolute right-3 top-1/2 -translate-y-1/2 transition-transform",
-                    isActive && isWeeklyDropdownOpen ? "rotate-180" : ""
-                  )}
-                />
-              </div>
-            );
-          }
-
-          return (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() => onSelectSchedule(option.value)}
-              className={cn(
-                "rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors",
-                isActive
-                  ? "border-[#FFADA1] bg-[#FFF4F2] text-[#FF7765]"
-                  : "border-[#F0F2F3] bg-[#F0F2F3] text-[#8D91A1]"
-              )}
-            >
-              {option.label}
-            </button>
-          );
-        })}
+      {/* 첫 번째 줄: 매주, 매달 */}
+      <div className={buttonRowStyles}>
+        {REPEAT_OPTIONS.slice(0, 2).map(renderScheduleButton)}
       </div>
 
+      {/* 매주 선택 시 요일 선택 영역 */}
       {scheduleType === "WEEKLY" && isWeeklyDropdownOpen && (
-        <div className="grid grid-cols-8 gap-2">
+        <div className="flex w-full items-center justify-between">
           {DAY_OPTIONS.map((day) => {
             const isEveryday = day === "EVERYDAY";
             const isEverydaySelected = daysOfWeek.length === WEEKDAY_OPTIONS.length;
@@ -97,10 +94,8 @@ export function ScheduleSelector({
                 type="button"
                 onClick={() => onToggleDay(day)}
                 className={cn(
-                  "rounded-xl border px-2 py-2 text-sm font-semibold tracking-[-0.02em] leading-[1.5]",
-                  isSelected
-                    ? "border-[#FFADA1] bg-[#FFF4F2] text-[#FF7765]"
-                    : "border-[#F0F2F3] bg-[#F0F2F3] text-[#8D91A1]"
+                  "flex h-[48px] w-[48px] shrink-0 flex-col items-center justify-center gap-[10px] px-3 py-2 text-sm font-semibold",
+                  isSelected ? activeButtonStyles : inactiveButtonStyles
                 )}
               >
                 {DAY_LABELS[day]}
@@ -110,22 +105,9 @@ export function ScheduleSelector({
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-2">
-        {REPEAT_OPTIONS.slice(2).map((option) => (
-          <button
-            key={option.value}
-            type="button"
-            onClick={() => onSelectSchedule(option.value)}
-            className={cn(
-              "rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors",
-              scheduleType === option.value
-                ? "border-[#FFADA1] bg-[#FFF4F2] text-[#FF7765]"
-                : "border-[#F0F2F3] bg-[#F0F2F3] text-[#8D91A1]"
-            )}
-          >
-            {option.label}
-          </button>
-        ))}
+      {/* 두 번째 줄: 매년, 안함 */}
+      <div className={buttonRowStyles}>
+        {REPEAT_OPTIONS.slice(2).map(renderScheduleButton)}
       </div>
     </div>
   );
