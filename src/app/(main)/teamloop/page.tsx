@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Header from "@/components/common/Header";
 import { TeamListSection } from "@/components/team/TeamListSection";
 import { TeamCard } from "@/components/team/TeamCard";
@@ -36,6 +37,7 @@ const mockRecommendedTeams: TeamItem[] = [
 ];
 
 export default function TeamLoopPage() {
+  const router = useRouter();
   const [myTeams, setMyTeams] = useState<TeamItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -126,7 +128,7 @@ export default function TeamLoopPage() {
         </TeamListSection>
       </main>
 
-      <TeamLoopFAB />
+      <TeamLoopFAB onClick={() => router.push("/teamloop/create")} />
     </div>
   );
 }
