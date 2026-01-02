@@ -153,21 +153,20 @@ export function useChecklist(
     });
 
     try {
-      await Promise.all(
-        detail.checklists.map((item) =>
-          apiFetch(`/rest-api/v1/checklists/${item.id}`, {
-            method: "PUT",
-            json: {
-              content: item.content,
-              completed: true,
-            },
-          })
-        )
-      );
+      await apiFetch(`/rest-api/v1/loops/${detail.id}/completion`, {
+        method: "PATCH",
+        json: {
+          completed: true,
+        },
+      });
+      // 애니메이션이 보이도록 약간의 딜레이 후 reload
+      setTimeout(() => {
+        reload();
+      }, 2500);
     } catch (error) {
       setDetail(previousState);
     }
-  }, [detail, setDetail]);
+  }, [detail, setDetail, reload]);
 
   return {
     detail,
