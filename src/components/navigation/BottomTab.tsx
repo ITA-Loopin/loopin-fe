@@ -37,9 +37,9 @@ const TAB_ITEMS: BottomTabItem[] = [
     icon: "/bottomTab/BottomTab_graph.svg",
   },
   {
-    key: "party",
-    label: "PARTY",
-    href: "/party",
+    key: "teamloop",
+    label: "TEAM LOOP",
+    href: "/teamloop",
     icon: "/bottomTab/BottomTab_party.svg",
   },
 ];
