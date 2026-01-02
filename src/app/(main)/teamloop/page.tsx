@@ -1,28 +1,17 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Header from "@/components/common/Header";
 import { TeamListSection } from "@/components/team/TeamListSection";
 import { TeamCard } from "@/components/team/TeamCard";
 import { TeamLoopFAB } from "@/components/team/TeamLoopFAB";
 import type { TeamItem } from "@/components/team/types";
-
-// TODO: API에서 데이터 가져오기
-const mockMyTeams: TeamItem[] = [
-  {
-    id: 1,
-    category: "스터디",
-    title: "에펙 마스터",
-    description: "3개월 동안 에펙 초보 탈출하기",
-    startDate: "2025.12.3",
-    endDate: "2026.2.26",
-    progress: 75,
-  },
-];
+import { fetchMyTeamList } from "@/lib/team";
 
 const mockRecommendedTeams: TeamItem[] = [
   {
     id: 2,
-    category: "스터디",
+    category: "STUDY",
     title: "필라테스 독학",
     description: "모두같이 필라테스 독학하자^^",
     startDate: "2025.12.3",
@@ -30,7 +19,7 @@ const mockRecommendedTeams: TeamItem[] = [
   },
   {
     id: 3,
-    category: "스터디",
+    category: "STUDY",
     title: "정처기 도전",
     description: "한 번에 붙어봅시다!",
     startDate: "2025.12.3",
@@ -38,7 +27,7 @@ const mockRecommendedTeams: TeamItem[] = [
   },
   {
     id: 4,
-    category: "스터디",
+    category: "STUDY",
     title: "독서 왕 되기",
     description: "매일매일 책을 읽어보아요",
     startDate: "2025.12.3",
@@ -47,6 +36,39 @@ const mockRecommendedTeams: TeamItem[] = [
 ];
 
 export default function TeamLoopPage() {
+  const [myTeams, setMyTeams] = useState<TeamItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadMyTeams = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const result = await fetchMyTeamList();
+
+        if (!cancelled) {
+          setMyTeams(result.teams);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : "팀 리스트를 불러오는데 실패했습니다");
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadMyTeams();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
   return (
     <div className="flex min-h-screen flex-col">
       <div className="relative">
@@ -67,13 +89,27 @@ export default function TeamLoopPage() {
         {/* 내 팀 목록 */}
         <div className="flex w-full flex-col items-start gap-4">
           <TeamListSection title="내 팀 목록" viewAllHref="/teamloop/my">
-            <div className="overflow-x-auto">
-              <div className="flex gap-4">
-                {mockMyTeams.map((team) => (
-                  <TeamCard key={team.id} team={team} variant="my" />
-                ))}
+            {isLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <p className="text-sm text-[#A0A9B1]">로딩 중...</p>
               </div>
-            </div>
+            ) : error ? (
+              <div className="flex items-center justify-center py-8">
+                <p className="text-sm text-red-500">{error}</p>
+              </div>
+            ) : myTeams.length === 0 ? (
+              <div className="flex items-center justify-center py-8">
+                <p className="text-sm text-[#A0A9B1]">참여한 팀이 없습니다</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <div className="flex gap-4">
+                  {myTeams.map((team) => (
+                    <TeamCard key={team.id} team={team} variant="my" />
+                  ))}
+                </div>
+              </div>
+            )}
           </TeamListSection>
         </div>
 
