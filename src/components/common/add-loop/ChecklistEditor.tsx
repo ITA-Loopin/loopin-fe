@@ -42,9 +42,10 @@ export function ChecklistEditor({
             <IconButton
               src="/addloopsheet/addloopsheet_delete.svg"
               alt="체크리스트 삭제"
-              width={20}
-              height={20}
+              width={24}
+              height={24}
               onClick={() => onRemoveChecklist(item.id)}
+              imageClassName="h-6 w-6"
             />
           </div>
         ))}
@@ -60,9 +61,10 @@ export function ChecklistEditor({
           <IconButton
             src="/addloopsheet/addloopsheet_add.svg"
             alt="체크리스트 추가"
-            width={20}
-            height={20}
+            width={24}
+            height={24}
             onClick={onAddChecklist}
+            imageClassName="h-6 w-6"
           />
         </div>
       </div>
