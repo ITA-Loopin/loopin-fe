@@ -7,6 +7,7 @@ type ChecklistProps = {
   checklists: LoopChecklist[];
   title?: string;
   onToggleItem?: (item: LoopChecklist) => void;
+  onDeleteItem?: (itemId: number) => void;
   // 체크리스트 추가 관련 props
   newChecklistContent?: string;
   onNewChecklistContentChange?: (content: string) => void;
@@ -16,6 +17,7 @@ type ChecklistProps = {
 export function Checklist({
   checklists,
   onToggleItem,
+  onDeleteItem,
   newChecklistContent,
   onNewChecklistContentChange,
   onAddChecklist,
@@ -46,7 +48,12 @@ export function Checklist({
       {/* 체크리스트 목록 */}
       <ul className="flex flex-col items-end justify-center gap-[10px]">
         {items.map((item) => (
-          <ChecklistItem key={item.id} item={item} onToggle={handleToggle} />
+          <ChecklistItem
+            key={item.id}
+            item={item}
+            onToggle={handleToggle}
+            onDelete={onDeleteItem}
+          />
         ))}
         {/* 체크리스트 추가 입력 */}
         {showAddInput && (

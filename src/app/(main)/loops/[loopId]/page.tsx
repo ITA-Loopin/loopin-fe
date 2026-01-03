@@ -91,6 +91,7 @@ export default function LoopDetailPage() {
               newChecklistContent={checklist.newChecklistContent}
               onNewChecklistContentChange={checklist.setNewChecklistContent}
               onToggleChecklist={checklist.handleToggleChecklist}
+              onDeleteChecklist={checklist.handleDeleteChecklist}
               onAddChecklist={checklist.handleAddChecklist}
               onCompleteLoop={checklist.handleCompleteLoop}
               isMenuOpen={isMenuOpen}

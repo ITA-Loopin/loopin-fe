@@ -12,6 +12,8 @@ const TEAM_CATEGORIES: TeamCategoryString[] = [
   "CONTEST",
   "STUDY",
   "ROUTINE",
+  "CLUB",
+  "EXTERNALACTIVITY",
   "ETC",
 ];
 
@@ -24,7 +26,7 @@ export function TeamTypeSelector({
       <p className="text-xs font-medium leading-[140%] tracking-[-0.24px] text-[#A0A9B1]">
         팀 유형
       </p>
-      <div className="flex w-full self-stretch items-center gap-[10px]">
+      <div className="flex w-full self-stretch items-center gap-[10px] flex-wrap">
         {TEAM_CATEGORIES.map((category) => {
           const isSelected = selectedCategory === category;
           return (
@@ -33,7 +35,7 @@ export function TeamTypeSelector({
               type="button"
               onClick={() => onSelectCategory(category)}
               className={cn(
-                "flex items-center justify-center gap-[16px] rounded-[42.105px] px-3 py-[6px] text-sm font-semibold leading-[150%] tracking-[-0.28px] transition-colors whitespace-nowrap",
+                "flex items-center justify-center gap-[16px] rounded-[42.105px] px-3 py-[6px] text-sm font-semibold leading-[150%] tracking-[-0.28px] transition-colors whitespace-nowrap flex-[0_0_calc((100%-30px)/4)]",
                 isSelected
                   ? "bg-[#FF7765] text-[#FFF]"
                   : "bg-[#F0F2F3] text-[#C6CCD1]"
