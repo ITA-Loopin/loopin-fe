@@ -26,6 +26,18 @@ export function EmptyLoopView() {
                 "radial-gradient(circle, rgba(255, 228, 224, 0.6) 0%, rgba(255, 255, 255, 0.8) 100%)",
             }}
           ></div>
+          {/* 루프 중앙 디자인 요소 */}
+          <div
+            className="absolute rounded-full"
+            style={{
+              width: "157px",
+              height: "157px",
+              transform: "rotate(33.923deg)",
+              borderRadius: "157px",
+              background: "linear-gradient(145deg, rgba(255, 84, 63, 0.40) 26.7%, rgba(242, 255, 213, 0.40) 88.06%)",
+              filter: "blur(40px)",
+            }}
+          ></div>
         </div>
       </section>
 

@@ -103,6 +103,45 @@ export default function HomePage() {
           filter: "blur(67px)",
         }}
       />
+      {/* 우측 상단 디자인 요소 (추가) */}
+      <div
+        className="absolute top-0 right-0 -z-10"
+        style={{
+          width: "379.346px",
+          height: "170.615px",
+          transform: "rotate(7.014deg)",
+          borderRadius: "379.346px",
+          opacity: 0.2,
+          background: "#E7FFBA",
+          filter: "blur(67px)",
+        }}
+      />
+      {/* 우측 하단 디자인 요소 */}
+      <div
+        className="absolute bottom-0 right-0 -z-10"
+        style={{
+          width: "379.346px",
+          height: "170.615px",
+          transform: "rotate(-42.799deg)",
+          borderRadius: "379.346px",
+          opacity: 0.2,
+          background: "#E7FFBA",
+          filter: "blur(67px)",
+        }}
+      />
+      {/* 왼쪽 중앙 하단 디자인 요소 */}
+      <div
+        className="absolute left-0 top-[60%] -z-10"
+        style={{
+          width: "209px",
+          height: "317.653px",
+          transform: "rotate(89.667deg)",
+          borderRadius: "317.653px",
+          opacity: 0.15,
+          background: "var(--primary-300, #FFC2BA)",
+          filter: "blur(67px)",
+        }}
+      />
       <HomeHeader />
 
       <div className="flex-1 px-4 pb-6 flex flex-col gap-6">
