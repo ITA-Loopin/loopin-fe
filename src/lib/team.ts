@@ -37,8 +37,6 @@ function mapTeamApiItemToTeamItem(apiItem: TeamApiItem): TeamItem {
     category: apiItem.category, // 문자열 그대로 사용
     title: apiItem.name,
     description: apiItem.goal,
-    startDate: "", // API 응답에 없음
-    endDate: "", // API 응답에 없음
     progress: apiItem.totalProgress,
   };
 }
