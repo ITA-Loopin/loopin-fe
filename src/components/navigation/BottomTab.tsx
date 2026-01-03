@@ -37,9 +37,9 @@ const TAB_ITEMS: BottomTabItem[] = [
     icon: "/bottomTab/BottomTab_graph.svg",
   },
   {
-    key: "party",
-    label: "PARTY",
-    href: "/party",
+    key: "teamloop",
+    label: "TEAM LOOP",
+    href: "/teamloop",
     icon: "/bottomTab/BottomTab_party.svg",
   },
 ];
@@ -58,13 +58,16 @@ export function BottomTab() {
         {TAB_ITEMS.map((item) => {
           const isActive =
             pathname === item.href ||
-            (item.href !== "/home" && pathname.startsWith(`${item.href}/`));
+            (item.href !== "/home" && pathname.startsWith(`${item.href}/`)) ||
+            (item.href === "/calendar" && pathname.startsWith("/loops/"));
 
           return (
             <Link
               key={item.key}
               href={item.href}
-              className="flex h-full flex-1 items-center justify-center text-xs font-semibold transition-colors"
+              className={`relative flex h-full flex-1 items-center justify-center text-xs font-semibold transition-colors ${
+                item.key === "calendar" ? "calendar-icon-trigger" : ""
+              }`}
             >
               {isActive ? (
                 <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#FF5A45]">
