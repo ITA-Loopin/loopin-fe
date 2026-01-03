@@ -65,7 +65,9 @@ export function BottomTab() {
             <Link
               key={item.key}
               href={item.href}
-              className="flex h-full flex-1 items-center justify-center text-xs font-semibold transition-colors"
+              className={`relative flex h-full flex-1 items-center justify-center text-xs font-semibold transition-colors ${
+                item.key === "calendar" ? "calendar-icon-trigger" : ""
+              }`}
             >
               {isActive ? (
                 <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#FF5A45]">
