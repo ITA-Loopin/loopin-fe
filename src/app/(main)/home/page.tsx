@@ -173,7 +173,7 @@ export default function HomePage() {
           filter: "blur(67px)",
         }}
       />
-      <HomeHeader />
+      
         {showTooltip && tooltipPosition && (
           <div
             className="absolute pointer-events-none"
