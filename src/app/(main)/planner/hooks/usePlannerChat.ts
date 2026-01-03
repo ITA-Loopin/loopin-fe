@@ -538,12 +538,20 @@ export function usePlannerChat() {
       setIsInputVisible(false);
 
       try {
+        // 첫 사용자 메시지인지 확인 (기존 사용자 메시지가 있는지 체크)
+        const hasPreviousUserMessage = messages.some(
+          (msg) => msg.author === "user"
+        );
+        const messageType = hasPreviousUserMessage
+          ? "UPDATE_LOOP"
+          : "CREATE_LOOP";
+
         // SSE는 단방향이므로 HTTP API로 메시지 전송
         await sendChatMessage({
           chatRoomId: plannerChatRoomId,
           clientMessageId: userMessage.id,
           content: trimmed,
-          messageType: "CONNECT",
+          messageType,
         });
       } catch (error) {
         console.error("루프 추천 요청 실패", error);

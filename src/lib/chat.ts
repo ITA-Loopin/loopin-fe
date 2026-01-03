@@ -115,18 +115,25 @@ export async function fetchChatMessages({
   );
 }
 
+export type MessageType =
+  | "CONNECT"
+  | "MESSAGE"
+  | "CREATE_LOOP"
+  | "UPDATE_LOOP"
+  | "READ_UP_TO";
+
 export type SendChatMessageParams = {
   chatRoomId: number;
-  clientMessageId?: string;
-  content: string;
-  messageType?: string;
+  clientMessageId: string; // required, uuid format
+  content: string; // required, >= 1 characters
+  messageType: MessageType; // required
 };
 
 export async function sendChatMessage({
   chatRoomId,
   clientMessageId,
   content,
-  messageType = "CONNECT",
+  messageType,
 }: SendChatMessageParams) {
   return apiFetch<{ success: boolean; message?: string }>(
     `/rest-api/v1/chat-message/${chatRoomId}/chat`,
@@ -134,7 +141,7 @@ export async function sendChatMessage({
       method: "POST",
       json: {
         content,
-        ...(clientMessageId && { clientMessageId }),
+        clientMessageId,
         messageType,
       },
     }
@@ -191,10 +198,6 @@ export type CreateChatRoomParams = {
 export async function createChatRoom(params: CreateChatRoomParams) {
   return apiFetch<CreateChatRoomResponse>("/rest-api/v1/chat-room/create", {
     method: "POST",
-    json: {
-      title: params.title,
-      ...(params.loopSelect !== undefined && { loopSelect: params.loopSelect }),
-    },
   });
 }
 
