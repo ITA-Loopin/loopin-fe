@@ -209,14 +209,10 @@ export function useChecklist(
           completed: true,
         },
       });
-      // 애니메이션이 보이도록 약간의 딜레이 후 reload
-      setTimeout(() => {
-        reload();
-      }, 2500);
     } catch (error) {
       setDetail(previousState);
     }
-  }, [detail, setDetail, reload]);
+  }, [detail, setDetail]);
 
   return {
     detail,
