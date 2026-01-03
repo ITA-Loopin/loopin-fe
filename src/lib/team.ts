@@ -1,9 +1,7 @@
 import { apiFetch } from "./api";
-import type { TeamItem } from "@/components/team/types";
+import type { TeamItem, TeamCategoryString } from "@/components/team/types";
 
 // API 응답 타입
-export type TeamCategoryString = "PROJECT" | "CONTEST" | "STUDY" | "ROUTINE" | "ETC";
-
 export type TeamApiItem = {
   teamId: number;
   category: TeamCategoryString;
