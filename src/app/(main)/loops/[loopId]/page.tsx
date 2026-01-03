@@ -24,6 +24,7 @@ export default function LoopDetailPage() {
   const [actionModal, setActionModal] = useState<{
     type: "edit" | "delete";
     isOpen: boolean;
+    isSingle?: boolean;
   }>({ type: "edit", isOpen: false });
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
   const [isGroupEditSheetOpen, setIsGroupEditSheetOpen] = useState(false);
@@ -43,13 +44,13 @@ export default function LoopDetailPage() {
   };
 
   const handleDeleteClick = async () => {
-    // 단일루프 (loopRule이 null)인 경우 바로 삭제
+    // 단일루프 (loopRule이 null)인 경우 삭제 확인 모달 열기
     if (!detail?.loopRule) {
-      await actions.handleDeleteLoop();
+      setActionModal({ type: "delete", isOpen: true, isSingle: true });
       return;
     }
     // 반복루프인 경우 모달 열기
-    setActionModal({ type: "delete", isOpen: true });
+    setActionModal({ type: "delete", isOpen: true, isSingle: false });
   };
 
   return (
@@ -111,14 +112,18 @@ export default function LoopDetailPage() {
         isOpen={actionModal.isOpen}
         type={actionModal.type}
         onClose={() => setActionModal((prev) => ({ ...prev, isOpen: false }))}
-        onPrimaryAction={() => {
-          setActionModal((prev) => ({ ...prev, isOpen: false }));
-          if (actionModal.type === "delete") {
-            actions.handleDeleteGroup();
-          } else {
-            setIsGroupEditSheetOpen(true);
-          }
-        }}
+        onPrimaryAction={
+          actionModal.isSingle
+            ? undefined
+            : () => {
+                setActionModal((prev) => ({ ...prev, isOpen: false }));
+                if (actionModal.type === "delete") {
+                  actions.handleDeleteGroup();
+                } else {
+                  setIsGroupEditSheetOpen(true);
+                }
+              }
+        }
         onSecondaryAction={() => {
           setActionModal((prev) => ({ ...prev, isOpen: false }));
           if (actionModal.type === "delete") {
