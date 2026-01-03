@@ -22,7 +22,7 @@ export function ChecklistEditor({
   const itemContainerStyles =
     "flex w-full items-start justify-between rounded-[10px] bg-[#F8F8F9] p-4";
   const baseInputStyles =
-    "flex-1 border-none bg-transparent px-0 py-0 text-base font-semibold leading-[150%] tracking-[-0.32px] focus:outline-none focus:ring-0";
+    "flex-1 w-full border-none bg-transparent px-0 py-0 text-base font-semibold leading-[150%] tracking-[-0.32px] focus:outline-none focus:ring-0";
 
   return (
     <div className="flex flex-col items-start gap-2 self-stretch">
@@ -30,7 +30,7 @@ export function ChecklistEditor({
         체크리스트
       </p>
 
-      <div className="flex w-full flex-col items-start gap-[10px]">
+      <div className="flex w-full flex-col  items-start gap-[10px]">
         {checklists.map((item, index) => (
           <div key={item.id} className={itemContainerStyles}>
             <input
