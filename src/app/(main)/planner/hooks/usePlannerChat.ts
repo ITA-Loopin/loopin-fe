@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { use, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   EXAMPLE_PROMPTS,
   INITIAL_MESSAGE,
@@ -12,8 +12,11 @@ import { generateId } from "../utils";
 import { useAppSelector } from "@/store/hooks";
 import {
   createChatSocket,
-  fetchChatMessages,
+  sendChatMessage,
+  fetchChatRooms,
+  createChatRoom,
   type ChatMessageDto,
+  type SSEMessageEvent,
 } from "@/lib/chat";
 
 type AppendStatus = "none" | "assistant" | "recommendations";
@@ -84,22 +87,94 @@ export function usePlannerChat() {
   const seenMessageIdsRef = useRef<Set<string>>(new Set());
   const pendingUserMessageIdsRef = useRef<Map<string, string[]>>(new Map());
   const previousChatRoomIdRef = useRef<number | null>(null);
-  const socketRef = useRef<WebSocket | null>(null);
-  const isSocketOpenRef = useRef(false);
-  const socketListenersRef = useRef<{
-    onOpen?: (event: Event) => void;
-    onMessage?: (event: MessageEvent) => void;
-    onClose?: (event: CloseEvent) => void;
-    onError?: (event: Event) => void;
-  }>({});
+  const sseAbortControllerRef = useRef<AbortController | null>(null);
+  const isSseConnectedRef = useRef(false);
+  const lastEventIdRef = useRef<string | null>(null);
 
-  const plannerChatRoomId = useMemo(() => {
-    if (user?.chatRoomId === undefined || user.chatRoomId === null) {
-      return null;
+  const [resolvedChatRoomId, setResolvedChatRoomId] = useState<number | null>(
+    null
+  );
+
+  // v1/chat-room API에서 항상 planner 채팅방 찾기
+  useEffect(() => {
+    if (!user) {
+      return;
     }
-    const parsed = Number(user.chatRoomId);
-    return Number.isFinite(parsed) ? parsed : null;
-  }, [user?.chatRoomId]);
+
+    let isCancelled = false;
+
+    const loadChatRooms = async () => {
+      try {
+        console.log("[DEBUG] 채팅방 목록 조회 시작");
+        const response = await fetchChatRooms();
+
+        if (isCancelled) return;
+
+        console.log("[DEBUG] 채팅방 목록 응답:", response);
+        const chatRooms = response.data?.chatRooms || [];
+        console.log("[DEBUG] 채팅방 목록:", chatRooms);
+
+        // loopSelect가 true인 채팅방 찾기 (planner 채팅방)
+        const plannerRoom = chatRooms.find((room) => room.loopSelect === true);
+        console.log("[DEBUG] planner 채팅방:", plannerRoom);
+
+        if (plannerRoom) {
+          console.log("[DEBUG] planner 채팅방 ID 설정:", plannerRoom.id);
+          setResolvedChatRoomId(plannerRoom.id);
+          return;
+        }
+
+        if (chatRooms.length > 0) {
+          // planner 채팅방이 없으면 첫 번째 채팅방 사용
+          console.log("[DEBUG] 첫 번째 채팅방 ID 설정:", chatRooms[0].id);
+          setResolvedChatRoomId(chatRooms[0].id);
+          return;
+        }
+
+        // 채팅방이 없으면 새로 생성
+        console.log("[DEBUG] 채팅방이 없어서 새로 생성합니다");
+        try {
+          const createResponse = await createChatRoom({
+            title: "플래너", // planner 채팅방 제목
+            loopSelect: true, // planner 채팅방으로 생성
+          });
+          if (isCancelled) return;
+
+          console.log("[DEBUG] 채팅방 생성 응답:", createResponse);
+          if (createResponse.data?.id) {
+            console.log(
+              "[DEBUG] 생성된 채팅방 ID 설정:",
+              createResponse.data.id
+            );
+            setResolvedChatRoomId(createResponse.data.id);
+          }
+        } catch (createError) {
+          if (!isCancelled) {
+            console.error("[DEBUG] 채팅방 생성 실패", createError);
+            console.error("[DEBUG] 에러 상세:", {
+              message:
+                createError instanceof Error
+                  ? createError.message
+                  : String(createError),
+              error: createError,
+            });
+          }
+        }
+      } catch (error) {
+        if (!isCancelled) {
+          console.error("[DEBUG] 채팅방 목록 불러오기 실패", error);
+        }
+      }
+    };
+
+    loadChatRooms();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [user]);
+
+  const plannerChatRoomId = resolvedChatRoomId;
 
   const currentUserQuery = useMemo(() => {
     if (!user) return undefined;
@@ -264,202 +339,156 @@ export function usePlannerChat() {
     return status;
   }, []);
 
-  const handleSocketMessage = useCallback(
-    (event: MessageEvent) => {
+  const handleSSEMessage = useCallback(
+    (event: SSEMessageEvent) => {
       try {
-        const parsed = JSON.parse(event.data) as
-          | ChatMessageDto
-          | { messageType?: string; data?: unknown };
+        // Last-Event-ID 저장
+        if (event.id) {
+          lastEventIdRef.current = event.id;
+        }
 
-        if (
-          parsed &&
-          typeof parsed === "object" &&
-          "messageType" in parsed &&
-          parsed.messageType === "RECOMMENDATION_RESULT" &&
-          Array.isArray(parsed.data)
-        ) {
-          setRecommendations(parsed.data as RecommendationSchedule[]);
-          setIsLoading(false);
-          setIsInputVisible(true);
+        // CONNECT 이벤트 처리
+        if (event.event === "CONNECT") {
+          console.info("SSE 연결 성공", event.data);
+          isSseConnectedRef.current = true;
           return;
         }
 
-        const status = appendNewMessages(parsed);
+        // MESSAGE 이벤트 처리
+        if (event.event === "MESSAGE") {
+          let parsed: ChatMessageDto | { messageType?: string; data?: unknown };
 
-        if (status === "assistant" || status === "recommendations") {
-          setIsLoading(false);
-          setIsInputVisible(true);
+          try {
+            parsed = JSON.parse(event.data);
+          } catch {
+            // data가 이미 객체인 경우
+            parsed = event.data as ChatMessageDto;
+          }
+
+          if (
+            parsed &&
+            typeof parsed === "object" &&
+            "messageType" in parsed &&
+            parsed.messageType === "RECOMMENDATION_RESULT" &&
+            Array.isArray(parsed.data)
+          ) {
+            setRecommendations(parsed.data as RecommendationSchedule[]);
+            setIsLoading(false);
+            setIsInputVisible(true);
+            return;
+          }
+
+          const status = appendNewMessages(parsed);
+
+          if (status === "assistant" || status === "recommendations") {
+            setIsLoading(false);
+            setIsInputVisible(true);
+          }
         }
       } catch (error) {
-        console.error("웹소켓 메시지 파싱 실패", error);
+        console.error("SSE 메시지 처리 실패", error);
       }
     },
     [appendNewMessages]
   );
 
-  const cleanupSocket = useCallback(() => {
-    const socket = socketRef.current;
-    if (!socket) {
-      return;
+  const cleanupSSE = useCallback(() => {
+    const abortController = sseAbortControllerRef.current;
+    if (abortController) {
+      abortController.abort();
+      sseAbortControllerRef.current = null;
     }
-
-    const listeners = socketListenersRef.current;
-
-    if (listeners.onOpen) {
-      socket.removeEventListener("open", listeners.onOpen);
-    }
-    if (listeners.onMessage) {
-      socket.removeEventListener("message", listeners.onMessage);
-    }
-    if (listeners.onClose) {
-      socket.removeEventListener("close", listeners.onClose);
-    }
-    if (listeners.onError) {
-      socket.removeEventListener("error", listeners.onError);
-    }
-
-    socket.close();
-
-    socketRef.current = null;
-    isSocketOpenRef.current = false;
-    socketListenersRef.current = {};
+    isSseConnectedRef.current = false;
   }, []);
 
-  const attachSocketListeners = useCallback(
-    (socket: WebSocket) => {
-      const onOpen = () => {
-        console.info("웹소켓 연결 성공", {
-          url: socket.url,
-          readyState: socket.readyState,
-        });
-        isSocketOpenRef.current = true;
-      };
-
-      const onMessage = (event: MessageEvent) => {
-        console.debug("웹소켓 수신", event.data);
-        handleSocketMessage(event);
-      };
-
-      const onClose = (event: CloseEvent) => {
-        console.warn("웹소켓 종료", {
-          code: event.code,
-          reason: event.reason,
-          wasClean: event.wasClean,
-        });
-        isSocketOpenRef.current = false;
-        socketRef.current = null;
-      };
-
-      const onError = (event: Event) => {
-        console.error("웹소켓 오류", event);
-      };
-
-      const listeners = socketListenersRef.current;
-
-      if (listeners.onOpen) {
-        socket.removeEventListener("open", listeners.onOpen);
-      }
-      if (listeners.onMessage) {
-        socket.removeEventListener("message", listeners.onMessage);
-      }
-      if (listeners.onClose) {
-        socket.removeEventListener("close", listeners.onClose);
-      }
-      if (listeners.onError) {
-        socket.removeEventListener("error", listeners.onError);
-      }
-
-      socket.addEventListener("open", onOpen);
-      socket.addEventListener("message", onMessage);
-      socket.addEventListener("close", onClose);
-      socket.addEventListener("error", onError);
-
-      socketListenersRef.current = {
-        onOpen,
-        onMessage,
-        onClose,
-        onError,
-      };
-    },
-    [handleSocketMessage]
-  );
-
-  const initializeSocket = useCallback(() => {
-    if (!plannerChatRoomId || !currentUserQuery) {
-      return null;
-    }
-
-    const existing = socketRef.current;
-    if (
-      existing &&
-      (existing.readyState === WebSocket.OPEN ||
-        existing.readyState === WebSocket.CONNECTING)
-    ) {
-      return existing;
-    }
-
-    cleanupSocket();
-
-    try {
-      const socket = createChatSocket({
-        chatRoomId: plannerChatRoomId,
-      });
-
-      socketRef.current = socket;
-      attachSocketListeners(socket);
-
-      return socket;
-    } catch (error) {
-      console.error("웹소켓 연결 실패", error);
-      return null;
-    }
-  }, [
-    plannerChatRoomId,
-    currentUserQuery,
-    attachSocketListeners,
-    cleanupSocket,
-  ]);
-
-  useEffect(() => {
+  const initializeSSE = useCallback(() => {
     if (!plannerChatRoomId || !currentUserQuery) {
       return;
     }
 
-    let isCancelled = false;
+    // 이미 연결되어 있는 경우 재연결하지 않음
+    if (isSseConnectedRef.current && sseAbortControllerRef.current) {
+      return;
+    }
 
-    const loadHistory = async () => {
-      try {
-        const response = await fetchChatMessages({
-          chatRoomId: plannerChatRoomId,
-          currentUser: currentUserQuery,
-          page: 0,
-          size: 20,
-        });
+    cleanupSSE();
 
-        if (!isCancelled) {
-          appendNewMessages(response.data);
-        }
-      } catch (error) {
-        if (!isCancelled) {
-          console.error("채팅 기록 불러오기 실패", error);
-        }
-      }
-    };
+    try {
+      const abortController = createChatSocket({
+        chatRoomId: plannerChatRoomId,
+        lastEventId: lastEventIdRef.current || undefined,
+        onOpen: () => {
+          console.info("SSE 연결 시작", {
+            chatRoomId: plannerChatRoomId,
+            lastEventId: lastEventIdRef.current,
+          });
+        },
+        onMessage: (event) => {
+          console.debug("SSE 수신", event);
+          handleSSEMessage(event);
+        },
+        onError: (error) => {
+          console.error("SSE 오류", error);
+          isSseConnectedRef.current = false;
 
-    loadHistory();
+          // 재연결 시도 (Last-Event-ID 포함)
+          setTimeout(() => {
+            if (!isSseConnectedRef.current) {
+              initializeSSE();
+            }
+          }, 3000);
+        },
+      });
 
-    return () => {
-      isCancelled = true;
-    };
-  }, [plannerChatRoomId, currentUserQuery, appendNewMessages]);
+      sseAbortControllerRef.current = abortController;
+    } catch (error) {
+      console.error("SSE 연결 실패", error);
+      isSseConnectedRef.current = false;
+    }
+  }, [plannerChatRoomId, currentUserQuery, handleSSEMessage, cleanupSSE]);
+
+  // 채팅 기록은 SSE를 통해 자동으로 받아오므로 별도로 불러올 필요 없음
+  // Last-Event-ID를 사용하면 이전 메시지도 자동으로 받아올 수 있음
+  // useEffect(() => {
+  //   if (!plannerChatRoomId || !currentUserQuery) {
+  //     return;
+  //   }
+
+  //   let isCancelled = false;
+
+  //   const loadHistory = async () => {
+  //     try {
+  //       const response = await fetchChatMessages({
+  //         chatRoomId: plannerChatRoomId,
+  //         currentUser: currentUserQuery,
+  //         page: 0,
+  //         size: 20,
+  //       });
+
+  //       if (!isCancelled) {
+  //         appendNewMessages(response.data);
+  //       }
+  //     } catch (error) {
+  //       if (!isCancelled) {
+  //         console.error("채팅 기록 불러오기 실패", error);
+  //       }
+  //     }
+  //   };
+
+  //   loadHistory();
+
+  //   return () => {
+  //     isCancelled = true;
+  //   };
+  // }, [plannerChatRoomId, currentUserQuery, appendNewMessages]);
 
   useEffect(() => {
-    initializeSocket();
+    initializeSSE();
 
     return () => {
-      cleanupSocket();
+      cleanupSSE();
     };
-  }, [initializeSocket, cleanupSocket]);
+  }, [initializeSSE, cleanupSSE]);
 
   const handleInputChange = useCallback((value: string) => {
     setInputValue(value);
@@ -484,6 +513,10 @@ export function usePlannerChat() {
       const queue = pendingUserMessageIdsRef.current.get(trimmed) ?? [];
       pendingUserMessageIdsRef.current.set(trimmed, [...queue, userMessage.id]);
 
+      console.log("[DEBUG] handleSubmit 호출");
+      console.log("[DEBUG] currentUserQuery:", currentUserQuery);
+      console.log("[DEBUG] plannerChatRoomId:", plannerChatRoomId);
+
       if (!currentUserQuery || !plannerChatRoomId) {
         setMessages((prev) => [
           ...prev,
@@ -496,83 +529,30 @@ export function usePlannerChat() {
         return;
       }
 
-      let socket = socketRef.current;
-      if (!socket || socket.readyState === WebSocket.CLOSING) {
-        socket = initializeSocket();
-      }
-
-      if (!socket) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: generateId(),
-            author: "assistant",
-            content: "연결 상태를 확인한 뒤 다시 시도해주세요.",
-          },
-        ]);
-        const queueAfterFailure = pendingUserMessageIdsRef.current.get(trimmed);
-        if (queueAfterFailure) {
-          const updatedQueue = queueAfterFailure.filter(
-            (pendingId) => pendingId !== userMessage.id
-          );
-          if (updatedQueue.length > 0) {
-            pendingUserMessageIdsRef.current.set(trimmed, updatedQueue);
-          } else {
-            pendingUserMessageIdsRef.current.delete(trimmed);
-          }
-        }
-        return;
+      // SSE 연결 확인 및 재연결
+      if (!isSseConnectedRef.current || !sseAbortControllerRef.current) {
+        initializeSSE();
       }
 
       setIsLoading(true);
       setIsInputVisible(false);
 
       try {
-        const payload = JSON.stringify({
-          messageType: "CREATE_LOOP",
+        // 첫 사용자 메시지인지 확인 (기존 사용자 메시지가 있는지 체크)
+        const hasPreviousUserMessage = messages.some(
+          (msg) => msg.author === "user"
+        );
+        const messageType = hasPreviousUserMessage
+          ? "UPDATE_LOOP"
+          : "CREATE_LOOP";
+
+        // SSE는 단방향이므로 HTTP API로 메시지 전송
+        await sendChatMessage({
           chatRoomId: plannerChatRoomId,
-          chatMessageDto: {
-            tempId: userMessage.id,
-            content: trimmed,
-          },
+          clientMessageId: userMessage.id,
+          content: trimmed,
+          messageType,
         });
-
-        if (socket.readyState === WebSocket.OPEN) {
-          socket.send(payload);
-        } else if (socket.readyState === WebSocket.CONNECTING) {
-          const handleOpen = () => {
-            try {
-              socket.send(payload);
-            } catch (sendError) {
-              console.error("웹소켓 전송 실패", sendError);
-              setMessages((prev) => [
-                ...prev,
-                {
-                  id: generateId(),
-                  author: "assistant",
-                  content: "메시지 전송에 실패했습니다. 다시 시도해주세요.",
-                },
-              ]);
-              setIsInputVisible(true);
-              setIsLoading(false);
-            } finally {
-              socket.removeEventListener("open", handleOpen);
-            }
-          };
-
-          socket.addEventListener("open", handleOpen);
-        } else {
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: generateId(),
-              author: "assistant",
-              content: "연결이 끊어졌습니다. 잠시 후 다시 시도해주세요.",
-            },
-          ]);
-          setIsInputVisible(true);
-          setIsLoading(false);
-        }
       } catch (error) {
         console.error("루프 추천 요청 실패", error);
         const message =
@@ -585,9 +565,21 @@ export function usePlannerChat() {
         ]);
         setIsInputVisible(true);
         setIsLoading(false);
+
+        const queueAfterFailure = pendingUserMessageIdsRef.current.get(trimmed);
+        if (queueAfterFailure) {
+          const updatedQueue = queueAfterFailure.filter(
+            (pendingId) => pendingId !== userMessage.id
+          );
+          if (updatedQueue.length > 0) {
+            pendingUserMessageIdsRef.current.set(trimmed, updatedQueue);
+          } else {
+            pendingUserMessageIdsRef.current.delete(trimmed);
+          }
+        }
       }
     },
-    [isLoading, currentUserQuery, plannerChatRoomId, initializeSocket]
+    [isLoading, currentUserQuery, plannerChatRoomId, initializeSSE]
   );
 
   const handleSelectRecommendation = useCallback(
