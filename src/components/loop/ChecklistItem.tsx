@@ -73,7 +73,7 @@ export function ChecklistItem({ item, onToggle, onDelete }: ChecklistItemProps) 
     >
       {/* 삭제 버튼 배경 */}
       <div
-        className="absolute right-0 top-0 flex h-full w-[80px] items-center justify-center bg-[#FF543F]"
+        className="absolute right-0 top-0 flex h-full w-[80px] items-center justify-center"
         style={{
           transform: `translateX(${translateX <= DELETE_THRESHOLD ? 0 : 100}%)`,
           transition: isDragging ? "none" : "transform 0.2s ease-out",
