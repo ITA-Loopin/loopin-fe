@@ -90,6 +90,19 @@ export default function HomePage() {
         }}
       />
       <div className="flex flex-col relative min-h-screen">
+      {/* 오른쪽 위 디자인 요소 */}
+      <div
+        className="absolute top-0 right-0 -z-10"
+        style={{
+          width: "360.827px",
+          height: "162.286px",
+          transform: "rotate(30.835deg)",
+          borderRadius: "360.827px",
+          opacity: 0.5,
+          background: "var(--primary-300, #FFC2BA)",
+          filter: "blur(67px)",
+        }}
+      />
       <HomeHeader />
 
       <div className="flex-1 px-4 pb-6 flex flex-col gap-6">
