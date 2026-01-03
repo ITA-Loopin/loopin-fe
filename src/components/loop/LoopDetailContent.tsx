@@ -15,6 +15,7 @@ interface LoopDetailContentProps {
   newChecklistContent: string;
   onNewChecklistContentChange: (content: string) => void;
   onToggleChecklist: (item: LoopChecklist) => Promise<void>;
+  onDeleteChecklist?: (itemId: number) => Promise<void>;
   onAddChecklist: () => Promise<void>;
   onCompleteLoop: () => Promise<void>;
   isMenuOpen: boolean;
@@ -29,6 +30,7 @@ export function LoopDetailContent({
   newChecklistContent,
   onNewChecklistContentChange,
   onToggleChecklist,
+  onDeleteChecklist,
   onAddChecklist,
   onCompleteLoop,
   isMenuOpen,
@@ -82,6 +84,7 @@ export function LoopDetailContent({
           <Checklist
             checklists={detail.checklists}
             onToggleItem={onToggleChecklist}
+            onDeleteItem={onDeleteChecklist}
             newChecklistContent={newChecklistContent}
             onNewChecklistContentChange={onNewChecklistContentChange}
             onAddChecklist={onAddChecklist}
