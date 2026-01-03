@@ -9,6 +9,7 @@ interface UseChecklistResult {
   setNewChecklistContent: (content: string) => void;
   handleToggleChecklist: (updatedItem: LoopChecklist) => Promise<void>;
   handleAddChecklist: () => Promise<void>;
+  handleDeleteChecklist: (itemId: number) => Promise<void>;
   handleCompleteLoop: () => Promise<void>;
   reload: () => void;
 }
@@ -112,8 +113,26 @@ export function useChecklist(
         json: { content },
       });
 
-      if (response?.success !== false) {
-        reload();
+      if (response?.data) {
+        // 서버에서 받은 실제 데이터로 tempId를 교체
+        setDetail((prev) => {
+          if (!prev) return prev;
+          const nextChecklists = prev.checklists.map((item) =>
+            item.id === tempId
+              ? {
+                  id: response.data!.id,
+                  content: response.data!.content,
+                  completed: response.data!.completed ?? false,
+                }
+              : item
+          );
+
+          return {
+            ...prev,
+            checklists: nextChecklists,
+            progress: calculateProgress(nextChecklists),
+          };
+        });
       }
     } catch (error) {
       setDetail((prev) => {
@@ -130,7 +149,38 @@ export function useChecklist(
       });
       setNewChecklistContent(content);
     }
-  }, [detail, newChecklistContent, setDetail, reload]);
+  }, [detail, newChecklistContent, setDetail]);
+
+  const handleDeleteChecklist = useCallback(
+    async (itemId: number) => {
+      if (!detail) {
+        return;
+      }
+
+      const previousState = detail;
+
+      setDetail((prev) => {
+        if (!prev) return prev;
+        const nextChecklists = prev.checklists.filter(
+          (item) => item.id !== itemId
+        );
+        return {
+          ...prev,
+          checklists: nextChecklists,
+          progress: calculateProgress(nextChecklists),
+        };
+      });
+
+      try {
+        await apiFetch(`/rest-api/v1/checklists/${itemId}`, {
+          method: "DELETE",
+        });
+      } catch (error) {
+        setDetail(previousState);
+      }
+    },
+    [detail, setDetail]
+  );
 
   const handleCompleteLoop = useCallback(async () => {
     if (!detail) {
@@ -174,6 +224,7 @@ export function useChecklist(
     setNewChecklistContent,
     handleToggleChecklist,
     handleAddChecklist,
+    handleDeleteChecklist,
     handleCompleteLoop,
     reload,
   };
