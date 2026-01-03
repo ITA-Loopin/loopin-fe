@@ -15,24 +15,18 @@ const mockRecommendedTeams: TeamItem[] = [
     category: "STUDY",
     title: "필라테스 독학",
     description: "모두같이 필라테스 독학하자^^",
-    startDate: "2025.12.3",
-    endDate: "2026.2.26",
   },
   {
     id: 3,
     category: "STUDY",
     title: "정처기 도전",
     description: "한 번에 붙어봅시다!",
-    startDate: "2025.12.3",
-    endDate: "2026.2.26",
   },
   {
     id: 4,
     category: "STUDY",
     title: "독서 왕 되기",
     description: "매일매일 책을 읽어보아요",
-    startDate: "2025.12.3",
-    endDate: "2026.2.26",
   },
 ];
 

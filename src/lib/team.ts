@@ -1,9 +1,7 @@
 import { apiFetch } from "./api";
-import type { TeamItem } from "@/components/team/types";
+import type { TeamItem, TeamCategoryString } from "@/components/team/types";
 
 // API 응답 타입
-export type TeamCategoryString = "PROJECT" | "CONTEST" | "STUDY" | "ROUTINE" | "ETC";
-
 export type TeamApiItem = {
   teamId: number;
   category: TeamCategoryString;
@@ -37,8 +35,6 @@ function mapTeamApiItemToTeamItem(apiItem: TeamApiItem): TeamItem {
     category: apiItem.category, // 문자열 그대로 사용
     title: apiItem.name,
     description: apiItem.goal,
-    startDate: "", // API 응답에 없음
-    endDate: "", // API 응답에 없음
     progress: apiItem.totalProgress,
   };
 }
