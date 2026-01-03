@@ -115,44 +115,231 @@ export async function fetchChatMessages({
   );
 }
 
-function resolveWsBaseUrl() {
+export type SendChatMessageParams = {
+  chatRoomId: number;
+  clientMessageId?: string;
+  content: string;
+  messageType?: string;
+};
+
+export async function sendChatMessage({
+  chatRoomId,
+  clientMessageId,
+  content,
+  messageType = "CONNECT",
+}: SendChatMessageParams) {
+  return apiFetch<{ success: boolean; message?: string }>(
+    `/rest-api/v1/chat-message/${chatRoomId}/chat`,
+    {
+      method: "POST",
+      json: {
+        content,
+        ...(clientMessageId && { clientMessageId }),
+        messageType,
+      },
+    }
+  );
+}
+
+export type ChatRoom = {
+  id: number;
+  ownerId: number;
+  title: string;
+  loopSelect: boolean;
+  lastMessageAt?: string;
+  lastReadAt?: string;
+};
+
+export type ChatRoomListResponse = {
+  success?: boolean;
+  code?: string;
+  message?: string;
+  data?: {
+    chatRooms?: ChatRoom[];
+  };
+  page?: {
+    page?: number;
+    size?: number;
+    totalPages?: number;
+    totalElements?: number;
+    first?: boolean;
+    last?: boolean;
+    hasNext?: boolean;
+  };
+  timestamp?: string;
+  traceId?: string;
+};
+
+export async function fetchChatRooms() {
+  return apiFetch<ChatRoomListResponse>("/rest-api/v1/chat-room");
+}
+
+export type CreateChatRoomResponse = {
+  success?: boolean;
+  code?: string;
+  message?: string;
+  data?: ChatRoom;
+  timestamp?: string;
+  traceId?: string;
+};
+
+export type CreateChatRoomParams = {
+  title: string;
+  loopSelect?: boolean;
+};
+
+export async function createChatRoom(params: CreateChatRoomParams) {
+  return apiFetch<CreateChatRoomResponse>("/rest-api/v1/chat-room/create", {
+    method: "POST",
+    json: {
+      title: params.title,
+      ...(params.loopSelect !== undefined && { loopSelect: params.loopSelect }),
+    },
+  });
+}
+
+function resolveSseBaseUrl() {
   if (typeof window === "undefined") {
-    const configured = process.env.NEXT_PUBLIC_CHAT_WS_URL;
+    const configured = process.env.NEXT_PUBLIC_CHAT_SSE_URL;
 
     if (configured && configured.length > 0) {
       return configured;
     }
 
-    return "wss://api.loopin.co.kr/ws/chat";
+    return "https://api.loopin.co.kr/rest-api/v1/sse/subscribe";
   }
 
-  return "wss://api.loopin.co.kr/ws/chat";
+  return "https://api.loopin.co.kr/rest-api/v1/sse/subscribe";
 }
 
 export type CreateChatSocketOptions = {
   chatRoomId: number;
+  lastEventId?: string;
+  onMessage?: (event: SSEMessageEvent) => void;
+  onError?: (error: Event) => void;
+  onOpen?: () => void;
 };
 
-export function createChatSocket({ chatRoomId }: CreateChatSocketOptions) {
-  const base = resolveWsBaseUrl();
+export type SSEMessageEvent = {
+  id: string | null;
+  event: string | null;
+  data: string;
+};
+
+export function createChatSocket({
+  chatRoomId,
+  lastEventId,
+  onMessage,
+  onError,
+  onOpen,
+}: CreateChatSocketOptions): AbortController {
+  const base = resolveSseBaseUrl();
 
   if (!base) {
-    throw new Error("웹소켓 베이스 URL이 설정되지 않았습니다.");
+    throw new Error("SSE 베이스 URL이 설정되지 않았습니다.");
   }
 
-  const rawParams = buildQueryParams({ chatRoomId });
-  const params = new URLSearchParams();
+  const url = `${base}/${chatRoomId}`;
 
-  Object.entries(rawParams).forEach(([key, value]) => {
-    if (value === undefined || value === null) return;
-    params.set(key, String(value));
-  });
+  const abortController = new AbortController();
 
-  const separator = base.includes("?") ? "&" : "?";
-  const url = `${base}${separator}${params.toString()}`;
+  // apiFetch 래퍼를 사용하여 SSE 연결
+  // parseJson: false로 설정하여 Response 객체를 직접 받아서 스트림 처리
+  apiFetch<Response>(url, {
+    method: "GET",
+    headers: {
+      Accept: "text/event-stream",
+    },
+    parseJson: false, // SSE는 JSON이 아닌 스트림이므로
+    signal: abortController.signal,
+  })
+    .then(async (response: Response) => {
+      if (!response.ok) {
+        throw new Error(`SSE 연결 실패: ${response.status}`);
+      }
 
-  // WebSocket은 같은 도메인(또는 서브도메인)이면 쿠키가 자동으로 전송됩니다.
-  // 쿠키의 Domain 속성이 .loopin.co.kr로 설정되어 있다면,
-  // local.loopin.co.kr에서 api.loopin.co.kr로 연결할 때도 쿠키가 자동 전송됩니다.
-  return new WebSocket(url);
+      if (!response.body) {
+        throw new Error("응답 본문이 없습니다.");
+      }
+
+      onOpen?.();
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let currentEvent: SSEMessageEvent = {
+        id: null,
+        event: null,
+        data: "",
+      };
+
+      const processLine = (line: string) => {
+        if (line === "") {
+          // 빈 줄은 메시지 구분자
+          if (currentEvent.data || currentEvent.id || currentEvent.event) {
+            onMessage?.(currentEvent);
+          }
+          currentEvent = { id: null, event: null, data: "" };
+          return;
+        }
+
+        const colonIndex = line.indexOf(":");
+        if (colonIndex === -1) {
+          return;
+        }
+
+        const field = line.slice(0, colonIndex).trim();
+        let value = line.slice(colonIndex + 1).trim();
+
+        // 값의 첫 공백 제거 (SSE 스펙)
+        if (value.startsWith(" ")) {
+          value = value.slice(1);
+        }
+
+        switch (field) {
+          case "id":
+            currentEvent.id = value;
+            break;
+          case "event":
+            currentEvent.event = value;
+            break;
+          case "data":
+            currentEvent.data += (currentEvent.data ? "\n" : "") + value;
+            break;
+        }
+      };
+
+      while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) {
+          // 마지막 버퍼 처리
+          if (buffer) {
+            buffer.split("\n").forEach(processLine);
+            // 마지막 이벤트가 완전하지 않을 수 있지만, SSE 스펙상 빈 줄로 끝나므로 처리하지 않음
+          }
+          break;
+        }
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || ""; // 마지막 불완전한 라인은 버퍼에 유지
+
+        lines.forEach(processLine);
+      }
+
+      // 마지막 이벤트가 완료되지 않은 경우 (빈 줄 없이 끝난 경우)
+      if (currentEvent.data || currentEvent.id || currentEvent.event) {
+        onMessage?.(currentEvent);
+      }
+    })
+    .catch((error) => {
+      if (error.name === "AbortError") {
+        // 정상적인 종료
+        return;
+      }
+      onError?.(error);
+    });
+
+  return abortController;
 }
