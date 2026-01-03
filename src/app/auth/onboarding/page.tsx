@@ -7,11 +7,10 @@ import { apiFetch } from "@/lib/api";
 import { useAppDispatch } from "@/store/hooks";
 import { setCredentials } from "@/store/slices/authSlice";
 import type { User } from "@/types/auth";
+import { buildUserFromMemberProfile, fetchMemberProfile } from "@/lib/member";
 
 type SignupSession = {
-  email: string;
-  provider: string;
-  providerId: string;
+  ticket: string;
 };
 
 type AlertState = {
@@ -89,6 +88,7 @@ export default function OnboardingPage() {
         data?: { available?: boolean };
       }>("/rest-api/v1/member/available", {
         searchParams: { nickname },
+        skipCredentials: true, // 인증이 필요 없는 공개 엔드포인트
       });
 
       const isAvailable =
@@ -129,30 +129,42 @@ export default function OnboardingPage() {
     try {
       const data = await apiFetch<{
         user?: User;
-        accessToken: string;
       }>("/rest-api/v1/auth/signup-login", {
         method: "POST",
         json: {
-          email: signupData.email,
-          provider: signupData.provider,
-          providerId: signupData.providerId,
           nickname,
+          ticket: signupData.ticket,
         },
+        skipCredentials: true, // 회원가입 시에는 쿠키가 아직 없음
       });
 
       const fallbackUser: User = {
-        id: signupData.providerId,
-        email: signupData.email,
+        id: "user",
         nickname,
-        kakaoId: Number.isNaN(Number(signupData.providerId))
-          ? 0
-          : Number(signupData.providerId),
       };
+
+      const baseUser: User = data.user
+        ? {
+            ...data.user,
+            id: data.user.id || "user",
+          }
+        : fallbackUser;
+
+      let finalUser = baseUser;
+
+      try {
+        const memberResponse = await fetchMemberProfile();
+        finalUser = buildUserFromMemberProfile(memberResponse.data, {
+          ...baseUser,
+          id: baseUser.id || "user",
+        });
+      } catch (memberError) {
+        console.error("회원 정보 동기화 실패", memberError);
+      }
 
       dispatch(
         setCredentials({
-          user: data.user || fallbackUser,
-          accessToken: data.accessToken,
+          user: finalUser,
         })
       );
 
