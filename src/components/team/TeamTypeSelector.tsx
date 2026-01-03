@@ -33,7 +33,7 @@ export function TeamTypeSelector({
               type="button"
               onClick={() => onSelectCategory(category)}
               className={cn(
-                "flex items-center justify-center gap-[16px] rounded-[42.105px] px-3 py-[6px] text-sm font-semibold leading-[150%] tracking-[-0.28px] transition-colors",
+                "flex items-center justify-center gap-[16px] rounded-[42.105px] px-3 py-[6px] text-sm font-semibold leading-[150%] tracking-[-0.28px] transition-colors whitespace-nowrap",
                 isSelected
                   ? "bg-[#FF7765] text-[#FFF]"
                   : "bg-[#F0F2F3] text-[#C6CCD1]"
