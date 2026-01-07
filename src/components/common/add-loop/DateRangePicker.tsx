@@ -19,6 +19,7 @@ type DateRangePickerProps = {
   onChangeStartMonth: (offset: number) => void;
   onChangeEndMonth: (offset: number) => void;
   disableEndDate?: boolean;
+  startDate?: Dayjs | null;
 };
 
 export function DateRangePicker({
@@ -37,6 +38,7 @@ export function DateRangePicker({
   onChangeStartMonth,
   onChangeEndMonth,
   disableEndDate = false,
+  startDate,
 }: DateRangePickerProps) {
   return (
     <div className="flex flex-col items-start gap-2 self-stretch">
@@ -108,6 +110,7 @@ export function DateRangePicker({
                 selectedDate={selectedEndDate}
                 onSelectDate={onSelectEndDate}
                 onChangeMonth={onChangeEndMonth}
+                minDate={startDate ?? undefined}
               />
             </div>
           )}

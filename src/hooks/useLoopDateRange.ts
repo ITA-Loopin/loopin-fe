@@ -76,11 +76,15 @@ export function useLoopDateRange({
 
   const handleSelectEndDate = useCallback(
     (date: Dayjs) => {
+      // 시작일보다 이전인 경우 선택하지 않음
+      if (startDate && date.isBefore(startDate, "day")) {
+        return;
+      }
       setEndDate(date);
       setEndCalendarMonth(date);
       closeEndCalendar();
     },
-    [closeEndCalendar]
+    [startDate, closeEndCalendar]
   );
 
   const handleChangeStartMonth = useCallback((offset: number) => {

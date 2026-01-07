@@ -46,6 +46,7 @@ type MonthCalendarProps = {
   selectedDate: Dayjs;
   onSelectDate: (date: Dayjs) => void;
   onChangeMonth: (offset: number) => void;
+  minDate?: Dayjs;
 };
 
 export function MonthCalendar({
@@ -53,6 +54,7 @@ export function MonthCalendar({
   selectedDate,
   onSelectDate,
   onChangeMonth,
+  minDate,
 }: MonthCalendarProps) {
   const monthLabel = visibleMonth.format("YYYY년 M월");
   const startOfMonth = visibleMonth.startOf("month");
@@ -115,6 +117,7 @@ export function MonthCalendar({
               selectedDate,
               today
             );
+            const isDisabled = minDate ? date.isBefore(minDate, "day") : false;
 
             return (
               <DayButton
@@ -123,6 +126,7 @@ export function MonthCalendar({
                 isCurrentMonth={isCurrentMonth}
                 isSelected={isSelected}
                 isToday={isToday}
+                isDisabled={isDisabled}
                 onSelectDate={onSelectDate}
               />
             );

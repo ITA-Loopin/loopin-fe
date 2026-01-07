@@ -6,6 +6,7 @@ type DayButtonProps = {
   isCurrentMonth: boolean;
   isSelected: boolean;
   isToday: boolean;
+  isDisabled?: boolean;
   onSelectDate: (date: Dayjs) => void;
 };
 
@@ -14,19 +15,27 @@ export function DayButton({
   isCurrentMonth,
   isSelected,
   isToday,
+  isDisabled = false,
   onSelectDate,
 }: DayButtonProps) {
   return (
     <button
       type="button"
-      onClick={() => onSelectDate(date)}
+      onClick={() => {
+        if (!isDisabled) {
+          onSelectDate(date);
+        }
+      }}
+      disabled={isDisabled}
       className={cn(
         "relative flex h-8 w-8 items-center justify-center justify-self-center rounded-full transition-all",
-        isSelected
-          ? "bg-[var(--primary-500,#FF7765)]"
-          : isCurrentMonth
-            ? "hover:bg-[#FFE5DF]"
-            : ""
+        isDisabled
+          ? "cursor-not-allowed"
+          : isSelected
+            ? "bg-[var(--primary-500,#FF7765)]"
+            : isCurrentMonth
+              ? "hover:bg-[#FFE5DF]"
+              : ""
       )}
     >
       {isToday && !isSelected ? (
@@ -35,11 +44,13 @@ export function DayButton({
       <span
         className={cn(
           "text-center text-sm font-semibold leading-[150%] tracking-[-0.28px]",
-          isSelected
-            ? "text-[var(--gray-100,#F8F8F9)]"
-            : isCurrentMonth
-              ? "text-[var(--gray-800,#3A3D40)]"
-              : "text-[var(--gray-300,#DDE0E3)]"
+          isDisabled
+            ? "text-[var(--gray-300,#DDE0E3)]"
+            : isSelected
+              ? "text-[var(--gray-100,#F8F8F9)]"
+              : isCurrentMonth
+                ? "text-[var(--gray-800,#3A3D40)]"
+                : "text-[var(--gray-300,#DDE0E3)]"
         )}
       >
         {date.date()}

@@ -147,6 +147,7 @@ export function useAddLoopForm({
       onSelectEndDate: dateRange.handleSelectEndDate,
       onChangeStartMonth: dateRange.handleChangeStartMonth,
       onChangeEndMonth: dateRange.handleChangeEndMonth,
+      startDate: dateRange.startDate,
     },
     checklist: {
       checklists: checklist.checklists,
