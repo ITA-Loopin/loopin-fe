@@ -46,7 +46,7 @@ export default function HomePage() {
 
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 import {
   TodayLoopTitle,
   EmptyLoopView,
@@ -55,10 +55,23 @@ import {
 } from "@/components/home";
 import Header from "@/components/common/Header";
 import { useDailyLoops } from "@/hooks/useDailyLoops";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 dayjs.locale("ko");
 
 export default function HomePage() {
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [tooltipPosition, setTooltipPosition] = useState<{
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+  } | null>(null);
+
   // 오늘 날짜 표시
   const todayText = useMemo(() => {
     return dayjs().format("YYYY년 M월 D일 dddd");
@@ -77,6 +90,25 @@ export default function HomePage() {
   // 루프 목록이 비어있는지 확인
   const isEmpty = loopList.length === 0;
 
+  useEffect(() => {
+    if (!isLoading && isEmpty) {
+      const calendarIcon = document.querySelector(
+        ".calendar-icon-trigger"
+      ) as HTMLElement;
+      if (calendarIcon) {
+        const rect = calendarIcon.getBoundingClientRect();
+        setTooltipPosition({
+          top: rect.top,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height,
+        });
+        setShowTooltip(true);
+      }
+    } else {
+      setShowTooltip(false);
+    }
+  }, [isLoading, isEmpty]);
 
   return (
     <>
@@ -89,37 +121,133 @@ export default function HomePage() {
         }}
       />
       <div className="flex flex-col relative min-h-screen">
-      <Header />
-
-      <div className="flex-1 px-4 pb-6 flex flex-col gap-6">
-        <TodayLoopTitle dateText={todayText} />
-
-        {isLoading ? (
-          <div className="flex-1 flex items-center justify-center">
-            <p className="text-sm text-gray-500">로딩 중...</p>
+      {/* 오른쪽 위 디자인 요소 */}
+      <div
+        className="absolute top-0 right-0 -z-10"
+        style={{
+          width: "360.827px",
+          height: "162.286px",
+          transform: "rotate(30.835deg)",
+          borderRadius: "360.827px",
+          opacity: 0.5,
+          background: "var(--primary-300, #FFC2BA)",
+          filter: "blur(67px)",
+        }}
+      />
+      {/* 우측 상단 디자인 요소 (추가) */}
+      <div
+        className="absolute top-0 right-0 -z-10"
+        style={{
+          width: "379.346px",
+          height: "170.615px",
+          transform: "rotate(7.014deg)",
+          borderRadius: "379.346px",
+          opacity: 0.2,
+          background: "#E7FFBA",
+          filter: "blur(67px)",
+        }}
+      />
+      {/* 우측 하단 디자인 요소 */}
+      <div
+        className="absolute bottom-0 right-0 -z-10"
+        style={{
+          width: "379.346px",
+          height: "170.615px",
+          transform: "rotate(-42.799deg)",
+          borderRadius: "379.346px",
+          opacity: 0.2,
+          background: "#E7FFBA",
+          filter: "blur(67px)",
+        }}
+      />
+      {/* 왼쪽 중앙 하단 디자인 요소 */}
+      <div
+        className="absolute left-0 top-[60%] -z-10"
+        style={{
+          width: "209px",
+          height: "317.653px",
+          transform: "rotate(89.667deg)",
+          borderRadius: "317.653px",
+          opacity: 0.15,
+          background: "var(--primary-300, #FFC2BA)",
+          filter: "blur(67px)",
+        }}
+      />
+      
+        {showTooltip && tooltipPosition && (
+          <div
+            className="absolute pointer-events-none"
+            style={{
+              top: `${tooltipPosition.top}px`,
+              left: `${tooltipPosition.left}px`,
+              width: `${tooltipPosition.width}px`,
+              height: `${tooltipPosition.height}px`,
+            }}
+          >
+            <Tooltip
+              open={showTooltip}
+              onOpenChange={setShowTooltip}
+              delayDuration={0}
+            >
+              <TooltipTrigger asChild>
+                <div className="absolute inset-0" />
+              </TooltipTrigger>
+              <TooltipContent
+                side="top"
+                sideOffset={40}
+                className="bg-[#FF7765] border-none shadow-none p-0 m-0 text-white relative [&_svg]:hidden [&_[data-slot='tooltip-arrow']]:hidden [&>svg]:hidden"
+                style={{
+                  display: "flex",
+                  padding: "7px 12px",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "10px",
+                  boxShadow: "0 0 7px 0 rgba(0, 0, 0, 0.05)",
+                  borderRadius: "8px",
+                }}
+              >
+                <span className="text-sm font-medium text-white whitespace-nowrap">
+                  오늘의 첫 루프를 만들어보세요!
+                </span>
+                <div
+                  className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 z-10"
+                  style={{
+                    backgroundColor: "#FF7765",
+                  }}
+                />
+              </TooltipContent>
+            </Tooltip>
           </div>
-        ) : isEmpty ? (
-          <EmptyLoopView />
-        ) : (
-          <>
-            <LoopProgress progress={totalProgress} />
-
-            {/* 말풍선 형태의 메시지 */}
-            <div className="relative flex items-center justify-center">
-              <div className="relative rounded-lg bg-white/90 px-4 py-3 text-sm font-semibold text-[#FF7765] shadow-[0px_2px_8px_rgba(0,0,0,0.1)]">
-                <span>오늘 하루의 루프를 모두 채워보세요!</span>
-                {/* 위쪽 삼각형 포인터 */}
-                <div className="absolute -top-2 left-1/2 h-0 w-0 -translate-x-1/2 transform border-l-[8px] border-r-[8px] border-b-[8px] border-l-transparent border-r-transparent border-b-[rgba(255,255,255,0.9)] drop-shadow-[0px_2px_4px_rgba(0,0,0,0.1)]"></div>
-              </div>
-            </div>
-
-            <LoopList loops={loopList} />
-          </>
         )}
-      </div>
+        <Header />
+
+        <div className="flex-1 px-4 pb-6 flex flex-col gap-6">
+          <TodayLoopTitle dateText={todayText} />
+
+          {isLoading ? (
+            <div className="flex-1 flex items-center justify-center">
+              <p className="text-sm text-gray-500">로딩 중...</p>
+            </div>
+          ) : isEmpty ? (
+            <EmptyLoopView />
+          ) : (
+            <>
+              <LoopProgress progress={totalProgress} />
+
+              {/* 말풍선 형태의 메시지 */}
+              <div className="relative flex items-center justify-center">
+                <div className="relative rounded-lg bg-white/90 px-4 py-3 text-sm font-semibold text-[#FF7765] shadow-[0px_2px_8px_rgba(0,0,0,0.1)]">
+                  <span>오늘 하루의 루프를 모두 채워보세요!</span>
+                  {/* 위쪽 삼각형 포인터 */}
+                  <div className="absolute -top-2 left-1/2 h-0 w-0 -translate-x-1/2 transform border-l-[8px] border-r-[8px] border-b-[8px] border-l-transparent border-r-transparent border-b-[rgba(255,255,255,0.9)] drop-shadow-[0px_2px_4px_rgba(0,0,0,0.1)]"></div>
+                </div>
+              </div>
+
+              <LoopList loops={loopList} />
+            </>
+          )}
+        </div>
       </div>
     </>
   );
 }
-
-

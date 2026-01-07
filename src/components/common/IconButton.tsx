@@ -34,6 +34,7 @@ export function IconButton({
         width={width ?? 24}
         height={height ?? 24}
         className={cn(!width && !height ? "h-6 w-6" : "", imageClassName)}
+        style={{ width: width ?? 24, height: height ?? 24 }}
       />
     </button>
   );

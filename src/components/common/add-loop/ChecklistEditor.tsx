@@ -37,7 +37,10 @@ export function ChecklistEditor({
               type="text"
               value={item.text}
               onChange={(event) => onChangeChecklist(index, event.target.value)}
-              className={cn(baseInputStyles, "text-[#3A3D40] placeholder:text-[#B7BAC7]")}
+              className={cn(
+                baseInputStyles,
+                "text-[#3A3D40] placeholder:text-[#B7BAC7]"
+              )}
             />
             <IconButton
               src="/addloopsheet/addloopsheet_delete.svg"
@@ -56,7 +59,10 @@ export function ChecklistEditor({
             value={newChecklistItem}
             onChange={(event) => onChangeNewChecklist(event.target.value)}
             placeholder="새로운 루틴을 추가해보세요"
-            className={cn(baseInputStyles, "text-[#2C2C2C] placeholder:text-[#C6CCD1]")}
+            className={cn(
+              baseInputStyles,
+              "text-[#2C2C2C] placeholder:text-[#C6CCD1]"
+            )}
           />
           <IconButton
             src="/addloopsheet/addloopsheet_add.svg"
@@ -71,5 +77,3 @@ export function ChecklistEditor({
     </div>
   );
 }
-
-
