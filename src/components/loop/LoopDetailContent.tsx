@@ -18,6 +18,7 @@ interface LoopDetailContentProps {
   onDeleteChecklist?: (itemId: number) => Promise<void>;
   onAddChecklist: () => Promise<void>;
   onCompleteLoop: () => Promise<void>;
+  isCompletingLoop?: boolean;
   isMenuOpen: boolean;
   onMenuClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onMenuClose: () => void;
@@ -33,6 +34,7 @@ export function LoopDetailContent({
   onDeleteChecklist,
   onAddChecklist,
   onCompleteLoop,
+  isCompletingLoop = false,
   isMenuOpen,
   onMenuClick,
   onMenuClose,
@@ -94,8 +96,12 @@ export function LoopDetailContent({
       </section>
 
       <div className="flex justify-center">
-        <PrimaryButton variant="primary" onClick={onCompleteLoop}>
-          루프 완료하기
+        <PrimaryButton
+          variant="primary"
+          onClick={onCompleteLoop}
+          disabled={isCompletingLoop}
+        >
+          {isCompletingLoop ? "완료 중..." : "루프 완료하기"}
         </PrimaryButton>
       </div>
 
