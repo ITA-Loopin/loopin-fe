@@ -93,7 +93,19 @@ export default function LoopDetailPage() {
               onToggleChecklist={checklist.handleToggleChecklist}
               onDeleteChecklist={checklist.handleDeleteChecklist}
               onAddChecklist={checklist.handleAddChecklist}
-              onCompleteLoop={checklist.handleCompleteLoop}
+              onCompleteLoop={async () => {
+                const result = await checklist.handleCompleteLoop();
+                if (result?.success) {
+                  if (result.alreadyComplete) {
+                    // 이미 100%인 경우 전 화면으로 이동
+                    router.back();
+                  }
+                  // 100% 미만인 경우는 원래 동작 유지 (토스트 없이, 이동 없이)
+                } else {
+                  alert("루프 완료에 실패했습니다. 다시 시도해주세요.");
+                }
+              }}
+              isCompletingLoop={checklist.isCompletingLoop}
               isMenuOpen={isMenuOpen}
               onMenuClick={handleMenuClick}
               onMenuClose={() => setIsMenuOpen(false)}

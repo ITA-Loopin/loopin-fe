@@ -10,7 +10,8 @@ interface UseChecklistResult {
   handleToggleChecklist: (updatedItem: LoopChecklist) => Promise<void>;
   handleAddChecklist: () => Promise<void>;
   handleDeleteChecklist: (itemId: number) => Promise<void>;
-  handleCompleteLoop: () => Promise<void>;
+  handleCompleteLoop: () => Promise<{ success: boolean; alreadyComplete?: boolean }>;
+  isCompletingLoop: boolean;
   reload: () => void;
 }
 
@@ -20,6 +21,7 @@ export function useChecklist(
   reload: () => void
 ): UseChecklistResult {
   const [newChecklistContent, setNewChecklistContent] = useState("");
+  const [isCompletingLoop, setIsCompletingLoop] = useState(false);
   const detailRef = useRef(detail);
   // tempId -> 실제 ID 매핑 저장 (content 기반 매칭의 불안정성 해결)
   const tempIdToRealIdMapRef = useRef<Map<number, number>>(new Map());
@@ -311,9 +313,15 @@ export function useChecklist(
 
   const handleCompleteLoop = useCallback(async () => {
     if (!detail) {
-      return;
+      return { success: false };
     }
 
+    // 이미 100%인 경우
+    if (detail.progress === 100) {
+      return { success: true, alreadyComplete: true };
+    }
+
+    setIsCompletingLoop(true);
     const previousState = detail;
 
     setDetail((prev) => {
@@ -336,8 +344,12 @@ export function useChecklist(
           completed: true,
         },
       });
+      setIsCompletingLoop(false);
+      return { success: true, alreadyComplete: false };
     } catch (error) {
       setDetail(previousState);
+      setIsCompletingLoop(false);
+      return { success: false };
     }
   }, [detail, setDetail]);
 
@@ -349,6 +361,7 @@ export function useChecklist(
     handleAddChecklist,
     handleDeleteChecklist,
     handleCompleteLoop,
+    isCompletingLoop,
     reload,
   };
 }
