@@ -1,7 +1,7 @@
 import type { LoopChecklist } from "@/types/loop";
 import { ChecklistItem } from "./ChecklistItem";
 import { IconButton } from "@/components/common/IconButton";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 type ChecklistProps = {
   checklists: LoopChecklist[];
@@ -23,6 +23,7 @@ export function Checklist({
   onAddChecklist,
 }: ChecklistProps) {
   const [items, setItems] = useState<LoopChecklist[]>(checklists);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setItems(checklists);
@@ -36,7 +37,21 @@ export function Checklist({
     onToggleItem?.({ ...target, completed: !target.completed });
   };
 
-  const showAddInput = newChecklistContent !== undefined && onNewChecklistContentChange && onAddChecklist;
+  const handleAddButtonClick = () => {
+    // + 버튼을 누르면 input에 포커스
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && newChecklistContent && newChecklistContent.trim() && onAddChecklist) {
+      e.preventDefault();
+      onAddChecklist();
+    }
+  };
+
+  const showAddInput = onNewChecklistContentChange && onAddChecklist;
 
   return (
     <section className="w-full">
@@ -60,10 +75,12 @@ export function Checklist({
           <li className="flex w-full items-start justify-between rounded-[10px] bg-white p-4">
             <div className="flex w-full items-center justify-between">
               <input
+                ref={inputRef}
                 type="text"
                 placeholder="새로운 루틴을 추가해보세요"
-                value={newChecklistContent}
+                value={newChecklistContent || ""}
                 onChange={(event) => onNewChecklistContentChange(event.target.value)}
+                onKeyDown={handleKeyDown}
                 className="flex-1 border-none bg-transparent text-base font-semibold leading-[150%] tracking-[-0.32px] placeholder:text-[#C6CCD1] outline-none focus:outline-none focus:ring-0"
               />
               <IconButton
@@ -72,7 +89,7 @@ export function Checklist({
                 width={20}
                 height={20}
                 className="h-5 w-5"
-                onClick={onAddChecklist}
+                onClick={handleAddButtonClick}
               />
             </div>
           </li>

@@ -319,6 +319,7 @@ export function useLoopGroupEditForm({
       onSelectEndDate: handleSelectEndDate,
       onChangeStartMonth: handleChangeStartMonth,
       onChangeEndMonth: handleChangeEndMonth,
+      startDate: startDate ? dayjs(startDate) : null,
     },
     checklist: {
       checklists,

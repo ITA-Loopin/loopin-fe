@@ -70,6 +70,7 @@ export function AddLoopSheet({
               onChangeStartMonth={dateRange.onChangeStartMonth}
               onChangeEndMonth={dateRange.onChangeEndMonth}
               disableEndDate={schedule.scheduleType === "NONE"}
+              startDate={dateRange.startDate}
             />
 
             <ChecklistEditor

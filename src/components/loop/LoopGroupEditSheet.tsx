@@ -71,6 +71,7 @@ export function LoopGroupEditSheet({
               onSelectEndDate={dateRange.onSelectEndDate}
               onChangeStartMonth={dateRange.onChangeStartMonth}
               onChangeEndMonth={dateRange.onChangeEndMonth}
+              startDate={dateRange.startDate}
             />
 
             <ChecklistEditor

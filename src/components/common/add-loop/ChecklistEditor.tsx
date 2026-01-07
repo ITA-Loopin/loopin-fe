@@ -1,6 +1,7 @@
 import { IconButton } from "@/components/common/IconButton";
 import { cn } from "@/lib/utils";
 import { Checklist } from "./constants";
+import { useRef, useEffect } from "react";
 
 type ChecklistEditorProps = {
   checklists: Checklist[];
@@ -19,10 +20,26 @@ export function ChecklistEditor({
   onChangeNewChecklist,
   onAddChecklist,
 }: ChecklistEditorProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const itemContainerStyles =
     "flex w-full items-start justify-between rounded-[10px] bg-[#F8F8F9] p-4";
   const baseInputStyles =
     "flex-1 w-full border-none bg-transparent px-0 py-0 text-base font-semibold leading-[150%] tracking-[-0.32px] focus:outline-none focus:ring-0";
+
+  const handleAddButtonClick = () => {
+    // + 버튼을 누르면 input에 포커스
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && newChecklistItem && newChecklistItem.trim()) {
+      e.preventDefault();
+      onAddChecklist();
+    }
+  };
 
   return (
     <div className="flex flex-col items-start gap-2 self-stretch">
@@ -55,9 +72,11 @@ export function ChecklistEditor({
 
         <div className={itemContainerStyles}>
           <input
+            ref={inputRef}
             type="text"
             value={newChecklistItem}
             onChange={(event) => onChangeNewChecklist(event.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder="새로운 루틴을 추가해보세요"
             className={cn(
               baseInputStyles,
@@ -69,7 +88,7 @@ export function ChecklistEditor({
             alt="체크리스트 추가"
             width={24}
             height={24}
-            onClick={onAddChecklist}
+            onClick={handleAddButtonClick}
             className="h-6 w-6"
           />
         </div>

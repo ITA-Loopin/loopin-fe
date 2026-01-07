@@ -64,6 +64,7 @@ export function LoopEditSheet({
               onChangeStartMonth={dateRange.onChangeStartMonth}
               onChangeEndMonth={dateRange.onChangeEndMonth}
               disableEndDate
+              startDate={dateRange.startDate}
             />
 
             {/* 루프 체크리스트 */}

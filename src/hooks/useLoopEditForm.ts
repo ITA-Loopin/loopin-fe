@@ -234,6 +234,7 @@ export function useLoopEditForm({
       onSelectEndDate: () => {},
       onChangeStartMonth: handleChangeStartMonth,
       onChangeEndMonth: () => {},
+      startDate: startDate ? dayjs(startDate) : null,
     },
     checklist: {
       checklists: checklists.map((item) => ({ id: item.id, text: item.text })),
