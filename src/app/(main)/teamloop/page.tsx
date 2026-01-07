@@ -95,7 +95,7 @@ export default function TeamLoopPage() {
               </div>
             ) : myTeams.length === 0 ? (
               <div className="flex items-center justify-center py-8">
-                <p className="text-sm text-[#A0A9B1]">참여한 팀이 없습니다</p>
+                <p className="text-sm text-[#A0A9B1]">아직 참여 중인 팀이 없어요 <br /> 새로운 팀을 생성해해보세요!</p>
               </div>
             ) : (
               <div className="w-full overflow-x-auto scroll-smooth snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
