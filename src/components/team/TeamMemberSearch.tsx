@@ -13,14 +13,12 @@ type TeamMemberSearchProps = {
   searchValue: string;
   onSearchChange: (value: string) => void;
   onInvite?: (member: TeamMember) => void;
-  invitedMembers?: TeamMember[];
 };
 
 export function TeamMemberSearch({
   searchValue,
   onSearchChange,
   onInvite,
-  invitedMembers = [],
 }: TeamMemberSearchProps) {
   const { searchResults, isSearching, searchMembers, clearSearchResults } =
     useSearchMembers();
@@ -76,30 +74,9 @@ export function TeamMemberSearch({
                 onClick={() => onInvite?.(member)}
                 className="flex h-[24px] items-center justify-center gap-[5px] rounded-[5px] bg-[#FF7765] px-2 text-[var(--gray-100,#F8F8F9)] text-xs font-semibold leading-[140%] tracking-[-0.24px]"
               >
-                추가하기
+                초대하기
               </button>
             </div>
-          ))}
-        </div>
-      )}
-
-      {/* 초대된 팀원 목록 */}
-      {invitedMembers.length > 0 && (
-        <div className="flex w-full flex-wrap gap-2 mt-2">
-          {invitedMembers.map((member) => (
-            <div
-              key={member.id}
-              className="flex w-full items-center justify-between self-stretch h-[44px] px-4 py-[9px] rounded-[10px] bg-[#FFF3F1]"
-            >
-              <div className="flex flex-col gap-1">
-                <span className="text-[var(--gray-800,#3A3D40)] text-sm font-medium leading-[150%] tracking-[-0.28px]">
-                  {member.nickname + " " + member.email + ""}
-                </span>
-              </div>
-              <div className="flex h-[24px] items-center justify-center gap-[5px] rounded-[5px] bg-[#FF7765] px-2 text-[var(--gray-100,#F8F8F9)] text-xs font-semibold leading-[140%] tracking-[-0.24px]">
-                팀원
-              </div>
-        </div>
           ))}
         </div>
       )}

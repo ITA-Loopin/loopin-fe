@@ -7,6 +7,7 @@ import { TeamTypeSelector } from "@/components/team/TeamTypeSelector";
 import { TeamNameInput } from "@/components/team/TeamNameInput";
 import { TeamGoalInput } from "@/components/team/TeamGoalInput";
 import { TeamMemberSearch } from "@/components/team/TeamMemberSearch";
+import { InvitedMemberList } from "@/components/team/InvitedMemberList";
 import { PrimaryButton } from "@/components/common/PrimaryButton";
 import type { TeamCategoryString } from "@/components/team/types";
 import { useCreateTeam } from "@/hooks/useCreateTeam";
@@ -31,6 +32,10 @@ export default function CreateTeamLoopPage() {
       setInvitedMembers([...invitedMembers, member]);
     }
     setSearchValue("");
+  };
+
+  const handleRemoveMember = (memberId: number) => {
+    setInvitedMembers(invitedMembers.filter((m) => m.id !== memberId));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -71,7 +76,11 @@ export default function CreateTeamLoopPage() {
             searchValue={searchValue}
             onSearchChange={setSearchValue}
             onInvite={handleInvite}
-            invitedMembers={invitedMembers}
+          />
+
+          <InvitedMemberList
+            members={invitedMembers}
+            onRemove={handleRemoveMember}
           />
 
           <div className="flex justify-center">
