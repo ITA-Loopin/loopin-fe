@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { IconButton } from "./IconButton";
 
 type HeaderLeftType = "logo" | "back" | "none";
-type HeaderRightType = "user" | "menu" | "none";
+type HeaderRightType = "user" | "menu" | "edit" | "none";
 
 type HeaderProps = {
   leftType?: HeaderLeftType;
@@ -20,10 +20,11 @@ type HeaderProps = {
   onProfileClick?: () => void;
   onNotificationClick?: () => void;
   onMenuClick?: () => void;
+  onEditClick?: () => void;
   className?: string;
 };
 
-export function Header({
+export default function Header({
   leftType = "logo",
   rightType = "user",
   leftSlot,
@@ -34,6 +35,7 @@ export function Header({
   onProfileClick,
   onNotificationClick,
   onMenuClick,
+  onEditClick,
   className,
 }: HeaderProps) {
   const router = useRouter();
@@ -67,6 +69,8 @@ export function Header({
         );
       case "menu":
         return <IconButton src="/header/header_menu.svg" alt="메뉴" onClick={onMenuClick} />;
+      case "edit":
+        return <IconButton src="/header/header_edit.svg" alt="수정" onClick={onEditClick} />;
       case "none":
       default:
         return null;
@@ -77,7 +81,7 @@ export function Header({
     if (centerSlot) return centerSlot;
     if (centerTitle)
       return (
-        <h1 className="text-center text-base font-semibold leading-[150%] tracking-[-0.32px] text-[#3A3D40]">
+        <h1 className="text-center text-body-1-sb text-[var(--gray-800)]">
           {centerTitle}
         </h1>
       );
@@ -106,5 +110,3 @@ function LogoIcon() {
     />
   );
 }
-
-export default Header;
