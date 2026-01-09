@@ -82,23 +82,69 @@ export type CreateTeamRequest = {
 export async function createTeam(
   data: CreateTeamRequest
 ): Promise<{ success: boolean; message?: string }> {
-  const response = await apiFetch<{
-    success: boolean;
-    code: string;
-    message: string;
-    data?: unknown;
-  }>("/rest-api/v1/teams", {
-    method: "POST",
-    json: data,
-  });
 
-  if (!response.success) {
-    throw new Error(response.message || "팀 생성에 실패했습니다");
+  try {
+    const response = await apiFetch<{
+      success: boolean;
+      code: string;
+      message: string;
+      data?: unknown;
+    }>("/rest-api/v1/teams", {
+      method: "POST",
+      json: data,
+    });
+
+    if (!response.success) {
+      throw new Error(response.message || "팀 생성에 실패했습니다");
+    }
+
+    return {
+      success: true,
+      message: response.message,
+    };
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * 모집 중인 팀 API 응답 타입
+ */
+export type RecruitingTeamApiItem = {
+  teamId: number;
+  category: TeamCategoryString;
+  name: string;
+  goal: string;
+  currentMemberCount: number;
+};
+
+export type RecruitingTeamListApiResponse = {
+  success: boolean;
+  code: string;
+  message: string;
+  data: RecruitingTeamApiItem[];
+  timestamp: string;
+  traceId: string;
+};
+
+/**
+ * 모집 중인 팀 리스트 조회 API
+ */
+export async function fetchRecruitingTeams(): Promise<TeamItem[]> {
+  const response = await apiFetch<RecruitingTeamListApiResponse>(
+    "/rest-api/v1/teams/recruiting"
+  );
+
+  if (!response.success || !response.data) {
+    throw new Error(response.message || "모집 중인 팀 리스트 조회에 실패했습니다");
   }
 
-  return {
-    success: true,
-    message: response.message,
-  };
+  // category, name, goal만 사용하여 TeamItem으로 변환
+  return response.data.map((item) => ({
+    id: item.teamId,
+    category: item.category,
+    title: item.name,
+    description: item.goal,
+  }));
 }
 
