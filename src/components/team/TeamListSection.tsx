@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 type TeamListSectionProps = {
   title: string;
   viewAllHref?: string;
@@ -12,14 +14,11 @@ export function TeamListSection({
   return (
     <section className="w-full">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-base font-semibold leading-[150%] tracking-[-0.32px] text-[#3A3D40]">{title}</h2>
+        <h2 className="text-body-1-sb text-[var(--gray-800)]">{title}</h2>
         {viewAllHref && (
-          <a
-            href={viewAllHref}
-            className="text-center text-xs font-medium leading-[140%] tracking-[-0.24px] text-[#A0A9B1]"
-          >
+          <Link href={viewAllHref} className="text-center text-caption-r text-[var(--gray-500)]">
             전체보기 &gt;
-          </a>
+          </Link>
         )}
       </div>
       {children}
