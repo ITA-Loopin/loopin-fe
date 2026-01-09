@@ -77,6 +77,25 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --gray-black: #121212;
+  --gray-white: #FFFFFF;
+  --gray-100: #F8F8F9;
+  --gray-200: #F0F2F3;
+  --gray-300: #DDE0E3;
+  --gray-400: #C6CCD1;
+  --gray-500: #A0A9B1;
+  --gray-600: #737980;
+  --gray-700: #4D5155;
+  --gray-800: #3A3D40;
+  --primary-100: #FFF3F1;
+  --primary-200: #FFE4E0;
+  --primary-300: #FFC2BA;
+  --primary-400: #FF9A8D;
+  --primary-500: #FF7765;
+  --primary-main: #FF543F;
+  --primary-700: #CC4432;
+  --primary-800: #9A3227;
+  --primary-900: #792A1E;
 }
 
 .dark {
