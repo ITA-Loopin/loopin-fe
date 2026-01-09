@@ -12,6 +12,11 @@ export const TEAM_CATEGORY_LABELS: Record<TeamCategoryString, string> = {
   EXTERNALACTIVITY: "대외활동",
 };
 
+// 모든 카테고리 배열
+export const TEAM_CATEGORIES: TeamCategoryString[] = Object.keys(
+  TEAM_CATEGORY_LABELS
+) as TeamCategoryString[];
+
 export function getTeamCategoryLabel(category: TeamCategoryString): string {
   return TEAM_CATEGORY_LABELS[category];
 }
