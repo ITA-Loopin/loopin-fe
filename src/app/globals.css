@@ -132,6 +132,56 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+@layer components {
+  /* ---------- title ---------- */
+  .text-title-1-eb {
+    @apply text-[24px] font-extrabold leading-[33.6px] tracking-[-0.48px];
+  }
+  .text-title-1-b {
+    @apply text-[24px] font-bold leading-[33.6px] tracking-[-0.48px];
+  }
+
+  .text-title-2-eb {
+    @apply text-[20px] font-extrabold leading-[28px] tracking-[-0.4px];
+  }
+  .text-title-2-b {
+    @apply text-[20px] font-bold leading-[28px] tracking-[-0.4px];
+  }
+
+  /* ---------- body ---------- */
+  .text-body-1-eb {
+    @apply text-base font-extrabold leading-[24px] tracking-[-0.32px];
+  }
+  .text-body-1-sb {
+    @apply text-base font-semibold leading-[24px] tracking-[-0.32px];
+  }
+  .text-body-1-b {
+    @apply text-base font-bold leading-[24px] tracking-[-0.32px];
+  }
+  .text-body-1-m {
+    @apply text-base font-medium leading-[24px] tracking-[-0.32px];
+  }
+
+  .text-body-2-eb {
+    @apply text-sm font-extrabold leading-[21px] tracking-[-0.28px];
+  }
+  .text-body-2-b {
+    @apply text-sm font-bold leading-[21px] tracking-[-0.28px];
+  }
+  .text-body-2-m {
+    @apply text-sm font-medium leading-[21px] tracking-[-0.28px];
+  }
+
+  /* ---------- caption ---------- */
+  .text-caption-m {
+    @apply text-xs font-medium leading-[16.8px] tracking-[-0.24px];
+  }
+  .text-caption-r {
+    @apply text-xs font-normal leading-[16.8px] tracking-[-0.24px];
+  }
+}
+
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
