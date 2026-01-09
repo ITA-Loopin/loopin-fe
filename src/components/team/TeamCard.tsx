@@ -3,10 +3,11 @@ import { getTeamCategoryLabel } from "./types";
 
 type TeamCardProps = {
   team: TeamItem;
-  variant: "my" | "recommended";
+  variant: "my" | "recruiting";
+  isEditMode?: boolean;
 };
 
-export function TeamCard({ team, variant }: TeamCardProps) {
+export function TeamCard({ team, variant, isEditMode = false }: TeamCardProps) {
   if (variant === "my") {
     // 가로 스크롤용 카드 (원형 프로그레스 포함)
     const progress = team.progress ?? 0;
@@ -15,21 +16,21 @@ export function TeamCard({ team, variant }: TeamCardProps) {
     const offset = circumference - (progress / 100) * circumference;
 
     return (
-      <div className="flex w-full flex-col items-start gap-[10px] rounded-[10px] bg-white p-4">
+      <div className="relative flex w-full flex-col items-start gap-[10px] rounded-[10px] bg-[var(--gray-white)] p-4">
         {/* 안 레이아웃 */}
         <div className="flex w-full items-start gap-5">
           {/* 왼쪽 레이아웃 */}
           <div className="flex w-full flex-col items-start justify-between">
             <div>
-              <span className="inline-block rounded-[30px] bg-[#FF9A8D] px-[7px] py-[5px] text-[10px] gap-[10px] font-medium leading-[140%] tracking-[-0.2px] text-white">
+              <span className="text-caption-10-m rounded-[30px] bg-[var(--primary-400)] px-[7px] py-[5px] gap-[10px] text-[var(--gray-white)]">
                 {getTeamCategoryLabel(team.category)}
               </span>
             </div>
             <div className="flex flex-col items-start self-stretch gap-1 pt-2">
-              <h3 className="text-base font-bold leading-[150%] tracking-[-0.32px] text-[#121212]">
+              <h3 className="text-body-1-b text-[var(--gray-black)]">
                 {team.title}
               </h3>
-              <p className="text-sm font-medium leading-[150%] tracking-[-0.28px] text-[#737980]">{team.description}</p>
+              <p className="text-body-2-m text-[var(--gray-600)]">{team.description}</p>
             </div>
           </div>
 
@@ -42,8 +43,8 @@ export function TeamCard({ team, variant }: TeamCardProps) {
                 cy="45"
                 r={radius}
                 fill="none"
-                stroke="#F0F2F3"
-                strokeWidth="7"
+                stroke="var(--gray-200)"
+                strokeWidth="6.5"
               />
               {/* 진행률 원 */}
               <circle
@@ -51,14 +52,14 @@ export function TeamCard({ team, variant }: TeamCardProps) {
                 cy="45"
                 r={radius}
                 fill="none"
-                stroke="#FF7765"
+                stroke="var(--primary-500)"
                 strokeWidth="7" 
                 strokeDasharray={circumference}
                 strokeDashoffset={offset}
                 strokeLinecap="round"
               />
             </svg>
-            <span className="absolute inset-0 flex items-center justify-center text-base font-bold leading-[150%] tracking-[-0.32px] text-[#121212]">
+            <span className="absolute inset-0 flex items-center justify-center text-body-1-b text-[var(--gray-black)]">
               {progress}%
             </span>
           </div>
@@ -69,19 +70,19 @@ export function TeamCard({ team, variant }: TeamCardProps) {
 
   // 세로 리스트용 카드 (원형 프로그레스 없음)
   return (
-    <div className="flex w-full flex-col items-start gap-[10px] self-stretch rounded-[10px] bg-white px-4 py-2.5">
+    <div className="flex w-full flex-col items-start gap-[10px] self-stretch rounded-[10px] bg-[var(--gray-white)] px-4 py-2.5">
       {/* 안 레이아웃 */}
       <div className="flex flex-col items-start gap-[10px]">
         <div className="flex items-center gap-[10px]">
-          <span className="inline-block rounded-[30px] bg-[#FF9A8D] px-[7px] py-[5px] text-[10px] font-medium leading-[140%] tracking-[-0.2px] text-white">
+          <span className="text-caption-10-m rounded-[30px] bg-[var(--primary-400)] px-[7px] py-[5px] text-[var(--gray-white)]">
             {getTeamCategoryLabel(team.category)}
           </span>
         </div>
         <div className="flex items-center gap-4">
-          <h3 className="text-base font-bold leading-[150%] tracking-[-0.32px] text-[#121212]">
+          <h3 className="text-body-1-b text-[var(--gray-black)]">
             {team.title}
           </h3>
-          <p className="text-xs font-medium leading-[140%] tracking-[-0.24px] text-[#737980]">
+          <p className="text-body-2-m text-[var(--gray-600)]">
             {team.description}
           </p>
         </div>
