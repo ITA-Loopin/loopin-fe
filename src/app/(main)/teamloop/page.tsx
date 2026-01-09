@@ -67,12 +67,7 @@ export default function TeamLoopPage() {
   }, []);
   return (
     <div className="flex min-h-screen flex-col">
-      <div className="relative">
-        <Header leftType="none" rightType="user" />
-        <h1 className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-base font-semibold leading-[150%] tracking-[-0.32px] text-[#3A3D40]">
-          팀 루프
-        </h1>
-      </div>
+      <Header leftType="none" rightType="user" centerTitle="팀 루프" />
 
       <div className="flex w-full flex-col items-start gap-[6px] px-[16px] pb-6 pt-6">
         <h2 className="text-[14px] font-medium leading-[150%] tracking-[-0.28px] text-[var(--primary-main,#FF543F)]">

@@ -14,6 +14,8 @@ type HeaderProps = {
   rightType?: HeaderRightType;
   leftSlot?: ReactNode;
   rightSlot?: ReactNode;
+  centerTitle?: string;
+  centerSlot?: ReactNode;
   onBack?: () => void;
   onProfileClick?: () => void;
   onNotificationClick?: () => void;
@@ -26,6 +28,8 @@ export function Header({
   rightType = "user",
   leftSlot,
   rightSlot,
+  centerTitle,
+  centerSlot,
   onBack,
   onProfileClick,
   onNotificationClick,
@@ -69,10 +73,22 @@ export function Header({
     }
   };
 
+  const renderCenter = () => {
+    if (centerSlot) return centerSlot;
+    if (centerTitle)
+      return (
+        <h1 className="text-center text-base font-semibold leading-[150%] tracking-[-0.32px] text-[#3A3D40]">
+          {centerTitle}
+        </h1>
+      );
+    return null;
+  };
+
   return (
-    <header className={cn("flex items-center justify-between px-4 pt-3 pb-6", className)}>
-      <div className="flex items-center">{renderLeft()}</div>
-      <div className="flex items-center gap-3">{renderRight()}</div>
+    <header className={cn("grid grid-cols-3 items-center px-4 pt-3 pb-6", className)}>
+      <div className="flex items-center justify-start">{renderLeft()}</div>
+      <div className="flex items-center justify-center">{renderCenter()}</div>
+      <div className="flex items-center justify-end gap-3">{renderRight()}</div>
     </header>
   );
 }

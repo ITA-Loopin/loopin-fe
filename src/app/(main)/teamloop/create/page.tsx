@@ -54,12 +54,7 @@ export default function CreateTeamLoopPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <div className="relative">
-        <Header leftType="back" rightType="user" onBack={() => router.back()} />
-        <h1 className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-base font-semibold leading-[150%] tracking-[-0.32px] text-[#3A3D40]">
-          팀 생성하기
-        </h1>
-      </div>
+      <Header leftType="back" rightType="user" onBack={() => router.back()} centerTitle="팀 생성" />
 
       <form onSubmit={handleSubmit} className="flex-1 px-[16px] pt-[30px]">
         <div className="flex flex-col gap-10">
