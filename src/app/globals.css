@@ -165,6 +165,9 @@
   .text-body-2-eb {
     @apply text-sm font-extrabold leading-[21px] tracking-[-0.28px];
   }
+  .text-body-2-sb {
+    @apply text-sm font-semibold leading-[21px] tracking-[-0.28px];
+  }
   .text-body-2-b {
     @apply text-sm font-bold leading-[21px] tracking-[-0.28px];
   }
@@ -178,6 +181,9 @@
   }
   .text-caption-r {
     @apply text-xs font-normal leading-[16.8px] tracking-[-0.24px];
+  }
+  .text-caption-10-m {
+    @apply text-[10px] font-medium leading-[14px] tracking-[-0.2px];
   }
 }
 
