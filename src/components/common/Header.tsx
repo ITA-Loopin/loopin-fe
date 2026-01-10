@@ -171,7 +171,12 @@ export default function Header({
   };
 
   return (
-    <header className={cn("grid grid-cols-3 items-center px-4 pt-3 pb-6", className)}>
+    <header
+      className={cn(
+        "grid grid-cols-3 items-center px-4 pt-[15px] pb-4 border border-[var(--gray-white)] bg-white/30 backdrop-blur-[7px]",
+        className
+      )}
+    >
       <div className="flex items-center justify-start">{renderLeft()}</div>
       <div className="flex items-center justify-center">{renderCenter()}</div>
       <div className="flex items-center justify-end gap-3">{renderRight()}</div>
