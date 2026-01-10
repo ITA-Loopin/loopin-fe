@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Header from "@/components/common/Header";
 import { LoopReport } from "@/components/analytics/LoopReport";
 import type { LoopReportData, ReportStatus } from "@/types/report";
 import { fetchLoopReport } from "@/lib/report";
@@ -110,7 +111,7 @@ export default function AnalyticsPage() {
   };
 
   return (
-    <div className="relative flex flex-col min-h-screen -mt-6" style={getBackgroundStyle(status)}>
+    <div className="relative flex flex-col" style={getBackgroundStyle(status)}>
       {/* NONE 상태를 제외한 모든 경우에 초록색 원형 오버레이 */}
       {status !== "NONE" && (
         <>
@@ -129,14 +130,11 @@ export default function AnalyticsPage() {
         </>
       )}
 
-      {/* 페이지 헤더 - 고정 */}
-      <div className="relative flex w-full items-center justify-center px-6 pt-6 pb-4 border border-white bg-white/30 backdrop-blur-[7px]">
-        <div className="flex w-[328px] items-center justify-center">
-          <h1 className="text-center text-base font-semibold leading-[150%] tracking-[-0.32px] text-[#3A3D40]">
-            루프 리포트
-          </h1>
-        </div>
-      </div>
+      <Header
+        leftType="none"
+        rightType="none"
+        centerTitle="루프 리포트"
+      />
 
       {isLoading ? (
         <div className="relative flex items-center justify-center py-12">
