@@ -60,7 +60,7 @@ export function TeamMemberSearch({
           onChange={(event) => handleSearch(event.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="닉네임을 검색해주세요"
-          className="flex-1 bg-transparent outline-none text-body-2-m text-[var(--gray-black)] placeholder:text-[var(--gray-400)]"
+          className="flex-1 bg-transparent outline-none text-body-2-m text-[var(--gray-black)] placeholder:text-body-2-m placeholder:text-[var(--gray-400)]"
         />
         <IconButton
           src="/team/search.svg"
