@@ -89,7 +89,7 @@ export async function createTeam(
       code: string;
       message: string;
       data?: unknown;
-    }>("/rest-api/v1/teams", {
+    }>("/rest-api/v1/teams/", {
       method: "POST",
       json: data,
     });

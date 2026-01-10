@@ -11,11 +11,10 @@ import { useLoopTitle } from "@/hooks/useLoopTitle";
 import { useLoopSchedule } from "@/hooks/useLoopSchedule";
 import { useLoopDateRange } from "@/hooks/useLoopDateRange";
 import { useLoopChecklist } from "@/hooks/useLoopChecklist";
-import { apiFetch } from "@/lib/api";
-import type { Checklist } from "@/components/common/add-loop/constants";
+import { useTeamMemberSelection } from "@/hooks/useTeamMemberSelection";
+import { useCreateTeamLoop } from "@/hooks/useCreateTeamLoop";
 import { LoopTypeSelector } from "./LoopTypeSelector";
 import { ImportanceSelector } from "./ImportanceSelector";
-import { fetchTeamMembers, type TeamMember } from "@/lib/team";
 
 type AddTeamLoopSheetProps = {
   isOpen: boolean;
@@ -30,12 +29,8 @@ export function AddTeamLoopSheet({
   teamId,
   onCreated,
 }: AddTeamLoopSheetProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [loopType, setLoopType] = useState<"COMMON" | "INDIVIDUAL" | undefined>(undefined);
   const [importance, setImportance] = useState<"HIGH" | "MEDIUM" | "LOW" | undefined>(undefined);
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
-  const [selectedMemberIds, setSelectedMemberIds] = useState<number[]>([]);
-  const [isLoadingMembers, setIsLoadingMembers] = useState(false);
 
   const { title, handleTitleChange } = useLoopTitle({
     isOpen,
@@ -60,42 +55,26 @@ export function AddTeamLoopSheet({
     defaultChecklists: undefined,
   });
 
+  const { teamMembers, selectedMemberIds, isLoadingMembers, handleMemberToggle } =
+    useTeamMemberSelection({
+      isOpen,
+      loopType,
+      teamId,
+    });
+
+  const { createTeamLoop, isSubmitting } = useCreateTeamLoop({
+    teamId,
+    onCreated,
+    onClose,
+  });
+
   // 바텀 시트가 열릴 때 초기화
   useEffect(() => {
     if (isOpen) {
       setLoopType(undefined);
       setImportance(undefined);
-      setSelectedMemberIds([]);
-      setTeamMembers([]);
     }
   }, [isOpen]);
-
-  // 개인 루프 선택 시 팀원 목록 조회
-  useEffect(() => {
-    if (!isOpen || !loopType) {
-      setSelectedMemberIds([]);
-      return;
-    }
-
-    if (loopType === "INDIVIDUAL") {
-      const loadTeamMembers = async () => {
-        try {
-          setIsLoadingMembers(true);
-          const members = await fetchTeamMembers(teamId);
-          setTeamMembers(members);
-        } catch (error) {
-          console.error("팀원 목록 조회 실패", error);
-          setTeamMembers([]);
-        } finally {
-          setIsLoadingMembers(false);
-        }
-      };
-      loadTeamMembers();
-    } else {
-      setTeamMembers([]);
-      setSelectedMemberIds([]);
-    }
-  }, [isOpen, loopType, teamId]);
 
   // scheduleType이 "NONE"으로 변경될 때 종료일 초기화
   const handleScheduleTypeClick = useCallback(
@@ -112,71 +91,31 @@ export function AddTeamLoopSheet({
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
 
-      const normalizedScheduleType = schedule.scheduleType || "NONE";
-      const isWeekly = normalizedScheduleType === "WEEKLY";
-
-      const payload = {
+      await createTeamLoop({
         title,
-        content: null as string | null,
-        scheduleType: normalizedScheduleType,
-        specificDate:
-          normalizedScheduleType === "NONE"
-            ? (dateRange.startDate?.format("YYYY-MM-DD") || null)
-            : null,
-        daysOfWeek: isWeekly ? schedule.daysOfWeek : [],
-        startDate: dateRange.startDate?.format("YYYY-MM-DD") || null,
-        endDate: dateRange.endDate?.format("YYYY-MM-DD") || null,
-        checklists: checklist.checklists
-          .map((item: Checklist) => item.text)
-          .filter((text: string) => text.trim().length > 0),
-        type: loopType,
+        scheduleType: schedule.scheduleType,
+        daysOfWeek: schedule.daysOfWeek,
+        startDate: dateRange.startDate,
+        endDate: dateRange.endDate,
+        checklists: checklist.checklists,
+        loopType,
         importance,
-        ...(loopType === "INDIVIDUAL" && selectedMemberIds.length > 0 && {
-          targetMemberIds: selectedMemberIds,
-        }),
-      };
-
-      try {
-        setIsSubmitting(true);
-        const apiUrl = `/rest-api/v1/teams/${teamId}/loops`;
-        await apiFetch(apiUrl, {
-          method: "POST",
-          credentials: "include",
-          json: payload,
-        });
-        onCreated?.();
-        onClose();
-      } catch (error) {
-        console.error("팀 루프 생성 실패", error);
-      } finally {
-        setIsSubmitting(false);
-      }
+        selectedMemberIds,
+      });
     },
     [
-      checklist.checklists,
-      dateRange.endDate,
-      dateRange.startDate,
-      onClose,
-      onCreated,
-      schedule.daysOfWeek,
-      schedule.scheduleType,
+      createTeamLoop,
       title,
+      schedule.scheduleType,
+      schedule.daysOfWeek,
+      dateRange.startDate,
+      dateRange.endDate,
+      checklist.checklists,
       loopType,
       importance,
-      teamId,
       selectedMemberIds,
-      dateRange.resetEndDate,
-      schedule.handleScheduleTypeClick,
     ]
   );
-
-  const handleMemberToggle = (memberId: number) => {
-    setSelectedMemberIds((prev) =>
-      prev.includes(memberId)
-        ? prev.filter((id) => id !== memberId)
-        : [...prev, memberId]
-    );
-  };
 
   return (
     <BottomSheet
