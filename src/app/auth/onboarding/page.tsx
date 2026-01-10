@@ -135,7 +135,7 @@ export default function OnboardingPage() {
           nickname,
           ticket: signupData.ticket,
         },
-        skipCredentials: true, // 회원가입 시에는 쿠키가 아직 없음
+        skipCredentials: false, // 회원가입 시에는 쿠키가 아직 없음
       });
 
       const fallbackUser: User = {

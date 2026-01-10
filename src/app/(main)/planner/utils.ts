@@ -1,10 +1,8 @@
 import type { RecommendationSchedule } from "./types";
+import { v4 as uuidv4 } from "uuid";
 
-export function generateId() {
-  if (typeof crypto !== "undefined" && crypto.randomUUID) {
-    return crypto.randomUUID();
-  }
-  return Math.random().toString(36).slice(2);
+export function generateId(): string {
+  return uuidv4();
 }
 
 export function delay(ms: number) {

@@ -1,5 +1,10 @@
 "use client";
 
+import { store } from "@/store/store";
+import { setCredentials, logout } from "@/store/slices/authSlice";
+import { fetchMemberProfile, buildUserFromMemberProfile } from "./member";
+import type { User } from "@/types/auth";
+
 type ApiFetchInput = RequestInfo | URL;
 
 type SearchParamValue = string | number | boolean | null | undefined;
@@ -24,6 +29,60 @@ interface ApiFetchOptions extends RequestInit {
 }
 
 const API_BASE_URL = "https://api.loopin.co.kr";
+
+// 리프레시 토큰 재인증 진행 중인지 추적
+let isRefreshing = false;
+let refreshPromise: Promise<boolean> | null = null;
+
+/**
+ * 리프레시 토큰으로 재인증 시도
+ */
+async function attemptTokenRefresh(): Promise<boolean> {
+  if (isRefreshing && refreshPromise) {
+    return refreshPromise;
+  }
+
+  isRefreshing = true;
+  refreshPromise = (async () => {
+    try {
+      const refreshResponse = await fetch(
+        `${API_BASE_URL}/rest-api/v1/auth/refresh-token`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            Accept: "application/json",
+          },
+        }
+      );
+
+      if (!refreshResponse.ok) {
+        return false;
+      }
+
+      const memberResponse = await fetchMemberProfile();
+
+      const userData = buildUserFromMemberProfile(memberResponse.data, {
+        id: "user",
+      });
+
+      store.dispatch(
+        setCredentials({
+          user: userData,
+        })
+      );
+
+      return true;
+    } catch (error) {
+      return false;
+    } finally {
+      isRefreshing = false;
+      refreshPromise = null;
+    }
+  })();
+
+  return refreshPromise;
+}
 
 /**
  *  apiFetch - fetch를 확장한 커스텀 함수
@@ -112,7 +171,35 @@ export async function apiFetch<T = unknown>(
   }
 
   // 실제 fetch 요청
-  const response = await fetch(requestInput, fetchOptions);
+  let response = await fetch(requestInput, fetchOptions);
+
+  // 401 에러 발생 시 리프레시 토큰으로 재인증 시도
+  if (response.status === 401 && !skipCredentials) {
+    // 리프레시 토큰 재인증
+    const refreshSuccess = await attemptTokenRefresh();
+
+    if (refreshSuccess) {
+      // 재인증 성공 시 원래 요청 재시도
+      response = await fetch(requestInput, fetchOptions);
+    } else {
+      // 재인증 실패 시 로그아웃하고 로그인 페이지로 리다이렉트
+      store.dispatch(logout());
+      if (typeof window !== "undefined") {
+        window.location.href = "/";
+      }
+      let errorBody: Record<string, unknown> = {};
+      try {
+        errorBody = await response.json();
+      } catch {
+        // JSON 파싱 실패 시 무시
+      }
+      throw new Error(
+        typeof errorBody.message === "string"
+          ? errorBody.message
+          : "인증이 만료되었습니다. 다시 로그인해주세요."
+      );
+    }
+  }
 
   // 응답 상태 체크
   if (!response.ok) {

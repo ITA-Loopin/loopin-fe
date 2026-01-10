@@ -7,10 +7,11 @@ import BottomTab from "@/components/navigation/BottomTab";
 export default function MainLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const isHomePage = pathname === "/home";
+  const isAnalyticsPage = pathname === "/analytics";
 
   return (
     <div
-      className={`relative flex min-h-screen flex-col ${isHomePage ? "" : "bg-[#F9FAFB]"}`}
+      className={`relative flex min-h-screen flex-col ${isHomePage || isAnalyticsPage ? "" : "bg-[#F9FAFB]"}`}
     >
       <div
         className={`${isHomePage ? "flex-auto" : "flex-1"} pb-24 pt-6 w-full`}
