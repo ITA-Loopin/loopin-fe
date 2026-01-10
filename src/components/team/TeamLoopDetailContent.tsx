@@ -38,7 +38,7 @@ interface TeamLoopDetailContentProps {
   onNewChecklistContentChange: (content: string) => void;
   onToggleChecklist: (item: LoopChecklist) => Promise<void>;
   onAddChecklist: () => Promise<void>;
-  onCompleteLoop: () => Promise<void>;
+  onCompleteLoop: () => Promise<{ success: boolean; alreadyComplete?: boolean }>;
   isMenuOpen: boolean;
   onMenuClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onMenuClose: () => void;
