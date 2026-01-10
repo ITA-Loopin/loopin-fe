@@ -9,27 +9,33 @@ import {useAuth} from "@/hooks/useAuth";
 import {useAccount} from "@/hooks/useAccount";
 
 type HeaderLeftType = "logo" | "back" | "none";
-type HeaderRightType = "user" | "menu" | "none";
+type HeaderRightType = "user" | "menu" | "edit" | "none";
 
 type HeaderProps = {
   leftType?: HeaderLeftType;
   rightType?: HeaderRightType;
   leftSlot?: ReactNode;
   rightSlot?: ReactNode;
+  centerTitle?: string;
+  centerSlot?: ReactNode;
   onBack?: () => void;
   onNotificationClick?: () => void;
   onMenuClick?: () => void;
+  onEditClick?: () => void;
   className?: string;
 };
 
-export function Header({
+export default function Header({
   leftType = "logo",
   rightType = "user",
   leftSlot,
   rightSlot,
+  centerTitle,
+  centerSlot,
   onBack,
   onNotificationClick,
   onMenuClick,
+  onEditClick,
   className,
 }: HeaderProps) {
   const router = useRouter();
@@ -145,16 +151,30 @@ export function Header({
         );
       case "menu":
         return <IconButton src="/header/header_menu.svg" alt="메뉴" onClick={onMenuClick} />;
+      case "edit":
+        return <IconButton src="/header/header_edit.svg" alt="수정" onClick={onEditClick} />;
       case "none":
       default:
         return null;
     }
   };
 
+  const renderCenter = () => {
+    if (centerSlot) return centerSlot;
+    if (centerTitle)
+      return (
+        <h1 className="text-center text-body-1-sb text-[var(--gray-800)]">
+          {centerTitle}
+        </h1>
+      );
+    return null;
+  };
+
   return (
-    <header className={cn("flex items-center justify-between px-4 pt-3 pb-6", className)}>
-      <div className="flex items-center">{renderLeft()}</div>
-      <div className="flex items-center gap-3">{renderRight()}</div>
+    <header className={cn("grid grid-cols-3 items-center px-4 pt-3 pb-6", className)}>
+      <div className="flex items-center justify-start">{renderLeft()}</div>
+      <div className="flex items-center justify-center">{renderCenter()}</div>
+      <div className="flex items-center justify-end gap-3">{renderRight()}</div>
     </header>
   );
 }
@@ -172,5 +192,3 @@ function LogoIcon() {
     />
   );
 }
-
-export default Header;
