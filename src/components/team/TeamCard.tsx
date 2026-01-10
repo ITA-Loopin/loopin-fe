@@ -1,13 +1,16 @@
+import { useRouter } from "next/navigation";
 import type { TeamItem } from "./types";
 import { getTeamCategoryLabel } from "./types";
 
 type TeamCardProps = {
   team: TeamItem;
   variant: "my" | "recruiting";
+  onClick?: () => void;
   isEditMode?: boolean;
 };
 
-export function TeamCard({ team, variant, isEditMode = false }: TeamCardProps) {
+export function TeamCard({ team, variant, onClick, isEditMode = false }: TeamCardProps) {
+  const router = useRouter();
   if (variant === "my") {
     // 가로 스크롤용 카드 (원형 프로그레스 포함)
     const progress = team.progress ?? 0;
@@ -15,8 +18,22 @@ export function TeamCard({ team, variant, isEditMode = false }: TeamCardProps) {
     const circumference = 2 * Math.PI * radius;
     const offset = circumference - (progress / 100) * circumference;
 
+    const handleClick = () => {
+      if (isEditMode) return; // 편집 모드일 때는 클릭 비활성화
+      if (onClick) {
+        onClick();
+      } else {
+        router.push(`/team/${team.id}`);
+      }
+    };
+
     return (
-      <div className="relative flex w-full flex-col items-start gap-[10px] rounded-[10px] bg-[var(--gray-white)] p-4">
+      <div 
+        className={`relative flex w-full flex-col items-start gap-[10px] rounded-[10px] bg-[var(--gray-white)] p-4 ${
+          !isEditMode ? "cursor-pointer" : ""
+        }`}
+        onClick={handleClick}
+      >
         {/* 안 레이아웃 */}
         <div className="flex w-full items-start gap-5">
           {/* 왼쪽 레이아웃 */}

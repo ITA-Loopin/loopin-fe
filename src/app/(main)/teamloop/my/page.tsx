@@ -240,7 +240,7 @@ export default function MyTeamListPage() {
                   </div>
                 )}
                 <div className={isEditMode ? "ml-4" : ""}>
-                  <TeamCard team={team} variant="my"/>
+                  <TeamCard team={team} variant="my" isEditMode={isEditMode} />
                 </div>
               </div>
             ))}
