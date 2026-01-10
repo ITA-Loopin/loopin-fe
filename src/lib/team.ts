@@ -148,3 +148,178 @@ export async function fetchRecruitingTeams(): Promise<TeamItem[]> {
   }));
 }
 
+/**
+ * 팀 상세 정보 조회 API 응답 타입
+ */
+export type TeamDetailApiResponse = {
+  teamId: number;
+  currentDate: string;
+  category: TeamCategoryString;
+  name: string;
+  goal: string;
+  leaderId: number;
+  totalLoopCount: number;
+  teamTotalProgress: number;
+  myLoopCount: number;
+  myTotalProgress: number;
+};
+
+/**
+ * 팀 상세 정보 조회 API
+ */
+export async function fetchTeamDetail(teamId: number): Promise<TeamItem & { myTotalProgress: number; teamTotalProgress: number }> {
+  const response = await apiFetch<{
+    success: boolean;
+    code: string;
+    message: string;
+    data: TeamDetailApiResponse;
+    timestamp: string;
+  }>(`/rest-api/v1/teams/${teamId}`);
+
+  if (!response.success || !response.data) {
+    throw new Error(response.message || "팀 정보 조회에 실패했습니다");
+  }
+
+  const data = response.data;
+  return {
+    id: data.teamId,
+    category: data.category,
+    title: data.name,
+    description: data.goal,
+    progress: data.myTotalProgress, // 내 루프 진행률 사용
+    myTotalProgress: data.myTotalProgress,
+    teamTotalProgress: data.teamTotalProgress,
+  };
+}
+
+/**
+ * 팀 루프 리스트 API 응답 타입
+ */
+export type TeamLoopApiItem = {
+  id: number;
+  title: string;
+  loopDate: string;
+  type: "COMMON" | "INDIVIDUAL";
+  importance: "HIGH" | "MEDIUM" | "LOW";
+  teamProgress: number;
+  personalProgress: number;
+  isParticipating: boolean;
+};
+
+export type TeamLoopListApiResponse = {
+  success: boolean;
+  code: string;
+  message: string;
+  data: TeamLoopApiItem[];
+  page: {
+    page: number;
+    size: number;
+    totalPages: number;
+    totalElements: number;
+    first: boolean;
+    last: boolean;
+    hasNext: boolean;
+  };
+  timestamp: string;
+  traceId: string;
+};
+
+/**
+ * 팀 루프 리스트 조회 API
+ */
+export async function fetchTeamLoops(
+  teamId: number,
+  date?: string
+): Promise<TeamLoopApiItem[]> {
+  const url = date
+    ? `/rest-api/v1/teams/${teamId}/loops?date=${date}`
+    : `/rest-api/v1/teams/${teamId}/loops`;
+  
+  const response = await apiFetch<TeamLoopListApiResponse>(url);
+
+  if (!response.success || !response.data) {
+    throw new Error(response.message || "팀 루프 리스트 조회에 실패했습니다");
+  }
+
+  return response.data;
+}
+
+/**
+ * 팀원 정보 타입
+ */
+export type TeamMember = {
+  memberId: number;
+  nickname: string;
+  profileImage: string;
+};
+
+/**
+ * 팀원 목록 API 응답 타입
+ */
+export type TeamMemberListApiResponse = {
+  success: boolean;
+  code: string;
+  message: string;
+  data: TeamMember[];
+  page: {
+    page: number;
+    size: number;
+    totalPages: number;
+    totalElements: number;
+    first: boolean;
+    last: boolean;
+    hasNext: boolean;
+  };
+  timestamp: string;
+  traceId: string;
+};
+
+/**
+ * 팀원 목록 조회 API
+ */
+export async function fetchTeamMembers(teamId: number): Promise<TeamMember[]> {
+  const response = await apiFetch<TeamMemberListApiResponse>(
+    `/rest-api/v1/teams/${teamId}/members`
+  );
+
+  if (!response.success || !response.data) {
+    throw new Error(response.message || "팀원 목록 조회에 실패했습니다");
+  }
+
+  return response.data;
+}
+
+/**
+ * 팀 루프 체크리스트 API 응답 타입
+ */
+export type TeamLoopChecklistApiItem = {
+  id: number;
+  content: string;
+  isChecked: boolean;
+};
+
+export type TeamLoopChecklistApiResponse = {
+  success: boolean;
+  code: string;
+  message: string;
+  data: TeamLoopChecklistApiItem[];
+  timestamp: string;
+};
+
+/**
+ * 팀 루프 체크리스트 조회 API
+ */
+export async function fetchTeamLoopChecklists(
+  loopId: number
+): Promise<TeamLoopChecklistApiItem[]> {
+  const response = await apiFetch<TeamLoopChecklistApiResponse>(
+    `/rest-api/v1/teams/loops/${loopId}/checklists`
+  );
+
+  if (!response.success || !response.data) {
+    throw new Error(response.message || "팀 루프 체크리스트 조회에 실패했습니다");
+  }
+
+  return response.data;
+}
+
