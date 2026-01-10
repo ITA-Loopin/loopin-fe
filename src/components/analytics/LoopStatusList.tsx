@@ -25,10 +25,10 @@ type LoopItemCardProps = {
 function LoopItemCard({ loop, variant = "default", opacity = 100 }: LoopItemCardProps) {
   const content = (
     <>
-      <p className="text-base font-semibold leading-[150%] tracking-[-0.32px] text-[var(--gray-800,#3A3D40)]">{loop.title}</p>
+      <p className="text-body-1-sb text-[var(--gray-800)]">{loop.title}</p>
       <div className="flex items-center gap-2">
-        <p className="text-sm font-medium leading-[150%] tracking-[-0.28px] text-[var(--gray-600,#737980)]">{loop.schedule}</p>
-        <p className="text-base font-semibold leading-[150%] tracking-[-0.32px] text-[var(--primary-main,#FF543F)]">
+        <p className="text-body-2-m text-[var(--gray-600)]">{loop.schedule}</p>
+        <p className="text-body-2-b text-[var(--primary-main)]">
           {loop.completionRate}%
         </p>
       </div>
@@ -73,7 +73,7 @@ function SuggestionButton({ onActionClick }: SuggestionButtonProps) {
     <button
       type="button"
       onClick={onActionClick}
-      className="flex items-center justify-center gap-2 rounded-[5px] bg-[var(--gray-300,#DDE0E3)] py-1.5 px-2 text-sm font-semibold leading-[150%] tracking-[-0.28px] text-[var(--gray-600,#737980)] transition"
+      className="flex items-center justify-center gap-2 rounded-[5px] bg-[var(--gray-200)] py-1.5 px-2 text-body-2-m text-[var(--gray-600)] transition"
     >
       <EditIcon />
       루프 수정하기
@@ -88,7 +88,7 @@ type LoopSuggestionCardProps = {
 function LoopSuggestionCard({ onActionClick }: LoopSuggestionCardProps) {
   return (
     <div className="flex flex-col items-center justify-center gap-[10px]">
-      <p className="text-xs font-medium leading-[140%] tracking-[-0.24px] text-[var(--gray-600,#737980)]">루프를 조금 가볍게 만들어볼까요?</p>
+      <p className="text-caption-r text-[var(--gray-600)]">루프를 조금 가볍게 만들어볼까요?</p>
       <SuggestionButton onActionClick={onActionClick} />
     </div>
   );
@@ -112,21 +112,21 @@ function LoopGroup({ title, loops, emptyMessage, showSuggestion, showAddButton, 
 
   return (
     <div className="space-y-3">
-      <h3 className="text-base font-semibold leading-[150%] tracking-[-0.32px] text-[var(--gray-black,#121212)]">{title}</h3>
+      <h3 className="text-body-1-sb text-[var(--gray-800)]">{title}</h3>
       
       {!hasLoops ? (
         <>
           <div className="flex flex-col items-start gap-[10px] rounded-xl px-4 py-3" style={{ backgroundColor: `rgba(255, 255, 255, ${opacity / 100})` }}>
-            <p className="text-base font-semibold leading-[150%] tracking-[-0.32px] text-[var(--gray-400,#C6CCD1)] text-left">{emptyMessage}</p>
+            <p className="text-body-1-sb text-[var(--gray-400)] text-left">{emptyMessage}</p>
             {showAddButton && (
               <>
-                <div className="w-full border-t border-[#E5E5E5]"></div>
+                <div className="w-full border-t border-[var(--gray-200)]"></div>
                 <div className="flex w-full flex-col items-center gap-[10px]">
-                  <p className="text-xs font-medium leading-[140%] tracking-[-0.24px] text-[var(--gray-600,#737980)] text-center">루프를 추가해볼까요?</p>
+                  <p className="text-caption-r text-[var(--gray-600)] text-center">루프를 추가해볼까요?</p>
                   <button
                     type="button"
                     onClick={onAddClick}
-                    className="flex items-center justify-center gap-2 rounded-[5px] bg-[var(--gray-300,#DDE0E3)] py-1.5 px-2 text-sm font-semibold leading-[150%] tracking-[-0.28px] text-[var(--gray-600,#737980)] transition"
+                    className="flex items-center justify-center gap-2 rounded-[5px] bg-[var(--gray-200)] py-1.5 px-2 text-body-2-sb text-[var(--gray-600)] transition"
                   >
                     <PlusIcon />
                     루프 추가하기
@@ -148,7 +148,7 @@ function LoopGroup({ title, loops, emptyMessage, showSuggestion, showAddButton, 
               <LoopItemCard key={loop.id} loop={loop} variant="inline" opacity={opacity} />
             ))}
           </div>
-          <div className="mt-3 border-t border-[#E5E5E5] pt-3">
+          <div className="mt-3 border-t border-[var(--gray-200)] pt-3">
             <LoopSuggestionCard onActionClick={onActionClick} />
           </div>
         </div>
