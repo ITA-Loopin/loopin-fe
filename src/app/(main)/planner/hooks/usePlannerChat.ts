@@ -18,6 +18,7 @@ import {
   type ChatMessageDto,
   type SSEMessageEvent,
 } from "@/lib/chat";
+import {useChatRoom} from "@/hooks/useChatRoom";
 
 type AppendStatus = "none" | "assistant" | "recommendations";
 
@@ -74,6 +75,7 @@ function normalizeChatMessages(input: unknown): ChatMessageDto[] {
 
 export function usePlannerChat() {
   const { user } = useAppSelector((state) => state.auth);
+  const { getChatRooms } = useChatRoom();
   const [messages, setMessages] = useState<ChatMessage[]>([
     { id: generateId(), author: "assistant", content: INITIAL_MESSAGE },
   ]);
@@ -106,23 +108,13 @@ export function usePlannerChat() {
     const loadChatRooms = async () => {
       try {
         console.log("[DEBUG] 채팅방 목록 조회 시작");
-        const response = await fetchChatRooms();
+        const response = await getChatRooms();
 
         if (isCancelled) return;
 
         console.log("[DEBUG] 채팅방 목록 응답:", response);
-        const chatRooms = response.data?.chatRooms || [];
+        const chatRooms = response?.data?.data?.chatRooms ?? [];
         console.log("[DEBUG] 채팅방 목록:", chatRooms);
-
-        // loopSelect가 true인 채팅방 찾기 (planner 채팅방)
-        const plannerRoom = chatRooms.find((room) => room.loopSelect === true);
-        console.log("[DEBUG] planner 채팅방:", plannerRoom);
-
-        if (plannerRoom) {
-          console.log("[DEBUG] planner 채팅방 ID 설정:", plannerRoom.id);
-          setResolvedChatRoomId(plannerRoom.id);
-          return;
-        }
 
         if (chatRooms.length > 0) {
           // planner 채팅방이 없으면 첫 번째 채팅방 사용
