@@ -116,20 +116,22 @@ function LoopGroup({ title, loops, emptyMessage, showSuggestion, showAddButton, 
       
       {!hasLoops ? (
         <>
-          <div className="flex flex-col items-center justify-center gap-[10px] rounded-xl px-4 py-3" style={{ backgroundColor: `rgba(255, 255, 255, ${opacity / 100})` }}>
-            <p className="text-base font-semibold leading-[150%] tracking-[-0.32px] text-[var(--gray-400,#C6CCD1)]">{emptyMessage}</p>
+          <div className="flex flex-col items-start gap-[10px] rounded-xl px-4 py-3" style={{ backgroundColor: `rgba(255, 255, 255, ${opacity / 100})` }}>
+            <p className="text-base font-semibold leading-[150%] tracking-[-0.32px] text-[var(--gray-400,#C6CCD1)] text-left">{emptyMessage}</p>
             {showAddButton && (
               <>
                 <div className="w-full border-t border-[#E5E5E5]"></div>
-                <p className="text-xs font-medium leading-[140%] tracking-[-0.24px] text-[var(--gray-600,#737980)]">루프를 추가해볼까요?</p>
-                <button
-                  type="button"
-                  onClick={onAddClick}
-                  className="flex items-center justify-center gap-2 rounded-[5px] bg-[var(--gray-300,#DDE0E3)] py-1.5 px-2 text-sm font-semibold leading-[150%] tracking-[-0.28px] text-[var(--gray-600,#737980)] transition"
-                >
-                  <PlusIcon />
-                  루프 추가하기
-                </button>
+                <div className="flex w-full flex-col items-center gap-[10px]">
+                  <p className="text-xs font-medium leading-[140%] tracking-[-0.24px] text-[var(--gray-600,#737980)] text-center">루프를 추가해볼까요?</p>
+                  <button
+                    type="button"
+                    onClick={onAddClick}
+                    className="flex items-center justify-center gap-2 rounded-[5px] bg-[var(--gray-300,#DDE0E3)] py-1.5 px-2 text-sm font-semibold leading-[150%] tracking-[-0.28px] text-[var(--gray-600,#737980)] transition"
+                  >
+                    <PlusIcon />
+                    루프 추가하기
+                  </button>
+                </div>
               </>
             )}
           </div>
