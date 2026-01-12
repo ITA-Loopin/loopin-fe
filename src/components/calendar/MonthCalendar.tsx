@@ -65,14 +65,14 @@ export function MonthCalendar({
   return (
     <section className="flex flex-col items-center gap-[24px] pb-6">
       {/* 달력 헤더 */}
-      <header className="flex items-center justify-between w-[150px] mt-6">
+      <header className="grid grid-cols-[auto_auto_auto] items-center gap-[10px] justify-center mt-6 w-full">
         <button
           type="button"
           onClick={() => onChangeMonth(-1)}
           className="flex w-[25px] h-[25px] py-[9px] px-[10px] items-center gap-[10px] shrink-0 rounded-[12.5px] bg-[var(--gray-white)]"
           aria-label="이전 달"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="6" height="8" viewBox="0 0 6 8" fill="none">
+          <svg xmlns="http://www.w3.org/2000/svg" width="6" height="8" viewBox="0 0 6 8" fill="none" >
             <path d="M4.75928 0.5L0.759277 4L4.75928 7.5" stroke="#3A3D40" strokeLinecap="round"/>
           </svg>
         </button>
@@ -87,7 +87,7 @@ export function MonthCalendar({
           className="flex w-[25px] h-[25px] py-[9px] px-[10px] items-center gap-[10px] shrink-0 rounded-[12.5px] bg-[var(--gray-white)]"
           aria-label="다음 달"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="6" height="8" viewBox="0 0 6 8" fill="none" style={{ transform: 'scaleX(-1)' }}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="6" height="8" viewBox="0 0 6 8" fill="none" className="-scale-x-100">
             <path d="M4.75928 0.5L0.759277 4L4.75928 7.5" stroke="#3A3D40" strokeLinecap="round"/>
           </svg>
         </button>
