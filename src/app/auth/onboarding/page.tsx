@@ -229,7 +229,7 @@ export default function OnboardingPage() {
               value={nickname}
               onChange={handleInputChange}
               placeholder="닉네임을 입력해주세요"
-              className="flex-1 border-none bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground"
+              className="w-full flex-1 border-none bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground"
               aria-label="닉네임"
             />
             <button

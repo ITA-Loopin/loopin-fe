@@ -30,7 +30,9 @@ export default function MyTeamListPage() {
         }
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : "팀 리스트를 불러오는데 실패했습니다");
+          setError(
+            err instanceof Error ? err.message : "팀 리스트를 불러오는데 실패했습니다"
+          );
         }
       } finally {
         if (!cancelled) {
@@ -109,17 +111,18 @@ export default function MyTeamListPage() {
     if (!isEditMode || touchStartY === null || touchStartIndex === null) return;
     e.preventDefault();
     const touch = e.touches[0];
-    const currentY = touch.clientY;
-    const deltaY = currentY - touchStartY;
 
-    // 드래그 중인 카드의 위치 업데이트
+    const deltaY = touch.clientY - touchStartY;
+
     if (Math.abs(deltaY) > 10) {
-      // 다른 카드 위에 있는지 확인
       const element = document.elementFromPoint(touch.clientX, touch.clientY);
       if (element) {
-        const cardElement = element.closest('[data-team-index]');
+        const cardElement = element.closest("[data-team-index]");
         if (cardElement) {
-          const targetIndex = parseInt(cardElement.getAttribute('data-team-index') || '-1');
+          const targetIndex = parseInt(
+            cardElement.getAttribute("data-team-index") || "-1",
+            10
+          );
           if (targetIndex !== -1 && targetIndex !== touchStartIndex) {
             setDragOverIndex(targetIndex);
           }
@@ -137,16 +140,17 @@ export default function MyTeamListPage() {
       return;
     }
 
-    // 드롭 위치 확인
     const touch = e.changedTouches[0];
     const element = document.elementFromPoint(touch.clientX, touch.clientY);
-    
+
     if (element) {
-      const cardElement = element.closest('[data-team-index]');
+      const cardElement = element.closest("[data-team-index]");
       if (cardElement) {
-        const dropIndex = parseInt(cardElement.getAttribute('data-team-index') || '-1');
+        const dropIndex = parseInt(
+          cardElement.getAttribute("data-team-index") || "-1",
+          10
+        );
         if (dropIndex !== -1 && dropIndex !== draggedIndex) {
-          // 순서 변경
           const newTeams = [...teams];
           const draggedItem = newTeams[draggedIndex];
           newTeams.splice(draggedIndex, 1);
@@ -165,13 +169,14 @@ export default function MyTeamListPage() {
   return (
     <div className="flex flex-col">
       <div className="relative">
-        <Header 
-          leftType="back" 
-          rightType={isEditMode ? "none" : "edit"} 
-          onBack={() => router.back()} 
+        <Header
+          leftType="back"
+          rightType={isEditMode ? "none" : "edit"}
+          onBack={() => router.back()}
           onEditClick={handleEditClick}
           centerTitle="내 팀 목록"
         />
+
         {isEditMode && (
           <div className="absolute right-4 top-1/2 -translate-y-1/2">
             <button
@@ -195,9 +200,12 @@ export default function MyTeamListPage() {
           </div>
         ) : teams.length === 0 ? (
           <div className="flex items-center justify-center py-8">
-            <p className="text-sm text-[#A0A9B1]">아직 참여 중인 팀이 없어요 <br /> 새로운 팀을 생성해보세요!</p>
+            <p className="text-sm text-[#A0A9B1]">
+              아직 참여 중인 팀이 없어요 <br /> 새로운 팀을 생성해보세요!
+            </p>
           </div>
         ) : (
+          // 편집 모드여도 좌우 16px 유지: -ml-4 제거
           <div className="flex w-full flex-col gap-4">
             {teams.map((team, index) => (
               <div
@@ -214,33 +222,35 @@ export default function MyTeamListPage() {
                 onTouchEnd={(e) => isEditMode && handleTouchEnd(e)}
                 className={`relative transition-all touch-none ${
                   isEditMode ? "cursor-move" : ""
-                } ${
-                  draggedIndex === index ? "opacity-50" : ""
-                } ${
+                } ${draggedIndex === index ? "opacity-50" : ""} ${
                   dragOverIndex === index && draggedIndex !== index
                     ? "translate-y-2 border-t-2 border-[var(--primary-main)]"
                     : ""
                 }`}
               >
-                {/* 드래그 핸들 (편집 모드일 때만 표시, 카드 밖에 배치) */}
-                {isEditMode && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 z-10 flex flex-col gap-1">
-                    <div className="flex gap-1">
-                      <div className="w-1 h-1 rounded-full bg-[var(--gray-500)]"></div>
-                      <div className="w-1 h-1 rounded-full bg-[var(--gray-500)]"></div>
+                {/* 핸들은 카드 '밖'에 두되, padding은 건드리지 않기 */}
+                <div className="flex items-center gap-2">
+                  {isEditMode && (
+                    <div className="flex shrink-0 flex-col gap-1">
+                      <div className="flex gap-1">
+                        <div className="h-1 w-1 rounded-full bg-[var(--gray-500)]" />
+                        <div className="h-1 w-1 rounded-full bg-[var(--gray-500)]" />
+                      </div>
+                      <div className="flex gap-1">
+                        <div className="h-1 w-1 rounded-full bg-[var(--gray-500)]" />
+                        <div className="h-1 w-1 rounded-full bg-[var(--gray-500)]" />
+                      </div>
+                      <div className="flex gap-1">
+                        <div className="h-1 w-1 rounded-full bg-[var(--gray-500)]" />
+                        <div className="h-1 w-1 rounded-full bg-[var(--gray-500)]" />
+                      </div>
                     </div>
-                    <div className="flex gap-1">
-                      <div className="w-1 h-1 rounded-full bg-[var(--gray-500)]"></div>
-                      <div className="w-1 h-1 rounded-full bg-[var(--gray-500)]"></div>
-                    </div>
-                    <div className="flex gap-1">
-                      <div className="w-1 h-1 rounded-full bg-[var(--gray-500)]"></div>
-                      <div className="w-1 h-1 rounded-full bg-[var(--gray-500)]"></div>
-                    </div>
+                  )}
+
+                  {/* 카드가 오른쪽을 침범하지 않게 */}
+                  <div className="min-w-0 flex-1">
+                    <TeamCard team={team} variant="my" isEditMode={isEditMode} />
                   </div>
-                )}
-                <div className={isEditMode ? "ml-4" : ""}>
-                  <TeamCard team={team} variant="my" isEditMode={isEditMode} />
                 </div>
               </div>
             ))}
@@ -250,4 +260,3 @@ export default function MyTeamListPage() {
     </div>
   );
 }
-

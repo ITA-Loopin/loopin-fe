@@ -29,7 +29,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
-          <main className="mx-auto flex min-h-screen w-full max-w-[500px] flex-col">
+          <main className="mx-auto flex h-screen w-full max-w-[500px] flex-col overflow-hidden">
             {children}
           </main>
         </Providers>
