@@ -1,14 +1,11 @@
 import { useMemo } from "react";
 import dayjs from "dayjs";
-import "dayjs/locale/ko";
 import type { LoopDetail, LoopChecklist } from "@/types/loop";
 import { LoopProgress } from "@/components/home/LoopProgress";
 import { Checklist } from "@/components/loop/Checklist";
 import { IconButton } from "@/components/common/IconButton";
 import { PrimaryButton } from "@/components/common/PrimaryButton";
 import { DropdownEditDelete } from "@/components/loop/DropdownEditDelete";
-
-dayjs.locale("ko");
 
 interface LoopDetailContentProps {
   detail: LoopDetail;
