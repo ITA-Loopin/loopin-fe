@@ -22,15 +22,17 @@ export function LoopListItem({ item }: LoopListItemProps) {
     <li>
       <Link
         href={`/loops/${item.id}`}
-        className="flex flex-col items-start gap-[10px] self-stretch py-3 px-4 rounded-[10px] bg-[var(--gray-white,#FFF)]"
+        className="flex flex-col items-start gap-[10px] self-stretch py-3 px-4 rounded-[10px] bg-[var(--gray-white)]"
       >
         {/* 안 레이아웃 */}
-        <div className="flex w-full max-w-[500px] items-center justify-between">
+        <div className="flex w-full items-center justify-between">
           <div className="flex flex-col gap-2">
-            <p className="text-base font-semibold leading-[150%] tracking-[-0.32px] text-[var(--gray-800,#3A3D40)]">{item.title}</p>
-            <p className="text-sm font-medium leading-[150%] tracking-[-0.28px] text-[var(--gray-500,#A0A9B1)]">
-              {item.totalChecklists}개 중 {item.completedChecklists}개 완료
-            </p>
+            <p className="text-body-1-sb text-[var(--gray-800)]">{item.title}</p>
+            {item.totalChecklists > 0 && (
+              <p className="text-body-2-m text-[var(--gray-500)]">
+                {item.totalChecklists}개 중 {item.completedChecklists}개 완료
+              </p>
+            )}
           </div>
           {/* 원형 진행률 표시기 */}
           <div className="relative flex h-9 w-9 items-center justify-center">
@@ -41,7 +43,7 @@ export function LoopListItem({ item }: LoopListItemProps) {
                 cy="24"
                 r={radius}
                 fill="none"
-                stroke="#F0F2F3"
+                stroke="var(--gray-200)"
                 strokeWidth="4.5"
               />
               {/* 진행률 원 (산호색) */}
@@ -50,7 +52,7 @@ export function LoopListItem({ item }: LoopListItemProps) {
                 cy="24"
                 r={radius}
                 fill="none"
-                stroke="#FF7765"
+                stroke="var(--primary-500)"
                 strokeWidth="4.5"
                 strokeDasharray={circumference}
                 strokeDashoffset={offset}
