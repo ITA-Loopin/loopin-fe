@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import { DayButton } from "./DayButton";
@@ -20,25 +21,6 @@ function generateCalendarDays(startDate: Dayjs, endDate: Dayjs): Dayjs[] {
   return days;
 }
 
-/**
- * 날짜의 상태를 판단하여 객체로 반환하는 함수
- * @param date 판단할 날짜
- * @param visibleMonth 현재 표시 중인 월
- * @param selectedDate 선택된 날짜
- * @param today 오늘 날짜
- * @returns 날짜 상태 객체
- */
-function getDateState(
-  date: Dayjs,
-  visibleMonth: Dayjs,
-  selectedDate: Dayjs
-) {
-  return {
-    isCurrentMonth: date.isSame(visibleMonth, "month"),
-    isSelected: date.isSame(selectedDate, "day"),
-  };
-}
-
 type MonthCalendarProps = {
   visibleMonth: Dayjs;
   selectedDate: Dayjs;
@@ -54,13 +36,16 @@ export function MonthCalendar({
   onChangeMonth,
   minDate,
 }: MonthCalendarProps) {
-  const monthLabel = visibleMonth.format("YYYY년 M월");
-  const startOfMonth = visibleMonth.startOf("month");
-  const endOfMonth = visibleMonth.endOf("month");
-  // 일요일 시작으로 고정 (DAY_NAMES와 일치)
-  const startOfCalendar = startOfMonth.subtract(startOfMonth.day(), "day");
-  const endOfCalendar = endOfMonth.add(6 - endOfMonth.day(), "day");
-  const days = generateCalendarDays(startOfCalendar, endOfCalendar);
+  const { monthLabel, days } = useMemo(() => {
+    const monthLabel = visibleMonth.format("YYYY년 M월");
+    const startOfMonth = visibleMonth.startOf("month");
+    const endOfMonth = visibleMonth.endOf("month");
+    // 일요일 시작으로 고정 (DAY_NAMES와 일치)
+    const startOfCalendar = startOfMonth.subtract(startOfMonth.day(), "day");
+    const endOfCalendar = endOfMonth.add(6 - endOfMonth.day(), "day");
+    const days = generateCalendarDays(startOfCalendar, endOfCalendar);
+    return { monthLabel, days };
+  }, [visibleMonth]);
 
   return (
     <section className="flex flex-col items-center gap-[24px] pb-6">
@@ -100,7 +85,7 @@ export function MonthCalendar({
           {/* 요일 */}
           {DAY_NAMES.map((day, index) => (
             <span
-              key={`${index}-${day}`}
+              key={index}
               className={`text-center text-body-2-sb ${
                 index === 0 
                   ? "text-[var(--primary-main)]" 
@@ -113,11 +98,8 @@ export function MonthCalendar({
           
           {/* 날짜 */}
           {days.map((date) => {
-            const { isCurrentMonth, isSelected } = getDateState(
-              date,
-              visibleMonth,
-              selectedDate,
-            );
+            const isCurrentMonth = date.isSame(visibleMonth, "month");
+            const isSelected = date.isSame(selectedDate, "day");
             const isDisabled = minDate ? date.isBefore(minDate, "day") : false;
 
             return (
