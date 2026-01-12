@@ -41,8 +41,16 @@ export function ChecklistEditor({
     }
   };
 
+  const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // ChecklistEditor 내부 클릭은 이벤트 전파를 막아서 form의 onClick이 실행되지 않도록 함
+    e.stopPropagation();
+  };
+
   return (
-    <div className="flex flex-col items-start gap-2 self-stretch">
+    <div 
+      className="flex flex-col items-start gap-2 self-stretch"
+      onClick={handleContainerClick}
+    >
       <p className="text-xs font-medium leading-[140%] tracking-[-0.24px] text-[#A0A9B1]">
         체크리스트
       </p>

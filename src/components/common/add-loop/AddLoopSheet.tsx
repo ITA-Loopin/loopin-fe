@@ -28,6 +28,13 @@ export function AddLoopSheet({
     submit,
   } = useAddLoopForm({ isOpen, onClose, defaultValues, onCreated });
 
+  const handleFormClick = (e: React.MouseEvent<HTMLFormElement>) => {
+    // 체크리스트 입력 중일 때만 체크리스트 추가
+    if (checklist.newChecklistItem && checklist.newChecklistItem.trim()) {
+      checklist.onAddChecklist();
+    }
+  };
+
   return (
     <BottomSheet
       isOpen={isOpen}
@@ -43,8 +50,21 @@ export function AddLoopSheet({
           </h2>
 
           {/* 루프 추가 폼 */}
-          <form className="w-full space-y-10" onSubmit={submit.onSubmit}>
+          <form 
+            className="w-full space-y-10" 
+            onSubmit={submit.onSubmit}
+            onClick={handleFormClick}
+          >
             <TitleInput value={title.value} onChange={title.onChange} />
+
+            <ChecklistEditor
+              checklists={checklist.checklists}
+              onChangeChecklist={checklist.onChangeChecklist}
+              onRemoveChecklist={checklist.onRemoveChecklist}
+              newChecklistItem={checklist.newChecklistItem}
+              onChangeNewChecklist={checklist.onChangeNewChecklist}
+              onAddChecklist={checklist.onAddChecklist}
+            />
 
             <ScheduleSelector
               scheduleType={schedule.scheduleType}
@@ -71,15 +91,6 @@ export function AddLoopSheet({
               onChangeEndMonth={dateRange.onChangeEndMonth}
               disableEndDate={schedule.scheduleType === "NONE"}
               startDate={dateRange.startDate}
-            />
-
-            <ChecklistEditor
-              checklists={checklist.checklists}
-              onChangeChecklist={checklist.onChangeChecklist}
-              onRemoveChecklist={checklist.onRemoveChecklist}
-              newChecklistItem={checklist.newChecklistItem}
-              onChangeNewChecklist={checklist.onChangeNewChecklist}
-              onAddChecklist={checklist.onAddChecklist}
             />
 
             <PrimaryButton

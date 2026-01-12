@@ -30,7 +30,11 @@ export function BottomSheet({
   return (
     <Sheet
       open={isOpen}
-      onOpenChange={(open) => !open && onClose?.()}
+      onOpenChange={(open) => {
+        if (!open) {
+          onClose?.();
+        }
+      }}
     >
       <SheetPortal>
         <SheetOverlay
