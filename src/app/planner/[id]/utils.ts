@@ -1,4 +1,6 @@
+import dayjs from "dayjs";
 import type { RecommendationSchedule } from "./types";
+import type { AddLoopDefaultValues } from "@/components/common/add-loop/constants";
 
 export function generateId() {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
@@ -13,16 +15,20 @@ export function delay(ms: number) {
   });
 }
 
+function formatDate(dateString: string): string {
+  const date = dayjs(dateString);
+  if (date.isValid()) {
+    return date.format("YYYY.MM.DD");
+  }
+  return dateString;
+}
+
 export function formatSchedule(schedule: RecommendationSchedule) {
   const { scheduleType, specificDate, startDate, endDate, daysOfWeek } =
     schedule;
 
   if (scheduleType === "NONE" && specificDate) {
-    return specificDate;
-  }
-
-  if (scheduleType === "DAILY" && startDate && endDate) {
-    return `${startDate} ~ ${endDate} · 매일`;
+    return formatDate(specificDate);
   }
 
   if (scheduleType === "WEEKLY" && daysOfWeek?.length) {
@@ -50,15 +56,43 @@ export function formatSchedule(schedule: RecommendationSchedule) {
       .join(", ");
 
     if (startDate && endDate) {
-      return `${startDate} ~ ${endDate} · ${korDays}`;
+      return `${korDays} | ${formatDate(startDate)} ~ ${formatDate(endDate)}`;
     }
 
     return korDays;
   }
 
+  if (scheduleType === "MONTHLY" && startDate && endDate) {
+    return `${formatDate(startDate)} ~ ${formatDate(endDate)} · 매달`;
+  }
+
+  if (scheduleType === "YEARLY" && startDate && endDate) {
+    return `${formatDate(startDate)} ~ ${formatDate(endDate)} · 매년`;
+  }
+
   if (startDate && endDate) {
-    return `${startDate} ~ ${endDate}`;
+    return `${formatDate(startDate)} ~ ${formatDate(endDate)}`;
   }
 
   return "일정 정보 없음";
+}
+
+export function recommendationToAddLoopDefaults(
+  recommendation: RecommendationSchedule
+): AddLoopDefaultValues {
+  const checklists =
+    recommendation.checklists?.map((text, index) => ({
+      id: generateId(),
+      text,
+    })) ?? [];
+
+  return {
+    title: recommendation.title,
+    scheduleType: recommendation.scheduleType,
+    specificDate: recommendation.specificDate,
+    daysOfWeek: recommendation.daysOfWeek,
+    startDate: recommendation.startDate,
+    endDate: recommendation.endDate,
+    checklists,
+  };
 }

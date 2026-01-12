@@ -1,21 +1,11 @@
 import { cn } from "@/lib/utils";
 import type { TeamCategoryString } from "./types";
-import { getTeamCategoryLabel, TEAM_CATEGORY_LABELS } from "./types";
+import { getTeamCategoryLabel, TEAM_CATEGORIES } from "./types";
 
 type TeamTypeSelectorProps = {
   selectedCategory: TeamCategoryString;
   onSelectCategory: (category: TeamCategoryString) => void;
 };
-
-const TEAM_CATEGORIES: TeamCategoryString[] = [
-  "PROJECT",
-  "CONTEST",
-  "STUDY",
-  "ROUTINE",
-  "CLUB",
-  "EXTERNALACTIVITY",
-  "ETC",
-];
 
 export function TeamTypeSelector({
   selectedCategory,
@@ -23,7 +13,7 @@ export function TeamTypeSelector({
 }: TeamTypeSelectorProps) {
   return (
     <div className="flex flex-col items-start gap-2 self-stretch">
-      <p className="text-xs font-medium leading-[140%] tracking-[-0.24px] text-[#A0A9B1]">
+      <p className="text-caption-r text-[var(--gray-500)]">
         팀 유형
       </p>
       <div className="flex w-full self-stretch items-center gap-[10px] flex-wrap">
@@ -35,10 +25,10 @@ export function TeamTypeSelector({
               type="button"
               onClick={() => onSelectCategory(category)}
               className={cn(
-                "flex items-center justify-center gap-[16px] rounded-[42.105px] px-3 py-[6px] text-sm font-semibold leading-[150%] tracking-[-0.28px] transition-colors whitespace-nowrap flex-[0_0_calc((100%-30px)/4)]",
+                "flex items-center justify-center gap-[16px] rounded-[42.105px] px-3 py-[6px] text-body-2-sb transition-colors whitespace-nowrap flex-[0_0_calc((100%-30px)/4)]",
                 isSelected
-                  ? "bg-[#FF7765] text-[#FFF]"
-                  : "bg-[#F0F2F3] text-[#C6CCD1]"
+                  ? "bg-[var(--primary-500)] text-[var(--gray-white)]"
+                  : "bg-[var(--gray-200)] text-[var(--gray-400)]"
               )}
             >
               {getTeamCategoryLabel(category)}

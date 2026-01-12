@@ -55,23 +55,9 @@ async function attemptTokenRefresh(): Promise<boolean> {
           },
         }
       );
-
       if (!refreshResponse.ok) {
         return false;
       }
-
-      const memberResponse = await fetchMemberProfile();
-
-      const userData = buildUserFromMemberProfile(memberResponse.data, {
-        id: "user",
-      });
-
-      store.dispatch(
-        setCredentials({
-          user: userData,
-        })
-      );
-
       return true;
     } catch (error) {
       return false;

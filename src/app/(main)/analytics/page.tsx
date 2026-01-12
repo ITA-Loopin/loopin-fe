@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Header from "@/components/common/Header";
 import { LoopReport } from "@/components/analytics/LoopReport";
 import type { LoopReportData, ReportStatus } from "@/types/report";
 import { fetchLoopReport } from "@/lib/report";
@@ -110,46 +111,44 @@ export default function AnalyticsPage() {
   };
 
   return (
-    <div className="relative flex flex-col min-h-screen -mt-6" style={getBackgroundStyle(status)}>
-      {/* NONE 상태를 제외한 모든 경우에 초록색 원형 오버레이 */}
-      {status !== "NONE" && (
-        <>
-          <div
-            className="absolute pointer-events-none rounded-[379.346px] bg-[#E7FFBA] blur-[67px] w-[379.346px] h-[379.018px] rotate-[-57.544deg] top-1/2 left-1/2"
-            style={{
-              opacity: status === "GOOD" ? 0.3 : 0.2,
-            }}
-          />
-          <div
-            className="absolute pointer-events-none rounded-[379.346px] bg-[#E7FFBA] blur-[67px] w-[379.346px] h-[219.725px] rotate-[-31.55deg] top-0 left-0"
-            style={{
-              opacity: status === "GOOD" ? 0.3 : 0.2,
-            }}
-          />
-        </>
-      )}
+    <>
+      <Header
+        leftType="none"
+        rightType="none"
+        centerTitle="루프 리포트"
+      />
+      <div className="relative flex flex-col" style={getBackgroundStyle(status)}>
+        {/* NONE 상태를 제외한 모든 경우에 초록색 원형 오버레이 */}
+        {status !== "NONE" && (
+          <>
+            <div
+              className="absolute pointer-events-none rounded-[379.346px] bg-[#E7FFBA] blur-[67px] w-[379.346px] h-[379.018px] rotate-[-57.544deg] top-1/2 left-1/2"
+              style={{
+                opacity: status === "GOOD" ? 0.3 : 0.2,
+              }}
+            />
+            <div
+              className="absolute pointer-events-none rounded-[379.346px] bg-[#E7FFBA] blur-[67px] w-[379.346px] h-[219.725px] rotate-[-31.55deg] top-0 left-0"
+              style={{
+                opacity: status === "GOOD" ? 0.3 : 0.2,
+              }}
+            />
+          </>
+        )}
 
-      {/* 페이지 헤더 - 고정 */}
-      <div className="relative flex w-full items-center justify-center px-6 pt-6 pb-4 border border-white bg-white/30 backdrop-blur-[7px]">
-        <div className="flex w-[328px] items-center justify-center">
-          <h1 className="text-center text-base font-semibold leading-[150%] tracking-[-0.32px] text-[#3A3D40]">
-            루프 리포트
-          </h1>
-        </div>
+        {isLoading ? (
+          <div className="relative flex items-center justify-center py-12">
+            <p className="text-sm text-[#8F8A87]">로딩 중...</p>
+          </div>
+        ) : (
+          <div className="relative">
+            <LoopReport
+              status={status}
+              data={data}
+            />
+          </div>
+        )}
       </div>
-
-      {isLoading ? (
-        <div className="relative flex items-center justify-center py-12">
-          <p className="text-sm text-[#8F8A87]">로딩 중...</p>
-        </div>
-      ) : (
-        <div className="relative">
-          <LoopReport
-            status={status}
-            data={data}
-          />
-        </div>
-      )}
-    </div>
+    </>
   );
 }

@@ -7,6 +7,7 @@ import { TeamTypeSelector } from "@/components/team/TeamTypeSelector";
 import { TeamNameInput } from "@/components/team/TeamNameInput";
 import { TeamGoalInput } from "@/components/team/TeamGoalInput";
 import { TeamMemberSearch } from "@/components/team/TeamMemberSearch";
+import { InvitedMemberList } from "@/components/team/InvitedMemberList";
 import { PrimaryButton } from "@/components/common/PrimaryButton";
 import type { TeamCategoryString } from "@/components/team/types";
 import { useCreateTeam } from "@/hooks/useCreateTeam";
@@ -33,6 +34,10 @@ export default function CreateTeamLoopPage() {
     setSearchValue("");
   };
 
+  const handleRemoveMember = (memberId: number) => {
+    setInvitedMembers(invitedMembers.filter((m) => m.id !== memberId));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -48,13 +53,8 @@ export default function CreateTeamLoopPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <div className="relative">
-        <Header leftType="back" rightType="user" onBack={() => router.back()} />
-        <h1 className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-base font-semibold leading-[150%] tracking-[-0.32px] text-[#3A3D40]">
-          팀 생성하기
-        </h1>
-      </div>
+    <div className="flex flex-col bg-[var(--gray-white)]">
+      <Header leftType="back" rightType="user" onBack={() => router.back()} centerTitle="팀 생성" />
 
       <form onSubmit={handleSubmit} className="flex-1 px-[16px] pt-[30px]">
         <div className="flex flex-col gap-10">
@@ -71,7 +71,11 @@ export default function CreateTeamLoopPage() {
             searchValue={searchValue}
             onSearchChange={setSearchValue}
             onInvite={handleInvite}
-            invitedMembers={invitedMembers}
+          />
+
+          <InvitedMemberList
+            members={invitedMembers}
+            onRemove={handleRemoveMember}
           />
 
           <div className="flex justify-center">
