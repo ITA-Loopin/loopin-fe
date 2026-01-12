@@ -31,8 +31,7 @@ function generateCalendarDays(startDate: Dayjs, endDate: Dayjs): Dayjs[] {
 function getDateState(
   date: Dayjs,
   visibleMonth: Dayjs,
-  selectedDate: Dayjs,
-  today: Dayjs
+  selectedDate: Dayjs
 ) {
   return {
     isCurrentMonth: date.isSame(visibleMonth, "month"),
@@ -58,9 +57,9 @@ export function MonthCalendar({
   const monthLabel = visibleMonth.format("YYYY년 M월");
   const startOfMonth = visibleMonth.startOf("month");
   const endOfMonth = visibleMonth.endOf("month");
-  const startOfCalendar = startOfMonth.startOf("week");
-  const endOfCalendar = endOfMonth.endOf("week");
-  const today = dayjs();
+  // 일요일 시작으로 고정 (DAY_NAMES와 일치)
+  const startOfCalendar = startOfMonth.subtract(startOfMonth.day(), "day");
+  const endOfCalendar = endOfMonth.add(6 - endOfMonth.day(), "day");
   const days = generateCalendarDays(startOfCalendar, endOfCalendar);
 
   return (
@@ -118,13 +117,12 @@ export function MonthCalendar({
               date,
               visibleMonth,
               selectedDate,
-              today
             );
             const isDisabled = minDate ? date.isBefore(minDate, "day") : false;
 
             return (
               <DayButton
-                key={date.toString()}
+                key={date.format("YYYY-MM-DD")}
                 date={date}
                 isCurrentMonth={isCurrentMonth}
                 isSelected={isSelected}
