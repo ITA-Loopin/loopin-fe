@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import dayjs from "dayjs";
-import "dayjs/locale/ko";
 import type { Dayjs } from "dayjs";
 import Header from "@/components/common/Header";
 import { AddLoopSheet } from "@/components/common/add-loop/AddLoopSheet";
@@ -11,12 +10,9 @@ import { MonthCalendar } from "@/components/calendar/MonthCalendar";
 import { AddLoopButton } from "@/components/calendar/AddLoopButton";
 import { useDailyLoops } from "@/hooks/useDailyLoops";
 
-dayjs.locale("ko");
-
 export default function CalendarPage() {
-  const today = useMemo(() => dayjs(), []);
-  const [selectedDate, setSelectedDate] = useState<Dayjs>(today);
-  const [visibleMonth, setVisibleMonth] = useState<Dayjs>(today.startOf("month"));
+  const [selectedDate, setSelectedDate] = useState<Dayjs>(() => dayjs());
+  const [visibleMonth, setVisibleMonth] = useState<Dayjs>(() => dayjs().startOf("month"));
 
   const selectedDateKey = useMemo(
     () => selectedDate.format("YYYY-MM-DD"),
@@ -37,7 +33,10 @@ export default function CalendarPage() {
 
   const handleSelectDate = (date: Dayjs) => {
     setSelectedDate(date);
-    setVisibleMonth(date.startOf("month"));
+    // 선택한 날짜가 현재 보이는 달과 다를 때 visibleMonth 업데이트
+    if (!date.isSame(visibleMonth, "month")) {
+      setVisibleMonth(date.startOf("month"));
+    }
   };
 
   const handleOpenAddLoopModal = () => {
@@ -57,8 +56,8 @@ export default function CalendarPage() {
     <>
       <div className="relative flex flex-col">
         <Header />
-        <main className="flex w-full flex-1 flex-col items-center gap-4 px-4 pb-8 pt-2">
-          <div className="w-full flex justify-center">
+        <main className="flex w-full flex-1 flex-col items-center gap-4 px-4">
+          <div className="flex justify-center w-full">
             <MonthCalendar
               visibleMonth={visibleMonth}
               selectedDate={selectedDate}
@@ -70,9 +69,8 @@ export default function CalendarPage() {
           <LoopList
             loops={loopList}
             isLoading={isLoading}
-            addButton={<AddLoopButton onClick={handleOpenAddLoopModal} />}
           />
-          {loopList.length > 0 && <AddLoopButton onClick={handleOpenAddLoopModal} />}
+          <AddLoopButton onClick={handleOpenAddLoopModal} />
 
         </main>
         <AddLoopSheet

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState, useRef } from "react";
 import { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import { DayButton } from "./DayButton";
@@ -36,6 +36,34 @@ export function MonthCalendar({
   onChangeMonth,
   minDate,
 }: MonthCalendarProps) {
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const minSwipeDistance = 50;
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      onChangeMonth(1); // 다음 달
+    }
+    if (isRightSwipe) {
+      onChangeMonth(-1); // 이전 달
+    }
+  };
+
   const { monthLabel, days } = useMemo(() => {
     const monthLabel = visibleMonth.format("YYYY년 M월");
     const startOfMonth = visibleMonth.startOf("month");
@@ -48,7 +76,12 @@ export function MonthCalendar({
   }, [visibleMonth]);
 
   return (
-    <section className="flex flex-col items-center gap-[24px] pb-6">
+    <section 
+      className="flex flex-col items-center gap-[24px] pb-6 transition-opacity duration-300 ease-in-out"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
       {/* 달력 헤더 */}
       <header className="grid grid-cols-[auto_auto_auto] items-center gap-[10px] justify-center mt-6 w-full">
         <button
@@ -81,7 +114,10 @@ export function MonthCalendar({
       {/* 겉 레이아웃 */}
       <div className="flex flex-col flex-shrink items-start w-full p-4 gap-[10px] rounded-[10px] bg-[var(--gray-white)]">
         {/* 안 레이아웃 - 요일과 날짜를 함께 감싸는 grid */}
-        <div className="grid w-full gap-y-6 gap-x-[25px] grid-cols-7 auto-rows-[21px] pb-[6px]">
+        <div 
+          key={visibleMonth.format("YYYY-MM")}
+          className="grid w-full gap-y-6 gap-x-[25px] grid-cols-7 auto-rows-[21px] pb-[6px] transition-opacity duration-300 ease-in-out"
+        >
           {/* 요일 */}
           {DAY_NAMES.map((day, index) => (
             <span
