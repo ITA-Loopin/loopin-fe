@@ -20,7 +20,7 @@ export function DayButton({
     <button
       type="button"
       onClick={() => {
-        if (!isDisabled) return;
+        if (isDisabled) return;
         onSelectDate(date);
       }}
       disabled={isDisabled}
