@@ -104,7 +104,7 @@ export async function fetchChatMessages({
   currentUser,
 }: FetchChatMessagesParams) {
   return apiFetch<ChatRoomMessagesResponse>(
-    `/rest-api/v1/chatmessage/${chatRoomId}`,
+    `/rest-api/v1/chat-message/${chatRoomId}`,
     {
       searchParams: buildQueryParams({
         page,
@@ -151,10 +151,10 @@ export async function sendChatMessage({
 export type ChatRoom = {
   id: number;
   ownerId: number;
-  title: string;
+  title: string | null;
   loopSelect: boolean;
-  lastMessageAt?: string;
-  lastReadAt?: string;
+  lastMessageAt?: string | null;
+  lastReadAt?: string | null;
 };
 
 export type ChatRoomListResponse = {
@@ -177,8 +177,14 @@ export type ChatRoomListResponse = {
   traceId?: string;
 };
 
-export async function fetchChatRooms() {
-  return apiFetch<ChatRoomListResponse>("/rest-api/v1/chat-room");
+export async function fetchChatRooms(
+  chatRoomType: "ALL" | "TEAM" | "AI" = "AI"
+) {
+  return apiFetch<ChatRoomListResponse>("/rest-api/v1/chat-room", {
+    searchParams: {
+      chatRoomType,
+    },
+  });
 }
 
 export type CreateChatRoomResponse = {
@@ -198,6 +204,7 @@ export type CreateChatRoomParams = {
 export async function createChatRoom(params: CreateChatRoomParams) {
   return apiFetch<CreateChatRoomResponse>("/rest-api/v1/chat-room/create", {
     method: "POST",
+    json: params,
   });
 }
 
@@ -209,24 +216,26 @@ function resolveSseBaseUrl() {
       return configured;
     }
 
-    return "https://api.loopin.co.kr/rest-api/v1/sse/subscribe";
+    return "https://api.loopin.co.kr";
   }
 
-  return "https://api.loopin.co.kr/rest-api/v1/sse/subscribe";
+  return "https://api.loopin.co.kr";
 }
 
-export type CreateChatSocketOptions = {
-  chatRoomId: number;
-  lastEventId?: string;
-  onMessage?: (event: SSEMessageEvent) => void;
-  onError?: (error: Event) => void;
-  onOpen?: () => void;
+export type SSEEventType = "CONNECT" | "MESSAGE";
+
+export type SSEEvent = {
+  id: string;
+  event: SSEEventType;
+  data: string | ChatMessageDto;
 };
 
-export type SSEMessageEvent = {
-  id: string | null;
-  event: string | null;
-  data: string;
+export type CreateSSEOptions = {
+  chatRoomId: number;
+  lastEventId?: string;
+  onMessage?: (event: MessageEvent) => void;
+  onError?: (error: Event) => void;
+  onOpen?: () => void;
 };
 
 export function createChatSocket({
@@ -235,114 +244,50 @@ export function createChatSocket({
   onMessage,
   onError,
   onOpen,
-}: CreateChatSocketOptions): AbortController {
-  const base = resolveSseBaseUrl();
+}: CreateSSEOptions): EventSource {
+  const baseUrl = resolveSseBaseUrl();
+  let url = `${baseUrl}/rest-api/v1/sse/subscribe/${chatRoomId}`;
 
-  if (!base) {
-    throw new Error("SSE 베이스 URL이 설정되지 않았습니다.");
-  }
+  // EventSource는 커스텀 헤더를 설정할 수 없으므로,
+  // Last-Event-ID가 필요한 경우 fetch를 사용해야 하지만,
+  // EventSource의 간편함을 위해 일단 EventSource를 사용하고
+  // 재연결 시 자동으로 lastEventId가 사용되도록 합니다.
+  // 초기 연결 시 lastEventId가 필요한 경우를 위해
+  // URL 파라미터로 전달하는 방법도 있지만, 표준은 헤더입니다.
 
-  const url = `${base}/${chatRoomId}`;
+  // EventSource는 withCredentials를 지원하므로 쿠키가 자동으로 전송됩니다.
+  const eventSource = new EventSource(url, {
+    withCredentials: true,
+  });
 
-  const abortController = new AbortController();
+  // EventSource는 재연결 시 자동으로 lastEventId를 사용하지만,
+  // 초기 연결 시에는 설정할 수 없습니다.
+  // 필요시 fetch + ReadableStream으로 변경할 수 있습니다.
 
-  // apiFetch 래퍼를 사용하여 SSE 연결
-  // parseJson: false로 설정하여 Response 객체를 직접 받아서 스트림 처리
-  apiFetch<Response>(url, {
-    method: "GET",
-    headers: {
-      Accept: "text/event-stream",
-    },
-    parseJson: false, // SSE는 JSON이 아닌 스트림이므로
-    signal: abortController.signal,
-  })
-    .then(async (response: Response) => {
-      if (!response.ok) {
-        throw new Error(`SSE 연결 실패: ${response.status}`);
-      }
+  // CONNECT 이벤트 처리
+  eventSource.addEventListener("CONNECT", (event: MessageEvent) => {
+    onOpen?.();
+  });
 
-      if (!response.body) {
-        throw new Error("응답 본문이 없습니다.");
-      }
+  // MESSAGE 이벤트 처리
+  eventSource.addEventListener("MESSAGE", (event: MessageEvent) => {
+    onMessage?.(event);
+  });
 
-      onOpen?.();
+  // 기본 message 이벤트도 처리 (이벤트 타입이 없는 경우)
+  eventSource.onmessage = (event: MessageEvent) => {
+    // event.type이 없으면 기본 message 이벤트
+    // 하지만 서버에서 명시적으로 event를 보내므로 이 핸들러는 거의 사용되지 않을 것입니다.
+    onMessage?.(event);
+  };
 
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
-      let currentEvent: SSEMessageEvent = {
-        id: null,
-        event: null,
-        data: "",
-      };
+  eventSource.onerror = (error: Event) => {
+    onError?.(error);
+  };
 
-      const processLine = (line: string) => {
-        if (line === "") {
-          // 빈 줄은 메시지 구분자
-          if (currentEvent.data || currentEvent.id || currentEvent.event) {
-            onMessage?.(currentEvent);
-          }
-          currentEvent = { id: null, event: null, data: "" };
-          return;
-        }
+  eventSource.onopen = () => {
+    onOpen?.();
+  };
 
-        const colonIndex = line.indexOf(":");
-        if (colonIndex === -1) {
-          return;
-        }
-
-        const field = line.slice(0, colonIndex).trim();
-        let value = line.slice(colonIndex + 1).trim();
-
-        // 값의 첫 공백 제거 (SSE 스펙)
-        if (value.startsWith(" ")) {
-          value = value.slice(1);
-        }
-
-        switch (field) {
-          case "id":
-            currentEvent.id = value;
-            break;
-          case "event":
-            currentEvent.event = value;
-            break;
-          case "data":
-            currentEvent.data += (currentEvent.data ? "\n" : "") + value;
-            break;
-        }
-      };
-
-      while (true) {
-        const { done, value } = await reader.read();
-
-        if (done) {
-          // 마지막 버퍼 처리
-          if (buffer) {
-            buffer.split("\n").forEach(processLine);
-            // 마지막 이벤트가 완전하지 않을 수 있지만, SSE 스펙상 빈 줄로 끝나므로 처리하지 않음
-          }
-          break;
-        }
-
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n");
-        buffer = lines.pop() || ""; // 마지막 불완전한 라인은 버퍼에 유지
-
-        lines.forEach(processLine);
-      }
-
-      // 마지막 이벤트가 완료되지 않은 경우 (빈 줄 없이 끝난 경우)
-      if (currentEvent.data || currentEvent.id || currentEvent.event) {
-        onMessage?.(currentEvent);
-      }
-    })
-    .catch((error) => {
-      if (error.name === "AbortError") {
-        // 정상적인 종료
-        return;
-      }
-      onError?.(error);
-    });
-
-  return abortController;
+  return eventSource;
 }
