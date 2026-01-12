@@ -92,17 +92,17 @@ export function MonthCalendar({
       </header>
 
       {/* 겉 레이아웃 */}
-      <div className="flex flex-col flex-shrink items-start w-full p-4 gap-[10px] rounded-[10px] bg-[var(--gray-white, #FFF)]">
+      <div className="flex flex-col flex-shrink items-start w-full p-4 gap-[10px] rounded-[10px] bg-[var(--gray-white)]">
         {/* 안 레이아웃 - 요일과 날짜를 함께 감싸는 grid */}
-        <div className="grid text-sm font-medium w-full max-w-[295px] sm:max-w-[500px] gap-y-6 gap-x-4 sm:gap-x-[25px] grid-cols-7 auto-rows-[21px] pb-4">
+        <div className="grid w-full gap-y-6 gap-x-[25px] grid-cols-7 auto-rows-[21px] pb-[6px]">
           {/* 요일 */}
           {DAY_NAMES.map((day, index) => (
             <span
               key={`${index}-${day}`}
-              className={`text-center text-sm font-semibold leading-[150%] tracking-[-0.28px] ${
+              className={`text-center text-body-2-sb ${
                 index === 0 
-                  ? "text-[#FF7765]" 
-                  : "text-[var(--gray-800,#3A3D40)]"
+                  ? "text-[var(--primary-main)]" 
+                  : "text-[var(--gray-800)]"
               }`}
             >
               {day}
@@ -111,7 +111,7 @@ export function MonthCalendar({
           
           {/* 날짜 */}
           {days.map((date) => {
-            const { isCurrentMonth, isSelected, isToday } = getDateState(
+            const { isCurrentMonth, isSelected } = getDateState(
               date,
               visibleMonth,
               selectedDate,
@@ -125,7 +125,6 @@ export function MonthCalendar({
                 date={date}
                 isCurrentMonth={isCurrentMonth}
                 isSelected={isSelected}
-                isToday={isToday}
                 isDisabled={isDisabled}
                 onSelectDate={onSelectDate}
               />

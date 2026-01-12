@@ -5,7 +5,6 @@ type DayButtonProps = {
   date: Dayjs;
   isCurrentMonth: boolean;
   isSelected: boolean;
-  isToday: boolean;
   isDisabled?: boolean;
   onSelectDate: (date: Dayjs) => void;
 };
@@ -14,7 +13,6 @@ export function DayButton({
   date,
   isCurrentMonth,
   isSelected,
-  isToday,
   isDisabled = false,
   onSelectDate,
 }: DayButtonProps) {
@@ -22,35 +20,23 @@ export function DayButton({
     <button
       type="button"
       onClick={() => {
-        if (!isDisabled) {
-          onSelectDate(date);
-        }
+        if (!isDisabled) return;
+        onSelectDate(date);
       }}
       disabled={isDisabled}
       className={cn(
-        "relative flex h-8 w-8 items-center justify-center justify-self-center rounded-full transition-all",
-        isDisabled
-          ? "cursor-not-allowed"
-          : isSelected
-            ? "bg-[var(--primary-500,#FF7765)]"
-            : isCurrentMonth
-              ? "hover:bg-[#FFE5DF]"
-              : ""
+        "flex h-8 w-8 items-center justify-center justify-self-center rounded-full transition-colors",
+        isDisabled && "cursor-not-allowed",
+        !isDisabled && isSelected && "bg-[var(--primary-500)]"
       )}
     >
-      {isToday && !isSelected ? (
-        <span className="absolute -z-[1] h-8 w-8 rounded-full border border-dashed border-[#FFB7AB]" />
-      ) : null}
       <span
         className={cn(
-          "text-center text-sm font-semibold leading-[150%] tracking-[-0.28px]",
-          isDisabled
-            ? "text-[var(--gray-300,#DDE0E3)]"
-            : isSelected
-              ? "text-[var(--gray-100,#F8F8F9)]"
-              : isCurrentMonth
-                ? "text-[var(--gray-800,#3A3D40)]"
-                : "text-[var(--gray-300,#DDE0E3)]"
+          "text-center text-body-2-sb",
+          isDisabled && "text-[var(--gray-300)]",
+          !isDisabled && isSelected && "text-[var(--gray-100)]",
+          !isDisabled && !isSelected && isCurrentMonth && "text-[var(--gray-800)]",
+          !isDisabled && !isSelected && !isCurrentMonth && "text-[var(--gray-300)]"
         )}
       >
         {date.date()}
