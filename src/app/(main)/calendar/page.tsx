@@ -10,7 +10,6 @@ import { LoopList } from "@/components/home";
 import { MonthCalendar } from "@/components/calendar/MonthCalendar";
 import { AddLoopButton } from "@/components/calendar/AddLoopButton";
 import { useDailyLoops } from "@/hooks/useDailyLoops";
-import { cn } from "@/lib/utils";
 
 dayjs.locale("ko");
 
@@ -56,23 +55,17 @@ export default function CalendarPage() {
 
   return (
     <>
-      <div
-        className="fixed inset-0 -z-10"
-        style={{
-          background:
-            "linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,228,224,0.35) 100%)",
-        }}
-      />
       <div className="relative flex flex-col">
         <Header />
         <main className="flex w-full flex-1 flex-col items-center gap-4 px-4 pb-8 pt-2">
-
-          <MonthCalendar
-            visibleMonth={visibleMonth}
-            selectedDate={selectedDate}
-            onSelectDate={handleSelectDate}
-            onChangeMonth={handleChangeMonth}
-          />
+          <div className="w-full flex justify-center">
+            <MonthCalendar
+              visibleMonth={visibleMonth}
+              selectedDate={selectedDate}
+              onSelectDate={handleSelectDate}
+              onChangeMonth={handleChangeMonth}
+            />
+          </div>
 
           <LoopList
             loops={loopList}
