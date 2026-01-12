@@ -6,6 +6,7 @@ type DayButtonProps = {
   isCurrentMonth: boolean;
   isSelected: boolean;
   isDisabled?: boolean;
+  hasLoop?: boolean;
   onSelectDate: (date: Dayjs) => void;
 };
 
@@ -14,6 +15,7 @@ export function DayButton({
   isCurrentMonth,
   isSelected,
   isDisabled = false,
+  hasLoop = false,
   onSelectDate,
 }: DayButtonProps) {
   return (
@@ -25,7 +27,7 @@ export function DayButton({
       }}
       disabled={isDisabled}
       className={cn(
-        "flex h-8 w-8 items-center justify-center justify-self-center rounded-full transition-colors",
+        "relative flex h-8 w-8 items-center justify-center justify-self-center rounded-full transition-colors",
         isDisabled && "cursor-not-allowed",
         !isDisabled && isSelected && "bg-[var(--primary-500)]"
       )}
@@ -41,6 +43,23 @@ export function DayButton({
       >
         {date.date()}
       </span>
+      {hasLoop && (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="4"
+          height="4"
+          viewBox="0 0 4 4"
+          fill="none"
+          className="absolute bottom-0.5"
+        >
+          <circle 
+            cx="2" 
+            cy="2" 
+            r="2" 
+            fill={isCurrentMonth ? "var(--primary-500)" : "var(--gray-300)"} 
+          />
+        </svg>
+      )}
     </button>
   );
 }

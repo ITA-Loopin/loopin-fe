@@ -1,6 +1,5 @@
-import { useMemo, useState, useRef } from "react";
+import { useMemo, useState } from "react";
 import { Dayjs } from "dayjs";
-import dayjs from "dayjs";
 import { DayButton } from "./DayButton";
 
 const DAY_NAMES = ["S", "M", "T", "W", "T", "F", "S"];
@@ -27,6 +26,7 @@ type MonthCalendarProps = {
   onSelectDate: (date: Dayjs) => void;
   onChangeMonth: (offset: number) => void;
   minDate?: Dayjs;
+  loopDays?: Map<string, boolean>;
 };
 
 export function MonthCalendar({
@@ -35,6 +35,7 @@ export function MonthCalendar({
   onSelectDate,
   onChangeMonth,
   minDate,
+  loopDays = new Map(),
 }: MonthCalendarProps) {
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
@@ -137,6 +138,7 @@ export function MonthCalendar({
             const isCurrentMonth = date.isSame(visibleMonth, "month");
             const isSelected = date.isSame(selectedDate, "day");
             const isDisabled = minDate ? date.isBefore(minDate, "day") : false;
+            const hasLoop = loopDays.get(date.format("YYYY-MM-DD")) ?? false;
 
             return (
               <DayButton
@@ -145,6 +147,7 @@ export function MonthCalendar({
                 isCurrentMonth={isCurrentMonth}
                 isSelected={isSelected}
                 isDisabled={isDisabled}
+                hasLoop={hasLoop}
                 onSelectDate={onSelectDate}
               />
             );

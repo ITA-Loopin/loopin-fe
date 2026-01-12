@@ -9,6 +9,7 @@ import { LoopList } from "@/components/home";
 import { MonthCalendar } from "@/components/calendar/MonthCalendar";
 import { AddLoopButton } from "@/components/calendar/AddLoopButton";
 import { useDailyLoops } from "@/hooks/useDailyLoops";
+import { useCalendarLoops } from "@/hooks/useCalendarLoops";
 
 export default function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState<Dayjs>(() => dayjs());
@@ -23,6 +24,11 @@ export default function CalendarPage() {
 
   const { loopList, isLoading } = useDailyLoops({
     date: selectedDateKey,
+    refreshKey,
+  });
+  const { loopDays } = useCalendarLoops({
+    year: visibleMonth.year(),
+    month: visibleMonth.month() + 1, // dayjs month는 0-based이므로 +1
     refreshKey,
   });
   const [isAddLoopModalOpen, setIsAddLoopModalOpen] = useState(false);
@@ -63,6 +69,7 @@ export default function CalendarPage() {
               selectedDate={selectedDate}
               onSelectDate={handleSelectDate}
               onChangeMonth={handleChangeMonth}
+              loopDays={loopDays}
             />
           </div>
 
