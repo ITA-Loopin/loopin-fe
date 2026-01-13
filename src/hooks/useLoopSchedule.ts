@@ -1,11 +1,17 @@
 import { useCallback, useEffect, useState } from "react";
-import { DayOption, WEEKDAY_OPTIONS } from "@/components/common/add-loop/constants";
+import {
+  DayOption,
+  RepeatValue,
+  ScheduleType,
+  Weekday,
+  WEEKDAY_OPTIONS,
+} from "@/components/common/add-loop/constants";
 
 interface UseLoopScheduleProps {
   isOpen: boolean;
-  defaultScheduleType?: string;
-  defaultDaysOfWeek?: string[];
-  onScheduleTypeChange?: (scheduleType: string) => void;
+  defaultScheduleType?: RepeatValue;
+  defaultDaysOfWeek?: Weekday[];
+  onScheduleTypeChange?: (scheduleType: RepeatValue) => void;
 }
 
 export function useLoopSchedule({
@@ -14,8 +20,8 @@ export function useLoopSchedule({
   defaultDaysOfWeek,
   onScheduleTypeChange,
 }: UseLoopScheduleProps) {
-  const [scheduleType, setScheduleType] = useState("");
-  const [daysOfWeek, setDaysOfWeek] = useState<string[]>([]);
+  const [scheduleType, setScheduleType] = useState<ScheduleType>("");
+  const [daysOfWeek, setDaysOfWeek] = useState<Weekday[]>([]);
   const [isWeeklyDropdownOpen, setIsWeeklyDropdownOpen] = useState(false);
 
   useEffect(() => {
@@ -23,12 +29,12 @@ export function useLoopSchedule({
 
     setScheduleType(defaultScheduleType ?? "");
     setDaysOfWeek(defaultDaysOfWeek ?? []);
-    const shouldOpenWeeklyDropdown = (defaultScheduleType ?? "") === "WEEKLY";
+    const shouldOpenWeeklyDropdown = defaultScheduleType === "WEEKLY";
     setIsWeeklyDropdownOpen(shouldOpenWeeklyDropdown);
   }, [isOpen, defaultScheduleType, defaultDaysOfWeek]);
 
   const handleScheduleTypeClick = useCallback(
-    (value: string) => {
+    (value: RepeatValue) => {
       if (value === "WEEKLY") {
         if (scheduleType === "WEEKLY") {
           setIsWeeklyDropdownOpen((prev) => !prev);

@@ -2,22 +2,18 @@
 
 import { useMemo, useState } from "react";
 import dayjs from "dayjs";
-import "dayjs/locale/ko";
 import type { Dayjs } from "dayjs";
 import Header from "@/components/common/Header";
 import { AddLoopSheet } from "@/components/common/add-loop/AddLoopSheet";
 import { LoopList } from "@/components/home";
 import { MonthCalendar } from "@/components/calendar/MonthCalendar";
-import { AddLoopButton } from "@/components/calendar/AddLoopButton";
+import { PrimaryButton } from "@/components/common/PrimaryButton";
 import { useDailyLoops } from "@/hooks/useDailyLoops";
-import { cn } from "@/lib/utils";
-
-dayjs.locale("ko");
+import { useCalendarLoops } from "@/hooks/useCalendarLoops";
 
 export default function CalendarPage() {
-  const today = useMemo(() => dayjs(), []);
-  const [selectedDate, setSelectedDate] = useState<Dayjs>(today);
-  const [visibleMonth, setVisibleMonth] = useState<Dayjs>(today.startOf("month"));
+  const [selectedDate, setSelectedDate] = useState<Dayjs>(() => dayjs());
+  const [visibleMonth, setVisibleMonth] = useState<Dayjs>(() => dayjs().startOf("month"));
 
   const selectedDateKey = useMemo(
     () => selectedDate.format("YYYY-MM-DD"),
@@ -30,6 +26,11 @@ export default function CalendarPage() {
     date: selectedDateKey,
     refreshKey,
   });
+  const { loopDays } = useCalendarLoops({
+    year: visibleMonth.year(),
+    month: visibleMonth.month() + 1, // dayjs month는 0-based이므로 +1
+    refreshKey,
+  });
   const [isAddLoopModalOpen, setIsAddLoopModalOpen] = useState(false);
 
   const handleChangeMonth = (offset: number) => {
@@ -38,7 +39,10 @@ export default function CalendarPage() {
 
   const handleSelectDate = (date: Dayjs) => {
     setSelectedDate(date);
-    setVisibleMonth(date.startOf("month"));
+    // 선택한 날짜가 현재 보이는 달과 다를 때 visibleMonth 업데이트
+    if (!date.isSame(visibleMonth, "month")) {
+      setVisibleMonth(date.startOf("month"));
+    }
   };
 
   const handleOpenAddLoopModal = () => {
@@ -56,30 +60,26 @@ export default function CalendarPage() {
 
   return (
     <>
-      <div
-        className="fixed inset-0 -z-10"
-        style={{
-          background:
-            "linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,228,224,0.35) 100%)",
-        }}
-      />
       <div className="relative flex flex-col">
         <Header />
-        <main className="flex w-full flex-1 flex-col items-center gap-4 px-4 pb-8 pt-2">
-
-          <MonthCalendar
-            visibleMonth={visibleMonth}
-            selectedDate={selectedDate}
-            onSelectDate={handleSelectDate}
-            onChangeMonth={handleChangeMonth}
-          />
+        <main className="flex w-full flex-1 flex-col items-center gap-4 px-4 pb-4">
+          <div className="flex justify-center w-full">
+            <MonthCalendar
+              visibleMonth={visibleMonth}
+              selectedDate={selectedDate}
+              onSelectDate={handleSelectDate}
+              onChangeMonth={handleChangeMonth}
+              loopDays={loopDays}
+            />
+          </div>
 
           <LoopList
             loops={loopList}
             isLoading={isLoading}
-            addButton={<AddLoopButton onClick={handleOpenAddLoopModal} />}
           />
-          {loopList.length > 0 && <AddLoopButton onClick={handleOpenAddLoopModal} />}
+          <PrimaryButton variant="secondary" onClick={handleOpenAddLoopModal}>
+            루프 추가하기
+          </PrimaryButton>
 
         </main>
         <AddLoopSheet
