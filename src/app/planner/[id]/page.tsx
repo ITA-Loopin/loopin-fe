@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { MessageBubble } from "./components/MessageBubble";
@@ -13,14 +13,18 @@ import { fetchChatRooms } from "@/lib/chat";
 import { AddLoopSheet } from "@/components/common/add-loop/AddLoopSheet";
 import { recommendationToAddLoopDefaults } from "./utils";
 import type { RecommendationSchedule } from "./types";
+import { UPDATE_MESSAGE } from "./constants";
 import GroupIcon from "@/../public/Group.svg";
+import RetryIcon from "@/../public/retry.svg";
 const MESSAGE_EXTRA_SPACE = 32;
 const INPUT_CONTAINER_HEIGHT = 192;
 
 export default function PlannerChatPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const chatRoomId = params?.id ? Number(params.id) : null;
+  const isNewChatRoom = searchParams.get("new") === "true";
   const [chatRoomTitle, setChatRoomTitle] = useState<string>("채팅방 이름");
   const [isAddLoopSheetOpen, setIsAddLoopSheetOpen] = useState(false);
   const [selectedRecommendation, setSelectedRecommendation] =
@@ -37,7 +41,10 @@ export default function PlannerChatPage() {
     handleInputChange,
     handleSubmit,
     handleRetry,
-  } = usePlannerChat(chatRoomId);
+    showUpdateMessage,
+  } = usePlannerChat(chatRoomId, isNewChatRoom);
+
+  const isExistingChatRoom = !isNewChatRoom;
 
   type PlannerFormValues = { prompt: string };
 
@@ -80,7 +87,9 @@ export default function PlannerChatPage() {
     fetchChatRoomTitle();
   }, [chatRoomId]);
 
-  const handleSelectRecommendation = (recommendation: RecommendationSchedule) => {
+  const handleSelectRecommendation = (
+    recommendation: RecommendationSchedule
+  ) => {
     setSelectedRecommendation(recommendation);
     setIsAddLoopSheetOpen(true);
   };
@@ -167,21 +176,38 @@ export default function PlannerChatPage() {
                 />
               ))}
 
-              <div className="mt-4 flex gap-2 rounded-sm bg-[#DDE0E3] px-4 py-3 w-fit justify-self-center">
-                <Image src={GroupIcon} alt="group" width={12} height={12} />
-                <button
-                  type="button"
-                  onClick={handleRetry}
-                  className="text-xs font-semibold text-[#737980]"
-                >
-                  다시 생성하기
-                </button>
-              </div>
+              {showUpdateMessage && (
+                <MessageBubble
+                  message={{
+                    id: "update-message",
+                    author: "assistant",
+                    content: UPDATE_MESSAGE,
+                  }}
+                />
+              )}
+
+              {!showUpdateMessage && (
+                <div className="mt-4 flex gap-2 rounded-sm bg-[#DDE0E3] px-4 py-3 w-fit justify-self-center">
+                  <Image
+                    src={isExistingChatRoom ? RetryIcon : GroupIcon}
+                    alt=""
+                    width={12}
+                    height={12}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleRetry}
+                    className="text-xs font-semibold text-[#737980]"
+                  >
+                    {isExistingChatRoom ? "루프 수정하기" : "다시 생성하기"}
+                  </button>
+                </div>
+              )}
             </div>
           ) : null}
         </div>
 
-        {isInputVisible && recommendations.length === 0 ? (
+        {isInputVisible && (showUpdateMessage || recommendations.length === 0) ? (
           <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center">
             <div className="pointer-events-auto w-full max-w-xl bg-white p-4 pb-6">
               {exampleLabel ? (
@@ -196,10 +222,18 @@ export default function PlannerChatPage() {
               >
                 <textarea
                   {...register("prompt")}
-                  placeholder="만들고 싶은 루프를 입력해주세요."
+                  placeholder={
+                    isExistingChatRoom
+                      ? "수정하고 싶은 루프 내용을 입력해주세요."
+                      : "만들고 싶은 루프를 입력해주세요."
+                  }
                   rows={1}
                   className="max-h-32 flex-1 border-none text-sm text-[#2C2C2C] outline-none"
-                  aria-label="루프 생성 요청 입력란"
+                  aria-label={
+                    isExistingChatRoom
+                      ? "루프 수정 요청 입력란"
+                      : "루프 생성 요청 입력란"
+                  }
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
@@ -246,6 +280,7 @@ export default function PlannerChatPage() {
         onCreated={() => {
           setIsAddLoopSheetOpen(false);
           setSelectedRecommendation(null);
+          router.push("/home");
         }}
       />
     </div>

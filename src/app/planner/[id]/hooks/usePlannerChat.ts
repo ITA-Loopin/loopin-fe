@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   EXAMPLE_PROMPTS,
   INITIAL_MESSAGE,
+  UPDATE_MESSAGE,
   LOOP_RESULT_PROMPT,
 } from "../constants";
 import type { ChatMessage, RecommendationSchedule } from "../types";
@@ -69,7 +70,10 @@ function normalizeChatMessages(input: unknown): ChatMessageDto[] {
   return [];
 }
 
-export function usePlannerChat(chatRoomId?: number | null) {
+export function usePlannerChat(
+  chatRoomId?: number | null,
+  isNewChatRoom?: boolean
+) {
   const { user } = useAppSelector((state) => state.auth);
   const [messages, setMessages] = useState<ChatMessage[]>([
     { id: generateId(), author: "assistant", content: INITIAL_MESSAGE },
@@ -80,6 +84,7 @@ export function usePlannerChat(chatRoomId?: number | null) {
   const [recommendations, setRecommendations] = useState<
     RecommendationSchedule[]
   >([]);
+  const [showUpdateMessage, setShowUpdateMessage] = useState(false);
   const messageListRef = useRef<HTMLDivElement | null>(null);
   const seenMessageIdsRef = useRef<Set<string>>(new Set());
   const pendingUserMessageIdsRef = useRef<Map<string, string[]>>(new Map());
@@ -99,7 +104,6 @@ export function usePlannerChat(chatRoomId?: number | null) {
     const parsed = Number(user.chatRoomId);
     return Number.isFinite(parsed) ? parsed : null;
   }, [chatRoomId, user?.chatRoomId]);
-
 
   useEffect(() => {
     if (!messageListRef.current) return;
@@ -230,7 +234,14 @@ export function usePlannerChat(chatRoomId?: number | null) {
     });
 
     if (newlyAdded.length) {
-      setMessages((prev) => [...prev, ...newlyAdded]);
+      setMessages((prev) => {
+        // 히스토리 메시지가 있으면 초기 메시지(INITIAL_MESSAGE) 제거
+        const filteredPrev = prev.filter(
+          (msg) =>
+            msg.content !== INITIAL_MESSAGE && msg.content !== UPDATE_MESSAGE
+        );
+        return [...filteredPrev, ...newlyAdded];
+      });
     }
 
     if (recommendationsToApply) {
@@ -362,7 +373,26 @@ export function usePlannerChat(chatRoomId?: number | null) {
         });
 
         if (!isCancelled) {
-          appendNewMessages(response.data);
+          const hasHistory = appendNewMessages(response.data);
+          // 기존 채팅방이고 히스토리가 있으면 UPDATE_MESSAGE 추가
+          if (isNewChatRoom === false && hasHistory !== "none") {
+            setMessages((prev) => {
+              const hasUpdateMessage = prev.some(
+                (msg) => msg.content === UPDATE_MESSAGE
+              );
+              if (!hasUpdateMessage) {
+                return [
+                  ...prev,
+                  {
+                    id: generateId(),
+                    author: "assistant",
+                    content: UPDATE_MESSAGE,
+                  },
+                ];
+              }
+              return prev;
+            });
+          }
         }
       } catch (error) {
         if (!isCancelled) {
@@ -376,7 +406,7 @@ export function usePlannerChat(chatRoomId?: number | null) {
     return () => {
       isCancelled = true;
     };
-  }, [plannerChatRoomId, appendNewMessages]);
+  }, [plannerChatRoomId, appendNewMessages, isNewChatRoom]);
 
   useEffect(() => {
     initializeSSE();
@@ -408,7 +438,7 @@ export function usePlannerChat(chatRoomId?: number | null) {
 
       const queue = pendingUserMessageIdsRef.current.get(trimmed) ?? [];
       pendingUserMessageIdsRef.current.set(trimmed, [...queue, userMessage.id]);
-      
+
       if (!plannerChatRoomId) {
         setMessages((prev) => [
           ...prev,
@@ -458,7 +488,7 @@ export function usePlannerChat(chatRoomId?: number | null) {
           chatRoomId: plannerChatRoomId,
           clientMessageId: userMessage.id,
           content: trimmed,
-          messageType: "CREATE_LOOP",
+          messageType: isNewChatRoom === false ? "UPDATE_LOOP" : "CREATE_LOOP",
         });
       } catch (error) {
         console.error("루프 추천 요청 실패", error);
@@ -487,13 +517,14 @@ export function usePlannerChat(chatRoomId?: number | null) {
         }
       }
     },
-    [isLoading, plannerChatRoomId, initializeSSE]
+    [isLoading, plannerChatRoomId, initializeSSE, isNewChatRoom]
   );
 
   const handleRetry = useCallback(() => {
-    setRecommendations([]);
+    // 추천 카드는 유지하고, UPDATE_MESSAGE를 추천 카드 아래에 표시
     setIsLoading(false);
     setIsInputVisible(true);
+    setShowUpdateMessage(true);
   }, []);
 
   return {
@@ -507,6 +538,7 @@ export function usePlannerChat(chatRoomId?: number | null) {
     handleInputChange,
     handleSubmit,
     handleRetry,
+    showUpdateMessage,
   };
 }
 
