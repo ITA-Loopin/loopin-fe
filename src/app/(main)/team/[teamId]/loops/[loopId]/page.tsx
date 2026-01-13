@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Header from "@/components/common/Header";
 import { useChecklist } from "@/hooks/useChecklist";
 import { useLoopActions } from "@/hooks/useLoopActions";
@@ -9,17 +9,25 @@ import { TeamLoopDetailContent } from "@/components/team/TeamLoopDetailContent";
 import { LoopActionModal } from "@/components/loop/LoopActionModal";
 import { LoopEditSheet } from "@/components/loop/LoopEditSheet";
 import { LoopGroupEditSheet } from "@/components/loop/LoopGroupEditSheet";
-import { fetchTeamLoops, fetchTeamLoopChecklists, fetchTeamLoopMyDetail, type TeamLoopApiItem } from "@/lib/team";
+import { fetchTeamLoops, fetchTeamLoopChecklists, fetchTeamLoopMyDetail, fetchTeamLoopAllDetail, type TeamLoopApiItem } from "@/lib/team";
 import type { LoopDetail } from "@/types/loop";
 
 export default function TeamLoopDetailPage() {
   const params = useParams<{ teamId: string; loopId: string }>();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const teamId = Number(params?.teamId);
   const loopId = Number(params?.loopId);
+  const view = searchParams?.get("view") || "my"; // 기본값은 "my"
 
   const [detail, setDetail] = useState<LoopDetail | null>(null);
   const [teamLoopData, setTeamLoopData] = useState<TeamLoopApiItem | null>(null);
+  const [memberProgresses, setMemberProgresses] = useState<Array<{
+    memberId: number;
+    nickname: string;
+    status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
+    progress: number;
+  }>>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
@@ -48,50 +56,101 @@ export default function TeamLoopDetailPage() {
         setIsLoading(true);
         setErrorMessage(null);
 
-        // 내 루프 상세 정보 가져오기
-        const myDetail = await fetchTeamLoopMyDetail(teamId, loopId);
-        if (cancelled) return;
+        if (view === "team") {
+          // 팀 루프 상세 정보 가져오기
+          const allDetail = await fetchTeamLoopAllDetail(teamId, loopId);
+          if (cancelled) return;
 
-        // TeamLoopApiItem 형태로 변환 (기존 코드 호환성)
-        const teamLoopData: TeamLoopApiItem = {
-          id: myDetail.id,
-          title: myDetail.title,
-          loopDate: myDetail.loopDate,
-          type: myDetail.type,
-          importance: myDetail.importance,
-          teamProgress: 0, // 내 루프 API에는 팀 진행률이 없음
-          personalProgress: myDetail.personalProgress,
-          isParticipating: true,
-          repeatCycle: myDetail.repeatCycle,
-        };
-        setTeamLoopData(teamLoopData);
+          // TeamLoopApiItem 형태로 변환
+          const teamLoopData: TeamLoopApiItem = {
+            id: allDetail.id,
+            title: allDetail.title,
+            loopDate: allDetail.loopDate,
+            type: allDetail.type,
+            importance: allDetail.importance,
+            teamProgress: allDetail.teamProgress,
+            personalProgress: 0, // 팀 루프 API에는 개인 진행률이 없음
+            isParticipating: false,
+            repeatCycle: allDetail.repeatCycle,
+          };
+          setTeamLoopData(teamLoopData);
 
-        // 체크리스트 변환
-        const checklists = myDetail.checklists
-          .map((item) => ({
-            id: item.checklistId,
-            content: item.content,
-            completed: item.isCompleted,
-          }))
-          .sort((a, b) => a.id - b.id);
+          // 팀원별 진행 상황 저장
+          setMemberProgresses(allDetail.memberProgresses);
 
-        if (cancelled) return;
+          // 체크리스트 변환 (팀 루프 API는 completed 정보가 없음)
+          const checklists = allDetail.checklists
+            .map((item) => ({
+              id: item.checklistId,
+              content: item.content,
+              completed: false, // 팀 루프 API에는 완료 정보가 없음
+            }))
+            .sort((a, b) => a.id - b.id);
 
-        // 진행률 계산 (API에서 받은 personalProgress 사용)
-        const normalizedProgress = Math.round(
-          Math.min(Math.max(myDetail.personalProgress * 100, 0), 100)
-        );
+          if (cancelled) return;
 
-        // LoopDetail 형태로 변환
-        setDetail({
-          id: myDetail.id,
-          title: myDetail.title,
-          content: null,
-          loopDate: myDetail.loopDate,
-          progress: normalizedProgress,
-          checklists,
-          loopRule: undefined,
-        });
+          // 진행률 계산 (API에서 받은 teamProgress 사용)
+          const normalizedProgress = Math.round(
+            Math.min(Math.max(allDetail.teamProgress * 100, 0), 100)
+          );
+
+          // LoopDetail 형태로 변환
+          setDetail({
+            id: allDetail.id,
+            title: allDetail.title,
+            content: null,
+            loopDate: allDetail.loopDate,
+            progress: normalizedProgress,
+            checklists,
+            loopRule: undefined,
+          });
+        } else {
+          // 내 루프 상세 정보 가져오기
+          const myDetail = await fetchTeamLoopMyDetail(teamId, loopId);
+          if (cancelled) return;
+
+          // TeamLoopApiItem 형태로 변환 (기존 코드 호환성)
+          const teamLoopData: TeamLoopApiItem = {
+            id: myDetail.id,
+            title: myDetail.title,
+            loopDate: myDetail.loopDate,
+            type: myDetail.type,
+            importance: myDetail.importance,
+            teamProgress: 0, // 내 루프 API에는 팀 진행률이 없음
+            personalProgress: myDetail.personalProgress,
+            isParticipating: true,
+            repeatCycle: myDetail.repeatCycle,
+          };
+          setTeamLoopData(teamLoopData);
+          setMemberProgresses([]); // 내 루프 탭에서는 팀원별 진행 상황 없음
+
+          // 체크리스트 변환
+          const checklists = myDetail.checklists
+            .map((item) => ({
+              id: item.checklistId,
+              content: item.content,
+              completed: item.isCompleted,
+            }))
+            .sort((a, b) => a.id - b.id);
+
+          if (cancelled) return;
+
+          // 진행률 계산 (API에서 받은 personalProgress 사용)
+          const normalizedProgress = Math.round(
+            Math.min(Math.max(myDetail.personalProgress * 100, 0), 100)
+          );
+
+          // LoopDetail 형태로 변환
+          setDetail({
+            id: myDetail.id,
+            title: myDetail.title,
+            content: null,
+            loopDate: myDetail.loopDate,
+            progress: normalizedProgress,
+            checklists,
+            loopRule: undefined,
+          });
+        }
       } catch (err) {
         if (!cancelled) {
           console.error("팀 루프 상세 정보 조회 실패", err);
@@ -110,7 +169,7 @@ export default function TeamLoopDetailPage() {
     return () => {
       cancelled = true;
     };
-  }, [teamId, loopId, reloadKey]);
+  }, [teamId, loopId, reloadKey, view]);
 
   const reload = () => {
     setReloadKey((prev) => prev + 1);
@@ -177,6 +236,7 @@ export default function TeamLoopDetailPage() {
             <TeamLoopDetailContent
               detail={detail}
               teamLoopData={teamLoopData || undefined}
+              memberProgresses={view === "team" ? memberProgresses : undefined}
               newChecklistContent={checklist.newChecklistContent}
               onNewChecklistContentChange={checklist.setNewChecklistContent}
               onToggleChecklist={checklist.handleToggleChecklist}

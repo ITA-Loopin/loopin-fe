@@ -415,3 +415,62 @@ export async function fetchTeamLoopMyDetail(
 
   return response.data;
 }
+
+/**
+ * 팀 루프 상세 조회 (팀 루프) API 응답 타입
+ */
+export type TeamLoopAllDetailApiResponse = {
+  success: boolean;
+  code: string;
+  message: string;
+  data: {
+    id: number;
+    title: string;
+    loopDate: string;
+    type: "COMMON" | "INDIVIDUAL";
+    repeatCycle: string;
+    importance: "HIGH" | "MEDIUM" | "LOW";
+    status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
+    teamProgress: number;
+    totalChecklistCount: number;
+    checklists: Array<{
+      checklistId: number;
+      content: string;
+    }>;
+    memberProgresses: Array<{
+      memberId: number;
+      nickname: string;
+      status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
+      progress: number;
+    }>;
+  };
+  page: {
+    page: number;
+    size: number;
+    totalPages: number;
+    totalElements: number;
+    first: boolean;
+    last: boolean;
+    hasNext: boolean;
+  };
+  timestamp: string;
+  traceId: string;
+};
+
+/**
+ * 팀 루프 상세 조회 (팀 루프) API
+ */
+export async function fetchTeamLoopAllDetail(
+  teamId: number,
+  loopId: number
+): Promise<TeamLoopAllDetailApiResponse["data"]> {
+  const response = await apiFetch<TeamLoopAllDetailApiResponse>(
+    `/rest-api/v1/teams/${teamId}/loops/${loopId}/all`
+  );
+
+  if (!response.success || !response.data) {
+    throw new Error(response.message || "팀 루프 상세 정보 조회에 실패했습니다");
+  }
+
+  return response.data;
+}

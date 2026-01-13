@@ -78,9 +78,10 @@ export function TeamLoopList({ loops, isLoading, activeTab, teamId }: TeamLoopLi
                 key={loop.id}
                 className="flex items-center justify-between p-4 rounded-[10px] bg-[var(--gray-white)] cursor-pointer"
                 onClick={() => {
-                  if (activeTab === "my" && teamId) {
-                    // 내 루프 탭: 팀 루프 상세 페이지로 이동
-                    router.push(`/team/${teamId}/loops/${loop.id}`);
+                  if (teamId) {
+                    // 내 루프 탭 또는 팀 루프 탭: 팀 루프 상세 페이지로 이동 (탭 정보를 쿼리로 전달)
+                    const tabParam = activeTab === "my" ? "?view=my" : "?view=team";
+                    router.push(`/team/${teamId}/loops/${loop.id}${tabParam}`);
                   } else {
                     // 팀 루프 탭: 개별 루프 상세 페이지로 이동
                     router.push(`/loops/${loop.id}`);
