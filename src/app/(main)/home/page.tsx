@@ -233,10 +233,8 @@ export default function HomePage() {
 
               {/* 말풍선 형태의 메시지 */}
               <div className="relative flex items-center justify-center">
-                <div className="relative rounded-lg bg-white/90 px-4 py-3 text-sm font-semibold text-[#FF7765] shadow-[0px_2px_8px_rgba(0,0,0,0.1)]">
+                <div className="relative rounded-lg bg-white/90 px-4 py-3 text-body-2-b text-[var(--primary-main)] shadow-[0_0_7px_0_rgba(0,0,0,0.05)] before:content-[''] before:absolute before:-top-[6px] before:left-1/2 before:-translate-x-1/2 before:w-0 before:h-0 before:border-l-[6px] before:border-r-[6px] before:border-b-[6px] before:border-l-transparent before:border-r-transparent before:border-b-white/90">
                   <span>오늘 하루의 루프를 모두 채워보세요!</span>
-                  {/* 위쪽 삼각형 포인터 */}
-                  <div className="absolute -top-2 left-1/2 h-0 w-0 -translate-x-1/2 transform border-l-[8px] border-r-[8px] border-b-[8px] border-l-transparent border-r-transparent border-b-[rgba(255,255,255,0.9)] drop-shadow-[0px_2px_4px_rgba(0,0,0,0.1)]"></div>
                 </div>
               </div>
 
