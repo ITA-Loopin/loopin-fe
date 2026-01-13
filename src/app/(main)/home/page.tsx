@@ -120,7 +120,7 @@ export default function HomePage() {
             "linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 228, 224, 0.3) 100%)",
         }}
       />
-      <div className="flex flex-col relative min-h-screen">
+      <div className="flex flex-col relative min-h-screen overflow-x-hidden">
       {/* 오른쪽 위 디자인 요소 */}
       <div
         className="absolute top-0 right-0 -z-10"
