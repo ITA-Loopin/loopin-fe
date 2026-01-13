@@ -162,9 +162,10 @@ export function TeamLoopDetailContent({
           <div className="flex flex-col gap-3">
             {memberProgresses.map((member) => {
               // API 응답 상태를 기준으로 프로그레스 계산
+              // member.progress는 이미 0-100 범위의 퍼센트 (체크리스트 기반)
               const progressPercent = 
                 member.status === "COMPLETED" ? 100 :
-                member.status === "IN_PROGRESS" ? Math.round(member.progress * 100) :
+                member.status === "IN_PROGRESS" ? Math.round(Math.min(Math.max(member.progress, 0), 100)) :
                 0; // NOT_STARTED
               
               const statusText = 

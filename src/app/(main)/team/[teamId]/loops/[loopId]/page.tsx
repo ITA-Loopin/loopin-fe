@@ -175,9 +175,10 @@ export default function TeamLoopDetailPage() {
 
           if (cancelled) return;
 
-          // 진행률 계산 (API에서 받은 teamProgress 사용)
+          // 진행률 계산 (API에서 받은 teamProgress는 이미 0-100 범위의 퍼센트)
+          // totalChecklistCount와 체크리스트 기반으로 계산
           const normalizedProgress = Math.round(
-            Math.min(Math.max(allDetail.teamProgress * 100, 0), 100)
+            Math.min(Math.max(allDetail.teamProgress, 0), 100)
           );
 
           // LoopDetail 형태로 변환
