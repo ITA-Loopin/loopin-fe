@@ -42,8 +42,9 @@ interface TeamLoopDetailContentProps {
   }>;
   newChecklistContent: string;
   onNewChecklistContentChange: (content: string) => void;
-  onToggleChecklist: (item: LoopChecklist) => Promise<void>;
-  onAddChecklist: () => Promise<void>;
+  onToggleChecklist?: (item: LoopChecklist) => Promise<void>;
+  onAddChecklist?: () => Promise<void>;
+  onDeleteChecklist?: (itemId: number) => Promise<void>;
   onCompleteLoop: () => Promise<{ success: boolean; alreadyComplete?: boolean }>;
   isMenuOpen: boolean;
   onMenuClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -60,6 +61,7 @@ export function TeamLoopDetailContent({
   onNewChecklistContentChange,
   onToggleChecklist,
   onAddChecklist,
+  onDeleteChecklist,
   onCompleteLoop,
   isMenuOpen,
   onMenuClick,
@@ -142,6 +144,7 @@ export function TeamLoopDetailContent({
           <Checklist
             checklists={detail.checklists}
             onToggleItem={isTeamView ? undefined : onToggleChecklist}
+            onDeleteItem={isTeamView ? undefined : onDeleteChecklist}
             newChecklistContent={newChecklistContent}
             onNewChecklistContentChange={onNewChecklistContentChange}
             onAddChecklist={isTeamView ? undefined : onAddChecklist}

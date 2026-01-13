@@ -9,7 +9,7 @@ import { TeamLoopDetailContent } from "@/components/team/TeamLoopDetailContent";
 import { LoopActionModal } from "@/components/loop/LoopActionModal";
 import { LoopEditSheet } from "@/components/loop/LoopEditSheet";
 import { LoopGroupEditSheet } from "@/components/loop/LoopGroupEditSheet";
-import { fetchTeamLoops, fetchTeamLoopChecklists, fetchTeamLoopMyDetail, fetchTeamLoopAllDetail, type TeamLoopApiItem } from "@/lib/team";
+import { fetchTeamLoops, fetchTeamLoopChecklists, fetchTeamLoopMyDetail, fetchTeamLoopAllDetail, createTeamLoopChecklist, toggleTeamLoopChecklist, deleteTeamLoopChecklist, type TeamLoopApiItem } from "@/lib/team";
 import type { LoopDetail } from "@/types/loop";
 
 export default function TeamLoopDetailPage() {
@@ -34,6 +34,87 @@ export default function TeamLoopDetailPage() {
 
   const checklist = useChecklist(detail, setDetail, () => setReloadKey((prev) => prev + 1));
   const actions = useLoopActions(detail);
+
+  // 내 루프 탭에서 체크리스트 추가 핸들러
+  const handleAddChecklist = async () => {
+    if (!detail || view !== "my" || !checklist.newChecklistContent.trim()) {
+      return;
+    }
+
+    const content = checklist.newChecklistContent.trim();
+    const tempId = Date.now();
+    const optimisticItem = {
+      id: tempId,
+      content,
+      completed: false,
+    };
+
+    // Optimistic update
+    setDetail((prev) => {
+      if (!prev) return prev;
+      const nextChecklists = [...prev.checklists, optimisticItem];
+      const total = nextChecklists.length;
+      const completed = nextChecklists.filter((i) => i.completed).length;
+      const progress = total > 0
+        ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
+        : 0;
+      return {
+        ...prev,
+        checklists: nextChecklists,
+        progress,
+      };
+    });
+    checklist.setNewChecklistContent("");
+
+    try {
+      const result = await createTeamLoopChecklist(loopId, content);
+      
+      // 서버에서 받은 실제 데이터로 tempId를 교체
+      setDetail((prev) => {
+        if (!prev) return prev;
+        const currentItem = prev.checklists.find((item) => item.id === tempId);
+        const nextChecklists = prev.checklists.map((item) =>
+          item.id === tempId
+            ? {
+                id: result.id,
+                content: result.content,
+                completed: currentItem?.completed ?? result.completed ?? false,
+              }
+            : item
+        );
+        const total = nextChecklists.length;
+        const completed = nextChecklists.filter((i) => i.completed).length;
+        const progress = total > 0
+          ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
+          : 0;
+        return {
+          ...prev,
+          checklists: nextChecklists,
+          progress,
+        };
+      });
+    } catch (error) {
+      // 에러 발생 시 UI에서 제거
+      setDetail((prev) => {
+        if (!prev) return prev;
+        const nextChecklists = prev.checklists.filter(
+          (item) => item.id !== tempId
+        );
+        const total = nextChecklists.length;
+        const completed = nextChecklists.filter((i) => i.completed).length;
+        const progress = total > 0
+          ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
+          : 0;
+        return {
+          ...prev,
+          checklists: nextChecklists,
+          progress,
+        };
+      });
+      checklist.setNewChecklistContent(content);
+      console.error("체크리스트 추가 실패:", error);
+    }
+  };
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [actionModal, setActionModal] = useState<{
     type: "edit" | "delete";
@@ -135,10 +216,12 @@ export default function TeamLoopDetailPage() {
 
           if (cancelled) return;
 
-          // 진행률 계산 (API에서 받은 personalProgress 사용)
-          const normalizedProgress = Math.round(
-            Math.min(Math.max(myDetail.personalProgress * 100, 0), 100)
-          );
+          // 진행률 계산 (실제 체크리스트 완료 상태 기반)
+          const total = checklists.length;
+          const completed = checklists.filter((item) => item.completed).length;
+          const normalizedProgress = total > 0
+            ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
+            : 0;
 
           // LoopDetail 형태로 변환
           setDetail({
@@ -173,6 +256,115 @@ export default function TeamLoopDetailPage() {
 
   const reload = () => {
     setReloadKey((prev) => prev + 1);
+  };
+
+  // 내 루프 탭에서 체크리스트 토글 핸들러
+  const handleToggleChecklist = async (updatedItem: { id: number; content: string; completed: boolean }) => {
+    if (!detail || view !== "my") {
+      return;
+    }
+
+    const previousCompleted = updatedItem.completed;
+
+    // Optimistic update
+    setDetail((prev) => {
+      if (!prev) return prev;
+      const nextChecklists = prev.checklists.map((item) =>
+        item.id === updatedItem.id
+          ? { ...item, completed: updatedItem.completed }
+          : item
+      );
+      const total = nextChecklists.length;
+      const completed = nextChecklists.filter((i) => i.completed).length;
+      const progress = total > 0
+        ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
+        : 0;
+      return {
+        ...prev,
+        checklists: nextChecklists,
+        progress,
+      };
+    });
+
+    try {
+      const result = await toggleTeamLoopChecklist(updatedItem.id);
+      // 서버 응답의 isChecked를 completed로 매핑하여 상태 업데이트
+      setDetail((prev) => {
+        if (!prev) return prev;
+        const nextChecklists = prev.checklists.map((item) =>
+          item.id === updatedItem.id
+            ? { ...item, completed: result.isChecked }
+            : item
+        );
+        const total = nextChecklists.length;
+        const completed = nextChecklists.filter((i) => i.completed).length;
+        const progress = total > 0
+          ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
+          : 0;
+        return {
+          ...prev,
+          checklists: nextChecklists,
+          progress,
+        };
+      });
+    } catch (error) {
+      // 에러 발생 시 이전 상태로 롤백
+      setDetail((prev) => {
+        if (!prev) return prev;
+        const nextChecklists = prev.checklists.map((item) =>
+          item.id === updatedItem.id
+            ? { ...item, completed: previousCompleted }
+            : item
+        );
+        const total = nextChecklists.length;
+        const completed = nextChecklists.filter((i) => i.completed).length;
+        const progress = total > 0
+          ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
+          : 0;
+        return {
+          ...prev,
+          checklists: nextChecklists,
+          progress,
+        };
+      });
+      console.error("체크리스트 상태 변경 실패:", error);
+    }
+  };
+
+  // 내 루프 탭에서 체크리스트 삭제 핸들러
+  const handleDeleteChecklist = async (itemId: number) => {
+    if (!detail || view !== "my") {
+      return;
+    }
+
+    const previousState = detail;
+
+    // Optimistic update
+    setDetail((prev) => {
+      if (!prev) return prev;
+      const nextChecklists = prev.checklists.filter(
+        (item) => item.id !== itemId
+      );
+      const total = nextChecklists.length;
+      const completed = nextChecklists.filter((i) => i.completed).length;
+      const progress = total > 0
+        ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
+        : 0;
+      return {
+        ...prev,
+        checklists: nextChecklists,
+        progress,
+      };
+    });
+
+    try {
+      await deleteTeamLoopChecklist(itemId);
+      // 삭제 성공 시 데이터 다시 로드
+      reload();
+    } catch (error) {
+      // 에러 발생 시 이전 상태로 롤백
+      setDetail(previousState);
+    }
   };
 
 
@@ -239,8 +431,9 @@ export default function TeamLoopDetailPage() {
               memberProgresses={view === "team" ? memberProgresses : undefined}
               newChecklistContent={checklist.newChecklistContent}
               onNewChecklistContentChange={checklist.setNewChecklistContent}
-              onToggleChecklist={checklist.handleToggleChecklist}
-              onAddChecklist={checklist.handleAddChecklist}
+              onToggleChecklist={view === "my" ? handleToggleChecklist : undefined}
+              onAddChecklist={view === "my" ? handleAddChecklist : undefined}
+              onDeleteChecklist={view === "my" ? handleDeleteChecklist : undefined}
               onCompleteLoop={checklist.handleCompleteLoop}
               isMenuOpen={isMenuOpen}
               onMenuClick={handleMenuClick}

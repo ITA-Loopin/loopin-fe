@@ -474,3 +474,97 @@ export async function fetchTeamLoopAllDetail(
 
   return response.data;
 }
+
+/**
+ * 팀 루프 체크리스트 추가 API
+ */
+export async function createTeamLoopChecklist(
+  loopId: number,
+  content: string
+): Promise<{ id: number; content: string; completed: boolean }> {
+  try {
+    const response = await apiFetch<{
+      success: boolean;
+      code: string;
+      message: string;
+      data: {
+        id: number;
+        content: string;
+        completed: boolean;
+      };
+    }>(`/rest-api/v1/teams/loops/${loopId}/checklists`, {
+      method: "POST",
+      json: { content },
+    });
+
+    if (!response.success || !response.data) {
+      throw new Error(response.message || "체크리스트 추가에 실패했습니다");
+    }
+
+    return response.data;
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "체크리스트 추가에 실패했습니다";
+    throw new Error(errorMessage);
+  }
+}
+
+/**
+ * 팀 루프 체크리스트 체크/해제 API
+ */
+export async function toggleTeamLoopChecklist(
+  checklistId: number
+): Promise<{ id: number; content: string; isChecked: boolean }> {
+  try {
+    const response = await apiFetch<{
+      success: boolean;
+      code: string;
+      message: string;
+      data: {
+        id: number;
+        content: string;
+        isChecked: boolean;
+      };
+    }>(`/rest-api/v1/teams/loops/checklists/${checklistId}/check`, {
+      method: "PATCH",
+    });
+
+    if (!response.success || !response.data) {
+      throw new Error(response.message || "체크리스트 상태 변경에 실패했습니다");
+    }
+
+    return response.data;
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "체크리스트 상태 변경에 실패했습니다";
+    throw new Error(errorMessage);
+  }
+}
+
+/**
+ * 팀 루프 체크리스트 삭제 API
+ */
+export async function deleteTeamLoopChecklist(
+  checklistId: number
+): Promise<{ success: boolean; message?: string }> {
+  try {
+    const response = await apiFetch<{
+      success: boolean;
+      code: string;
+      message: string;
+      data?: unknown;
+    }>(`/rest-api/v1/teams/loops/checklists/${checklistId}`, {
+      method: "DELETE",
+    });
+
+    if (!response.success) {
+      throw new Error(response.message || "체크리스트 삭제에 실패했습니다");
+    }
+
+    return { success: true };
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "체크리스트 삭제에 실패했습니다";
+    throw new Error(errorMessage);
+  }
+}

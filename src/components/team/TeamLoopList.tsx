@@ -36,10 +36,17 @@ export function TeamLoopList({ loops, isLoading, activeTab, teamId }: TeamLoopLi
 
   // API 데이터를 UI 형식으로 변환
   const displayLoops: LoopDisplayItem[] = filteredLoops.map((loop) => {
-    const progress = activeTab === "my" 
-      ? Math.round(loop.personalProgress * 100)
-      : Math.round(loop.teamProgress * 100);
+    // API의 personalProgress/teamProgress는 0~1 범위이므로 100을 곱하고, 0~100 범위로 제한
+    const rawProgress = activeTab === "my" 
+      ? loop.personalProgress
+      : loop.teamProgress;
     
+    // 0~1 범위로 정규화 (이미 0~1 범위일 수도 있고, 0~100 범위일 수도 있음)
+    const normalizedProgress = rawProgress > 1 
+      ? Math.min(Math.max(rawProgress, 0), 100) // 이미 0~100 범위
+      : Math.min(Math.max(rawProgress * 100, 0), 100); // 0~1 범위를 0~100으로 변환
+    
+    const progress = Math.round(normalizedProgress);
     const status = getProgressStatus(progress);
     const importance = formatImportance(loop.importance);
     const type = formatLoopType(loop.type);
