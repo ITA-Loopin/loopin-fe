@@ -43,7 +43,7 @@ export function BottomSheet({
         <SheetContent
           side="bottom"
           className={cn(
-            "mx-auto w-full max-w-[480px] gap-0 rounded-t-[32px] border-none px-6 pb-8 pt-4 shadow-[0px_-20px_44px_rgba(0,0,0,0.16)] [&_[data-slot=sheet-close]]:hidden",
+            "mx-auto w-full max-w-[480px] gap-0 rounded-t-[32px] border-none pb-8 pt-4 shadow-[0px_-20px_44px_rgba(0,0,0,0.16)] [&_[data-slot=sheet-close]]:hidden",
             className
           )}
         >
