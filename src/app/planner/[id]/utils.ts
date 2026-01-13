@@ -90,21 +90,15 @@ export function recommendationToAddLoopDefaults(
       text,
     })) ?? [];
 
-  // scheduleType을 RepeatValue로 타입 단언 (API에서 받은 값이므로 런타임 검증 필요할 수 있음)
-  const scheduleType: RepeatValue | undefined = recommendation.scheduleType
-    ? (recommendation.scheduleType as RepeatValue)
-    : undefined;
-
-  // daysOfWeek를 Weekday[]로 타입 단언
-  const daysOfWeek: Weekday[] | undefined = recommendation.daysOfWeek
-    ? (recommendation.daysOfWeek as Weekday[])
-    : undefined;
-
   return {
     title: recommendation.title,
-    scheduleType,
+    scheduleType: recommendation.scheduleType
+      ? (recommendation.scheduleType as RepeatValue)
+      : undefined,
     specificDate: recommendation.specificDate,
-    daysOfWeek,
+    daysOfWeek: recommendation.daysOfWeek
+      ? (recommendation.daysOfWeek as Weekday[])
+      : undefined,
     startDate: recommendation.startDate,
     endDate: recommendation.endDate,
     checklists,
