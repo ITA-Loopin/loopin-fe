@@ -48,9 +48,9 @@ export function DateRangePicker({
         onClick={onToggleStartCalendar}
         className="flex h-[40px] w-full items-center justify-between px-4 py-[9px] rounded-[10px] bg-[var(--gray-200)]"
       >
-        <span className={cn("text-body-2-sb text-[var(--gray-800)]")}>시작일</span>
+        <span className={cn("text-body-2-sb font-semibold text-[var(--gray-800)]")}>시작일</span>
         <div className="flex items-center gap-[10px]">
-          <span className={cn("text-body-2-sb text-[var(--gray-800)]")}>
+          <span className={cn("text-body-2-sb font-semibold text-[var(--gray-800)]")}>
             {formattedStartDate}
           </span>
           <Image
@@ -90,12 +90,12 @@ export function DateRangePicker({
         )}
       >
         <span className={cn(
-          "text-body-2-sb",
+          "text-body-2-sb font-semibold",
           disableEndDate ? "text-[var(--gray-400)]" : "text-[var(--gray-800)]"
         )}>종료일</span>
         <div className="flex items-center gap-[10px]">
           <span className={cn(
-            "text-body-2-sb",
+            "text-body-2-sb font-semibold",
             disableEndDate ? "text-[var(--gray-400)]" : "text-[var(--gray-800)]"
           )}>
             {formattedEndDate}

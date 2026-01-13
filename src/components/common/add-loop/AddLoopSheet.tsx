@@ -39,7 +39,7 @@ export function AddLoopSheet({
       <div className="inline-flex items-center px-4 py-5">
         <div className="flex w-full flex-col items-center">
           {/* 바텀시트 제목 */}
-          <h2 className="mb-6 text-center text-body-1-sb text-[var(--gray-600)]">
+          <h2 className="mb-6 text-center text-body-1-sb font-semibold text-[var(--gray-600)]">
             루프 추가하기
           </h2>
 

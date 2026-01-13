@@ -34,7 +34,7 @@ export function DayButton({
     >
       <span
         className={cn(
-          "text-center text-body-2-sb",
+          "text-center text-body-2-sb font-semibold",
           isDisabled && "text-[var(--gray-300)]",
           !isDisabled && isSelected && "text-[var(--gray-100)]",
           !isDisabled && !isSelected && isCurrentMonth && "text-[var(--gray-800)]",

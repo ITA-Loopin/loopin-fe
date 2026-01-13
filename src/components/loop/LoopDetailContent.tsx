@@ -48,12 +48,12 @@ export function LoopDetailContent({
   return (
     <>
       <section className="flex flex-col gap-2 pt-6">
-        <div className="flex items-end justify-between self-stretch">
-          <div className="flex flex-col items-start gap-1.5">
-            <div className="text-sm font-medium leading-[150%] tracking-[-0.28px] text-[var(--gray-600,#737980)]">{formattedDate}</div>
-            <h1 className="text-[20px] font-bold leading-[140%] tracking-[-0.4px] text-[var(--gray-black,#121212)]">{detail.title}</h1>
+        <div className="flex items-end justify-between self-stretch gap-2">
+          <div className="flex flex-col items-start gap-1.5 min-w-0 flex-1">
+            <div className="text-body-2-m text-[var(--gray-600)]">{formattedDate}</div>
+            <h1 className="text-title-2-b text-[var(--gray-black)] truncate w-full">{detail.title}</h1>
           </div>
-          <div className="relative">
+          <div className="relative flex-shrink-0">
             <IconButton
               src="/loop/loop_kebab.svg"
               alt="메뉴"
@@ -79,7 +79,7 @@ export function LoopDetailContent({
 
       <section className="flex flex-col items-center gap-6 px-1">
         <LoopProgress progress={detail.progress} />
-        <div className="w-full max-w-[420px] space-y-4">
+        <div className="w-full space-y-4">
           <Checklist
             checklists={detail.checklists}
             onToggleItem={onToggleChecklist}

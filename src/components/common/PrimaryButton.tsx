@@ -29,7 +29,7 @@ export function PrimaryButton({
       disabled={disabled}
       aria-disabled={disabled}
       className={cn(
-        "flex w-full justify-center items-center h-12 gap-[10px] rounded-[30px] text-body-1-sb text-[var(--gray-white)] whitespace-nowrap",
+        "flex w-full justify-center items-center h-12 gap-[10px] rounded-[30px] text-body-1-sb font-semibold text-[var(--gray-white)] whitespace-nowrap",
         VARIANT_STYLES[variant],
         disabled && "pointer-events-none opacity-50 cursor-not-allowed",
         className

@@ -132,7 +132,7 @@ export function MonthCalendar({
           {DAY_NAMES.map((day, index) => (
             <span
               key={index}
-              className={`text-center text-body-2-sb ${
+              className={`text-center text-body-2-sb font-semibold ${
                 index === 0 
                   ? "text-[var(--primary-main)]" 
                   : "text-[var(--gray-800)]"

@@ -50,7 +50,7 @@ export function ScheduleSelector({
           type="button"
           onClick={() => onSelectSchedule(option.value)}
           className={cn(
-            "relative flex h-[38px] w-full items-center justify-center rounded-[5px] px-4 py-[9px] text-body-2-sb transition-colors",
+            "relative flex h-[38px] w-full items-center justify-center rounded-[5px] px-4 py-[9px] text-body-2-sb font-semibold transition-colors",
             isActive ? activeButtonStyles : inactiveButtonStyles
           )}
         >
@@ -112,7 +112,7 @@ export function ScheduleSelector({
                 type="button"
                 onClick={() => onToggleDay(day)}
                 className={cn(
-                  "flex h-[34px] flex-1 items-center justify-center px-1 py-2 text-body-2-sb rounded-[5px]",
+                  "flex h-[34px] flex-1 items-center justify-center px-1 py-2 text-body-2-sb font-semibold rounded-[5px]",
                   isSelected ? activeButtonStyles : inactiveButtonStyles
                 )}
               >

@@ -24,7 +24,7 @@ export function ChecklistEditor({
   const itemContainerStyles =
     "flex w-full items-start justify-between rounded-[10px] bg-[var(--gray-100)] p-4";
   const baseInputStyles =
-    "flex-1 w-full border-none bg-transparent px-0 py-0 text-body-1-sb text-[var(--gray-black)] placeholder:text-[var(--gray-400)] focus:outline-none";
+    "flex-1 w-full border-none bg-transparent px-0 py-0 text-body-1-sb font-semibold text-[var(--gray-black)] placeholder:text-[var(--gray-400)] focus:outline-none";
 
   const trimmedValue = newChecklistItem.trim();
 
