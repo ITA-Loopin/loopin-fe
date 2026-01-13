@@ -22,7 +22,7 @@ function generateCalendarDays(startDate: Dayjs, endDate: Dayjs): Dayjs[] {
 
 type MonthCalendarProps = {
   visibleMonth: Dayjs;
-  selectedDate: Dayjs;
+  selectedDate: Dayjs | null;
   onSelectDate: (date: Dayjs) => void;
   onChangeMonth: (offset: number) => void;
   minDate?: Dayjs;
@@ -151,7 +151,7 @@ export function MonthCalendar({
           )}
           {days.map((date) => {
             const isCurrentMonth = date.isSame(visibleMonth, "month");
-            const isSelected = date.isSame(selectedDate, "day");
+            const isSelected = selectedDate ? date.isSame(selectedDate, "day") : false;
             const isDisabled = minDate ? date.isBefore(minDate, "day") : false;
             const hasLoop = loopDays.get(date.format("YYYY-MM-DD")) ?? false;
 
