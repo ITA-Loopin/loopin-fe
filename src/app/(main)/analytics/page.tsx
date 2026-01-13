@@ -92,26 +92,47 @@ export default function AnalyticsPage() {
       case "GOOD":
         return {
           background: "linear-gradient(180deg, #FFE4E0 1.89%, #FF9A8D 100%)",
+          backgroundColor: "#FF9A8D",
         };
       case "OK":
         return {
           background: "linear-gradient(180deg, #FFECE9 0%, #FFD5CF 99.24%)",
+          backgroundColor: "#FFD5CF",
         };
       case "HARD":
         return {
           background: "radial-gradient(174.4% 50% at 50% 50%, #F8F8F9 0%, #FFF2F0 55.77%)",
+          backgroundColor: "#FFF2F0",
         };
       case "NONE":
         return {
           background: "var(--gray-100, #F8F8F9)",
+          backgroundColor: "var(--gray-100, #F8F8F9)",
         };
       default:
         return {};
     }
   };
 
+  // 레이아웃의 스크롤 영역 배경색도 설정
+  useEffect(() => {
+    const scrollContainer = document.querySelector('[class*="overflow-y-auto"]');
+    if (scrollContainer && scrollContainer instanceof HTMLElement) {
+      const bgColor = 
+        status === "GOOD" ? "#FF9A8D" :
+        status === "OK" ? "#FFD5CF" :
+        status === "HARD" ? "#FFF2F0" :
+        "#F8F8F9";
+      scrollContainer.style.backgroundColor = bgColor;
+      
+      return () => {
+        scrollContainer.style.backgroundColor = "";
+      };
+    }
+  }, [status]);
+
   return (
-    <div className="relative flex flex-col" style={getBackgroundStyle(status)}>
+    <div className="relative flex flex-col min-h-full" style={getBackgroundStyle(status)}>
       <Header
         leftType="none"
         rightType="none"
