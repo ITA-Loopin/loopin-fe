@@ -132,7 +132,7 @@ export default function AnalyticsPage() {
   }, [status]);
 
   return (
-    <div className="relative flex flex-col min-h-full" style={getBackgroundStyle(status)}>
+    <div className="relative flex flex-col min-h-full overflow-x-hidden" style={getBackgroundStyle(status)}>
       <Header
         leftType="none"
         rightType="none"

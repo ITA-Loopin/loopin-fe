@@ -73,6 +73,7 @@ export function DateRangePicker({
             onSelectDate={onSelectStartDate}
             onChangeMonth={onChangeStartMonth}
             hideOtherMonths={true}
+            isDropdown={true}
           />
         </div>
       )}
@@ -122,6 +123,7 @@ export function DateRangePicker({
             onChangeMonth={onChangeEndMonth}
             minDate={startDate ?? undefined}
             hideOtherMonths={true}
+            isDropdown={true}
           />
         </div>
       )}

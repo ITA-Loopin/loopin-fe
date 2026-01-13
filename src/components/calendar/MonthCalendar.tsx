@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Dayjs } from "dayjs";
+import { cn } from "@/lib/utils";
 import { DayButton } from "./DayButton";
 
 const DAY_NAMES = ["S", "M", "T", "W", "T", "F", "S"];
@@ -28,6 +29,7 @@ type MonthCalendarProps = {
   minDate?: Dayjs;
   loopDays?: Map<string, boolean>;
   hideOtherMonths?: boolean;
+  isDropdown?: boolean;
 };
 
 export function MonthCalendar({
@@ -38,6 +40,7 @@ export function MonthCalendar({
   minDate,
   loopDays = new Map(),
   hideOtherMonths = false,
+  isDropdown = false,
 }: MonthCalendarProps) {
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
@@ -92,37 +95,45 @@ export function MonthCalendar({
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* 달력 헤더 */}
-      <header className="grid grid-cols-[auto_auto_auto] items-center gap-[10px] justify-center mt-6 w-full">
-        <button
-          type="button"
-          onClick={() => onChangeMonth(-1)}
-          className="flex w-[25px] h-[25px] py-[9px] px-[10px] items-center gap-[10px] shrink-0 rounded-[12.5px] bg-[var(--gray-white)]"
-          aria-label="이전 달"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="6" height="8" viewBox="0 0 6 8" fill="none" >
-            <path d="M4.75928 0.5L0.759277 4L4.75928 7.5" stroke="#3A3D40" strokeLinecap="round"/>
-          </svg>
-        </button>
-        <div className="text-center">
-          <p className="text-body-1-b text-[var(--gray-800)]">
-            {monthLabel}
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={() => onChangeMonth(1)}
-          className="flex w-[25px] h-[25px] py-[9px] px-[10px] items-center gap-[10px] shrink-0 rounded-[12.5px] bg-[var(--gray-white)]"
-          aria-label="다음 달"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="6" height="8" viewBox="0 0 6 8" fill="none" className="-scale-x-100">
-            <path d="M4.75928 0.5L0.759277 4L4.75928 7.5" stroke="#3A3D40" strokeLinecap="round"/>
-          </svg>
-        </button>
-      </header>
+      {/* 헤더와 날짜 부분을 감싸는 컨테이너 */}
+      <div className={cn(
+        "flex flex-col items-center gap-[24px] w-full rounded-[10px] pt-6",
+        isDropdown ? "bg-[var(--gray-100)]" : "bg-transparent"
+      )}>
+        {/* 달력 헤더 */}
+        <header className="grid grid-cols-[auto_auto_auto] items-center gap-[10px] justify-center w-full">
+          <button
+            type="button"
+            onClick={() => onChangeMonth(-1)}
+            className="flex w-[25px] h-[25px] py-[9px] px-[10px] items-center gap-[10px] shrink-0 rounded-[12.5px] bg-[var(--gray-white)]"
+            aria-label="이전 달"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="6" height="8" viewBox="0 0 6 8" fill="none" >
+              <path d="M4.75928 0.5L0.759277 4L4.75928 7.5" stroke="#3A3D40" strokeLinecap="round"/>
+            </svg>
+          </button>
+          <div className="text-center">
+            <p className="text-body-1-b text-[var(--gray-800)]">
+              {monthLabel}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => onChangeMonth(1)}
+            className="flex w-[25px] h-[25px] py-[9px] px-[10px] items-center gap-[10px] shrink-0 rounded-[12.5px] bg-[var(--gray-white)]"
+            aria-label="다음 달"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="6" height="8" viewBox="0 0 6 8" fill="none" className="-scale-x-100">
+              <path d="M4.75928 0.5L0.759277 4L4.75928 7.5" stroke="#3A3D40" strokeLinecap="round"/>
+            </svg>
+          </button>
+        </header>
 
-      {/* 겉 레이아웃 */}
-      <div className="flex flex-col flex-shrink items-start w-full p-4 gap-[10px] rounded-[10px] bg-[var(--gray-white)]">
+        {/* 겉 레이아웃 */}
+        <div className={cn(
+          "flex flex-col flex-shrink items-start w-full gap-[10px] rounded-[10px] p-4",
+          !isDropdown ? "bg-[var(--gray-white)]" : " "
+        )}>
         {/* 안 레이아웃 - 요일과 날짜를 함께 감싸는 grid */}
         <div 
           key={visibleMonth.format("YYYY-MM")}
@@ -174,6 +185,7 @@ export function MonthCalendar({
             ))
           )}
         </div>
+      </div>
       </div>
     </section>
   );
