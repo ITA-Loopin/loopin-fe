@@ -11,10 +11,10 @@ export default function MainLayout({ children }: { children: ReactNode }) {
 
   return (
     <div
-      className={`relative flex min-h-screen flex-col ${isHomePage || isAnalyticsPage ? "" : "bg-[#F9FAFB]"}`}
+      className={`relative flex h-screen flex-col overflow-hidden ${isHomePage || isAnalyticsPage ? "" : "bg-[#F9FAFB]"}`}
     >
       <div
-        className={`${isHomePage ? "flex-auto" : "flex-1"} pb-24 pt-6 w-full`}
+        className={`${isHomePage ? "flex-auto" : "flex-1"} pb-24 w-full overflow-y-auto`}
       >
         {children}
       </div>

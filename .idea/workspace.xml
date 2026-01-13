@@ -10,6 +10,13 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="TypeScript File" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -37,7 +44,7 @@
     "js.debugger.nextJs.config.created.client": "true",
     "js.debugger.nextJs.config.created.server": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/gujunhwi/Desktop/ITA/LoopIn/loopin-fe",
+    "last_opened_file_path": "/Users/gujunhwi/Desktop/ITA/LoopIn/loopin-fe/public",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -48,6 +55,11 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/public" />
+    </key>
+  </component>
   <component name="RunManager" selected="npm.Next.js: 서버 측">
     <configuration name="Next.js: 클라이언트 측에서 디버그" type="JavascriptDebugType" uri="http://localhost:80/">
       <method v="2" />
@@ -79,6 +91,17 @@
       <option name="presentableId" value="Default" />
       <updated>1767944960227</updated>
       <workItem from="1767944961289" duration="484000" />
+      <workItem from="1768021231807" duration="4678000" />
+      <workItem from="1768081475810" duration="597000" />
+      <workItem from="1768082260473" duration="597000" />
+      <workItem from="1768083258122" duration="597000" />
+      <workItem from="1768120457586" duration="597000" />
+      <workItem from="1768220750113" duration="379000" />
+      <workItem from="1768221167227" duration="598000" />
+      <workItem from="1768231169676" duration="597000" />
+      <workItem from="1768232811275" duration="597000" />
+      <workItem from="1768234142126" duration="597000" />
+      <workItem from="1768250798322" duration="963000" />
     </task>
     <servers />
   </component>
