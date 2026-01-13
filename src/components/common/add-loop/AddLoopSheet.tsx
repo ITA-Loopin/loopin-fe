@@ -90,7 +90,7 @@ export function AddLoopSheet({
             <PrimaryButton
               type="submit"
               disabled={submit.isSubmitting}
-              className="primary"
+              variant="secondary"
             >
               루프 추가하기
             </PrimaryButton>
