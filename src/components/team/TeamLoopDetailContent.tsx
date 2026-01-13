@@ -51,6 +51,7 @@ interface TeamLoopDetailContentProps {
   onMenuClose: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  onMemberClick?: (memberId: number, nickname: string) => void;
 }
 
 export function TeamLoopDetailContent({
@@ -68,6 +69,7 @@ export function TeamLoopDetailContent({
   onMenuClose,
   onEdit,
   onDelete,
+  onMemberClick,
 }: TeamLoopDetailContentProps) {
   const isTeamView = !!memberProgresses; // 팀 루프 탭인지 확인
   // 중요도 변환
@@ -186,7 +188,8 @@ export function TeamLoopDetailContent({
               return (
                 <div
                   key={member.memberId}
-                  className="flex items-center justify-between p-4 rounded-[10px] bg-[var(--gray-white)]"
+                  className="flex items-center justify-between p-4 rounded-[10px] bg-[var(--gray-white)] cursor-pointer"
+                  onClick={() => onMemberClick?.(member.memberId, member.nickname)}
                 >
                   <div className="flex items-center gap-2 flex-1">
                     <span className="text-body-2-sb text-[var(--gray-800)]">

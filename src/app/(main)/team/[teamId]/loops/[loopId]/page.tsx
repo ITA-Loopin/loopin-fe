@@ -11,6 +11,7 @@ import { LoopEditSheet } from "@/components/loop/LoopEditSheet";
 import { LoopGroupEditSheet } from "@/components/loop/LoopGroupEditSheet";
 import { fetchTeamLoops, fetchTeamLoopChecklists, fetchTeamLoopMyDetail, fetchTeamLoopAllDetail, createTeamLoopChecklist, toggleTeamLoopChecklist, deleteTeamLoopChecklist, type TeamLoopApiItem } from "@/lib/team";
 import type { LoopDetail } from "@/types/loop";
+import { MemberProgressModal } from "@/components/team/MemberProgressModal";
 
 export default function TeamLoopDetailPage() {
   const params = useParams<{ teamId: string; loopId: string }>();
@@ -122,6 +123,10 @@ export default function TeamLoopDetailPage() {
   }>({ type: "edit", isOpen: false });
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
   const [isGroupEditSheetOpen, setIsGroupEditSheetOpen] = useState(false);
+  const [selectedMember, setSelectedMember] = useState<{
+    memberId: number;
+    nickname: string;
+  } | null>(null);
 
   // 팀 루프 정보 및 체크리스트 가져오기
   useEffect(() => {
@@ -440,6 +445,9 @@ export default function TeamLoopDetailPage() {
               onMenuClose={() => setIsMenuOpen(false)}
               onEdit={handleEditClick}
               onDelete={handleDeleteClick}
+              onMemberClick={(memberId, nickname) => {
+                setSelectedMember({ memberId, nickname });
+              }}
             />
           ) : (
             <div className="flex items-center justify-center min-h-[calc(100dvh-120px)]">
@@ -487,6 +495,13 @@ export default function TeamLoopDetailPage() {
             router.replace(`/team/${teamId}`);
           }
         }}
+      />
+      <MemberProgressModal
+        isOpen={!!selectedMember}
+        loopId={loopId}
+        memberId={selectedMember?.memberId ?? 0}
+        memberNickname={selectedMember?.nickname ?? ""}
+        onClose={() => setSelectedMember(null)}
       />
     </>
   );

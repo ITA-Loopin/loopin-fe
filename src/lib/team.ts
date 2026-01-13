@@ -568,3 +568,53 @@ export async function deleteTeamLoopChecklist(
     throw new Error(errorMessage);
   }
 }
+
+/**
+ * 팀 루프 멤버 체크리스트 조회 API 응답 타입
+ */
+export type TeamLoopMemberChecklistApiResponse = {
+  success: boolean;
+  code: string;
+  message: string;
+  data: {
+    memberId: number;
+    nickname: string;
+    progress: number;
+    checklists: Array<{
+      id: number;
+      content: string;
+      isChecked: boolean;
+    }>;
+  };
+  page: {
+    page: number;
+    size: number;
+    totalPages: number;
+    totalElements: number;
+    first: boolean;
+    last: boolean;
+    hasNext: boolean;
+  };
+  timestamp: string;
+  traceId: string;
+};
+
+/**
+ * 팀 루프 멤버 체크리스트 조회 API
+ */
+export async function fetchTeamLoopMemberChecklist(
+  loopId: number,
+  memberId?: number
+): Promise<TeamLoopMemberChecklistApiResponse["data"]> {
+  const url = memberId
+    ? `/rest-api/v1/teams/loops/${loopId}/checklists?memberId=${memberId}`
+    : `/rest-api/v1/teams/loops/${loopId}/checklists`;
+  
+  const response = await apiFetch<TeamLoopMemberChecklistApiResponse>(url);
+
+  if (!response.success || !response.data) {
+    throw new Error(response.message || "팀원 체크리스트 조회에 실패했습니다");
+  }
+
+  return response.data;
+}
