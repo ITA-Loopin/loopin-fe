@@ -65,7 +65,8 @@ export function useAddLoopForm({
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
 
-      const normalizedScheduleType = schedule.scheduleType || "NONE";
+      const normalizedScheduleType: RepeatValue = 
+        schedule.scheduleType === "" ? "NONE" : (schedule.scheduleType as RepeatValue);
       const isWeekly = normalizedScheduleType === "WEEKLY";
 
       const payload = {
