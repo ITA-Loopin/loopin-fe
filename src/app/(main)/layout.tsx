@@ -15,7 +15,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
       className={`relative flex h-screen flex-col overflow-hidden ${isHomePage || isAnalyticsPage || isMyPage ? "" : "bg-[#F9FAFB]"}`}
     >
       <div
-        className={`${isHomePage ? "flex-auto" : "flex-1"} pb-24 w-full overflow-y-auto overflow-x-hidden ${isAnalyticsPage ? "bg-transparent" : ""}`}
+        className={`${isHomePage ? "flex-auto min-h-0" : "flex-1"} pb-24 w-full overflow-y-auto overflow-x-hidden ${isAnalyticsPage ? "bg-transparent" : ""}`}
       >
         {children}
       </div>
