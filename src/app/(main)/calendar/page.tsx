@@ -7,7 +7,7 @@ import Header from "@/components/common/Header";
 import { AddLoopSheet } from "@/components/common/add-loop/AddLoopSheet";
 import { LoopList } from "@/components/home";
 import { MonthCalendar } from "@/components/calendar/MonthCalendar";
-import { AddLoopButton } from "@/components/calendar/AddLoopButton";
+import { PrimaryButton } from "@/components/common/PrimaryButton";
 import { useDailyLoops } from "@/hooks/useDailyLoops";
 import { useCalendarLoops } from "@/hooks/useCalendarLoops";
 
@@ -77,7 +77,9 @@ export default function CalendarPage() {
             loops={loopList}
             isLoading={isLoading}
           />
-          <AddLoopButton onClick={handleOpenAddLoopModal} />
+          <PrimaryButton variant="secondary" onClick={handleOpenAddLoopModal}>
+            루프 추가하기
+          </PrimaryButton>
 
         </main>
         <AddLoopSheet
