@@ -70,11 +70,6 @@ export function LoopDetailContent({
             )}
           </div>
         </div>
-        {/* {detail.content ? (
-          <p className="text-sm leading-relaxed text-[#676A79]">
-            {detail.content}
-          </p>
-        ) : null} */}
       </section>
 
       <section className="flex flex-col items-center gap-6 px-1">
