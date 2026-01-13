@@ -9,7 +9,7 @@ import { TeamLoopDetailContent } from "@/components/team/TeamLoopDetailContent";
 import { LoopActionModal } from "@/components/loop/LoopActionModal";
 import { LoopEditSheet } from "@/components/loop/LoopEditSheet";
 import { LoopGroupEditSheet } from "@/components/loop/LoopGroupEditSheet";
-import { fetchTeamLoops, fetchTeamLoopChecklists, type TeamLoopApiItem } from "@/lib/team";
+import { fetchTeamLoops, fetchTeamLoopChecklists, fetchTeamLoopMyDetail, type TeamLoopApiItem } from "@/lib/team";
 import type { LoopDetail } from "@/types/loop";
 
 export default function TeamLoopDetailPage() {
@@ -48,62 +48,45 @@ export default function TeamLoopDetailPage() {
         setIsLoading(true);
         setErrorMessage(null);
 
-        // 1. 팀 루프 리스트에서 기본 정보 가져오기
-        const loops = await fetchTeamLoops(teamId);
+        // 내 루프 상세 정보 가져오기
+        const myDetail = await fetchTeamLoopMyDetail(teamId, loopId);
         if (cancelled) return;
 
-        const foundLoop = loops.find((loop) => loop.id === loopId);
-        if (!foundLoop) {
-          setErrorMessage("팀 루프를 찾을 수 없습니다.");
-          setDetail(null);
-          setTeamLoopData(null);
-          return;
-        }
+        // TeamLoopApiItem 형태로 변환 (기존 코드 호환성)
+        const teamLoopData: TeamLoopApiItem = {
+          id: myDetail.id,
+          title: myDetail.title,
+          loopDate: myDetail.loopDate,
+          type: myDetail.type,
+          importance: myDetail.importance,
+          teamProgress: 0, // 내 루프 API에는 팀 진행률이 없음
+          personalProgress: myDetail.personalProgress,
+          isParticipating: true,
+        };
+        setTeamLoopData(teamLoopData);
 
-        setTeamLoopData(foundLoop);
-
-        // 2. 체크리스트 가져오기
-        let checklists: Array<{ id: number; content: string; completed: boolean }> = [];
-        try {
-          const checklistData = await fetchTeamLoopChecklists(loopId);
-          if (!cancelled) {
-            checklists = checklistData
-              .map((item) => ({
-                id: item.id,
-                content: item.content,
-                completed: item.isChecked,
-              }))
-              .sort((a, b) => a.id - b.id);
-          }
-        } catch (checklistError) {
-          console.error("팀 루프 체크리스트 조회 실패", checklistError);
-          // 체크리스트 조회 실패해도 기본 정보는 표시
-        }
+        // 체크리스트 변환
+        const checklists = myDetail.checklists
+          .map((item) => ({
+            id: item.checklistId,
+            content: item.content,
+            completed: item.isCompleted,
+          }))
+          .sort((a, b) => a.id - b.id);
 
         if (cancelled) return;
 
-        // 진행률 계산
-        const totalChecklistCount = checklists.length;
-        const completedChecklistCount = checklists.filter(
-          (item) => item.completed
-        ).length;
-        const normalizedProgress =
-          totalChecklistCount > 0
-            ? Math.round(
-                Math.min(
-                  Math.max((completedChecklistCount / totalChecklistCount) * 100, 0),
-                  100
-                )
-              )
-            : 0;
+        // 진행률 계산 (API에서 받은 personalProgress 사용)
+        const normalizedProgress = Math.round(
+          Math.min(Math.max(myDetail.personalProgress * 100, 0), 100)
+        );
 
         // LoopDetail 형태로 변환
-        // 팀 루프 리스트에는 스케줄 정보가 없으므로 null로 설정
         setDetail({
-          id: foundLoop.id,
-          title: foundLoop.title,
+          id: myDetail.id,
+          title: myDetail.title,
           content: null,
-          loopDate: foundLoop.loopDate,
+          loopDate: myDetail.loopDate,
           progress: normalizedProgress,
           checklists,
           loopRule: undefined,
