@@ -8,6 +8,7 @@ import { DateRangePicker } from "@/components/common/add-loop/DateRangePicker";
 import { ChecklistEditor } from "@/components/common/add-loop/ChecklistEditor";
 import type { LoopDetail } from "@/types/loop";
 import { useLoopGroupEditForm } from "../../hooks/useLoopGroupEditForm";
+import type { ScheduleType, Weekday } from "@/components/common/add-loop/constants";
 
 type LoopGroupEditSheetProps = {
   isOpen: boolean;
@@ -49,9 +50,9 @@ export function LoopGroupEditSheet({
             <TitleInput value={title.value} onChange={title.onChange} />
 
             <ScheduleSelector
-              scheduleType={schedule.scheduleType}
+              scheduleType={schedule.scheduleType as ScheduleType}
               isWeeklyDropdownOpen={schedule.isWeeklyDropdownOpen}
-              daysOfWeek={schedule.daysOfWeek}
+              daysOfWeek={schedule.daysOfWeek as Weekday[]}
               onSelectSchedule={schedule.onSelectSchedule}
               onToggleDay={schedule.onToggleDay}
             />

@@ -8,10 +8,11 @@ export default function MainLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const isHomePage = pathname === "/home";
   const isAnalyticsPage = pathname === "/analytics";
+  const isMyPage = pathname === "/my-page";
 
   return (
     <div
-      className={`relative flex h-screen flex-col overflow-hidden ${isHomePage || isAnalyticsPage ? "" : "bg-[#F9FAFB]"}`}
+      className={`relative flex h-screen flex-col overflow-hidden ${isHomePage || isAnalyticsPage || isMyPage ? "" : "bg-[#F9FAFB]"}`}
     >
       <div
         className={`${isHomePage ? "flex-auto" : "flex-1"} pb-24 w-full overflow-y-auto overflow-x-hidden ${isAnalyticsPage ? "bg-transparent" : ""}`}

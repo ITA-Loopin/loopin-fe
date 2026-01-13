@@ -7,7 +7,7 @@ interface UseLoopChecklistProps {
 }
 
 interface ChecklistChangeHandler {
-  (index: number, text: string): void;
+  (id: string, text: string): void;
 }
 
 export function useLoopChecklist({ isOpen, defaultChecklists }: UseLoopChecklistProps) {
@@ -27,12 +27,10 @@ export function useLoopChecklist({ isOpen, defaultChecklists }: UseLoopChecklist
     setNewChecklistItem("");
   }, [newChecklistItem]);
 
-  const handleChecklistChange: ChecklistChangeHandler = useCallback((index, text) => {
-    setChecklists((prev) => {
-      const next = [...prev];
-      next[index] = { ...next[index], text };
-      return next;
-    });
+  const handleChecklistChange: ChecklistChangeHandler = useCallback((id, text) => {
+    setChecklists((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, text } : item))
+    );
   }, []);
 
   const handleRemoveChecklist = useCallback((id: string) => {

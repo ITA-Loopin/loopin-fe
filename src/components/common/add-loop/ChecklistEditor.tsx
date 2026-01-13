@@ -1,11 +1,10 @@
 import { IconButton } from "@/components/common/IconButton";
-import { cn } from "@/lib/utils";
 import { Checklist } from "./constants";
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 
 type ChecklistEditorProps = {
   checklists: Checklist[];
-  onChangeChecklist: (index: number, text: string) => void;
+  onChangeChecklist: (id: string, text: string) => void;
   onRemoveChecklist: (id: string) => void;
   newChecklistItem: string;
   onChangeNewChecklist: (value: string) => void;
@@ -23,54 +22,56 @@ export function ChecklistEditor({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const itemContainerStyles =
-    "flex w-full items-start justify-between rounded-[10px] bg-[#F8F8F9] p-4";
+    "flex w-full items-start justify-between rounded-[10px] bg-[var(--gray-100)] p-4";
   const baseInputStyles =
-    "flex-1 w-full border-none bg-transparent px-0 py-0 text-base font-semibold leading-[150%] tracking-[-0.32px] focus:outline-none focus:ring-0";
+    "flex-1 w-full border-none bg-transparent px-0 py-0 text-body-1-sb font-semibold text-[var(--gray-black)] placeholder:text-[var(--gray-400)] focus:outline-none";
+
+  const trimmedValue = newChecklistItem.trim();
 
   const handleAddButtonClick = () => {
-    // + 버튼을 누르면 input에 포커스
-    if (inputRef.current) {
-      inputRef.current.focus();
+    // 입력값이 있으면 추가, 없으면 포커스
+    if (trimmedValue) {
+      onAddChecklist();
+    } else {
+      inputRef.current?.focus();
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && newChecklistItem && newChecklistItem.trim()) {
+    if (e.key === "Enter" && trimmedValue) {
       e.preventDefault();
       onAddChecklist();
     }
   };
 
   return (
-    <div className="flex flex-col items-start gap-2 self-stretch">
-      <p className="text-xs font-medium leading-[140%] tracking-[-0.24px] text-[#A0A9B1]">
+    <div 
+      className="flex flex-col items-start gap-2 self-stretch"
+    >
+      <p className="text-caption-r text-[var(--gray-500)]">
         체크리스트
       </p>
 
-      <div className="flex w-full flex-col  items-start gap-[10px]">
-        {checklists.map((item, index) => (
+      <div className="flex w-full flex-col items-start gap-[10px]">
+        {checklists.map((item) => (
           <div key={item.id} className={itemContainerStyles}>
             <input
               type="text"
               value={item.text}
-              onChange={(event) => onChangeChecklist(index, event.target.value)}
-              className={cn(
-                baseInputStyles,
-                "text-[#3A3D40] placeholder:text-[#B7BAC7]"
-              )}
+              onChange={(event) => onChangeChecklist(item.id, event.target.value)}
+              className={baseInputStyles}
             />
             <IconButton
               src="/addloopsheet/addloopsheet_delete.svg"
               alt="체크리스트 삭제"
-              width={24}
-              height={24}
+              width={20}
+              height={20}
               onClick={() => onRemoveChecklist(item.id)}
-              className="h-6 w-6"
             />
           </div>
         ))}
 
-        <div className={itemContainerStyles}>
+        <div className={itemContainerStyles} data-checklist-input-container>
           <input
             ref={inputRef}
             type="text"
@@ -78,18 +79,15 @@ export function ChecklistEditor({
             onChange={(event) => onChangeNewChecklist(event.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="새로운 루틴을 추가해보세요"
-            className={cn(
-              baseInputStyles,
-              "text-[#2C2C2C] placeholder:text-[#C6CCD1]"
-            )}
+            className={baseInputStyles}
+            data-checklist-input
           />
           <IconButton
             src="/addloopsheet/addloopsheet_add.svg"
             alt="체크리스트 추가"
-            width={24}
-            height={24}
+            width={20}
+            height={20}
             onClick={handleAddButtonClick}
-            className="h-6 w-6"
           />
         </div>
       </div>

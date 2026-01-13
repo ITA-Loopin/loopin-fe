@@ -26,6 +26,7 @@ export function AddLoopSheet({
     dateRange,
     checklist,
     submit,
+    onFormPointerDown,
   } = useAddLoopForm({ isOpen, onClose, defaultValues, onCreated });
 
   return (
@@ -35,16 +36,29 @@ export function AddLoopSheet({
       className="max-h-[90vh] overflow-y-auto"
       title="루프 추가하기"
     >
-      <div className="inline-flex items-center gap-2.5 px-4 py-5">
-        <div className="flex w-full flex-col items-center gap-6">
+      <div className="inline-flex items-center px-4 py-5">
+        <div className="flex w-full flex-col items-center">
           {/* 바텀시트 제목 */}
-          <h2 className="text-center text-base font-semibold text-[#737980] leading-[150%] tracking-[-0.32px]">
+          <h2 className="mb-6 text-center text-body-1-sb font-semibold text-[var(--gray-600)]">
             루프 추가하기
           </h2>
 
           {/* 루프 추가 폼 */}
-          <form className="w-full space-y-10" onSubmit={submit.onSubmit}>
+          <form 
+            className="w-full space-y-10" 
+            onSubmit={submit.onSubmit}
+            onPointerDownCapture={onFormPointerDown}
+          >
             <TitleInput value={title.value} onChange={title.onChange} />
+
+            <ChecklistEditor
+              checklists={checklist.checklists}
+              onChangeChecklist={checklist.onChangeChecklist}
+              onRemoveChecklist={checklist.onRemoveChecklist}
+              newChecklistItem={checklist.newChecklistItem}
+              onChangeNewChecklist={checklist.onChangeNewChecklist}
+              onAddChecklist={checklist.onAddChecklist}
+            />
 
             <ScheduleSelector
               scheduleType={schedule.scheduleType}
@@ -73,19 +87,10 @@ export function AddLoopSheet({
               startDate={dateRange.startDate}
             />
 
-            <ChecklistEditor
-              checklists={checklist.checklists}
-              onChangeChecklist={checklist.onChangeChecklist}
-              onRemoveChecklist={checklist.onRemoveChecklist}
-              newChecklistItem={checklist.newChecklistItem}
-              onChangeNewChecklist={checklist.onChangeNewChecklist}
-              onAddChecklist={checklist.onAddChecklist}
-            />
-
             <PrimaryButton
               type="submit"
               disabled={submit.isSubmitting}
-              className="primary"
+              variant="secondary"
             >
               루프 추가하기
             </PrimaryButton>

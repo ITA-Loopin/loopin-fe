@@ -1,3 +1,5 @@
+"use client";
+
 import type { LoopChecklist } from "@/types/loop";
 import { ChecklistItem } from "./ChecklistItem";
 import { IconButton } from "@/components/common/IconButton";
@@ -8,6 +10,7 @@ type ChecklistProps = {
   title?: string;
   onToggleItem?: (item: LoopChecklist) => void;
   onDeleteItem?: (itemId: number) => void;
+
   // 체크리스트 추가 관련 props
   newChecklistContent?: string;
   onNewChecklistContentChange?: (content: string) => void;
@@ -37,39 +40,76 @@ export function Checklist({
     onToggleItem?.({ ...target, completed: !target.completed });
   };
 
+  const showAddInput = !!(onNewChecklistContentChange && onAddChecklist);
+
+  /**
+   * 입력값이 있으면 추가(커밋)
+   * - 성공하면 true, 아니면 false
+   */
+  const commitNewChecklist = () => {
+    if (!showAddInput) return false;
+
+    const value = (newChecklistContent ?? "").trim();
+    if (!value) return false;
+
+    onAddChecklist?.();
+    return true;
+  };
+
+  /**
+   * + 버튼:
+   * - 입력값 있으면 추가
+   * - 비어있으면 포커스
+   */
   const handleAddButtonClick = () => {
-    // + 버튼을 누르면 input에 포커스
-    if (inputRef.current) {
+    if (!inputRef.current) return;
+
+    const didAdd = commitNewChecklist();
+    if (!didAdd) {
       inputRef.current.focus();
     }
   };
 
+  /**
+   * Enter:
+   * - 입력값 있으면 추가
+   */
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && newChecklistContent && newChecklistContent.trim() && onAddChecklist) {
-      e.preventDefault();
-      onAddChecklist();
-    }
+    if (e.key !== "Enter") return;
+
+    const didAdd = commitNewChecklist();
+    if (didAdd) e.preventDefault();
   };
 
-  const showAddInput = onNewChecklistContentChange && onAddChecklist;
+  /**
+   * 체크리스트 입력에서 포커스가 빠질 때(= 바깥 클릭 포함)
+   * - 입력값 있으면 추가
+   */
+  const handleInputBlur = () => {
+    commitNewChecklist();
+  };
 
   return (
     <section className="w-full">
       {/* 체크리스트 개수 */}
-      <h2 className="mb-2 text-[20px] font-bold leading-[140%] tracking-[-0.4px] text-black">
+      <h2 className="mb-4 text-title-2-b text-[var(--gray-black)]">
         {"Checklist"}
-        <span className="text-center text-sm font-semibold leading-[150%] tracking-[-0.28px] text-[#737980]">· {items.length}</span>
+        <span className="text-center text-body-2-sb font-semibold text-[var(--gray-600)]">
+          · {items.length}
+        </span>
       </h2>
+
       {/* 체크리스트 목록 */}
       <ul className="flex flex-col items-end justify-center gap-[10px]">
         {items.map((item) => (
           <ChecklistItem
             key={item.id}
             item={item}
-            onToggle={handleToggle}
+            onToggle={onToggleItem ? handleToggle : undefined}
             onDelete={onDeleteItem}
           />
         ))}
+
         {/* 체크리스트 추가 입력 */}
         {showAddInput && (
           <li className="flex w-full items-start justify-between rounded-[10px] bg-white p-4">
@@ -79,18 +119,23 @@ export function Checklist({
                 type="text"
                 placeholder="새로운 루틴을 추가해보세요"
                 value={newChecklistContent || ""}
-                onChange={(event) => onNewChecklistContentChange(event.target.value)}
+                onChange={(event) =>
+                  onNewChecklistContentChange?.(event.target.value)
+                }
                 onKeyDown={handleKeyDown}
-                className="flex-1 border-none bg-transparent text-base font-semibold leading-[150%] tracking-[-0.32px] placeholder:text-[#C6CCD1] outline-none focus:outline-none focus:ring-0"
+                onBlur={handleInputBlur}
+                className="flex-1 border-none bg-transparent text-body-1-sb font-semibold placeholder:text-[var(--gray-400)] outline-none focus:outline-none"
               />
-              <IconButton
-                src="/addloopsheet/addloopsheet_add.svg"
-                alt="루틴 추가"
-                width={20}
-                height={20}
-                className="h-5 w-5"
-                onClick={handleAddButtonClick}
-              />
+
+              <div onMouseDown={(e) => e.preventDefault()}>
+                <IconButton
+                  src="/addloopsheet/addloopsheet_add.svg"
+                  alt="루틴 추가"
+                  width={20}
+                  height={20}
+                  onClick={handleAddButtonClick}
+                />
+              </div>
             </div>
           </li>
         )}
@@ -98,5 +143,3 @@ export function Checklist({
     </section>
   );
 }
-
-
