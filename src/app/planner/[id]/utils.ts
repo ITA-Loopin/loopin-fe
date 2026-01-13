@@ -1,6 +1,10 @@
 import dayjs from "dayjs";
 import type { RecommendationSchedule } from "./types";
-import type { AddLoopDefaultValues } from "@/components/common/add-loop/constants";
+import type {
+  AddLoopDefaultValues,
+  RepeatValue,
+  Weekday,
+} from "@/components/common/add-loop/constants";
 
 export function generateId() {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
@@ -86,11 +90,21 @@ export function recommendationToAddLoopDefaults(
       text,
     })) ?? [];
 
+  // scheduleType을 RepeatValue로 타입 단언 (API에서 받은 값이므로 런타임 검증 필요할 수 있음)
+  const scheduleType: RepeatValue | undefined = recommendation.scheduleType
+    ? (recommendation.scheduleType as RepeatValue)
+    : undefined;
+
+  // daysOfWeek를 Weekday[]로 타입 단언
+  const daysOfWeek: Weekday[] | undefined = recommendation.daysOfWeek
+    ? (recommendation.daysOfWeek as Weekday[])
+    : undefined;
+
   return {
     title: recommendation.title,
-    scheduleType: recommendation.scheduleType,
+    scheduleType,
     specificDate: recommendation.specificDate,
-    daysOfWeek: recommendation.daysOfWeek,
+    daysOfWeek,
     startDate: recommendation.startDate,
     endDate: recommendation.endDate,
     checklists,
