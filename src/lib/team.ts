@@ -204,6 +204,7 @@ export type TeamLoopApiItem = {
   teamProgress: number;
   personalProgress: number;
   isParticipating: boolean;
+  repeatCycle?: string;
 };
 
 export type TeamLoopListApiResponse = {
@@ -323,3 +324,297 @@ export async function fetchTeamLoopChecklists(
   return response.data;
 }
 
+/**
+ * 팀 목록 순서 변경 API 요청 타입
+ */
+export type UpdateTeamOrderRequest = {
+  teamId: number;
+  newPosition: number;
+};
+
+/**
+ * 팀 목록 순서 변경 API
+ */
+export async function updateTeamOrder(
+  data: UpdateTeamOrderRequest
+): Promise<{ success: boolean; message?: string }> {
+  try {
+    const response = await apiFetch<{
+      success: boolean;
+      code: string;
+      message: string;
+      data?: unknown;
+    }>("/rest-api/v1/teams/order", {
+      method: "PUT",
+      json: data,
+    });
+
+    if (!response.success) {
+      throw new Error(response.message || "팀 순서 변경에 실패했습니다");
+    }
+
+    return {
+      success: true,
+      message: response.message,
+    };
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * 팀 루프 상세 조회 (내 루프) API 응답 타입
+ */
+export type TeamLoopMyDetailApiResponse = {
+  success: boolean;
+  code: string;
+  message: string;
+  data: {
+    id: number;
+    title: string;
+    loopDate: string;
+    type: "COMMON" | "INDIVIDUAL";
+    repeatCycle: string;
+    importance: "HIGH" | "MEDIUM" | "LOW";
+    status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
+    personalProgress: number;
+    totalChecklistCount: number;
+    checklists: Array<{
+      checklistId: number;
+      content: string;
+      isCompleted: boolean;
+    }>;
+  };
+  page: {
+    page: number;
+    size: number;
+    totalPages: number;
+    totalElements: number;
+    first: boolean;
+    last: boolean;
+    hasNext: boolean;
+  };
+  timestamp: string;
+  traceId: string;
+};
+
+/**
+ * 팀 루프 상세 조회 (내 루프) API
+ */
+export async function fetchTeamLoopMyDetail(
+  teamId: number,
+  loopId: number
+): Promise<TeamLoopMyDetailApiResponse["data"]> {
+  const response = await apiFetch<TeamLoopMyDetailApiResponse>(
+    `/rest-api/v1/teams/${teamId}/loops/${loopId}/my`
+  );
+
+  if (!response.success || !response.data) {
+    throw new Error(response.message || "팀 루프 상세 정보 조회에 실패했습니다");
+  }
+
+  return response.data;
+}
+
+/**
+ * 팀 루프 상세 조회 (팀 루프) API 응답 타입
+ */
+export type TeamLoopAllDetailApiResponse = {
+  success: boolean;
+  code: string;
+  message: string;
+  data: {
+    id: number;
+    title: string;
+    loopDate: string;
+    type: "COMMON" | "INDIVIDUAL";
+    repeatCycle: string;
+    importance: "HIGH" | "MEDIUM" | "LOW";
+    status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
+    teamProgress: number;
+    totalChecklistCount: number;
+    checklists: Array<{
+      checklistId: number;
+      content: string;
+    }>;
+    memberProgresses: Array<{
+      memberId: number;
+      nickname: string;
+      status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
+      progress: number;
+    }>;
+  };
+  page: {
+    page: number;
+    size: number;
+    totalPages: number;
+    totalElements: number;
+    first: boolean;
+    last: boolean;
+    hasNext: boolean;
+  };
+  timestamp: string;
+  traceId: string;
+};
+
+/**
+ * 팀 루프 상세 조회 (팀 루프) API
+ */
+export async function fetchTeamLoopAllDetail(
+  teamId: number,
+  loopId: number
+): Promise<TeamLoopAllDetailApiResponse["data"]> {
+  const response = await apiFetch<TeamLoopAllDetailApiResponse>(
+    `/rest-api/v1/teams/${teamId}/loops/${loopId}/all`
+  );
+
+  if (!response.success || !response.data) {
+    throw new Error(response.message || "팀 루프 상세 정보 조회에 실패했습니다");
+  }
+
+  return response.data;
+}
+
+/**
+ * 팀 루프 체크리스트 추가 API
+ */
+export async function createTeamLoopChecklist(
+  loopId: number,
+  content: string
+): Promise<{ id: number; content: string; completed: boolean }> {
+  try {
+    const response = await apiFetch<{
+      success: boolean;
+      code: string;
+      message: string;
+      data: {
+        id: number;
+        content: string;
+        completed: boolean;
+      };
+    }>(`/rest-api/v1/teams/loops/${loopId}/checklists`, {
+      method: "POST",
+      json: { content },
+    });
+
+    if (!response.success || !response.data) {
+      throw new Error(response.message || "체크리스트 추가에 실패했습니다");
+    }
+
+    return response.data;
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "체크리스트 추가에 실패했습니다";
+    throw new Error(errorMessage);
+  }
+}
+
+/**
+ * 팀 루프 체크리스트 체크/해제 API
+ */
+export async function toggleTeamLoopChecklist(
+  checklistId: number
+): Promise<{ id: number; content: string; isChecked: boolean }> {
+  try {
+    const response = await apiFetch<{
+      success: boolean;
+      code: string;
+      message: string;
+      data: {
+        id: number;
+        content: string;
+        isChecked: boolean;
+      };
+    }>(`/rest-api/v1/teams/loops/checklists/${checklistId}/check`, {
+      method: "PATCH",
+    });
+
+    if (!response.success || !response.data) {
+      throw new Error(response.message || "체크리스트 상태 변경에 실패했습니다");
+    }
+
+    return response.data;
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "체크리스트 상태 변경에 실패했습니다";
+    throw new Error(errorMessage);
+  }
+}
+
+/**
+ * 팀 루프 체크리스트 삭제 API
+ */
+export async function deleteTeamLoopChecklist(
+  checklistId: number
+): Promise<{ success: boolean; message?: string }> {
+  try {
+    const response = await apiFetch<{
+      success: boolean;
+      code: string;
+      message: string;
+      data?: unknown;
+    }>(`/rest-api/v1/teams/loops/checklists/${checklistId}`, {
+      method: "DELETE",
+    });
+
+    if (!response.success) {
+      throw new Error(response.message || "체크리스트 삭제에 실패했습니다");
+    }
+
+    return { success: true };
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "체크리스트 삭제에 실패했습니다";
+    throw new Error(errorMessage);
+  }
+}
+
+/**
+ * 팀 루프 멤버 체크리스트 조회 API 응답 타입
+ */
+export type TeamLoopMemberChecklistApiResponse = {
+  success: boolean;
+  code: string;
+  message: string;
+  data: {
+    memberId: number;
+    nickname: string;
+    progress: number;
+    checklists: Array<{
+      id: number;
+      content: string;
+      isChecked: boolean;
+    }>;
+  };
+  page: {
+    page: number;
+    size: number;
+    totalPages: number;
+    totalElements: number;
+    first: boolean;
+    last: boolean;
+    hasNext: boolean;
+  };
+  timestamp: string;
+  traceId: string;
+};
+
+/**
+ * 팀 루프 멤버 체크리스트 조회 API
+ */
+export async function fetchTeamLoopMemberChecklist(
+  loopId: number,
+  memberId?: number
+): Promise<TeamLoopMemberChecklistApiResponse["data"]> {
+  const url = memberId
+    ? `/rest-api/v1/teams/loops/${loopId}/checklists?memberId=${memberId}`
+    : `/rest-api/v1/teams/loops/${loopId}/checklists`;
+  
+  const response = await apiFetch<TeamLoopMemberChecklistApiResponse>(url);
+
+  if (!response.success || !response.data) {
+    throw new Error(response.message || "팀원 체크리스트 조회에 실패했습니다");
+  }
+
+  return response.data;
+}

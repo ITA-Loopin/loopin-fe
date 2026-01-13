@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { IconButton } from "@/components/common/IconButton";
 import { useSearchMembers } from "@/hooks/useSearchMembers";
 
@@ -21,13 +21,15 @@ export function TeamMemberSearch({
   onSearchChange,
   onInvite,
 }: TeamMemberSearchProps) {
-  const { searchResults, searchMembers, clearSearchResults } =
+  const { searchResults, isSearching, searchMembers, clearSearchResults } =
     useSearchMembers();
+  const [hasSearched, setHasSearched] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleSearch = (value: string) => {
     onSearchChange(value);
     clearSearchResults();
+    setHasSearched(false);
   };
 
   const handleSearchClick = () => {
@@ -36,6 +38,7 @@ export function TeamMemberSearch({
 
   const handleSearchSubmit = () => {
     if (searchValue.trim()) {
+      setHasSearched(true);
       searchMembers(searchValue);
     }
   };
@@ -60,7 +63,7 @@ export function TeamMemberSearch({
           onChange={(event) => handleSearch(event.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="닉네임을 검색해주세요"
-          className="flex-1 bg-transparent outline-none text-body-2-m text-[var(--gray-black)] placeholder:text-body-2-m placeholder:text-[var(--gray-400)]"
+          className="flex-1 bg-transparent outline-none text-body-2-m text-[var(--gray-black)] placeholder:text-[16px] placeholder:text-body-2-m placeholder:text-[var(--gray-400)]"
         />
         <IconButton
           src="/team/search.svg"
@@ -72,30 +75,39 @@ export function TeamMemberSearch({
       </div>
 
       {/* 검색 결과 */}
-      {searchResults.length > 0 && (
+      {hasSearched && !isSearching && (
         <div className="flex w-full flex-col gap-2">
-          {searchResults.map((member) => (
-            <div
-              key={member.id}
-              className="flex items-center justify-between self-stretch h-[44px] px-4 py-[9px] rounded-[10px] bg-[var(--primary-100)]"
-            >
-              <div className="flex flex-col gap-1">
-                <span className="text-body-2-m text-[var(--gray-800)]">
-                  {member.nickname + " " + member.email + ""}
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  onInvite?.(member);
-                  clearSearchResults();
-                }}
-                className="flex h-[24px] items-center justify-center gap-[5px] rounded-[5px] bg-[var(--primary-500)] px-2 text-[var(--gray-white)] text-caption-m"
+          {searchResults.length > 0 ? (
+            searchResults.map((member) => (
+              <div
+                key={member.id}
+                className="flex items-center justify-between self-stretch h-[44px] px-4 py-[9px] rounded-[10px] bg-[var(--primary-100)]"
               >
-                초대하기
-              </button>
+                <div className="flex flex-col gap-1">
+                  <span className="text-body-2-m text-[var(--gray-800)]">
+                    {member.nickname + " " + member.email + ""}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onInvite?.(member);
+                    clearSearchResults();
+                    setHasSearched(false);
+                  }}
+                  className="flex h-[24px] items-center justify-center gap-[5px] rounded-[5px] bg-[var(--primary-500)] px-2 text-[var(--gray-white)] text-caption-m"
+                >
+                  초대하기
+                </button>
+              </div>
+            ))
+          ) : (
+            <div className="flex items-center justify-center h-[44px] px-4 py-[9px]">
+              <p className="text-caption-r text-[var(--gray-600,#737980)]">
+                해당하는 닉네임이 없습니다
+              </p>
             </div>
-          ))}
+          )}
         </div>
       )}
     </div>

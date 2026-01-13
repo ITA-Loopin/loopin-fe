@@ -119,15 +119,17 @@ export function ChecklistItem({ item, onToggle, onDelete }: ChecklistItemProps) 
             {item.content}
           </span>
 
-          <IconButton
-            src={item.completed ? "/loop/loop_btn_complete.svg" : "/loop/loop_btn.svg"}
-            alt={item.completed ? "체크리스트 완료" : "체크리스트 미완료"}
-            width={24}
-            height={24}
-            onClick={handleToggleClick}
-            className="h-6 w-6"
-            imageClassName="h-6 w-6"
-          />
+          {onToggle && (
+            <IconButton
+              src={item.completed ? "/loop/loop_btn_complete.svg" : "/loop/loop_btn.svg"}
+              alt={item.completed ? "체크리스트 완료" : "체크리스트 미완료"}
+              width={24}
+              height={24}
+              onClick={handleToggleClick}
+              className="h-6 w-6"
+              imageClassName="h-6 w-6"
+            />
+          )}
         </div>
       </div>
     </li>

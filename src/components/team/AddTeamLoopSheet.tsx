@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, FormEvent } from "react";
+import { useState, useEffect, useCallback, useRef, FormEvent } from "react";
 import { BottomSheet } from "@/components/common/BottomSheet";
 import { PrimaryButton } from "@/components/common/PrimaryButton";
 import { TitleInput } from "@/components/common/add-loop/TitleInput";
@@ -69,6 +69,8 @@ export function AddTeamLoopSheet({
     onClose,
   });
 
+  const lastCommitRef = useRef(0);
+
   // 바텀 시트가 열릴 때 초기화
   useEffect(() => {
     if (isOpen) {
@@ -86,6 +88,27 @@ export function AddTeamLoopSheet({
       }
     },
     [schedule, dateRange]
+  );
+
+  // 폼 내 다른 영역 클릭 시 체크리스트 추가
+  const handleFormPointerDown = useCallback(
+    (e: React.PointerEvent<HTMLFormElement>) => {
+      // 체크리스트 입력 필드가 아닌 곳을 클릭했을 때 체크리스트 추가
+      const target = e.target as HTMLElement;
+      const isChecklistInput = target.closest('[data-checklist-input-container]');
+      const trimmedValue = checklist.newChecklistItem.trim();
+
+      if (!isChecklistInput && trimmedValue) {
+        // 중복 실행 방지: 200ms 이내 재클릭 무시
+        const now = Date.now();
+        if (now - lastCommitRef.current < 200) {
+          return;
+        }
+        lastCommitRef.current = now;
+        checklist.handleAddChecklist();
+      }
+    },
+    [checklist.newChecklistItem, checklist.handleAddChecklist]
   );
 
   const handleSubmit = useCallback(
@@ -133,7 +156,11 @@ export function AddTeamLoopSheet({
           </h2>
 
           {/* 루프 추가 폼 */}
-          <form className="w-full space-y-10" onSubmit={handleSubmit}>
+          <form 
+            className="w-full space-y-10" 
+            onSubmit={handleSubmit}
+            onPointerDownCapture={handleFormPointerDown}
+          >
             <TitleInput value={title} onChange={handleTitleChange} />
 
             <LoopTypeSelector 
@@ -210,6 +237,15 @@ export function AddTeamLoopSheet({
               </div>
             )}
 
+            <ChecklistEditor
+              checklists={checklist.checklists}
+              onChangeChecklist={checklist.handleChecklistChange}
+              onRemoveChecklist={checklist.handleRemoveChecklist}
+              newChecklistItem={checklist.newChecklistItem}
+              onChangeNewChecklist={checklist.handleNewChecklistChange}
+              onAddChecklist={checklist.handleAddChecklist}
+            />
+
             <ImportanceSelector 
               value={importance} 
               onChange={(value) => setImportance(value)} 
@@ -251,15 +287,6 @@ export function AddTeamLoopSheet({
               onChangeStartMonth={dateRange.handleChangeStartMonth}
               onChangeEndMonth={dateRange.handleChangeEndMonth}
               disableEndDate={schedule.scheduleType === "NONE"}
-            />
-
-            <ChecklistEditor
-              checklists={checklist.checklists}
-              onChangeChecklist={checklist.handleChecklistChange}
-              onRemoveChecklist={checklist.handleRemoveChecklist}
-              newChecklistItem={checklist.newChecklistItem}
-              onChangeNewChecklist={checklist.handleNewChecklistChange}
-              onAddChecklist={checklist.handleAddChecklist}
             />
 
             <PrimaryButton
