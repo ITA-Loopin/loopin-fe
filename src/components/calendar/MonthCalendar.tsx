@@ -27,6 +27,7 @@ type MonthCalendarProps = {
   onChangeMonth: (offset: number) => void;
   minDate?: Dayjs;
   loopDays?: Map<string, boolean>;
+  hideOtherMonths?: boolean;
 };
 
 export function MonthCalendar({
@@ -36,6 +37,7 @@ export function MonthCalendar({
   onChangeMonth,
   minDate,
   loopDays = new Map(),
+  hideOtherMonths = false,
 }: MonthCalendarProps) {
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
@@ -69,12 +71,19 @@ export function MonthCalendar({
     const monthLabel = visibleMonth.format("YYYY년 M월");
     const startOfMonth = visibleMonth.startOf("month");
     const endOfMonth = visibleMonth.endOf("month");
+    
+    if (hideOtherMonths) {
+      // 해당 달의 날짜만 표시
+      const days = generateCalendarDays(startOfMonth, endOfMonth);
+      return { monthLabel, days };
+    }
+    
     // 일요일 시작으로 고정 (DAY_NAMES와 일치)
     const startOfCalendar = startOfMonth.subtract(startOfMonth.day(), "day");
     const endOfCalendar = endOfMonth.add(6 - endOfMonth.day(), "day");
     const days = generateCalendarDays(startOfCalendar, endOfCalendar);
     return { monthLabel, days };
-  }, [visibleMonth]);
+  }, [visibleMonth, hideOtherMonths]);
 
   return (
     <section 
@@ -134,6 +143,12 @@ export function MonthCalendar({
           ))}
           
           {/* 날짜 */}
+          {hideOtherMonths && visibleMonth.startOf("month").day() > 0 && (
+            // 첫 주의 빈 칸 채우기
+            Array.from({ length: visibleMonth.startOf("month").day() }).map((_, i) => (
+              <div key={`empty-start-${i}`} />
+            ))
+          )}
           {days.map((date) => {
             const isCurrentMonth = date.isSame(visibleMonth, "month");
             const isSelected = date.isSame(selectedDate, "day");
@@ -152,6 +167,12 @@ export function MonthCalendar({
               />
             );
           })}
+          {hideOtherMonths && visibleMonth.endOf("month").day() < 6 && (
+            // 마지막 주의 빈 칸 채우기
+            Array.from({ length: 6 - visibleMonth.endOf("month").day() }).map((_, i) => (
+              <div key={`empty-end-${i}`} />
+            ))
+          )}
         </div>
       </div>
     </section>
