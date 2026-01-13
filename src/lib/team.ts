@@ -204,6 +204,7 @@ export type TeamLoopApiItem = {
   teamProgress: number;
   personalProgress: number;
   isParticipating: boolean;
+  repeatCycle?: string;
 };
 
 export type TeamLoopListApiResponse = {

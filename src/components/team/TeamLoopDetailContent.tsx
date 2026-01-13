@@ -70,10 +70,13 @@ export function TeamLoopDetailContent({
     return formatLoopType(teamLoopData?.type);
   }, [teamLoopData?.type]);
 
-  // 스케줄 포맷팅
+  // 스케줄 포맷팅 (API의 repeatCycle 우선 사용)
   const scheduleText = useMemo(() => {
+    if (teamLoopData?.repeatCycle) {
+      return teamLoopData.repeatCycle;
+    }
     return formatSchedule(detail.loopRule);
-  }, [detail.loopRule]);
+  }, [teamLoopData?.repeatCycle, detail.loopRule]);
 
   // 완료 여부
   const status = useMemo(() => {

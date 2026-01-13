@@ -49,7 +49,7 @@ export function TeamLoopList({ loops, isLoading, activeTab, teamId }: TeamLoopLi
       title: loop.title,
       status,
       importance,
-      schedule: "매주 월·금", // TODO: API에 schedule 정보가 없으면 제거하거나 다른 방식으로 처리
+      schedule: loop.repeatCycle || "",
       type,
       progress,
     };

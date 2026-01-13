@@ -62,6 +62,7 @@ export default function TeamLoopDetailPage() {
           teamProgress: 0, // 내 루프 API에는 팀 진행률이 없음
           personalProgress: myDetail.personalProgress,
           isParticipating: true,
+          repeatCycle: myDetail.repeatCycle,
         };
         setTeamLoopData(teamLoopData);
 
