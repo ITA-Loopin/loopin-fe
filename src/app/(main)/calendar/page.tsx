@@ -62,7 +62,7 @@ export default function CalendarPage() {
     <>
       <div className="relative flex flex-col">
         <Header />
-        <main className="flex w-full flex-1 flex-col items-center gap-4 px-4">
+        <main className="flex w-full flex-1 flex-col items-center gap-4 px-4 pb-4">
           <div className="flex justify-center w-full">
             <MonthCalendar
               visibleMonth={visibleMonth}
