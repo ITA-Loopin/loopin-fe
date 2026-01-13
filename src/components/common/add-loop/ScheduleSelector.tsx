@@ -94,7 +94,7 @@ export function ScheduleSelector({
                   type="button"
                   onClick={() => onToggleDay(day)}
                   className={cn(
-                    "flex h-[34px] flex-1 items-center justify-center px-1 py-2 text-body-2-sb rounded-[5px]",
+                    "flex h-[34px] flex-1 items-center justify-center px-1 py-2 text-body-2-sb font-semibold rounded-[5px]",
                     isEverydaySelected ? activeButtonStyles : inactiveButtonStyles
                   )}
                 >
