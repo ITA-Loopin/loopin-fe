@@ -167,9 +167,9 @@ export function TeamLoopDetailContent({
                 member.status === "IN_PROGRESS" ? "진행중" :
                 "시작전";
               const statusColor =
-                member.status === "COMPLETED" ? "bg-[var(--primary-100)] text-[var(--primary-main)]" :
-                member.status === "IN_PROGRESS" ? "bg-[var(--orange-100)] text-[var(--orange-500)]" :
-                "bg-[var(--gray-100)] text-[var(--gray-500)]";
+                member.status === "COMPLETED" ? "bg-[#E1FF9B] text-[var(--gray-600)]" :
+                member.status === "IN_PROGRESS" ? "bg-[var(--primary-500)] text-[var(--gray-white)]" :
+                "bg-[var(--gray-400)] text-[var(--gray-white)]";
 
               // 원형 프로그레스 바 설정
               const radius = 18;
