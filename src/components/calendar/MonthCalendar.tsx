@@ -97,8 +97,10 @@ export function MonthCalendar({
     >
       {/* 헤더와 날짜 부분을 감싸는 컨테이너 */}
       <div className={cn(
-        "flex flex-col items-center gap-[24px] w-full rounded-[10px] pt-6",
-        isDropdown ? "bg-[var(--gray-100)]" : "bg-transparent"
+        "flex flex-col items-center w-full rounded-[10px]",
+        isDropdown 
+          ? "bg-[var(--gray-100)] gap-4 p-4" 
+          : "bg-transparent gap-[24px] pt-6"
       )}>
         {/* 달력 헤더 */}
         <header className="grid grid-cols-[auto_auto_auto] items-center gap-[10px] justify-center w-full">
@@ -131,13 +133,16 @@ export function MonthCalendar({
 
         {/* 겉 레이아웃 */}
         <div className={cn(
-          "flex flex-col flex-shrink items-start w-full gap-[10px] rounded-[10px] p-4",
-          !isDropdown ? "bg-[var(--gray-white)]" : " "
+          "flex flex-col flex-shrink items-start w-full gap-[10px] rounded-[10px]",
+          !isDropdown ? "bg-[var(--gray-white)] p-4" : ""
         )}>
         {/* 안 레이아웃 - 요일과 날짜를 함께 감싸는 grid */}
         <div 
           key={visibleMonth.format("YYYY-MM")}
-          className="grid w-full gap-y-6 gap-x-[25px] grid-cols-7 auto-rows-[21px] pb-[6px] transition-opacity duration-300 ease-in-out"
+          className={cn(
+            "grid w-full gap-y-6 gap-x-[25px] grid-cols-7 auto-rows-[21px] transition-opacity duration-300 ease-in-out",
+            isDropdown ? "pb-2" : "pb-[6px]"
+          )}
         >
           {/* 요일 */}
           {DAY_NAMES.map((day, index) => (
