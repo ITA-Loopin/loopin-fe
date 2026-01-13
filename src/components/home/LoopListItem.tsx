@@ -28,11 +28,11 @@ export function LoopListItem({ item }: LoopListItemProps) {
         <div className="flex w-full items-center justify-between">
           <div className="flex flex-col gap-2">
             <p className="text-body-1-sb text-[var(--gray-800)]">{item.title}</p>
-            {item.totalChecklists > 0 && (
-              <p className="text-body-2-m text-[var(--gray-500)]">
-                {item.totalChecklists}개 중 {item.completedChecklists}개 완료
-              </p>
-            )}
+            <p className="text-body-2-m text-[var(--gray-500)]">
+              {item.totalChecklists > 0
+                ? `${item.totalChecklists}개 중 ${item.completedChecklists}개 완료`
+                : "체크리스트 없음"}
+            </p>
           </div>
           {/* 원형 진행률 표시기 */}
           <div className="relative flex h-9 w-9 items-center justify-center">
