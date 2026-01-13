@@ -13,6 +13,7 @@ import { useLoopDateRange } from "@/hooks/useLoopDateRange";
 import { useLoopChecklist } from "@/hooks/useLoopChecklist";
 import { useTeamMemberSelection } from "@/hooks/useTeamMemberSelection";
 import { useCreateTeamLoop } from "@/hooks/useCreateTeamLoop";
+import { RepeatValue } from "@/components/common/add-loop/constants";
 import { LoopTypeSelector } from "./LoopTypeSelector";
 import { ImportanceSelector } from "./ImportanceSelector";
 
@@ -78,7 +79,7 @@ export function AddTeamLoopSheet({
 
   // scheduleType이 "NONE"으로 변경될 때 종료일 초기화
   const handleScheduleTypeClick = useCallback(
-    (value: string) => {
+    (value: RepeatValue) => {
       schedule.handleScheduleTypeClick(value);
       if (value === "NONE") {
         dateRange.resetEndDate();
@@ -93,7 +94,7 @@ export function AddTeamLoopSheet({
 
       await createTeamLoop({
         title,
-        scheduleType: schedule.scheduleType,
+        scheduleType: schedule.scheduleType === "" ? undefined : schedule.scheduleType,
         daysOfWeek: schedule.daysOfWeek,
         startDate: dateRange.startDate,
         endDate: dateRange.endDate,

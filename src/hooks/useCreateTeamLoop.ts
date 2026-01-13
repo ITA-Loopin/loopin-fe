@@ -33,8 +33,8 @@ export function useCreateTeamLoop({
   const createTeamLoop = useCallback(
     async (data: {
       title: string;
-      scheduleType: string | undefined;
-      daysOfWeek: string[];
+      scheduleType: string | undefined; // ScheduleType (RepeatValue | "")를 string으로 변환
+      daysOfWeek: string[]; // Weekday[]를 string[]로 변환
       startDate: Dayjs | null;
       endDate: Dayjs | null;
       checklists: Checklist[];

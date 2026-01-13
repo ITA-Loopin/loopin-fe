@@ -45,7 +45,6 @@ export default function HomePage() {
 "use client";
 
 import dayjs from "dayjs";
-import "dayjs/locale/ko";
 import { useMemo, useEffect, useState } from "react";
 import {
   TodayLoopTitle,
@@ -60,8 +59,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
-dayjs.locale("ko");
 
 export default function HomePage() {
   const [showTooltip, setShowTooltip] = useState(false);
