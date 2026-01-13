@@ -16,7 +16,7 @@ export function LoopList({ loops, isLoading = false }: LoopListProps) {
       )}
     >
       <h2 className="flex items-baseline gap-1 text-title-2-b text-[var(--gray-black)]">
-        Loop List <span className="text-body-2-sb text-[var(--gray-600)]">· {loops.length}</span>
+        Loop List <span className="text-body-2-sb font-semibold text-[var(--gray-600)]">· {loops.length}</span>
       </h2>
       
       <ul className="flex flex-col gap-[10px] mt-4">

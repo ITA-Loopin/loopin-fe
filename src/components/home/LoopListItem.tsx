@@ -27,7 +27,7 @@ export function LoopListItem({ item }: LoopListItemProps) {
         {/* 안 레이아웃 */}
         <div className="flex w-full items-center justify-between">
           <div className="flex flex-col gap-2">
-            <p className="text-body-1-sb text-[var(--gray-800)]">{item.title}</p>
+            <p className="text-body-1-sb font-semibold text-[var(--gray-800)]">{item.title}</p>
             <p className="text-body-2-m text-[var(--gray-500)]">
               {item.totalChecklists > 0
                 ? `${item.totalChecklists}개 중 ${item.completedChecklists}개 완료`
