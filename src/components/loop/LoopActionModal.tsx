@@ -29,7 +29,7 @@ export function LoopActionModal({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="relative w-full rounded-[15px] bg-white p-3">
+      <div className="relative w-[328px] rounded-[15px] bg-white p-3">
         {/* 닫기 버튼은 absolute 유지 */}
         <IconButton
           src="/loop/loop_delete.png"
@@ -45,7 +45,7 @@ export function LoopActionModal({
           -> 텍스트 블록에 "아이콘 영역 회피 + 16px 간격"을 직접 확보.
         */}
         <div className="mt-9 flex flex-col items-center gap-5">
-          <p className="text-center text-body-1-b text-[var(--gray-800)]">
+          <p className="text-center text-body-1-b text-[var(--gray-800)] min-h-[48px] flex items-center justify-center">
             {isSingleMode ? (
               "이 루프를 삭제할까요?"
             ) : (
