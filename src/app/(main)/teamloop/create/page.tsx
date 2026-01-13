@@ -78,7 +78,7 @@ export default function CreateTeamLoopPage() {
             onRemove={handleRemoveMember}
           />
 
-          <div className="flex justify-center">
+          <div className="flex justify-center mb-4">
             <PrimaryButton type="submit" disabled={isSubmitting}>
               팀 생성하기
             </PrimaryButton>
