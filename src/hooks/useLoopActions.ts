@@ -41,14 +41,14 @@ export function useLoopActions(
   }, [detail?.id, isDeleting, router]);
 
   const handleDeleteGroup = useCallback(async () => {
-    const ruleId = detail?.loopRule?.ruleId ?? detail?.loopRuleId;
-    if (!ruleId || isDeletingGroup) {
+    // API 문서에 따르면 loopId는 "선택한 루프의 ID"이므로 detail.id를 사용
+    if (!detail?.id || isDeletingGroup) {
       return;
     }
 
     try {
       setIsDeletingGroup(true);
-      await apiFetch(`/rest-api/v1/loops/group/${ruleId}`, {
+      await apiFetch(`/rest-api/v1/loops/group/${detail.id}`, {
         method: "DELETE",
       });
       router.back();
@@ -57,7 +57,7 @@ export function useLoopActions(
     } finally {
       setIsDeletingGroup(false);
     }
-  }, [detail?.loopRule?.ruleId, detail?.loopRuleId, isDeletingGroup, router]);
+  }, [detail?.id, isDeletingGroup, router]);
 
   return {
     isDeleting,
