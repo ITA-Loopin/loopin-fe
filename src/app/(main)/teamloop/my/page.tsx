@@ -1,18 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/common/Header";
 import { TeamCard } from "@/components/team/TeamCard";
 import type { TeamItem } from "@/components/team/types";
-import { fetchMyTeamList } from "@/lib/team";
+import { fetchMyTeamList, updateTeamOrder } from "@/lib/team";
 
 export default function MyTeamListPage() {
   const router = useRouter();
   const [teams, setTeams] = useState<TeamItem[]>([]);
+  const [originalTeams, setOriginalTeams] = useState<TeamItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [touchStartY, setTouchStartY] = useState<number | null>(null);
@@ -27,6 +29,7 @@ export default function MyTeamListPage() {
         const result = await fetchMyTeamList();
         if (!cancelled) {
           setTeams(result.teams);
+          setOriginalTeams(result.teams);
         }
       } catch (err) {
         if (!cancelled) {
@@ -52,11 +55,38 @@ export default function MyTeamListPage() {
     setIsEditMode(true);
   };
 
-  const handleSave = () => {
-    // TODO: API 호출로 순서 저장
-    setIsEditMode(false);
-    setDraggedIndex(null);
-    setDragOverIndex(null);
+  const handleSave = async () => {
+    try {
+      setIsSaving(true);
+      setError(null);
+
+      // 순서가 변경된 팀들에 대해 API 호출
+      const updatePromises = teams.map((team, index) => {
+        const originalIndex = originalTeams.findIndex((t) => t.id === team.id);
+        // 순서가 변경된 경우에만 API 호출
+        if (originalIndex !== index) {
+          return updateTeamOrder({
+            teamId: team.id,
+            newPosition: index,
+          });
+        }
+        return Promise.resolve();
+      });
+
+      await Promise.all(updatePromises);
+
+      // 성공 시 원본 순서 업데이트
+      setOriginalTeams(teams);
+      setIsEditMode(false);
+      setDraggedIndex(null);
+      setDragOverIndex(null);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "팀 순서 변경에 실패했습니다"
+      );
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleDragStart = (index: number) => {
@@ -109,7 +139,7 @@ export default function MyTeamListPage() {
 
   const handleTouchMove = (e: React.TouchEvent, index: number) => {
     if (!isEditMode || touchStartY === null || touchStartIndex === null) return;
-    e.preventDefault();
+    // touch-action: none이 설정되어 있으므로 preventDefault 불필요
     const touch = e.touches[0];
 
     const deltaY = touch.clientY - touchStartY;
@@ -181,9 +211,10 @@ export default function MyTeamListPage() {
           <div className="absolute right-4 top-1/2 -translate-y-1/2">
             <button
               onClick={handleSave}
-              className="text-body-1-sb text-[var(--primary-main)]"
+              disabled={isSaving}
+              className="text-body-1-sb text-[var(--primary-main)] disabled:opacity-50"
             >
-              완료
+              {isSaving ? "저장 중..." : "완료"}
             </button>
           </div>
         )}
@@ -220,13 +251,14 @@ export default function MyTeamListPage() {
                 onTouchStart={(e) => isEditMode && handleTouchStart(e, index)}
                 onTouchMove={(e) => isEditMode && handleTouchMove(e, index)}
                 onTouchEnd={(e) => isEditMode && handleTouchEnd(e)}
-                className={`relative transition-all touch-none ${
-                  isEditMode ? "cursor-move" : ""
+                className={`relative transition-all ${
+                  isEditMode ? "cursor-move touch-none" : ""
                 } ${draggedIndex === index ? "opacity-50" : ""} ${
                   dragOverIndex === index && draggedIndex !== index
                     ? "translate-y-2 border-t-2 border-[var(--primary-main)]"
                     : ""
                 }`}
+                style={isEditMode ? { touchAction: "none" } : undefined}
               >
                 {/* 핸들은 카드 '밖'에 두되, padding은 건드리지 않기 */}
                 <div className="flex items-center gap-2">

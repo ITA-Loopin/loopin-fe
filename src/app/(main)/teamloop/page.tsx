@@ -102,7 +102,7 @@ export default function TeamLoopPage() {
               </div>
             ) : myTeams.length === 0 ? (
               <div className="flex items-center justify-center py-8">
-                <p className="text-body-2-sb text-[var(--gray-500)] text-center">
+                <p className="text-body-2-sb font-semibold text-[var(--gray-500)] text-center">
                   아직 참여 중인 팀이 없어요 <br /> 새로운 팀을 생성해보세요!
                 </p>
               </div>
@@ -141,7 +141,7 @@ export default function TeamLoopPage() {
             </div>
           ) : recruitingTeams.length === 0 ? (
             <div className="flex items-center justify-center py-8">
-              <p className="text-body-2-sb text-[var(--gray-500)] text-center">
+              <p className="text-body-2-sb font-semibold text-[var(--gray-500)] text-center">
                 모집 중인 팀이 없어요
               </p>
             </div>

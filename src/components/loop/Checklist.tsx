@@ -105,7 +105,7 @@ export function Checklist({
           <ChecklistItem
             key={item.id}
             item={item}
-            onToggle={handleToggle}
+            onToggle={onToggleItem ? handleToggle : undefined}
             onDelete={onDeleteItem}
           />
         ))}
