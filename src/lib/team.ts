@@ -323,3 +323,40 @@ export async function fetchTeamLoopChecklists(
   return response.data;
 }
 
+/**
+ * 팀 목록 순서 변경 API 요청 타입
+ */
+export type UpdateTeamOrderRequest = {
+  teamId: number;
+  newPosition: number;
+};
+
+/**
+ * 팀 목록 순서 변경 API
+ */
+export async function updateTeamOrder(
+  data: UpdateTeamOrderRequest
+): Promise<{ success: boolean; message?: string }> {
+  try {
+    const response = await apiFetch<{
+      success: boolean;
+      code: string;
+      message: string;
+      data?: unknown;
+    }>("/rest-api/v1/teams/order", {
+      method: "PUT",
+      json: data,
+    });
+
+    if (!response.success) {
+      throw new Error(response.message || "팀 순서 변경에 실패했습니다");
+    }
+
+    return {
+      success: true,
+      message: response.message,
+    };
+  } catch (error) {
+    throw error;
+  }
+}
