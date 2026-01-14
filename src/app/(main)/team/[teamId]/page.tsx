@@ -208,7 +208,7 @@ export default function TeamDetailPage() {
 
         {/* 루프 프로그레스 또는 캘린더 */}
         {activeTab === "calendar" ? (
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center -mt-6 mb-6">
             <MonthCalendar
               visibleMonth={visibleMonth}
               selectedDate={selectedDate}
