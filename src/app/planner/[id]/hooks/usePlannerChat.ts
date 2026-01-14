@@ -246,6 +246,8 @@ export function usePlannerChat(
 
     if (recommendationsToApply) {
       setRecommendations(recommendationsToApply);
+      // 새로운 추천이 오면 UPDATE_MESSAGE 숨기고 다시 생성하기 버튼 표시
+      setShowUpdateMessage(false);
     }
 
     return status;
@@ -291,6 +293,8 @@ export function usePlannerChat(
               setRecommendations(messageData.data as RecommendationSchedule[]);
               setIsLoading(false);
               setIsInputVisible(true);
+              // 새로운 추천이 오면 UPDATE_MESSAGE 숨기고 다시 생성하기 버튼 표시
+              setShowUpdateMessage(false);
               return;
             }
 
@@ -521,10 +525,23 @@ export function usePlannerChat(
   );
 
   const handleRetry = useCallback(() => {
-    // 추천 카드는 유지하고, UPDATE_MESSAGE를 추천 카드 아래에 표시
+    setRecommendations([]);
     setIsLoading(false);
     setIsInputVisible(true);
     setShowUpdateMessage(true);
+    // INITIAL_MESSAGE가 없으면 다시 추가
+    setMessages((prev) => {
+      const hasInitialMessage = prev.some(
+        (msg) => msg.content === INITIAL_MESSAGE
+      );
+      if (!hasInitialMessage) {
+        return [
+          { id: generateId(), author: "assistant", content: INITIAL_MESSAGE },
+          ...prev,
+        ];
+      }
+      return prev;
+    });
   }, []);
 
   return {
