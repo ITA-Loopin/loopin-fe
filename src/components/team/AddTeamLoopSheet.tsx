@@ -183,7 +183,7 @@ export function AddTeamLoopSheet({
                       return (
                         <div
                           key={member.memberId}
-                          className="flex items-center gap-3 self-stretch h-[44px] px-4 py-[9px] rounded-[10px] bg-[var(--gray-white)] border border-[var(--gray-200)]"
+                          className="flex items-center gap-3 self-stretch h-[44px] px-4 py-[9px] rounded-[10px] bg-[var(--gray-100)]"
                         >
                           {/* 프로필 이미지 */}
                           <div className="w-8 h-8 rounded-full bg-[var(--gray-200)] flex items-center justify-center overflow-hidden">

@@ -233,7 +233,21 @@ export default function HomePage() {
 
               {/* 말풍선 형태의 메시지 */}
               <div className="relative flex items-center justify-center">
-                <div className="relative rounded-lg bg-white/90 px-4 py-3 text-body-2-b text-[var(--primary-main)] shadow-[0_0_7px_0_rgba(0,0,0,0.05)] before:content-[''] before:absolute before:-top-[6px] before:left-1/2 before:-translate-x-1/2 before:w-0 before:h-0 before:border-l-[6px] before:border-r-[6px] before:border-b-[6px] before:border-l-transparent before:border-r-transparent before:border-b-white/90">
+                <div className="relative flex h-9 self-stretch items-center justify-center gap-[10px] rounded-[5px] bg-white/50 backdrop-blur-[0px] px-3 py-[7px] text-body-2-b text-[var(--primary-main)] shadow-[0_0_7px_0_rgba(0,0,0,0.05)]">
+                  {/* 삼각형 포인터 */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="17"
+                    height="12"
+                    viewBox="0 0 17 12"
+                    fill="none"
+                    className="absolute -top-3 left-1/2 -translate-x-1/2"
+                  >
+                    <path
+                      d="M8.5 0L17 12H0L8.5 0Z"
+                      className="fill-white/50"
+                    />
+                  </svg>
                   <span>오늘 하루의 루프를 모두 채워보세요!</span>
                 </div>
               </div>

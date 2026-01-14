@@ -132,45 +132,49 @@ export default function TeamDetailPage() {
 
   return (
     <div className="flex flex-col">
-      <Header
-        leftType="back"
-        rightType="user"
-        onBack={() => router.back()}
-        centerTitle={teamName}
-      />
+      {/* 확장된 헤더 영역 (Header + 탭) */}
+      <div className="bg-white/30 backdrop-blur-[7px]">
+        <Header
+          leftType="back"
+          rightType="user"
+          onBack={() => router.back()}
+          centerTitle={teamName}
+          className="bg-transparent backdrop-blur-none border-none"
+        />
 
-      {/* 탭 */}
-      <div className="flex w-full items-center border-b border-[var(--gray-200)]">
-        <button
-          onClick={() => setActiveTab("my")}
-          className={`flex-1 py-3 text-body-2-sb transition-colors ${
-            activeTab === "my"
-              ? "text-[var(--primary-500)] border-b-1 border-[var(--primary-500)]"
-              : "text-[var(--gray-400)]"
-          }`}
-        >
-          내 루프
-        </button>
-        <button
-          onClick={() => setActiveTab("team")}
-          className={`flex-1 py-3 text-body-2-sb transition-colors ${
-            activeTab === "team"
-              ? "text-[var(--primary-500)] border-b-1 border-[var(--primary-500)]"
-              : "text-[var(--gray-400)]"
-          }`}
-        >
-          팀 루프
-        </button>
-        <button
-          onClick={() => setActiveTab("calendar")}
-          className={`flex-1 py-3 text-body-2-sb transition-colors ${
-            activeTab === "calendar"
-              ? "text-[var(--primary-500)] border-b-1 border-[var(--primary-500)]"
-              : "text-[var(--gray-400)]"
-          }`}
-        >
-          캘린더
-        </button>
+        {/* 탭 */}
+        <div className="flex w-full items-center border-b border-[var(--gray-200)]">
+          <button
+            onClick={() => setActiveTab("my")}
+            className={`flex-1 py-3 text-body-2-sb transition-colors ${
+              activeTab === "my"
+                ? "text-[var(--primary-500)] border-b-1 border-[var(--primary-500)]"
+                : "text-[var(--gray-400)]"
+            }`}
+          >
+            내 루프
+          </button>
+          <button
+            onClick={() => setActiveTab("team")}
+            className={`flex-1 py-3 text-body-2-sb transition-colors ${
+              activeTab === "team"
+                ? "text-[var(--primary-500)] border-b-1 border-[var(--primary-500)]"
+                : "text-[var(--gray-400)]"
+            }`}
+          >
+            팀 루프
+          </button>
+          <button
+            onClick={() => setActiveTab("calendar")}
+            className={`flex-1 py-3 text-body-2-sb transition-colors ${
+              activeTab === "calendar"
+                ? "text-[var(--primary-500)] border-b-1 border-[var(--primary-500)]"
+                : "text-[var(--gray-400)]"
+            }`}
+          >
+            캘린더
+          </button>
+        </div>
       </div>
 
       <main className="flex-1 px-4 py-6">
@@ -204,7 +208,7 @@ export default function TeamDetailPage() {
 
         {/* 루프 프로그레스 또는 캘린더 */}
         {activeTab === "calendar" ? (
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center -mt-6 mb-6">
             <MonthCalendar
               visibleMonth={visibleMonth}
               selectedDate={selectedDate}
@@ -223,10 +227,24 @@ export default function TeamDetailPage() {
         {/* 툴팁 독려멘트 */}
         {activeTab !== "calendar" && (
           <div className="mb-6 flex justify-center">
-            <div className="rounded-[10px] bg-[var(--gray-white)] px-4 py-3">
-              <p className="text-body-2-m text-[var(--gray-800)] text-center">
-                오늘 하루의 루프를 모두 채워보세요!
-              </p>
+            <div className="relative flex items-center justify-center">
+              <div className="relative flex h-9 self-stretch items-center justify-center gap-[10px] rounded-[5px] bg-white/50 backdrop-blur-[0px] px-3 py-[7px] text-body-2-b text-[var(--gray-700)] shadow-[0_0_7px_0_rgba(0,0,0,0.05)]">
+                {/* 삼각형 포인터 */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="17"
+                  height="12"
+                  viewBox="0 0 17 12"
+                  fill="none"
+                  className="absolute -top-3 left-1/2 -translate-x-1/2"
+                >
+                  <path
+                    d="M8.5 0L17 12H0L8.5 0Z"
+                    className="fill-white/50"
+                  />
+                </svg>
+                <span>오늘 하루의 루프를 모두 채워보세요!</span>
+              </div>
             </div>
           </div>
         )}
