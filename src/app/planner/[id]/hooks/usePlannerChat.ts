@@ -72,7 +72,7 @@ function normalizeChatMessages(input: unknown): ChatMessageDto[] {
 
 export function usePlannerChat(
   chatRoomId?: number | null,
-  isNewChatRoom?: boolean
+  loopSelect?: boolean
 ) {
   const { user } = useAppSelector((state) => state.auth);
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -84,6 +84,8 @@ export function usePlannerChat(
   const [recommendations, setRecommendations] = useState<
     RecommendationSchedule[]
   >([]);
+  const [updateRecommendation, setUpdateRecommendation] =
+    useState<RecommendationSchedule | null>(null);
   const [showUpdateMessage, setShowUpdateMessage] = useState(false);
   const messageListRef = useRef<HTMLDivElement | null>(null);
   const seenMessageIdsRef = useRef<Set<string>>(new Set());
@@ -132,126 +134,136 @@ export function usePlannerChat(
     return `ex. ${EXAMPLE_PROMPTS.join(" / ")}`;
   }, [inputValue, isInputVisible]);
 
-  const appendNewMessages = useCallback((rawMessages?: unknown) => {
-    const apiMessages = normalizeChatMessages(rawMessages);
+  const appendNewMessages = useCallback(
+    (rawMessages?: unknown) => {
+      const apiMessages = normalizeChatMessages(rawMessages);
 
-    if (!apiMessages.length) {
-      return "none" as AppendStatus;
-    }
-
-    const sorted = [...apiMessages].sort((a, b) => {
-      const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-      const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-      return aTime - bTime;
-    });
-
-    const newlyAdded: ChatMessage[] = [];
-    let recommendationsToApply: RecommendationSchedule[] | null = null;
-    let status: AppendStatus = "none";
-
-    sorted.forEach((message) => {
-      const dedupeKeyRaw =
-        message.tempId ??
-        (message.id !== undefined ? String(message.id) : message.createdAt);
-
-      if (!dedupeKeyRaw) {
-        return;
+      if (!apiMessages.length) {
+        return "none" as AppendStatus;
       }
 
-      const dedupeKey = String(dedupeKeyRaw);
-      if (seenMessageIdsRef.current.has(dedupeKey)) {
-        return;
-      }
+      const sorted = [...apiMessages].sort((a, b) => {
+        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return aTime - bTime;
+      });
 
-      const hasRecommendations =
-        Array.isArray(message.recommendations) &&
-        message.recommendations.length > 0;
-      const isUser = message.authorType === "USER";
-      const trimmedContent = (message.content ?? "").trim();
+      const newlyAdded: ChatMessage[] = [];
+      let recommendationsToApply: RecommendationSchedule[] | null = null;
+      let status: AppendStatus = "none";
 
-      if (isUser && trimmedContent) {
-        const queue = pendingUserMessageIdsRef.current.get(trimmedContent);
-        if (queue && queue.length > 0) {
-          const localId = queue.shift();
+      sorted.forEach((message) => {
+        const dedupeKeyRaw =
+          message.tempId ??
+          (message.id !== undefined ? String(message.id) : message.createdAt);
 
-          if (queue.length === 0) {
-            pendingUserMessageIdsRef.current.delete(trimmedContent);
+        if (!dedupeKeyRaw) {
+          return;
+        }
+
+        const dedupeKey = String(dedupeKeyRaw);
+        if (seenMessageIdsRef.current.has(dedupeKey)) {
+          return;
+        }
+
+        const hasRecommendations =
+          Array.isArray(message.recommendations) &&
+          message.recommendations.length > 0;
+        const isUser = message.authorType === "USER";
+        const trimmedContent = (message.content ?? "").trim();
+
+        if (isUser && trimmedContent) {
+          const queue = pendingUserMessageIdsRef.current.get(trimmedContent);
+          if (queue && queue.length > 0) {
+            const localId = queue.shift();
+
+            if (queue.length === 0) {
+              pendingUserMessageIdsRef.current.delete(trimmedContent);
+            }
+
+            if (localId) {
+              seenMessageIdsRef.current.add(localId);
+            }
+
+            seenMessageIdsRef.current.add(dedupeKey);
+            return;
           }
+        }
 
-          if (localId) {
-            seenMessageIdsRef.current.add(localId);
-          }
-
+        if (!hasRecommendations && !trimmedContent) {
           seenMessageIdsRef.current.add(dedupeKey);
           return;
         }
-      }
 
-      if (!hasRecommendations && !trimmedContent) {
+        const author = hasRecommendations
+          ? ("assistant" as const)
+          : isUser
+            ? ("user" as const)
+            : ("assistant" as const);
+
+        if (author === "assistant") {
+          status = hasRecommendations ? "recommendations" : "assistant";
+        }
+
+        const bubbleContent =
+          hasRecommendations && !trimmedContent
+            ? LOOP_RESULT_PROMPT
+            : trimmedContent;
+
+        if (bubbleContent) {
+          newlyAdded.push({
+            id:
+              message.tempId ??
+              (message.id !== undefined ? String(message.id) : generateId()),
+            author,
+            content: bubbleContent,
+          });
+        }
+
+        if (hasRecommendations) {
+          recommendationsToApply = message.recommendations!.map((item) => ({
+            title: item.title,
+            content: item.content,
+            scheduleType: item.scheduleType,
+            specificDate: item.specificDate,
+            daysOfWeek: item.daysOfWeek,
+            startDate: item.startDate,
+            endDate: item.endDate,
+            checklists: item.checklists,
+          }));
+        }
+
         seenMessageIdsRef.current.add(dedupeKey);
-        return;
-      }
+      });
 
-      const author = hasRecommendations
-        ? ("assistant" as const)
-        : isUser
-          ? ("user" as const)
-          : ("assistant" as const);
-
-      if (author === "assistant") {
-        status = hasRecommendations ? "recommendations" : "assistant";
-      }
-
-      const bubbleContent =
-        hasRecommendations && !trimmedContent
-          ? LOOP_RESULT_PROMPT
-          : trimmedContent;
-
-      if (bubbleContent) {
-        newlyAdded.push({
-          id:
-            message.tempId ??
-            (message.id !== undefined ? String(message.id) : generateId()),
-          author,
-          content: bubbleContent,
+      if (newlyAdded.length) {
+        setMessages((prev) => {
+          // 히스토리 메시지가 있으면 초기 메시지(INITIAL_MESSAGE) 제거
+          const filteredPrev = prev.filter(
+            (msg) =>
+              msg.content !== INITIAL_MESSAGE && msg.content !== UPDATE_MESSAGE
+          );
+          return [...filteredPrev, ...newlyAdded];
         });
       }
 
-      if (hasRecommendations) {
-        recommendationsToApply = message.recommendations!.map((item) => ({
-          title: item.title,
-          content: item.content,
-          scheduleType: item.scheduleType,
-          specificDate: item.specificDate,
-          daysOfWeek: item.daysOfWeek,
-          startDate: item.startDate,
-          endDate: item.endDate,
-          checklists: item.checklists,
-        }));
+      if (recommendationsToApply) {
+        const recs: RecommendationSchedule[] = recommendationsToApply;
+        // UPDATE_LOOP인 경우 첫 번째 추천을 updateRecommendation에 저장하지만 추천도 표시
+        if (loopSelect === true && recs.length > 0) {
+          setUpdateRecommendation(recs[0]);
+          setRecommendations(recs); // 추천도 무조건 표시
+        } else {
+          setRecommendations(recs);
+        }
+        // 새로운 추천이 오면 UPDATE_MESSAGE 숨기고 다시 생성하기 버튼 표시
+        setShowUpdateMessage(false);
       }
 
-      seenMessageIdsRef.current.add(dedupeKey);
-    });
-
-    if (newlyAdded.length) {
-      setMessages((prev) => {
-        // 히스토리 메시지가 있으면 초기 메시지(INITIAL_MESSAGE) 제거
-        const filteredPrev = prev.filter(
-          (msg) =>
-            msg.content !== INITIAL_MESSAGE && msg.content !== UPDATE_MESSAGE
-        );
-        return [...filteredPrev, ...newlyAdded];
-      });
-    }
-
-    if (recommendationsToApply) {
-      setRecommendations(recommendationsToApply);
-      // 새로운 추천이 오면 UPDATE_MESSAGE 숨기고 다시 생성하기 버튼 표시
-      setShowUpdateMessage(false);
-    }
-
-    return status;
-  }, []);
+      return status;
+    },
+    [loopSelect]
+  );
 
   const handleSSEMessage = useCallback(
     (event: MessageEvent) => {
@@ -378,8 +390,8 @@ export function usePlannerChat(
 
         if (!isCancelled) {
           const hasHistory = appendNewMessages(response.data);
-          // 기존 채팅방이고 히스토리가 있으면 UPDATE_MESSAGE 추가
-          if (isNewChatRoom === false && hasHistory !== "none") {
+          // loopSelect가 true이고 히스토리가 있으면 UPDATE_MESSAGE 추가
+          if (loopSelect === true && hasHistory !== "none") {
             setMessages((prev) => {
               const hasUpdateMessage = prev.some(
                 (msg) => msg.content === UPDATE_MESSAGE
@@ -410,7 +422,7 @@ export function usePlannerChat(
     return () => {
       isCancelled = true;
     };
-  }, [plannerChatRoomId, appendNewMessages, isNewChatRoom]);
+  }, [plannerChatRoomId, appendNewMessages, loopSelect]);
 
   useEffect(() => {
     initializeSSE();
@@ -492,7 +504,7 @@ export function usePlannerChat(
           chatRoomId: plannerChatRoomId,
           clientMessageId: userMessage.id,
           content: trimmed,
-          messageType: isNewChatRoom === false ? "UPDATE_LOOP" : "CREATE_LOOP",
+          messageType: loopSelect === true ? "UPDATE_LOOP" : "CREATE_LOOP",
         });
       } catch (error) {
         console.error("루프 추천 요청 실패", error);
@@ -521,7 +533,7 @@ export function usePlannerChat(
         }
       }
     },
-    [isLoading, plannerChatRoomId, initializeSSE, isNewChatRoom]
+    [isLoading, plannerChatRoomId, initializeSSE, loopSelect]
   );
 
   const handleRetry = useCallback(() => {
@@ -550,6 +562,7 @@ export function usePlannerChat(
     isLoading,
     isInputVisible,
     recommendations,
+    updateRecommendation,
     exampleLabel,
     messageListRef,
     handleInputChange,

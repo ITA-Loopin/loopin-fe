@@ -14,6 +14,7 @@ type LoopGroupEditSheetProps = {
   loop: LoopDetail | null;
   onClose: () => void;
   onUpdated?: (newLoopId?: number) => Promise<void> | void;
+  chatRoomId?: number | null;
 };
 
 export function LoopGroupEditSheet({
@@ -21,6 +22,7 @@ export function LoopGroupEditSheet({
   loop,
   onClose,
   onUpdated,
+  chatRoomId,
 }: LoopGroupEditSheetProps) {
   const { title, schedule, dateRange, checklist, submit } =
     useLoopGroupEditForm({
@@ -28,6 +30,7 @@ export function LoopGroupEditSheet({
       loop,
       onClose,
       onUpdated,
+      chatRoomId,
     });
 
   return (

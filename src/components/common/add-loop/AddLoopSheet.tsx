@@ -12,6 +12,7 @@ type AddLoopSheetProps = {
   onClose: () => void;
   defaultValues?: AddLoopDefaultValues;
   onCreated?: () => void;
+  chatRoomId?: number | null;
 };
 
 export function AddLoopSheet({
@@ -19,6 +20,7 @@ export function AddLoopSheet({
   onClose,
   defaultValues,
   onCreated,
+  chatRoomId,
 }: AddLoopSheetProps) {
   const {
     title,
@@ -26,7 +28,7 @@ export function AddLoopSheet({
     dateRange,
     checklist,
     submit,
-  } = useAddLoopForm({ isOpen, onClose, defaultValues, onCreated });
+  } = useAddLoopForm({ isOpen, onClose, defaultValues, onCreated, chatRoomId });
 
   return (
     <BottomSheet

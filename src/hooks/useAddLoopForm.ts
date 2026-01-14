@@ -11,6 +11,7 @@ interface UseAddLoopFormProps {
   onClose: () => void;
   defaultValues?: AddLoopDefaultValues;
   onCreated?: () => void;
+  chatRoomId?: number | null;
 }
 
 export function useAddLoopForm({
@@ -18,6 +19,7 @@ export function useAddLoopForm({
   onClose,
   defaultValues,
   onCreated,
+  chatRoomId,
 }: UseAddLoopFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -81,10 +83,14 @@ export function useAddLoopForm({
       try {
         setIsSubmitting(true);
         const apiUrl = "/rest-api/v1/loops";
+        const requestPayload = {
+          ...payload,
+          ...(chatRoomId && { chatRoomId }),
+        };
         await apiFetch(apiUrl, {
           method: "POST",
           credentials: "include",
-          json: payload,
+          json: requestPayload,
         });
         onCreated?.();
         onClose();
