@@ -223,10 +223,24 @@ export default function TeamDetailPage() {
         {/* 툴팁 독려멘트 */}
         {activeTab !== "calendar" && (
           <div className="mb-6 flex justify-center">
-            <div className="rounded-[10px] bg-[var(--gray-white)] px-4 py-3">
-              <p className="text-body-2-m text-[var(--gray-800)] text-center">
-                오늘 하루의 루프를 모두 채워보세요!
-              </p>
+            <div className="relative flex items-center justify-center">
+              <div className="relative flex h-9 self-stretch items-center justify-center gap-[10px] rounded-[5px] bg-white/50 backdrop-blur-[0px] px-3 py-[7px] text-body-2-b text-[var(--gray-700)] shadow-[0_0_7px_0_rgba(0,0,0,0.05)]">
+                {/* 삼각형 포인터 */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="17"
+                  height="12"
+                  viewBox="0 0 17 12"
+                  fill="none"
+                  className="absolute -top-3 left-1/2 -translate-x-1/2"
+                >
+                  <path
+                    d="M8.5 0L17 12H0L8.5 0Z"
+                    className="fill-white/50"
+                  />
+                </svg>
+                <span>오늘 하루의 루프를 모두 채워보세요!</span>
+              </div>
             </div>
           </div>
         )}
