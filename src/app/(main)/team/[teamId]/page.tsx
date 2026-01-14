@@ -132,45 +132,49 @@ export default function TeamDetailPage() {
 
   return (
     <div className="flex flex-col">
-      <Header
-        leftType="back"
-        rightType="user"
-        onBack={() => router.back()}
-        centerTitle={teamName}
-      />
+      {/* 확장된 헤더 영역 (Header + 탭) */}
+      <div className="bg-white/30 backdrop-blur-[7px]">
+        <Header
+          leftType="back"
+          rightType="user"
+          onBack={() => router.back()}
+          centerTitle={teamName}
+          className="bg-transparent backdrop-blur-none border-none"
+        />
 
-      {/* 탭 */}
-      <div className="flex w-full items-center border-b border-[var(--gray-200)]">
-        <button
-          onClick={() => setActiveTab("my")}
-          className={`flex-1 py-3 text-body-2-sb transition-colors ${
-            activeTab === "my"
-              ? "text-[var(--primary-500)] border-b-1 border-[var(--primary-500)]"
-              : "text-[var(--gray-400)]"
-          }`}
-        >
-          내 루프
-        </button>
-        <button
-          onClick={() => setActiveTab("team")}
-          className={`flex-1 py-3 text-body-2-sb transition-colors ${
-            activeTab === "team"
-              ? "text-[var(--primary-500)] border-b-1 border-[var(--primary-500)]"
-              : "text-[var(--gray-400)]"
-          }`}
-        >
-          팀 루프
-        </button>
-        <button
-          onClick={() => setActiveTab("calendar")}
-          className={`flex-1 py-3 text-body-2-sb transition-colors ${
-            activeTab === "calendar"
-              ? "text-[var(--primary-500)] border-b-1 border-[var(--primary-500)]"
-              : "text-[var(--gray-400)]"
-          }`}
-        >
-          캘린더
-        </button>
+        {/* 탭 */}
+        <div className="flex w-full items-center border-b border-[var(--gray-200)]">
+          <button
+            onClick={() => setActiveTab("my")}
+            className={`flex-1 py-3 text-body-2-sb transition-colors ${
+              activeTab === "my"
+                ? "text-[var(--primary-500)] border-b-1 border-[var(--primary-500)]"
+                : "text-[var(--gray-400)]"
+            }`}
+          >
+            내 루프
+          </button>
+          <button
+            onClick={() => setActiveTab("team")}
+            className={`flex-1 py-3 text-body-2-sb transition-colors ${
+              activeTab === "team"
+                ? "text-[var(--primary-500)] border-b-1 border-[var(--primary-500)]"
+                : "text-[var(--gray-400)]"
+            }`}
+          >
+            팀 루프
+          </button>
+          <button
+            onClick={() => setActiveTab("calendar")}
+            className={`flex-1 py-3 text-body-2-sb transition-colors ${
+              activeTab === "calendar"
+                ? "text-[var(--primary-500)] border-b-1 border-[var(--primary-500)]"
+                : "text-[var(--gray-400)]"
+            }`}
+          >
+            캘린더
+          </button>
+        </div>
       </div>
 
       <main className="flex-1 px-4 py-6">
