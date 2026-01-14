@@ -87,7 +87,7 @@ export function useAddLoopForm({
 
       try {
         setIsSubmitting(true);
-        const apiUrl = "/rest-api/v1/loops/";
+        const apiUrl = "/rest-api/v1/loops";
         await apiFetch(apiUrl, {
           method: "POST",
           credentials: "include",
