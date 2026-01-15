@@ -7,7 +7,13 @@ import "dayjs/locale/ko";
 
 // 전역 dayjs locale 설정
 dayjs.locale("ko");
+import { FirebaseServiceWorker } from "@/components/common/FirebaseServiceWorker";
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  return <Provider store={store}>{children}</Provider>;
+  return (
+    <Provider store={store}>
+      <FirebaseServiceWorker />
+      {children}
+    </Provider>
+  );
 }
