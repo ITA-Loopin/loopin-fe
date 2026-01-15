@@ -12,6 +12,7 @@ type AddLoopSheetProps = {
   onClose: () => void;
   defaultValues?: AddLoopDefaultValues;
   onCreated?: () => void;
+  chatRoomId?: number | null;
 };
 
 export function AddLoopSheet({
@@ -19,15 +20,10 @@ export function AddLoopSheet({
   onClose,
   defaultValues,
   onCreated,
+  chatRoomId,
 }: AddLoopSheetProps) {
-  const {
-    title,
-    schedule,
-    dateRange,
-    checklist,
-    submit,
-    onFormPointerDown,
-  } = useAddLoopForm({ isOpen, onClose, defaultValues, onCreated });
+  const { title, schedule, dateRange, checklist, submit, onFormPointerDown } =
+    useAddLoopForm({ isOpen, onClose, defaultValues, onCreated, chatRoomId });
 
   return (
     <BottomSheet
@@ -44,8 +40,8 @@ export function AddLoopSheet({
           </h2>
 
           {/* 루프 추가 폼 */}
-          <form 
-            className="w-full space-y-10" 
+          <form
+            className="w-full space-y-10"
             onSubmit={submit.onSubmit}
             onPointerDownCapture={onFormPointerDown}
           >
@@ -100,5 +96,3 @@ export function AddLoopSheet({
     </BottomSheet>
   );
 }
-
-

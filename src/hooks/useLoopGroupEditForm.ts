@@ -3,13 +3,18 @@ import dayjs, { Dayjs } from "dayjs";
 import { apiFetch } from "@/lib/api";
 import type { LoopDetail } from "@/types/loop";
 import { useEditChecklist } from "@/hooks/useEditChecklist";
-import { Checklist, DayOption, WEEKDAY_OPTIONS } from "@/components/common/add-loop/constants";
+import {
+  Checklist,
+  DayOption,
+  WEEKDAY_OPTIONS,
+} from "@/components/common/add-loop/constants";
 
 interface UseLoopGroupEditFormProps {
   isOpen: boolean;
   loop: LoopDetail | null;
   onClose: () => void;
   onUpdated?: (newLoopId?: number) => Promise<void> | void;
+  chatRoomId?: number | null;
 }
 
 export function useLoopGroupEditForm({
@@ -17,6 +22,7 @@ export function useLoopGroupEditForm({
   loop,
   onClose,
   onUpdated,
+  chatRoomId,
 }: UseLoopGroupEditFormProps) {
   const [title, setTitle] = useState("");
   const [scheduleType, setScheduleType] = useState("");
@@ -173,8 +179,8 @@ export function useLoopGroupEditForm({
         const base = endDate
           ? dayjs(endDate)
           : startDate
-          ? dayjs(startDate)
-          : dayjs();
+            ? dayjs(startDate)
+            : dayjs();
         setEndCalendarMonth(base);
         setIsStartCalendarOpen(false);
       }
@@ -222,11 +228,13 @@ export function useLoopGroupEditForm({
         checklists: checklists
           .map((item) => item.text.trim())
           .filter((text) => text.length > 0),
+        ...(chatRoomId && { chatRoomId }),
       };
 
       try {
         setIsSubmitting(true);
         const ruleId = loop.loopRule?.ruleId ?? loop.loopRuleId;
+        console.log("ruleId", ruleId);
         if (!ruleId) {
           throw new Error("루프 그룹 ID가 없습니다.");
         }
@@ -287,6 +295,7 @@ export function useLoopGroupEditForm({
       startDate,
       endDate,
       checklists,
+      chatRoomId,
       onUpdated,
       onClose,
     ]
@@ -335,4 +344,3 @@ export function useLoopGroupEditForm({
     },
   };
 }
-
