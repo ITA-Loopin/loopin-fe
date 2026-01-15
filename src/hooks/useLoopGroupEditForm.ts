@@ -234,6 +234,7 @@ export function useLoopGroupEditForm({
       try {
         setIsSubmitting(true);
         const ruleId = loop.loopRule?.ruleId ?? loop.loopRuleId;
+        console.log("ruleId", ruleId);
         if (!ruleId) {
           throw new Error("루프 그룹 ID가 없습니다.");
         }

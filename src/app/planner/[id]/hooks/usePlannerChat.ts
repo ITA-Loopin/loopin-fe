@@ -537,7 +537,6 @@ export function usePlannerChat(
   );
 
   const handleRetry = useCallback(() => {
-    setRecommendations([]);
     setIsLoading(false);
     setIsInputVisible(true);
     setShowUpdateMessage(true);
