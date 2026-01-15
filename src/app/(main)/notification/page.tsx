@@ -34,26 +34,6 @@ export default function NotificationPage() {
           page: 0,
           size: 20,
         });
-
-        if (response.success && response.data) {
-          setNotifications(response.data);
-
-          // 읽지 않은 알림이 있으면 모두 읽음 처리
-          const unreadIds = response.data
-            .filter((notif) => !notif.isRead)
-            .map((notif) => notif.id);
-
-          if (unreadIds.length > 0) {
-            try {
-              await markNotificationsAsRead(unreadIds);
-            } catch (err) {
-              console.error("알림 읽음 처리 실패:", err);
-              // 읽음 처리 실패해도 계속 진행
-            }
-          }
-        } else {
-          setError("알림을 불러오는데 실패했습니다.");
-        }
       } catch (err) {
         console.error("알림 로드 실패:", err);
         setError(
@@ -117,8 +97,7 @@ export default function NotificationPage() {
   }, [notifications]);
 
   const handleReject = async (notificationId: number) => {
-    // TODO: 거절 로직 구현
-    console.log("거절:", notificationId);
+    await markNotificationsAsRead([notificationId]);
   };
 
   const handleAccept = async (notification: Notification) => {
