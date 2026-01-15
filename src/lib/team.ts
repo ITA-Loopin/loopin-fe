@@ -158,6 +158,8 @@ export type TeamDetailApiResponse = {
   name: string;
   goal: string;
   leaderId: number;
+  createdAt: string;
+  visibility: "PUBLIC" | "PRIVATE";
   totalLoopCount: number;
   teamTotalProgress: number;
   myLoopCount: number;
@@ -167,7 +169,14 @@ export type TeamDetailApiResponse = {
 /**
  * 팀 상세 정보 조회 API
  */
-export async function fetchTeamDetail(teamId: number): Promise<TeamItem & { myTotalProgress: number; teamTotalProgress: number }> {
+export async function fetchTeamDetail(teamId: number): Promise<TeamItem & { 
+  myTotalProgress: number; 
+  teamTotalProgress: number;
+  leaderId: number;
+  createdAt: string;
+  visibility: "PUBLIC" | "PRIVATE";
+  totalLoopCount: number;
+}> {
   const response = await apiFetch<{
     success: boolean;
     code: string;
@@ -189,6 +198,10 @@ export async function fetchTeamDetail(teamId: number): Promise<TeamItem & { myTo
     progress: data.myTotalProgress, // 내 루프 진행률 사용
     myTotalProgress: data.myTotalProgress,
     teamTotalProgress: data.teamTotalProgress,
+    leaderId: data.leaderId,
+    createdAt: data.createdAt,
+    visibility: data.visibility,
+    totalLoopCount: data.totalLoopCount,
   };
 }
 
@@ -618,3 +631,35 @@ export async function fetchTeamLoopMemberChecklist(
 
   return response.data;
 }
+
+
+/**
+ * 팀 삭제 API
+ */
+export async function deleteTeam(
+  teamId: number
+): Promise<{ success: boolean; message?: string }> {
+  try {
+    const response = await apiFetch<{
+      success: boolean;
+      code: string;
+      message: string;
+      data?: unknown;
+    }>(`/rest-api/v1/teams/${teamId}`, {
+      method: "DELETE",
+    });
+
+    if (!response.success) {
+      throw new Error(response.message || "팀 삭제에 실패했습니다");
+    }
+
+    return {
+      success: true,
+      message: response.message,
+    };
+  } catch (error) {
+    throw error;
+  }
+}
+
+
