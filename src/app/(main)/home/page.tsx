@@ -194,7 +194,7 @@ export default function HomePage() {
                 </TooltipTrigger>
                 <TooltipContent
                   side="top"
-                  sideOffset={40}
+                  sideOffset={20}
                   className="bg-[#FF7765] border-none shadow-none p-0 m-0 text-white relative [&_svg]:hidden [&_[data-slot='tooltip-arrow']]:hidden [&>svg]:hidden"
                   style={{
                     display: "flex",
