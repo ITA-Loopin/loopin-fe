@@ -32,10 +32,6 @@ export function TeamMemberSearch({
     setHasSearched(false);
   };
 
-  const handleSearchClick = () => {
-    inputRef.current?.focus();
-  };
-
   const handleSearchSubmit = () => {
     if (searchValue.trim()) {
       setHasSearched(true);
@@ -70,7 +66,7 @@ export function TeamMemberSearch({
           alt="검색"
           width={20}
           height={20}
-          onClick={handleSearchClick}
+          onClick={handleSearchSubmit}
         />
       </div>
 
