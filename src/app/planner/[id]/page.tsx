@@ -235,13 +235,7 @@ export default function PlannerChatPage() {
         </div>
 
         {isInputVisible &&
-<<<<<<< Updated upstream
-        (showUpdateMessage || recommendations.length === 0) ? (
-=======
-        (showUpdateMessage ||
-          recommendations.length === 0 ||
-          pendingMessageType) ? (
->>>>>>> Stashed changes
+        (showUpdateMessage || recommendations.length === 0 || pendingMessageType) ? (
           <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center">
             <div className="pointer-events-auto w-full max-w-xl bg-white p-4 pb-6">
               {exampleLabel ? (

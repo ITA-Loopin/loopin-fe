@@ -456,23 +456,20 @@ export function usePlannerChat(
 
       setInputValue("");
       setRecommendations([]);
-<<<<<<< Updated upstream
-=======
-
+      
       // 추천 카드와 함께 온 메시지 제거하고 사용자 메시지 추가
       const recommendationMessageId = recommendationMessageIdRef.current;
       if (recommendationMessageId) {
         recommendationMessageIdRef.current = null;
       }
-
+      
       setMessages((prev) => {
         const filtered = recommendationMessageId
           ? prev.filter((msg) => msg.id !== recommendationMessageId)
           : prev;
         return [...filtered, userMessage];
       });
-
->>>>>>> Stashed changes
+      
       seenMessageIdsRef.current.add(userMessage.id);
 
       const queue = pendingUserMessageIdsRef.current.get(trimmed) ?? [];
@@ -580,9 +577,7 @@ export function usePlannerChat(
     setPendingMessageType("RECREATE_LOOP");
     setRecommendations([]);
     setUpdateRecommendation(null);
-<<<<<<< Updated upstream
-=======
-
+    
     // 추천 카드와 함께 온 메시지 제거
     if (recommendationMessageIdRef.current) {
       setMessages((prev) =>
@@ -591,24 +586,12 @@ export function usePlannerChat(
       recommendationMessageIdRef.current = null;
     }
   }, []);
->>>>>>> Stashed changes
 
-    const retryMessageId = generateId();
-
-    try {
-      // RECREATE_LOOP 메시지 타입으로 전송
-      await sendChatMessage({
-        chatRoomId: plannerChatRoomId,
-        clientMessageId: retryMessageId,
-        content: "content",
-        messageType: "RECREATE_LOOP",
-      });
-    } catch (error) {
-      console.error("루프 재생성 요청 실패", error);
-      setIsInputVisible(true);
-      setIsLoading(false);
-    }
-  }, [plannerChatRoomId, initializeSSE]);
+  const handleUpdateLoop = useCallback(() => {
+    // 입력 필드를 보여주고 UPDATE_LOOP 모드로 설정
+    setIsInputVisible(true);
+    setPendingMessageType("UPDATE_LOOP");
+  }, []);
 
   return {
     messages,
