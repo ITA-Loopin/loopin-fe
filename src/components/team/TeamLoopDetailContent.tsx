@@ -141,7 +141,7 @@ export function TeamLoopDetailContent({
       </section>
 
       <section className="flex flex-col items-center gap-6">
-        <LoopProgress progress={detail.progress} />
+        <LoopProgress progress={Math.round(detail.progress)} />
         <div className="w-full max-w-[420px]">
           <Checklist
             checklists={detail.checklists}

@@ -131,9 +131,9 @@ export default function TeamDetailPage() {
     : (team.teamTotalProgress ?? 0);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col min-h-full">
       {/* 확장된 헤더 영역 (Header + 탭) */}
-      <div className="bg-white/30 backdrop-blur-[7px]">
+      <div className="bg-white/30 backdrop-blur-[7px] flex-shrink-0">
         <Header
           leftType="back"
           rightType="user"
@@ -289,6 +289,18 @@ export default function TeamDetailPage() {
           teamId={Number(teamId)}
           onCreated={() => {
             setIsAddLoopSheetOpen(false);
+            
+            // 팀 상세 정보 새로고침 (myTotalProgress, teamTotalProgress 업데이트)
+            const loadTeamDetail = async () => {
+              if (!teamId) return;
+              try {
+                const teamData = await fetchTeamDetail(Number(teamId));
+                setTeam(teamData);
+              } catch (err) {
+                console.error("팀 정보 조회 실패", err);
+              }
+            };
+            
             // 루프 리스트 새로고침
             const loadTeamLoops = async () => {
               if (!teamId) return;
@@ -307,6 +319,8 @@ export default function TeamDetailPage() {
                 setIsLoadingLoops(false);
               }
             };
+            
+            loadTeamDetail();
             loadTeamLoops();
           }}
         />
