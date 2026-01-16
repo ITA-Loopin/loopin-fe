@@ -15,7 +15,7 @@ export function RecommendationCard({
   onSelect,
 }: RecommendationCardProps) {
   return (
-    <div className="rounded-2xl bg-white p-5 shadow-sm">
+    <div className="rounded-2xl bg-white p-5 mb-4 shadow-sm">
       <div className="space-y-2">
         {/* Header */}
         <div className="space-y-1">

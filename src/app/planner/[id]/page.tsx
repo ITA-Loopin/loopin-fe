@@ -162,7 +162,7 @@ export default function PlannerChatPage() {
             paddingBottom: `calc(${messageListPadding}px)`,
           }}
         >
-          <div className="space-y-4">
+          <div className="">
             {messages.map((message, index) => {
               const isAssistant = message.author === "assistant";
               const showIndicator = index === 0 && isAssistant;
@@ -178,7 +178,7 @@ export default function PlannerChatPage() {
           </div>
 
           {recommendations.length > 0 ? (
-            <div className="space-y-4">
+            <div className="">
               {recommendations.map((recommendation, index) => (
                 <RecommendationCard
                   key={recommendation.title}
@@ -253,17 +253,15 @@ export default function PlannerChatPage() {
                       : "만들고 싶은 루프를 입력해주세요."
                   }
                   rows={1}
-                  className="max-h-32 flex-1 border-none text-sm text-[#2C2C2C] outline-none"
+                  className="max-h-32 flex-1 border-none text-sm text-[#2C2C2C] outline-none resize-none"
                   aria-label="루프 생성 요청 입력란"
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
-                      formHandleSubmit(async (values) => {
-                        if (values.prompt?.trim()) {
-                          await handleSubmit(values.prompt.trim());
-                          reset({ prompt: "" });
-                        }
-                      })();
+                      const form = e.currentTarget.form;
+                      if (form) {
+                        form.requestSubmit();
+                      }
                     }
                   }}
                 />

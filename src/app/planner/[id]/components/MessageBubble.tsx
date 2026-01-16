@@ -7,10 +7,10 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
 
   return (
     <div
-      className={`shadow-sm rounded-2xl flex ${isUser ? "justify-end" : "justify-start"} `}
+      className={`w-full flex mb-4 ${isUser ? "justify-end" : "justify-start"}`}
     >
       <div
-        className={`max-w-[90%] whitespace-pre-line rounded-2xl px-4 py-3 text-sm leading-relaxed rounded-bl-md bg-white text-[#2C2C2C]`}
+        className={`max-w-[90%] whitespace-pre-line rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm bg-white text-[#2C2C2C]`}
       >
         {message.content}
       </div>
