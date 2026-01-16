@@ -180,7 +180,7 @@ export default function OnboardingPage() {
 
       sessionStorage.removeItem("signup_data");
       setIsModalOpen(false);
-      router.replace("/home");
+      router.replace("/onboarding");
     } catch (error) {
       console.error("회원가입 처리 실패", error);
       setModalError(
