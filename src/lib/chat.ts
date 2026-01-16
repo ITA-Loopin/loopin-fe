@@ -23,6 +23,7 @@ export type ChatMessageDto = {
   content?: string;
   authorType?: string;
   recommendations?: ChatRecommendationDto[];
+  loopRuleId?: number;
   createdAt?: string;
 };
 
@@ -266,7 +267,7 @@ export function createChatSocket({
 
   // CONNECT 이벤트 처리
   eventSource.addEventListener("CONNECT", (event: MessageEvent) => {
-    onOpen?.();
+      onOpen?.();
   });
 
   // MESSAGE 이벤트 처리

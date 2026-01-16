@@ -94,5 +94,41 @@ export function recommendationToAddLoopDefaults(
     startDate: recommendation.startDate,
     endDate: recommendation.endDate,
     checklists,
+    loopRuleId: recommendation.loopRuleId,
+  };
+}
+
+export function recommendationToLoopDetail(
+  recommendation: RecommendationSchedule
+): import("@/types/loop").LoopDetail {
+  const checklists =
+    recommendation.checklists?.map((text, index) => ({
+      id: index + 1,
+      content: text,
+      completed: false,
+    })) ?? [];
+
+  const ruleId = recommendation.loopRuleId ?? 0;
+  const loopRule = {
+    ruleId,
+    scheduleType: recommendation.scheduleType,
+    daysOfWeek: recommendation.daysOfWeek,
+    startDate: recommendation.startDate ?? null,
+    endDate: recommendation.endDate ?? null,
+  };
+
+  return {
+    id: 0,
+    title: recommendation.title,
+    content: recommendation.content || null,
+    loopDate: recommendation.specificDate || recommendation.startDate || "",
+    progress: 0,
+    checklists,
+    loopRule,
+    scheduleType: recommendation.scheduleType,
+    daysOfWeek: recommendation.daysOfWeek,
+    startDate: recommendation.startDate ?? null,
+    endDate: recommendation.endDate ?? null,
+    loopRuleId: ruleId,
   };
 }

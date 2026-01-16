@@ -1,6 +1,9 @@
 import { FormEvent, useCallback, useState } from "react";
 import { apiFetch } from "@/lib/api";
-import { AddLoopDefaultValues, Checklist } from "@/components/common/add-loop/constants";
+import {
+  AddLoopDefaultValues,
+  Checklist,
+} from "@/components/common/add-loop/constants";
 import { useLoopTitle } from "./useLoopTitle";
 import { useLoopSchedule } from "./useLoopSchedule";
 import { useLoopDateRange } from "./useLoopDateRange";
@@ -11,6 +14,7 @@ interface UseAddLoopFormProps {
   onClose: () => void;
   defaultValues?: AddLoopDefaultValues;
   onCreated?: () => void;
+  chatRoomId?: number | null;
 }
 
 export function useAddLoopForm({
@@ -18,6 +22,7 @@ export function useAddLoopForm({
   onClose,
   defaultValues,
   onCreated,
+  chatRoomId,
 }: UseAddLoopFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -68,7 +73,7 @@ export function useAddLoopForm({
         scheduleType: normalizedScheduleType,
         specificDate:
           normalizedScheduleType === "NONE"
-            ? (dateRange.startDate?.format("YYYY-MM-DD") || null)
+            ? dateRange.startDate?.format("YYYY-MM-DD") || null
             : null,
         daysOfWeek: isWeekly ? schedule.daysOfWeek : [],
         startDate: dateRange.startDate?.format("YYYY-MM-DD") || null,
@@ -80,11 +85,20 @@ export function useAddLoopForm({
 
       try {
         setIsSubmitting(true);
-        const apiUrl = "/rest-api/v1/loops/";
+        const apiUrl = "/rest-api/v1/loops";
+        const requestPayload = {
+          ...payload,
+          ...(chatRoomId && { chatRoomId }),
+        };
+        const searchParams: Record<string, string | number> = {};
+        if (defaultValues?.loopRuleId) {
+          searchParams.loopRuleId = defaultValues.loopRuleId;
+        }
         await apiFetch(apiUrl, {
           method: "POST",
           credentials: "include",
-          json: payload,
+          json: requestPayload,
+          ...(Object.keys(searchParams).length > 0 && { searchParams }),
         });
         onCreated?.();
         onClose();
@@ -163,5 +177,3 @@ export function useAddLoopForm({
     },
   };
 }
-
-

@@ -24,7 +24,7 @@ function formatDate(dateString?: string): string {
 function mapChatRoomToChatLoop(room: ChatRoom): ChatLoop {
   return {
     id: room.id,
-    name: room.title || `루프 ${room.id}`,
+    name: room.title || "새 채팅",
     date: formatDate(room.lastMessageAt ?? ""),
   };
 }
@@ -61,7 +61,7 @@ export default function PlannerListPage() {
       });
 
       if (response.data?.id) {
-        router.push(`/planner/${response.data.id}`);
+        router.push(`/planner/${response.data.id}?new=true`);
       } else {
         console.error("채팅방 생성 실패: 응답에 ID가 없습니다", response);
       }
@@ -69,7 +69,7 @@ export default function PlannerListPage() {
       console.error("채팅방 생성 실패", error);
       // 에러 발생 시에도 임시로 이동 (개발 중)
       const newChatRoomId = Date.now();
-      router.push(`/planner/${newChatRoomId}`);
+      router.push(`/planner/${newChatRoomId}?new=true`);
     }
   };
 
