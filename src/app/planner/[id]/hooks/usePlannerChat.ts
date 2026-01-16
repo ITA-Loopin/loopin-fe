@@ -1,11 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-  EXAMPLE_PROMPTS,
-  UPDATE_MESSAGE,
-  LOOP_RESULT_PROMPT,
-} from "../constants";
+import { EXAMPLE_PROMPTS, UPDATE_MESSAGE } from "../constants";
 import type { ChatMessage, RecommendationSchedule } from "../types";
 import { generateId } from "../utils";
 import { useAppSelector } from "@/store/hooks";
@@ -214,18 +210,13 @@ export function usePlannerChat(
           status = hasRecommendations ? "recommendations" : "assistant";
         }
 
-        const bubbleContent =
-          hasRecommendations && !trimmedContent
-            ? LOOP_RESULT_PROMPT
-            : trimmedContent;
-
-        if (bubbleContent) {
+        if (trimmedContent) {
           newlyAdded.push({
             id:
               message.tempId ??
               (message.id !== undefined ? String(message.id) : generateId()),
             author,
-            content: bubbleContent,
+            content: trimmedContent,
           });
         }
 
@@ -320,10 +311,17 @@ export function usePlannerChat(
 
             // RECREATE_LOOP 후 텍스트 응답 체크 (추천이 없는 텍스트 메시지면 입력 요청)
             const content = messageData.content || "";
-            const hasRecommendations = Array.isArray(messageData.recommendations) && messageData.recommendations.length > 0;
-            
+            const hasRecommendations =
+              Array.isArray(messageData.recommendations) &&
+              messageData.recommendations.length > 0;
+
             // RECREATE_LOOP를 보낸 후 텍스트 응답을 받았고 추천이 없으면 입력 필드 표시
-            if (hasSentRecreateLoopRef.current && !hasRecommendations && content.trim() && messageData.authorType === "BOT") {
+            if (
+              hasSentRecreateLoopRef.current &&
+              !hasRecommendations &&
+              content.trim() &&
+              messageData.authorType === "BOT"
+            ) {
               setIsWaitingForRecreateInput(true);
               setIsLoading(false);
               setIsInputVisible(true);
@@ -566,7 +564,13 @@ export function usePlannerChat(
         }
       }
     },
-    [isLoading, plannerChatRoomId, initializeSSE, loopSelect, isWaitingForRecreateInput]
+    [
+      isLoading,
+      plannerChatRoomId,
+      initializeSSE,
+      loopSelect,
+      isWaitingForRecreateInput,
+    ]
   );
 
   const handleRetry = useCallback(async () => {
