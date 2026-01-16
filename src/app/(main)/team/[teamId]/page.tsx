@@ -263,7 +263,7 @@ export default function TeamDetailPage() {
             <button
               type="button"
               onClick={() => {
-                // TODO: 팀 활동 기록보기 페이지로 이동
+                router.push(`/team/${teamId}/activity`);
               }}
               className="flex w-full h-9 px-2 py-1.5 justify-center items-center gap-2 rounded-[5px] bg-[var(--gray-200)] text-body-2-sb text-[var(--gray-600)] whitespace-nowrap"
             >

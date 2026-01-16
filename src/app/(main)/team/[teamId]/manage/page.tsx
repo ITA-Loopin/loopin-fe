@@ -277,8 +277,10 @@ export default function TeamManagePage() {
                          <span className="flex h-6 items-center justify-center px-2 py-0 gap-[10px] rounded-[5px] bg-[var(--primary-200)] text-caption-m text-[var(--primary-main)]">
                            팀장
                          </span>
-                         {/* X 버튼과 같은 너비의 빈 공간 */}
-                         <div className="w-[10px] h-[10px]" />
+                         {/* X 버튼과 같은 너비의 빈 공간 - 리더일 때만 */}
+                         {isLeader && (
+                           <div className="w-[10px] h-[10px]" />
+                         )}
                        </>
                      )}
                      {member.memberId !== teamDetail.leaderId && (
@@ -294,10 +296,6 @@ export default function TeamManagePage() {
                              height={10}
                              onClick={() => handleRemoveMemberClick(member.memberId, member.nickname)}
                            />
-                         )}
-                         {!isLeader && (
-                           /* X 버튼과 같은 너비의 빈 공간 */
-                           <div className="w-6 h-6" />
                          )}
                        </>
                      )}
