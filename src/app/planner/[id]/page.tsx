@@ -47,7 +47,9 @@ export default function PlannerChatPage() {
     handleInputChange,
     handleSubmit,
     handleRetry,
+    handleUpdateLoop,
     showUpdateMessage,
+    pendingMessageType,
   } = usePlannerChat(chatRoomId, chatRoomLoopSelect);
 
   type PlannerFormValues = { prompt: string };
@@ -212,6 +214,8 @@ export default function PlannerChatPage() {
                     onClick={() => {
                       if (chatRoomLoopSelect && updateRecommendation) {
                         setIsLoopGroupEditSheetOpen(true);
+                      } else if (chatRoomLoopSelect) {
+                        handleUpdateLoop();
                       } else {
                         handleRetry();
                       }
@@ -231,7 +235,7 @@ export default function PlannerChatPage() {
         </div>
 
         {isInputVisible &&
-        (showUpdateMessage || recommendations.length === 0) ? (
+        (showUpdateMessage || recommendations.length === 0 || pendingMessageType) ? (
           <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center">
             <div className="pointer-events-auto w-full max-w-xl bg-white p-4 pb-6">
               {exampleLabel ? (
@@ -249,9 +253,13 @@ export default function PlannerChatPage() {
                 <textarea
                   {...register("prompt")}
                   placeholder={
-                    chatRoomLoopSelect
-                      ? "수정하고 싶은 루프 내용을 입력해주세요."
-                      : "만들고 싶은 루프를 입력해주세요."
+                    pendingMessageType === "RECREATE_LOOP"
+                      ? "다시 생성하고 싶은 루프 내용을 입력해주세요."
+                      : pendingMessageType === "UPDATE_LOOP"
+                        ? "수정하고 싶은 루프 내용을 입력해주세요."
+                        : chatRoomLoopSelect
+                          ? "수정하고 싶은 루프 내용을 입력해주세요."
+                          : "만들고 싶은 루프를 입력해주세요."
                   }
                   rows={1}
                   className="max-h-32 flex-1 border-none text-sm text-[#2C2C2C] outline-none resize-none"
