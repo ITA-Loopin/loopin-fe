@@ -1,6 +1,3 @@
-export const INITIAL_MESSAGE = `새 루프를 시작해볼까요?
-해야 할 일, 종료일, 반복 주기 등을 적어주세요!`;
-
 export const UPDATE_MESSAGE = `루프를 수정해볼까요?
 수정하고 싶은 루프 내용을 자세하게 알려주세요!`;
 
