@@ -675,6 +675,36 @@ export async function deleteTeam(
 }
 
 /**
+ * 팀원 삭제 API
+ */
+export async function removeTeamMember(
+  teamId: number,
+  memberId: number
+): Promise<{ success: boolean; message?: string }> {
+  try {
+    const response = await apiFetch<{
+      success: boolean;
+      code: string;
+      message: string;
+      data?: unknown;
+    }>(`/rest-api/v1/teams/${teamId}/members/${memberId}`, {
+      method: "DELETE",
+    });
+
+    if (!response.success) {
+      throw new Error(response.message || "팀원 삭제에 실패했습니다");
+    }
+
+    return {
+      success: true,
+      message: response.message,
+    };
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
  * 팀 활동 조회 API 응답 타입
  */
 export type TeamMemberActivitiesApiResponse = {
