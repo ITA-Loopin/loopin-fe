@@ -243,10 +243,22 @@ export type TeamLoopListApiResponse = {
  */
 export async function fetchTeamLoops(
   teamId: number,
-  date?: string
+  date?: string,
+  status?: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED"
 ): Promise<TeamLoopApiItem[]> {
-  const url = date
-    ? `/rest-api/v1/teams/${teamId}/loops?date=${date}`
+  const searchParams = new URLSearchParams();
+  
+  if (date) {
+    searchParams.append("date", date);
+  }
+  
+  if (status) {
+    searchParams.append("status", status);
+  }
+  
+  const queryString = searchParams.toString();
+  const url = queryString
+    ? `/rest-api/v1/teams/${teamId}/loops?${queryString}`
     : `/rest-api/v1/teams/${teamId}/loops`;
   
   const response = await apiFetch<TeamLoopListApiResponse>(url);
@@ -660,6 +672,72 @@ export async function deleteTeam(
   } catch (error) {
     throw error;
   }
+}
+
+/**
+ * 팀 활동 조회 API 응답 타입
+ */
+export type TeamMemberActivitiesApiResponse = {
+  success: boolean;
+  code: string;
+  message: string;
+  data: {
+    memberActivities: Array<{
+      memberId: number;
+      nickname: string;
+      isMe: boolean;
+      statusStats: {
+        NOT_STARTED?: number;
+        IN_PROGRESS?: number;
+        COMPLETED?: number;
+      };
+      typeStats: {
+        COMMON?: number;
+        INDIVIDUAL?: number;
+      };
+      overallProgress: number;
+      lastActivity?: {
+        actionType: string;
+        targetName: string;
+        timestamp: string;
+      };
+    }>;
+    recentTeamActivities: Array<{
+      memberId: number;
+      nickname: string;
+      actionType: string;
+      targetName: string;
+      timestamp: string;
+    }>;
+  };
+  page: {
+    page: number;
+    size: number;
+    totalPages: number;
+    totalElements: number;
+    first: boolean;
+    last: boolean;
+    hasNext: boolean;
+  };
+  timestamp: string;
+  traceId: string;
+};
+
+/**
+ * 팀 활동 조회 API
+ */
+export async function fetchTeamMemberActivities(
+  teamId: number
+): Promise<TeamMemberActivitiesApiResponse["data"]> {
+  const response = await apiFetch<TeamMemberActivitiesApiResponse>(
+    `/rest-api/v1/teams/${teamId}/member-activities`
+  );
+
+  if (!response.success || !response.data) {
+    throw new Error(response.message || "팀 활동 조회에 실패했습니다");
+  }
+
+  return response.data;
 }
 
 
