@@ -7,6 +7,7 @@ type RecommendationCardProps = {
   recommendation: RecommendationSchedule;
   index: number;
   onSelect: (recommendation: RecommendationSchedule) => void;
+  chatRoomLoopSelect: boolean;
 };
 
 export function RecommendationCard({

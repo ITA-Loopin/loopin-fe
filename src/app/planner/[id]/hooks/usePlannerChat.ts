@@ -84,6 +84,9 @@ export function usePlannerChat(
   const [updateRecommendation, setUpdateRecommendation] =
     useState<RecommendationSchedule | null>(null);
   const [showUpdateMessage, setShowUpdateMessage] = useState(false);
+  const [isWaitingForRecreateInput, setIsWaitingForRecreateInput] =
+    useState(false);
+  const hasSentRecreateLoopRef = useRef(false);
   const messageListRef = useRef<HTMLDivElement | null>(null);
   const seenMessageIdsRef = useRef<Set<string>>(new Set());
   const pendingUserMessageIdsRef = useRef<Map<string, string[]>>(new Map());
@@ -315,6 +318,18 @@ export function usePlannerChat(
               return;
             }
 
+            // RECREATE_LOOP 후 텍스트 응답 체크 (추천이 없는 텍스트 메시지면 입력 요청)
+            const content = messageData.content || "";
+            const hasRecommendations = Array.isArray(messageData.recommendations) && messageData.recommendations.length > 0;
+            
+            // RECREATE_LOOP를 보낸 후 텍스트 응답을 받았고 추천이 없으면 입력 필드 표시
+            if (hasSentRecreateLoopRef.current && !hasRecommendations && content.trim() && messageData.authorType === "BOT") {
+              setIsWaitingForRecreateInput(true);
+              setIsLoading(false);
+              setIsInputVisible(true);
+              hasSentRecreateLoopRef.current = false; // 플래그 초기화
+            }
+
             // 일반 메시지 처리
             const status = appendNewMessages(messageData);
 
@@ -505,12 +520,25 @@ export function usePlannerChat(
 
       try {
         // SSE는 단방향이므로 메시지 전송은 REST API 사용
+        // RECREATE_LOOP 후 입력 요청 메시지를 받았으면 CREATE_LOOP로 전송
+        const messageType = isWaitingForRecreateInput
+          ? "CREATE_LOOP"
+          : loopSelect === true
+            ? "UPDATE_LOOP"
+            : "CREATE_LOOP";
+
         await sendChatMessage({
           chatRoomId: plannerChatRoomId,
           clientMessageId: userMessage.id,
           content: trimmed,
-          messageType: loopSelect === true ? "UPDATE_LOOP" : "CREATE_LOOP",
+          messageType,
         });
+
+        // 메시지 전송 후 플래그 초기화
+        if (isWaitingForRecreateInput) {
+          setIsWaitingForRecreateInput(false);
+          hasSentRecreateLoopRef.current = false; // RECREATE_LOOP 플래그도 초기화
+        }
       } catch (error) {
         console.error("루프 추천 요청 실패", error);
         const message =
@@ -538,7 +566,7 @@ export function usePlannerChat(
         }
       }
     },
-    [isLoading, plannerChatRoomId, initializeSSE, loopSelect]
+    [isLoading, plannerChatRoomId, initializeSSE, loopSelect, isWaitingForRecreateInput]
   );
 
   const handleRetry = useCallback(async () => {
@@ -557,11 +585,13 @@ export function usePlannerChat(
     setIsInputVisible(false);
     setRecommendations([]);
     setUpdateRecommendation(null);
+    setIsWaitingForRecreateInput(false);
 
     const retryMessageId = generateId();
 
     try {
       // RECREATE_LOOP 메시지 타입으로 전송
+      hasSentRecreateLoopRef.current = true; // RECREATE_LOOP 전송 플래그 설정
       await sendChatMessage({
         chatRoomId: plannerChatRoomId,
         clientMessageId: retryMessageId,
