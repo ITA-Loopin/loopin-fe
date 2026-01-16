@@ -13,6 +13,8 @@ import {
   type MemberResponse,
 } from "@/lib/member";
 import type { User } from "@/types/auth";
+import { saveFCMTokenApi } from "@/lib/fcm";
+import { authFetch } from "@/utils/fetch";
 
 export const dynamic = "force-dynamic";
 
@@ -52,6 +54,14 @@ function HomeContent() {
           user: userData,
         })
       );
+
+      // 로그인 성공 후 FCM 토큰 저장
+      try {
+        await saveFCMTokenApi(authFetch);
+      } catch (error) {
+        console.error("FCM 토큰 저장 실패:", error);
+        // FCM 토큰 저장 실패는 로그인 플로우를 중단하지 않음
+      }
 
       router.replace("/home");
     } catch (error) {
