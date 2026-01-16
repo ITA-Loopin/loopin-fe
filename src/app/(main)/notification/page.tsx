@@ -34,6 +34,10 @@ export default function NotificationPage() {
           page: 0,
           size: 20,
         });
+
+        if (response.data) {
+          setNotifications(response.data);
+        }
       } catch (err) {
         console.error("알림 로드 실패:", err);
         setError(
@@ -97,7 +101,15 @@ export default function NotificationPage() {
   }, [notifications]);
 
   const handleReject = async (notificationId: number) => {
-    await markNotificationsAsRead([notificationId]);
+    try {
+      await markNotificationsAsRead([notificationId]);
+      // 알림 목록에서 제거
+      setNotifications((prev) =>
+        prev.filter((notif) => notif.id !== notificationId)
+      );
+    } catch (err) {
+      console.error("알림 거절 실패:", err);
+    }
   };
 
   const handleAccept = async (notification: Notification) => {
@@ -165,41 +177,25 @@ function NotificationCard({
   onAccept,
 }: NotificationCardProps) {
   return (
-    <div className="rounded-lg bg-white border border-gray-200 p-4 shadow-sm">
-      <div className="flex items-start gap-3 mb-4">
-        {notification.senderProfileUrl && (
-          <img
-            src={notification.senderProfileUrl}
-            alt={notification.senderNickname}
-            className="w-10 h-10 rounded-full object-cover"
-          />
-        )}
-        <div className="flex-1">
-          <p className="text-sm text-gray-800 leading-relaxed">
-            {notification.content}
-          </p>
-          <p className="text-xs text-gray-500 mt-1">
-            {dayjs(notification.createdAt).format("M월 D일 HH:mm")}
-          </p>
-        </div>
-      </div>
+    <div className="rounded-lg bg-gray-50 border border-gray-100 p-4">
+      <p className="text-sm text-gray-900 mb-4 leading-relaxed">
+        {notification.content}
+      </p>
 
-      {notification.targetObject === "TeamInvite" && (
-        <div className="flex gap-2">
-          <button
-            onClick={() => onReject(notification.id)}
-            className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            거절하기
-          </button>
-          <button
-            onClick={() => onAccept(notification)}
-            className="flex-1 px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
-          >
-            팀 참여하기
-          </button>
-        </div>
-      )}
+      <div className="flex gap-2">
+        <button
+          onClick={() => onReject(notification.id)}
+          className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-lg"
+        >
+          거절하기
+        </button>
+        <button
+          onClick={() => onAccept(notification)}
+          className="flex-1 px-4 py-2 text-sm font-medium text-red-600 bg-white rounded-lg "
+        >
+          팀 참여하기
+        </button>
+      </div>
     </div>
   );
 }
