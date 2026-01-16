@@ -13,6 +13,7 @@ import {
   deleteTeam,
   removeTeamMember,
   leaveTeam,
+  inviteTeamMember,
   type TeamMember,
 } from "@/lib/team";
 import { fetchMemberProfile } from "@/lib/member";
@@ -40,6 +41,7 @@ export default function TeamManagePage() {
   const [isRemoving, setIsRemoving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
+  const [isInviting, setIsInviting] = useState(false);
   const [currentMemberId, setCurrentMemberId] = useState<number | null>(null);
   const [memberToRemove, setMemberToRemove] = useState<{ memberId: number; nickname: string } | null>(null);
   const [isVisibilityDropdownOpen, setIsVisibilityDropdownOpen] = useState(false);
@@ -111,14 +113,11 @@ export default function TeamManagePage() {
   }, [teamId]);
 
   const handleInvite = async (member: { id: number; nickname: string; email: string }) => {
-    // TODO: API 준비되면 활성화
-    toast.info("팀원 초대 기능은 준비 중입니다");
-    /*
     if (!teamId || isInviting) return;
 
     try {
       setIsInviting(true);
-      await inviteTeamMember(Number(teamId), member.nickname);
+      await inviteTeamMember(Number(teamId), member.id);
       toast.success("팀원을 초대했습니다");
       
       // 팀원 목록 새로고침
@@ -130,7 +129,6 @@ export default function TeamManagePage() {
     } finally {
       setIsInviting(false);
     }
-    */
   };
 
   const handleRemoveMemberClick = (memberId: number, nickname: string) => {
