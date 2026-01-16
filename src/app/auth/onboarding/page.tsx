@@ -8,6 +8,8 @@ import { useAppDispatch } from "@/store/hooks";
 import { setCredentials } from "@/store/slices/authSlice";
 import type { User } from "@/types/auth";
 import { buildUserFromMemberProfile, fetchMemberProfile } from "@/lib/member";
+import { saveFCMTokenApi } from "@/lib/fcm";
+import { authFetch } from "@/utils/fetch";
 
 type SignupSession = {
   ticket: string;
@@ -167,6 +169,14 @@ export default function OnboardingPage() {
           user: finalUser,
         })
       );
+
+      // 회원가입/로그인 성공 후 FCM 토큰 저장
+      try {
+        await saveFCMTokenApi(authFetch);
+      } catch (error) {
+        console.error("FCM 토큰 저장 실패:", error);
+        // FCM 토큰 저장 실패는 회원가입 플로우를 중단하지 않음
+      }
 
       sessionStorage.removeItem("signup_data");
       setIsModalOpen(false);

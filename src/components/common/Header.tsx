@@ -62,6 +62,14 @@ export default function Header({
     router.push("/my-page");
   };
 
+  const handleNotificationClick = () => {
+    if (onNotificationClick) {
+      onNotificationClick();
+    } else {
+      router.push("/notification");
+    }
+  };
+
   const renderRight = () => {
     if (rightSlot) return rightSlot;
 
@@ -78,7 +86,7 @@ export default function Header({
             <IconButton
               src="/header/header_bell.svg"
               alt="알림"
-              onClick={onNotificationClick}
+              onClick={handleNotificationClick}
             />
           </div>
         );
