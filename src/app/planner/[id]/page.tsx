@@ -185,6 +185,7 @@ export default function PlannerChatPage() {
                   recommendation={recommendation}
                   index={index + 1}
                   onSelect={handleSelectRecommendation}
+                  chatRoomLoopSelect={chatRoomLoopSelect}
                 />
               ))}
 

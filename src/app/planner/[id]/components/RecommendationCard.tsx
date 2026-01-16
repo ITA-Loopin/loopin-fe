@@ -13,6 +13,7 @@ export function RecommendationCard({
   recommendation,
   index,
   onSelect,
+  chatRoomLoopSelect,
 }: RecommendationCardProps) {
   return (
     <div className="rounded-2xl bg-white p-5 mb-4 shadow-sm">
@@ -47,13 +48,15 @@ export function RecommendationCard({
           </div>
         ) : null}
 
-        <button
-          type="button"
-          onClick={() => onSelect(recommendation)}
-          className="mt-1 w-full rounded-sm bg-[#FFE4E0] py-1 text-sm font-semibold text-[#FF543F]"
-        >
-          선택하기
-        </button>
+        {!chatRoomLoopSelect && (
+          <button
+            type="button"
+            onClick={() => onSelect(recommendation)}
+            className="mt-1 w-full rounded-sm bg-[#FFE4E0] py-1 text-sm font-semibold text-[#FF543F]"
+          >
+            선택하기
+          </button>
+        )}
       </div>
     </div>
   );

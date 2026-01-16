@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   EXAMPLE_PROMPTS,
-  INITIAL_MESSAGE,
   UPDATE_MESSAGE,
   LOOP_RESULT_PROMPT,
 } from "../constants";
@@ -75,9 +74,7 @@ export function usePlannerChat(
   loopSelect?: boolean
 ) {
   const { user } = useAppSelector((state) => state.auth);
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    { id: generateId(), author: "assistant", content: INITIAL_MESSAGE },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isInputVisible, setIsInputVisible] = useState(true);
@@ -123,9 +120,7 @@ export function usePlannerChat(
 
     previousChatRoomIdRef.current = plannerChatRoomId;
     seenMessageIdsRef.current.clear();
-    setMessages([
-      { id: generateId(), author: "assistant", content: INITIAL_MESSAGE },
-    ]);
+    setMessages([]);
     setRecommendations([]);
   }, [plannerChatRoomId]);
 
@@ -153,6 +148,17 @@ export function usePlannerChat(
       let status: AppendStatus = "none";
 
       sorted.forEach((message) => {
+        // deleteMessageId가 있으면 해당 메시지를 숨김
+        if (message.deleteMessageId) {
+          setMessages((prev) =>
+            prev.filter((msg) => msg.id !== message.deleteMessageId)
+          );
+          // recommendations도 삭제 (RECREATE_LOOP인 경우)
+          setRecommendations([]);
+          setUpdateRecommendation(null);
+          return;
+        }
+
         const dedupeKeyRaw =
           message.tempId ??
           (message.id !== undefined ? String(message.id) : message.createdAt);
@@ -239,10 +245,8 @@ export function usePlannerChat(
 
       if (newlyAdded.length) {
         setMessages((prev) => {
-          // 히스토리 메시지가 있으면 초기 메시지(INITIAL_MESSAGE) 제거
           const filteredPrev = prev.filter(
-            (msg) =>
-              msg.content !== INITIAL_MESSAGE && msg.content !== UPDATE_MESSAGE
+            (msg) => msg.content !== UPDATE_MESSAGE
           );
           return [...filteredPrev, ...newlyAdded];
         });
@@ -403,7 +407,7 @@ export function usePlannerChat(
                   {
                     id: generateId(),
                     author: "assistant",
-                    content: UPDATE_MESSAGE,
+                    content: UPDATE_MESSAGE || "content",
                   },
                 ];
               }
@@ -537,24 +541,39 @@ export function usePlannerChat(
     [isLoading, plannerChatRoomId, initializeSSE, loopSelect]
   );
 
-  const handleRetry = useCallback(() => {
-    setIsLoading(false);
-    setIsInputVisible(true);
-    setShowUpdateMessage(true);
-    // INITIAL_MESSAGE가 없으면 다시 추가
-    setMessages((prev) => {
-      const hasInitialMessage = prev.some(
-        (msg) => msg.content === INITIAL_MESSAGE
-      );
-      if (!hasInitialMessage) {
-        return [
-          { id: generateId(), author: "assistant", content: INITIAL_MESSAGE },
-          ...prev,
-        ];
-      }
-      return prev;
-    });
-  }, []);
+  const handleRetry = useCallback(async () => {
+    if (!plannerChatRoomId) {
+      return;
+    }
+
+    // SSE 연결 확인
+    const eventSource = eventSourceRef.current;
+    if (!eventSource || eventSource.readyState !== EventSource.OPEN) {
+      initializeSSE();
+      return;
+    }
+
+    setIsLoading(true);
+    setIsInputVisible(false);
+    setRecommendations([]);
+    setUpdateRecommendation(null);
+
+    const retryMessageId = generateId();
+
+    try {
+      // RECREATE_LOOP 메시지 타입으로 전송
+      await sendChatMessage({
+        chatRoomId: plannerChatRoomId,
+        clientMessageId: retryMessageId,
+        content: "content",
+        messageType: "RECREATE_LOOP",
+      });
+    } catch (error) {
+      console.error("루프 재생성 요청 실패", error);
+      setIsInputVisible(true);
+      setIsLoading(false);
+    }
+  }, [plannerChatRoomId, initializeSSE]);
 
   return {
     messages,
