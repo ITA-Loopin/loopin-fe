@@ -211,11 +211,7 @@ export function usePlannerChat(
           status = hasRecommendations ? "recommendations" : "assistant";
         }
 
-        let messageId: string | null = null;
         if (trimmedContent) {
-          messageId =
-            message.tempId ??
-            (message.id !== undefined ? String(message.id) : generateId());
           newlyAdded.push({
             id: messageId,
             author,
