@@ -648,6 +648,36 @@ export async function fetchTeamLoopMemberChecklist(
 
 
 /**
+ * 팀 루프 완료 API
+ */
+export async function completeTeamLoop(
+  teamId: number,
+  loopId: number
+): Promise<{ success: boolean; message?: string }> {
+  try {
+    const response = await apiFetch<{
+      success: boolean;
+      code: string;
+      message: string;
+      data?: unknown;
+    }>(`/rest-api/v1/teams/${teamId}/loops/${loopId}/complete`, {
+      method: "POST",
+    });
+
+    if (!response.success) {
+      throw new Error(response.message || "팀 루프 완료에 실패했습니다");
+    }
+
+    return {
+      success: true,
+      message: response.message,
+    };
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
  * 팀 삭제 API
  */
 export async function deleteTeam(

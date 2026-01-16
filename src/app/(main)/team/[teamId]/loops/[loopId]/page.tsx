@@ -9,7 +9,7 @@ import { TeamLoopDetailContent } from "@/components/team/TeamLoopDetailContent";
 import { LoopActionModal } from "@/components/loop/LoopActionModal";
 import { LoopEditSheet } from "@/components/loop/LoopEditSheet";
 import { LoopGroupEditSheet } from "@/components/loop/LoopGroupEditSheet";
-import { fetchTeamLoops, fetchTeamLoopChecklists, fetchTeamLoopMyDetail, fetchTeamLoopAllDetail, createTeamLoopChecklist, toggleTeamLoopChecklist, deleteTeamLoopChecklist, type TeamLoopApiItem } from "@/lib/team";
+import { fetchTeamLoops, fetchTeamLoopChecklists, fetchTeamLoopMyDetail, fetchTeamLoopAllDetail, createTeamLoopChecklist, toggleTeamLoopChecklist, deleteTeamLoopChecklist, completeTeamLoop, type TeamLoopApiItem } from "@/lib/team";
 import type { LoopDetail } from "@/types/loop";
 import { MemberProgressModal } from "@/components/team/MemberProgressModal";
 
@@ -405,6 +405,56 @@ export default function TeamLoopDetailPage() {
     setActionModal({ type: "delete", isOpen: true });
   };
 
+  // 팀 루프 완료 핸들러
+  const handleCompleteTeamLoop = async () => {
+    if (!detail || view !== "my") {
+      return { success: false };
+    }
+
+    // 이미 100%인 경우
+    if (detail.progress === 100) {
+      return { success: true, alreadyComplete: true };
+    }
+
+    const previousState = detail;
+
+    // 먼저 체크리스트만 완료 상태로 변경 (progress는 나중에)
+    setDetail((prev) => {
+      if (!prev) return prev;
+      const nextChecklists = prev.checklists.map((item) => ({
+        ...item,
+        completed: true,
+      }));
+      return {
+        ...prev,
+        checklists: nextChecklists,
+        // progress는 나중에 애니메이션으로 변경
+      };
+    });
+
+    // progress를 천천히 100으로 증가시키는 애니메이션
+    setTimeout(() => {
+      setDetail((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          progress: 100,
+        };
+      });
+    }, 100);
+
+    try {
+      await completeTeamLoop(teamId, loopId);
+      // Optimistic update로 이미 UI가 업데이트되었으므로 reload 불필요
+      // 화면 깜빡임을 방지하기 위해 reload 제거
+      return { success: true, alreadyComplete: false };
+    } catch (error) {
+      // 에러 발생 시 이전 상태로 롤백
+      setDetail(previousState);
+      return { success: false };
+    }
+  };
+
   return (
     <>
       <div
@@ -447,7 +497,7 @@ export default function TeamLoopDetailPage() {
               onToggleChecklist={view === "my" ? handleToggleChecklist : undefined}
               onAddChecklist={view === "my" ? handleAddChecklist : undefined}
               onDeleteChecklist={view === "my" ? handleDeleteChecklist : undefined}
-              onCompleteLoop={checklist.handleCompleteLoop}
+              onCompleteLoop={handleCompleteTeamLoop}
               isMenuOpen={isMenuOpen}
               onMenuClick={handleMenuClick}
               onMenuClose={() => setIsMenuOpen(false)}
