@@ -161,8 +161,11 @@ export default function TeamLoopDetailPage() {
           };
           setTeamLoopData(teamLoopData);
 
-          // 팀원별 진행 상황 저장
-          setMemberProgresses(allDetail.memberProgresses);
+          // 팀원별 진행 상황 저장 (progress를 정수로 변환)
+          setMemberProgresses(allDetail.memberProgresses.map((member) => ({
+            ...member,
+            progress: Math.round(Math.min(Math.max(member.progress, 0), 100)),
+          })));
 
           // 체크리스트 변환 (팀 루프 API는 completed 정보가 없음)
           const checklists = allDetail.checklists
