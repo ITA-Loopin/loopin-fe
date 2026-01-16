@@ -455,6 +455,23 @@ export function usePlannerChat(
       setMessages((prev) => [...prev, userMessage]);
       setInputValue("");
       setRecommendations([]);
+<<<<<<< Updated upstream
+=======
+
+      // 추천 카드와 함께 온 메시지 제거하고 사용자 메시지 추가
+      const recommendationMessageId = recommendationMessageIdRef.current;
+      if (recommendationMessageId) {
+        recommendationMessageIdRef.current = null;
+      }
+
+      setMessages((prev) => {
+        const filtered = recommendationMessageId
+          ? prev.filter((msg) => msg.id !== recommendationMessageId)
+          : prev;
+        return [...filtered, userMessage];
+      });
+
+>>>>>>> Stashed changes
       seenMessageIdsRef.current.add(userMessage.id);
 
       const queue = pendingUserMessageIdsRef.current.get(trimmed) ?? [];
@@ -557,6 +574,18 @@ export function usePlannerChat(
     setIsInputVisible(false);
     setRecommendations([]);
     setUpdateRecommendation(null);
+<<<<<<< Updated upstream
+=======
+
+    // 추천 카드와 함께 온 메시지 제거
+    if (recommendationMessageIdRef.current) {
+      setMessages((prev) =>
+        prev.filter((msg) => msg.id !== recommendationMessageIdRef.current)
+      );
+      recommendationMessageIdRef.current = null;
+    }
+  }, []);
+>>>>>>> Stashed changes
 
     const retryMessageId = generateId();
 
