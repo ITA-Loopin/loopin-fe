@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
@@ -8,6 +8,8 @@ import Header from "@/components/common/Header";
 import {
   fetchNotifications,
   markNotificationsAsRead,
+  rejectTeamInvitation,
+  acceptTeamInvitation,
   type Notification,
 } from "@/lib/notification";
 
@@ -25,31 +27,31 @@ export default function NotificationPage() {
   const [error, setError] = useState<string | null>(null);
 
   // 알림 목록 조회
-  useEffect(() => {
-    const loadNotifications = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const response = await fetchNotifications({
-          page: 0,
-          size: 20,
-        });
+  const loadNotifications = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await fetchNotifications({
+        page: 0,
+        size: 20,
+      });
 
-        if (response.data) {
-          setNotifications(response.data);
-        }
-      } catch (err) {
-        console.error("알림 로드 실패:", err);
-        setError(
-          err instanceof Error ? err.message : "알림을 불러오는데 실패했습니다."
-        );
-      } finally {
-        setIsLoading(false);
+      if (response.data) {
+        setNotifications(response.data);
       }
-    };
-
-    loadNotifications();
+    } catch (err) {
+      console.error("알림 로드 실패:", err);
+      setError(
+        err instanceof Error ? err.message : "알림을 불러오는데 실패했습니다."
+      );
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    loadNotifications();
+  }, [loadNotifications]);
 
   // 알림을 날짜별로 그룹화
   const groupedNotifications = useMemo(() => {
@@ -100,25 +102,24 @@ export default function NotificationPage() {
     return groups;
   }, [notifications]);
 
-  const handleReject = async (notificationId: number) => {
+  const handleReject = async (notification: Notification) => {
     try {
-      await markNotificationsAsRead([notificationId]);
-      // 알림 목록에서 제거
-      setNotifications((prev) =>
-        prev.filter((notif) => notif.id !== notificationId)
-      );
+      await rejectTeamInvitation(notification.objectId);
+      await markNotificationsAsRead([notification.id]);
+      await loadNotifications();
     } catch (err) {
       console.error("알림 거절 실패:", err);
     }
   };
 
   const handleAccept = async (notification: Notification) => {
-    // TODO: 팀 참여 로직 구현 (targetObject와 objectId에 따라 다르게 처리)
-    console.log("팀 참여:", notification);
-
-    if (notification.targetObject === "TeamInvite") {
-      // 팀 페이지로 이동하거나 팀 참여 API 호출
+    try {
+      await acceptTeamInvitation(notification.objectId);
+      await markNotificationsAsRead([notification.id]);
+      await loadNotifications();
       router.push(`/team/${notification.objectId}`);
+    } catch (err) {
+      console.error("팀 참여 실패:", err);
     }
   };
 
@@ -167,7 +168,7 @@ export default function NotificationPage() {
 
 type NotificationCardProps = {
   notification: Notification;
-  onReject: (id: number) => void;
+  onReject: (notification: Notification) => void;
   onAccept: (notification: Notification) => void;
 };
 
@@ -184,14 +185,14 @@ function NotificationCard({
 
       <div className="flex gap-2">
         <button
-          onClick={() => onReject(notification.id)}
+          onClick={() => onReject(notification)}
           className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-lg"
         >
           거절하기
         </button>
         <button
           onClick={() => onAccept(notification)}
-          className="flex-1 px-4 py-2 text-sm font-medium text-red-600 bg-white rounded-lg "
+          className="flex-1 px-4 py-2 text-sm font-medium text-red-600 bg-white rounded-lg"
         >
           팀 참여하기
         </button>
