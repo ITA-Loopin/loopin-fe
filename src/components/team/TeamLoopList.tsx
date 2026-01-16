@@ -34,6 +34,20 @@ export function TeamLoopList({ loops, isLoading, activeTab, teamId }: TeamLoopLi
     }
   });
 
+  // API 상태를 한국어로 변환
+  const formatStatus = (apiStatus: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED"): "완료됨" | "진행중" | "시작전" => {
+    switch (apiStatus) {
+      case "COMPLETED":
+        return "완료됨";
+      case "IN_PROGRESS":
+        return "진행중";
+      case "NOT_STARTED":
+        return "시작전";
+      default:
+        return "시작전";
+    }
+  };
+
   // API 데이터를 UI 형식으로 변환
   const displayLoops: LoopDisplayItem[] = filteredLoops.map((loop) => {
     // API의 personalProgress/teamProgress는 0~1 범위이므로 100을 곱하고, 0~100 범위로 제한
@@ -47,7 +61,11 @@ export function TeamLoopList({ loops, isLoading, activeTab, teamId }: TeamLoopLi
       : Math.min(Math.max(rawProgress * 100, 0), 100); // 0~1 범위를 0~100으로 변환
     
     const progress = Math.round(normalizedProgress);
-    const status = getProgressStatus(progress);
+    // 내 루프 탭: personalStatus, 팀 루프 탭: teamStatus 사용
+    const apiStatus = activeTab === "my" 
+      ? loop.personalStatus 
+      : loop.teamStatus;
+    const status = formatStatus(apiStatus);
     const importance = formatImportance(loop.importance);
     const type = formatLoopType(loop.type);
     

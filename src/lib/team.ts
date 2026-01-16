@@ -212,6 +212,8 @@ export type TeamLoopApiItem = {
   id: number;
   title: string;
   loopDate: string;
+  personalStatus: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
+  teamStatus: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
   type: "COMMON" | "INDIVIDUAL";
   importance: "HIGH" | "MEDIUM" | "LOW";
   teamProgress: number;
