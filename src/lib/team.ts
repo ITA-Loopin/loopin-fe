@@ -195,9 +195,9 @@ export async function fetchTeamDetail(teamId: number): Promise<TeamItem & {
     category: data.category,
     title: data.name,
     description: data.goal,
-    progress: data.myTotalProgress, // 내 루프 진행률 사용
-    myTotalProgress: data.myTotalProgress,
-    teamTotalProgress: data.teamTotalProgress,
+    progress: Math.round(Math.min(Math.max(data.myTotalProgress, 0), 100)), // 내 루프 진행률 사용 (정수로 변환)
+    myTotalProgress: Math.round(Math.min(Math.max(data.myTotalProgress, 0), 100)),
+    teamTotalProgress: Math.round(Math.min(Math.max(data.teamTotalProgress, 0), 100)),
     leaderId: data.leaderId,
     createdAt: data.createdAt,
     visibility: data.visibility,
@@ -696,11 +696,11 @@ export type TeamMemberActivitiesApiResponse = {
         INDIVIDUAL?: number;
       };
       overallProgress: number;
-      lastActivity?: {
+      lastActivity: {
         actionType: string;
         targetName: string;
         timestamp: string;
-      };
+      } | null;
     }>;
     recentTeamActivities: Array<{
       memberId: number;
@@ -710,7 +710,7 @@ export type TeamMemberActivitiesApiResponse = {
       timestamp: string;
     }>;
   };
-  page: {
+  page?: {
     page: number;
     size: number;
     totalPages: number;
@@ -720,7 +720,7 @@ export type TeamMemberActivitiesApiResponse = {
     hasNext: boolean;
   };
   timestamp: string;
-  traceId: string;
+  traceId?: string;
 };
 
 /**

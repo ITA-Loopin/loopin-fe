@@ -83,7 +83,7 @@ export default function TeamActivityPage() {
             commonLoopCount,
             individualLoopCount,
             recentActivity: activity.lastActivity?.targetName,
-            progress: Math.round(activity.overallProgress * 100),
+            progress: Math.round(activity.overallProgress),
           };
         });
         
@@ -236,8 +236,15 @@ export default function TeamActivityPage() {
               </div>
             ) : (
               filteredLoops.slice(0, 2).map((loop) => {
-              const progress = Math.round(loop.teamProgress * 100);
-              const status = getProgressStatus(progress);
+              // personalProgress 사용 (0-1 범위일 수도 있고 0-100 범위일 수도 있음)
+              const rawProgress = loop.personalProgress;
+              const progress = rawProgress > 1 
+                ? Math.round(rawProgress) 
+                : Math.round(rawProgress * 100);
+              // statusFilter에 맞는 상태 표시 (API에서 이미 필터링된 결과)
+              const status = statusFilter === "COMPLETED" ? "완료됨" 
+                : statusFilter === "IN_PROGRESS" ? "진행중" 
+                : "시작전";
               const radius = 18;
               const circumference = 2 * Math.PI * radius;
               const offset = circumference - (progress / 100) * circumference;
@@ -262,7 +269,7 @@ export default function TeamActivityPage() {
                     </p>
                   </div>
                   <div className="relative flex h-9 w-9 items-center justify-center ml-4">
-                    <svg className="h-9 w-9 -rotate-90" viewBox="0 0 48 48">
+                    <svg className="h-9 w-9" viewBox="0 0 48 48">
                       <circle
                         cx="24"
                         cy="24"
@@ -281,6 +288,7 @@ export default function TeamActivityPage() {
                         strokeDasharray={circumference}
                         strokeDashoffset={offset}
                         strokeLinecap="round"
+                        transform="rotate(-90 24 24)"
                       />
                     </svg>
                   </div>
@@ -295,30 +303,29 @@ export default function TeamActivityPage() {
         {myActivity && (
           <section className="mb-10">
             <h2 className="text-body-1-sb text-[var(--gray-800)]">내 활동</h2>
-            <div className="p-4 rounded-[10px] bg-[var(--gray-white)]">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex flex-col gap-2 flex-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-caption-m px-2 py-1 rounded-[5px] bg-[var(--gray-300)] text-[var(--gray-600)]">
-                      시작전 {myActivity.notStartedCount}
-                    </span>
-                    <span className="text-caption-m px-2 py-1 rounded-[5px] bg-[var(--primary-500)] text-[var(--gray-white)]">
-                      진행중 {myActivity.inProgressCount}
-                    </span>
-                    <span className="text-caption-m px-2 py-1 rounded-[5px] bg-[#E1FF9B] text-[var(--gray-600)]">
-                      완료됨 {myActivity.completedCount}
-                    </span>
-                  </div>
-                  <p className="text-body-2-m text-[var(--gray-800)]">
-                    공동 루프 {myActivity.commonLoopCount}개·개별 루프 {myActivity.individualLoopCount}개
-                  </p>
-                  {myActivity.recentActivity && (
-                    <p className="text-body-2-m text-[var(--gray-500)]">
-                      최근 활동: {myActivity.recentActivity}
-                    </p>
-                  )}
+            <div className="flex items-start justify-between gap-4 p-4 mt-4 rounded-[10px] bg-[var(--gray-white)]">
+              <div className="flex flex-col gap-2 flex-1">
+                <div className="flex items-start gap-[6px]">
+                  <span className="items-center justify-center px-[7px] py-[5px] gap-[10px] rounded-[30px] bg-[var(--gray-400)] text-caption-10-m text-[var(--gray-white)]">
+                    시작전·{myActivity.notStartedCount}
+                  </span>
+                  <span className="items-center justify-center px-[7px] py-[5px] gap-[10px] rounded-[30px] bg-[var(--primary-500)] text-caption-10-m text-[var(--gray-white)]">
+                    진행중·{myActivity.inProgressCount}
+                  </span>
+                  <span className="items-center justify-center px-[7px] py-[5px] gap-[10px] rounded-[30px] bg-[#E1FF9B] text-caption-10-m text-[var(--gray-600)]">
+                    완료됨·{myActivity.completedCount}
+                  </span>
                 </div>
-                <div className="relative flex h-16 w-16 items-center justify-center">
+                <p className="text-body-1-sb text-[var(--gray-black)]">
+                  공동 루프 {myActivity.commonLoopCount}개·개별 루프 {myActivity.individualLoopCount}개
+                </p>
+                {myActivity.recentActivity && (
+                  <p className="text-body-2-m text-[var(--gray-500)]">
+                    최근 활동: {myActivity.recentActivity}
+                  </p>
+                )}
+              </div>
+              <div className="relative flex h-16 w-16 items-center justify-center">
                   <svg className="h-16 w-16 -rotate-90" viewBox="0 0 64 64">
                     <circle
                       cx="32"
@@ -344,7 +351,6 @@ export default function TeamActivityPage() {
                     {myActivity.progress}%
                   </span>
                 </div>
-              </div>
             </div>
           </section>
         )}
@@ -353,26 +359,26 @@ export default function TeamActivityPage() {
         {teamMemberActivities.length > 0 && (
           <section className="mb-10">
             <h2 className="text-body-1-sb text-[var(--gray-800)]">팀원 활동</h2>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-4 mt-4">
               {teamMemberActivities.map((member) => (
                 <div
                   key={member.memberId}
-                  className="p-4 rounded-[10px] bg-[var(--gray-white)]"
+                  className="py-4 px-3 rounded-[10px] bg-[var(--gray-white)]"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex flex-col gap-2 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-caption-m px-2 py-1 rounded-[5px] bg-[var(--gray-300)] text-[var(--gray-600)]">
+                        <span className="items-center justify-center px-[7px] py-[5px] gap-[10px] rounded-[30px] bg-[var(--gray-400)] text-caption-10-m text-[var(--gray-white)]">
                           시작전 {member.notStartedCount}
                         </span>
-                        <span className="text-caption-m px-2 py-1 rounded-[5px] bg-[var(--primary-500)] text-[var(--gray-white)]">
+                        <span className="items-center justify-center px-[7px] py-[5px] gap-[10px] rounded-[30px] bg-[var(--primary-500)] text-caption-10-m text-[var(--gray-white)]">
                           진행중 {member.inProgressCount}
                         </span>
-                        <span className="text-caption-m px-2 py-1 rounded-[5px] bg-[#E1FF9B] text-[var(--gray-600)]">
+                        <span className="items-center justify-center px-[7px] py-[5px] gap-[10px] rounded-[30px] bg-[#E1FF9B] text-caption-10-m text-[var(--gray-600)]">
                           완료됨 {member.completedCount}
                         </span>
                       </div>
-                      <p className="text-body-2-m text-[var(--gray-800)]">{member.nickname}</p>
+                      <p className="text-body-1-sb text-[var(--gray-black)]">{member.nickname}</p>
                       {member.recentActivity && (
                         <p className="text-body-2-m text-[var(--gray-500)]">
                           최근 활동: {member.recentActivity}
