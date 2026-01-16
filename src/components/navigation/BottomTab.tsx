@@ -14,31 +14,31 @@ type BottomTabItem = {
 const TAB_ITEMS: BottomTabItem[] = [
   {
     key: "ai-planner",
-    label: "AI PLANNER",
+    label: "AI 플래너",
     href: "/planner",
     icon: "/bottomTab/BottomTab_AI.svg",
   },
   {
     key: "calendar",
-    label: "CALENDAR",
+    label: "루프 캘린더",
     href: "/calendar",
     icon: "/bottomTab/BottomTab_calender.svg",
   },
   {
     key: "home",
-    label: "HOME",
+    label: "홈",
     href: "/home",
     icon: "/bottomTab/BottomTab_home.svg",
   },
   {
     key: "analytics",
-    label: "REPORT",
+    label: "루프 리포트",
     href: "/analytics",
     icon: "/bottomTab/BottomTab_graph.svg",
   },
   {
     key: "teamloop",
-    label: "TEAM LOOP",
+    label: "팀 루프",
     href: "/teamloop",
     icon: "/bottomTab/BottomTab_party.svg",
   },
@@ -65,25 +65,27 @@ export function BottomTab() {
             <Link
               key={item.key}
               href={item.href}
-              className={`relative flex h-full flex-1 items-center justify-center text-xs font-semibold transition-colors ${
+              className={`relative flex h-full flex-1 flex-col items-center justify-center gap-1 transition-colors ${
                 item.key === "calendar" ? "calendar-icon-trigger" : ""
               }`}
             >
-              {isActive ? (
-                <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#FF5A45]">
-                  {item.label}
-                </span>
-              ) : (
-                <Image
-                  src={item.icon}
-                  alt={item.label}
-                  width={24}
-                  height={24}
-                  className={`h-6 w-6 transition-opacity ${
-                    pathname === item.href ? "opacity-100" : "opacity-80"
-                  }`}
-                />
-              )}
+              <Image
+                src={item.icon}
+                alt={item.label}
+                width={20}
+                height={20}
+                className={`transition-opacity ${
+                  isActive ? "opacity-100" : "opacity-80"
+                }`}
+                style={isActive ? { filter: "brightness(0) saturate(100%) invert(45%) sepia(96%) saturate(1352%) hue-rotate(340deg) brightness(100%) contrast(97%)" } : {}}
+              />
+              <span
+                className={`text-center text-[8px] font-bold leading-[150%] tracking-[-0.32px] transition-colors ${
+                  isActive ? "text-[var(--primary-main,#FF543F)]" : "text-[var(--gray-500)]"
+                }`}
+              >
+                {item.label}
+              </span>
             </Link>
           );
         })}
