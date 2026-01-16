@@ -162,12 +162,13 @@ export default function TeamActivityPage() {
 
   if (!teamDetail) {
     return (
-      <div className="flex min-h-screen flex-col">
+      <div className="flex min-h-full flex-col">
         <Header
           leftType="back"
           rightType="edit"
           onBack={() => router.back()}
           centerTitle="팀 활동 기록"
+          className="flex-shrink-0"
         />
         <div className="flex flex-1 items-center justify-center">
           <p className="text-body-2-m text-red-500">팀 정보를 불러올 수 없습니다</p>
@@ -177,15 +178,16 @@ export default function TeamActivityPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-[var(--gray-100)]">
+    <div className="flex flex-col min-h-full bg-[var(--gray-100)]">
       <Header
         leftType="back"
         rightType="edit"
         onBack={() => router.back()}
         centerTitle="팀 활동 기록"
+        className="flex-shrink-0"
       />
 
-      <main className="flex-1 px-4 py-6">
+      <main className="flex-1 px-4 py-6 overflow-y-auto">
         {/* 필터 탭 */}
         <div className="inline-flex items-center gap-[10px]">
           <button
@@ -245,7 +247,7 @@ export default function TeamActivityPage() {
               const status = statusFilter === "COMPLETED" ? "완료됨" 
                 : statusFilter === "IN_PROGRESS" ? "진행중" 
                 : "시작전";
-              const radius = 18;
+              const radius = 15.75; // 36x36 SVG에서 strokeWidth 4.5 고려: (36/2 - 4.5/2) = 15.75
               const circumference = 2 * Math.PI * radius;
               const offset = circumference - (progress / 100) * circumference;
 
@@ -269,18 +271,18 @@ export default function TeamActivityPage() {
                     </p>
                   </div>
                   <div className="relative flex h-9 w-9 items-center justify-center ml-4">
-                    <svg className="h-9 w-9" viewBox="0 0 48 48">
+                    <svg className="h-9 w-9" viewBox="0 0 36 36">
                       <circle
-                        cx="24"
-                        cy="24"
+                        cx="18"
+                        cy="18"
                         r={radius}
                         fill="none"
                         stroke="var(--gray-200)"
                         strokeWidth="4.5"
                       />
                       <circle
-                        cx="24"
-                        cy="24"
+                        cx="18"
+                        cy="18"
                         r={radius}
                         fill="none"
                         stroke="var(--primary-500)"
@@ -288,7 +290,7 @@ export default function TeamActivityPage() {
                         strokeDasharray={circumference}
                         strokeDashoffset={offset}
                         strokeLinecap="round"
-                        transform="rotate(-90 24 24)"
+                        transform="rotate(-90 18 18)"
                       />
                     </svg>
                   </div>
@@ -325,29 +327,30 @@ export default function TeamActivityPage() {
                   </p>
                 )}
               </div>
-              <div className="relative flex h-16 w-16 items-center justify-center">
-                  <svg className="h-16 w-16 -rotate-90" viewBox="0 0 64 64">
+              <div className="relative flex h-[90px] w-[90px] items-center justify-center">
+                  <svg className="h-[90px] w-[90px]" viewBox="0 0 90 90">
                     <circle
-                      cx="32"
-                      cy="32"
-                      r="28"
+                      cx="45"
+                      cy="45"
+                      r="39"
                       fill="none"
                       stroke="var(--gray-200)"
                       strokeWidth="6"
                     />
                     <circle
-                      cx="32"
-                      cy="32"
-                      r="28"
+                      cx="45"
+                      cy="45"
+                      r="39"
                       fill="none"
                       stroke="var(--primary-500)"
                       strokeWidth="6"
-                      strokeDasharray={2 * Math.PI * 28}
-                      strokeDashoffset={2 * Math.PI * 28 - (myActivity.progress / 100) * 2 * Math.PI * 28}
+                      strokeDasharray={2 * Math.PI * 39}
+                      strokeDashoffset={2 * Math.PI * 39 - (myActivity.progress / 100) * 2 * Math.PI * 39}
                       strokeLinecap="round"
+                      transform="rotate(-90 45 45)"
                     />
                   </svg>
-                  <span className="absolute text-body-2-sb text-[var(--gray-800)]">
+                  <span className="absolute text-body-1-b text-[var(--gray-black)]">
                     {myActivity.progress}%
                   </span>
                 </div>
@@ -369,13 +372,13 @@ export default function TeamActivityPage() {
                     <div className="flex flex-col gap-2 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="items-center justify-center px-[7px] py-[5px] gap-[10px] rounded-[30px] bg-[var(--gray-400)] text-caption-10-m text-[var(--gray-white)]">
-                          시작전 {member.notStartedCount}
+                          시작전·{member.notStartedCount}
                         </span>
                         <span className="items-center justify-center px-[7px] py-[5px] gap-[10px] rounded-[30px] bg-[var(--primary-500)] text-caption-10-m text-[var(--gray-white)]">
-                          진행중 {member.inProgressCount}
+                          진행중·{member.inProgressCount}
                         </span>
                         <span className="items-center justify-center px-[7px] py-[5px] gap-[10px] rounded-[30px] bg-[#E1FF9B] text-caption-10-m text-[var(--gray-600)]">
-                          완료됨 {member.completedCount}
+                          완료됨·{member.completedCount}
                         </span>
                       </div>
                       <p className="text-body-1-sb text-[var(--gray-black)]">{member.nickname}</p>
@@ -385,29 +388,30 @@ export default function TeamActivityPage() {
                         </p>
                       )}
                     </div>
-                    <div className="relative flex h-16 w-16 items-center justify-center">
-                      <svg className="h-16 w-16 -rotate-90" viewBox="0 0 64 64">
+                    <div className="relative flex h-[90px] w-[90px] items-center justify-center">
+                      <svg className="h-[90px] w-[90px]" viewBox="0 0 90 90">
                         <circle
-                          cx="32"
-                          cy="32"
-                          r="28"
+                          cx="45"
+                          cy="45"
+                          r="39"
                           fill="none"
                           stroke="var(--gray-200)"
                           strokeWidth="6"
                         />
                         <circle
-                          cx="32"
-                          cy="32"
-                          r="28"
+                          cx="45"
+                          cy="45"
+                          r="39"
                           fill="none"
                           stroke="var(--primary-500)"
                           strokeWidth="6"
-                          strokeDasharray={2 * Math.PI * 28}
-                          strokeDashoffset={2 * Math.PI * 28 - (member.progress / 100) * 2 * Math.PI * 28}
+                          strokeDasharray={2 * Math.PI * 39}
+                          strokeDashoffset={2 * Math.PI * 39 - (member.progress / 100) * 2 * Math.PI * 39}
                           strokeLinecap="round"
+                          transform="rotate(-90 45 45)"
                         />
                       </svg>
-                      <span className="absolute text-body-2-sb text-[var(--gray-800)]">
+                      <span className="absolute text-body-1-b text-[var(--gray-black)]">
                         {member.progress}%
                       </span>
                     </div>
@@ -422,7 +426,7 @@ export default function TeamActivityPage() {
         <section>
           <h2 className="text-body-1-sb text-[var(--gray-800)]">팀원 활동 로그</h2>
           {activityLogs.length > 0 ? (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 mt-4">
               {activityLogs.map((log, index) => (
                 <div
                   key={index}
