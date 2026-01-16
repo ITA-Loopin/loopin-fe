@@ -238,8 +238,8 @@ export default function TeamActivityPage() {
               </div>
             ) : (
               filteredLoops.slice(0, 2).map((loop) => {
-              // personalProgress 사용 (0-1 범위일 수도 있고 0-100 범위일 수도 있음)
-              const rawProgress = loop.personalProgress;
+              // teamProgress 사용 (0-1 범위일 수도 있고 0-100 범위일 수도 있음)
+              const rawProgress = loop.teamProgress;
               const progress = rawProgress > 1 
                 ? Math.round(rawProgress) 
                 : Math.round(rawProgress * 100);

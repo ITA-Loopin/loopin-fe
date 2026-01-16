@@ -12,6 +12,7 @@ import {
   fetchTeamMembers,
   deleteTeam,
   removeTeamMember,
+  leaveTeam,
   type TeamMember,
 } from "@/lib/team";
 import { fetchMemberProfile } from "@/lib/member";
@@ -190,9 +191,6 @@ export default function TeamManagePage() {
   };
 
   const handleLeaveTeam = async () => {
-    // TODO: 팀 나가기 API 준비되면 활성화
-    toast.info("팀 나가기 기능은 준비 중입니다");
-    /*
     if (!teamId || isLeaving) return;
 
     try {
@@ -205,7 +203,6 @@ export default function TeamManagePage() {
     } finally {
       setIsLeaving(false);
     }
-    */
   };
 
   if (isLoading) {
