@@ -243,9 +243,9 @@ export default function TeamActivityPage() {
               const progress = rawProgress > 1 
                 ? Math.round(rawProgress) 
                 : Math.round(rawProgress * 100);
-              // statusFilter에 맞는 상태 표시 (API에서 이미 필터링된 결과)
-              const status = statusFilter === "COMPLETED" ? "완료됨" 
-                : statusFilter === "IN_PROGRESS" ? "진행중" 
+              // teamStatus를 기준으로 상태 표시
+              const status = loop.teamStatus === "COMPLETED" ? "완료됨" 
+                : loop.teamStatus === "IN_PROGRESS" ? "진행중" 
                 : "시작전";
               const radius = 15.75; // 36x36 SVG에서 strokeWidth 4.5 고려: (36/2 - 4.5/2) = 15.75
               const circumference = 2 * Math.PI * radius;

@@ -158,6 +158,8 @@ export default function TeamLoopDetailPage() {
             personalProgress: 0, // 팀 루프 API에는 개인 진행률이 없음
             isParticipating: false,
             repeatCycle: allDetail.repeatCycle,
+            personalStatus: "NOT_STARTED",
+            teamStatus: "NOT_STARTED",
           };
           setTeamLoopData(teamLoopData);
 
@@ -210,6 +212,8 @@ export default function TeamLoopDetailPage() {
             personalProgress: myDetail.personalProgress,
             isParticipating: true,
             repeatCycle: myDetail.repeatCycle,
+            personalStatus: "NOT_STARTED",
+            teamStatus: "NOT_STARTED",
           };
           setTeamLoopData(teamLoopData);
           setMemberProgresses([]); // 내 루프 탭에서는 팀원별 진행 상황 없음

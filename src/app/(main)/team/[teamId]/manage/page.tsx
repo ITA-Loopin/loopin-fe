@@ -11,6 +11,7 @@ import {
   fetchTeamDetail,
   fetchTeamMembers,
   deleteTeam,
+  removeTeamMember,
   type TeamMember,
 } from "@/lib/team";
 import { fetchMemberProfile } from "@/lib/member";
@@ -138,10 +139,6 @@ export default function TeamManagePage() {
   const handleRemoveMember = async () => {
     if (!teamId || !memberToRemove || isRemoving) return;
 
-    // TODO: API 준비되면 활성화
-    toast.info("팀원 제거 기능은 준비 중입니다");
-    setMemberToRemove(null);
-    /*
     try {
       setIsRemoving(true);
       await removeTeamMember(Number(teamId), memberToRemove.memberId);
@@ -156,7 +153,6 @@ export default function TeamManagePage() {
       setIsRemoving(false);
       setMemberToRemove(null);
     }
-    */
   };
 
   const handleVisibilityChange = async (visibility: "PUBLIC" | "PRIVATE") => {

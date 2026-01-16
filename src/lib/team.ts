@@ -212,6 +212,8 @@ export type TeamLoopApiItem = {
   id: number;
   title: string;
   loopDate: string;
+  personalStatus: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
+  teamStatus: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
   type: "COMMON" | "INDIVIDUAL";
   importance: "HIGH" | "MEDIUM" | "LOW";
   teamProgress: number;
@@ -663,6 +665,36 @@ export async function deleteTeam(
 
     if (!response.success) {
       throw new Error(response.message || "팀 삭제에 실패했습니다");
+    }
+
+    return {
+      success: true,
+      message: response.message,
+    };
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * 팀원 삭제 API
+ */
+export async function removeTeamMember(
+  teamId: number,
+  memberId: number
+): Promise<{ success: boolean; message?: string }> {
+  try {
+    const response = await apiFetch<{
+      success: boolean;
+      code: string;
+      message: string;
+      data?: unknown;
+    }>(`/rest-api/v1/teams/${teamId}/members/${memberId}`, {
+      method: "DELETE",
+    });
+
+    if (!response.success) {
+      throw new Error(response.message || "팀원 삭제에 실패했습니다");
     }
 
     return {
