@@ -1,6 +1,9 @@
 import { FormEvent, useCallback, useState } from "react";
 import { apiFetch } from "@/lib/api";
-import { AddLoopDefaultValues, Checklist } from "@/components/common/add-loop/constants";
+import {
+  AddLoopDefaultValues,
+  Checklist,
+} from "@/components/common/add-loop/constants";
 import { useLoopTitle } from "./useLoopTitle";
 import { useLoopSchedule } from "./useLoopSchedule";
 import { useLoopDateRange } from "./useLoopDateRange";
@@ -70,7 +73,7 @@ export function useAddLoopForm({
         scheduleType: normalizedScheduleType,
         specificDate:
           normalizedScheduleType === "NONE"
-            ? (dateRange.startDate?.format("YYYY-MM-DD") || null)
+            ? dateRange.startDate?.format("YYYY-MM-DD") || null
             : null,
         daysOfWeek: isWeekly ? schedule.daysOfWeek : [],
         startDate: dateRange.startDate?.format("YYYY-MM-DD") || null,
@@ -174,5 +177,3 @@ export function useAddLoopForm({
     },
   };
 }
-
-
