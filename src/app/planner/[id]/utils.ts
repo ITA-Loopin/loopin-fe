@@ -94,6 +94,7 @@ export function recommendationToAddLoopDefaults(
     startDate: recommendation.startDate,
     endDate: recommendation.endDate,
     checklists,
+    loopRuleId: recommendation.loopRuleId,
   };
 }
 
@@ -107,8 +108,9 @@ export function recommendationToLoopDetail(
       completed: false,
     })) ?? [];
 
+  const ruleId = recommendation.loopRuleId ?? 0;
   const loopRule = {
-    ruleId: 0,
+    ruleId,
     scheduleType: recommendation.scheduleType,
     daysOfWeek: recommendation.daysOfWeek,
     startDate: recommendation.startDate ?? null,
@@ -127,5 +129,6 @@ export function recommendationToLoopDetail(
     daysOfWeek: recommendation.daysOfWeek,
     startDate: recommendation.startDate ?? null,
     endDate: recommendation.endDate ?? null,
+    loopRuleId: ruleId,
   };
 }

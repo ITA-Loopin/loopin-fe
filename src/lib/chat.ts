@@ -23,6 +23,7 @@ export type ChatMessageDto = {
   content?: string;
   authorType?: string;
   recommendations?: ChatRecommendationDto[];
+  loopRuleId?: number;
   createdAt?: string;
 };
 
