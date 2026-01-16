@@ -117,7 +117,7 @@ export default function HomePage() {
             "linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 228, 224, 0.3) 100%)",
         }}
       />
-      <div className={`flex flex-col relative overflow-x-hidden h-full min-h-0 ${isEmpty && !isLoading ? "overflow-y-hidden" : ""}`}>
+      <div className="relative flex flex-col min-h-full overflow-x-hidden">
       {/* 오른쪽 위 디자인 요소 */}
       <div
         className="absolute top-0 right-0 -z-10"
@@ -218,7 +218,7 @@ export default function HomePage() {
         )}
         <Header />
 
-        <div className="px-4 pt-6 flex flex-col gap-6 flex-1 min-h-0">
+        <div className="px-4 pt-6 pb-6 flex flex-col gap-6 flex-1 min-h-0">
           <TodayLoopTitle dateText={todayText} />
 
           {isLoading ? (
