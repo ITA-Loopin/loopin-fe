@@ -707,6 +707,66 @@ export async function removeTeamMember(
 }
 
 /**
+ * 팀 나가기 API
+ */
+export async function leaveTeam(
+  teamId: number
+): Promise<{ success: boolean; message?: string }> {
+  try {
+    const response = await apiFetch<{
+      success: boolean;
+      code: string;
+      message: string;
+      data?: unknown;
+    }>(`/rest-api/v1/teams/${teamId}/leave`, {
+      method: "DELETE",
+    });
+
+    if (!response.success) {
+      throw new Error(response.message || "팀 나가기에 실패했습니다");
+    }
+
+    return {
+      success: true,
+      message: response.message,
+    };
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * 팀원 초대 API
+ */
+export async function inviteTeamMember(
+  teamId: number,
+  memberId: number
+): Promise<{ success: boolean; message?: string }> {
+  try {
+    const response = await apiFetch<{
+      success: boolean;
+      code: string;
+      message: string;
+      data?: unknown;
+    }>(`/rest-api/v1/teams/${teamId}/invitations`, {
+      method: "POST",
+      json: { inviteeIds: [memberId] },
+    });
+
+    if (!response.success) {
+      throw new Error(response.message || "팀원 초대에 실패했습니다");
+    }
+
+    return {
+      success: true,
+      message: response.message,
+    };
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
  * 팀 활동 조회 API 응답 타입
  */
 export type TeamMemberActivitiesApiResponse = {
