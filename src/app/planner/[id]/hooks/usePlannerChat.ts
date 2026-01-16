@@ -230,6 +230,7 @@ export function usePlannerChat(
             startDate: item.startDate,
             endDate: item.endDate,
             checklists: item.checklists,
+            loopRuleId: message.loopRuleId,
           }));
         }
 

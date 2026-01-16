@@ -94,10 +94,15 @@ export function useAddLoopForm({
           ...payload,
           ...(chatRoomId && { chatRoomId }),
         };
+        const searchParams: Record<string, string | number> = {};
+        if (defaultValues?.loopRuleId) {
+          searchParams.loopRuleId = defaultValues.loopRuleId;
+        }
         await apiFetch(apiUrl, {
           method: "POST",
           credentials: "include",
           json: requestPayload,
+          ...(Object.keys(searchParams).length > 0 && { searchParams }),
         });
         onCreated?.();
         onClose();

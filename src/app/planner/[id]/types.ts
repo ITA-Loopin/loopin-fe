@@ -9,6 +9,7 @@ export type RecommendationSchedule = {
   startDate?: string;
   endDate?: string;
   checklists?: string[];
+  loopRuleId?: number;
 };
 
 export type ChatMessage = {

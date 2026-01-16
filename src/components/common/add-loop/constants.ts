@@ -46,6 +46,7 @@ export interface AddLoopDefaultValues {
   startDate?: string;
   endDate?: string;
   checklists?: Checklist[];
+  loopRuleId?: number;
 }
 
 export interface AddLoopFormPayload {
