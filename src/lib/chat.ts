@@ -24,6 +24,7 @@ export type ChatMessageDto = {
   authorType?: string;
   recommendations?: ChatRecommendationDto[];
   loopRuleId?: number;
+  deleteMessageId?: string;
   createdAt?: string;
 };
 
@@ -120,6 +121,7 @@ export type MessageType =
   | "CONNECT"
   | "MESSAGE"
   | "CREATE_LOOP"
+  | "RECREATE_LOOP"
   | "UPDATE_LOOP"
   | "READ_UP_TO";
 

@@ -1,12 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-  EXAMPLE_PROMPTS,
-  INITIAL_MESSAGE,
-  UPDATE_MESSAGE,
-  LOOP_RESULT_PROMPT,
-} from "../constants";
+import { EXAMPLE_PROMPTS, UPDATE_MESSAGE } from "../constants";
 import type { ChatMessage, RecommendationSchedule } from "../types";
 import { generateId } from "../utils";
 import { useAppSelector } from "@/store/hooks";
@@ -75,9 +70,7 @@ export function usePlannerChat(
   loopSelect?: boolean
 ) {
   const { user } = useAppSelector((state) => state.auth);
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    { id: generateId(), author: "assistant", content: INITIAL_MESSAGE },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isInputVisible, setIsInputVisible] = useState(true);
@@ -87,6 +80,9 @@ export function usePlannerChat(
   const [updateRecommendation, setUpdateRecommendation] =
     useState<RecommendationSchedule | null>(null);
   const [showUpdateMessage, setShowUpdateMessage] = useState(false);
+  const [isWaitingForRecreateInput, setIsWaitingForRecreateInput] =
+    useState(false);
+  const hasSentRecreateLoopRef = useRef(false);
   const messageListRef = useRef<HTMLDivElement | null>(null);
   const seenMessageIdsRef = useRef<Set<string>>(new Set());
   const pendingUserMessageIdsRef = useRef<Map<string, string[]>>(new Map());
@@ -123,9 +119,7 @@ export function usePlannerChat(
 
     previousChatRoomIdRef.current = plannerChatRoomId;
     seenMessageIdsRef.current.clear();
-    setMessages([
-      { id: generateId(), author: "assistant", content: INITIAL_MESSAGE },
-    ]);
+    setMessages([]);
     setRecommendations([]);
   }, [plannerChatRoomId]);
 
@@ -153,6 +147,17 @@ export function usePlannerChat(
       let status: AppendStatus = "none";
 
       sorted.forEach((message) => {
+        // deleteMessageId가 있으면 해당 메시지를 숨김
+        if (message.deleteMessageId) {
+          setMessages((prev) =>
+            prev.filter((msg) => msg.id !== message.deleteMessageId)
+          );
+          // recommendations도 삭제 (RECREATE_LOOP인 경우)
+          setRecommendations([]);
+          setUpdateRecommendation(null);
+          return;
+        }
+
         const dedupeKeyRaw =
           message.tempId ??
           (message.id !== undefined ? String(message.id) : message.createdAt);
@@ -205,18 +210,13 @@ export function usePlannerChat(
           status = hasRecommendations ? "recommendations" : "assistant";
         }
 
-        const bubbleContent =
-          hasRecommendations && !trimmedContent
-            ? LOOP_RESULT_PROMPT
-            : trimmedContent;
-
-        if (bubbleContent) {
+        if (trimmedContent) {
           newlyAdded.push({
             id:
               message.tempId ??
               (message.id !== undefined ? String(message.id) : generateId()),
             author,
-            content: bubbleContent,
+            content: trimmedContent,
           });
         }
 
@@ -239,10 +239,8 @@ export function usePlannerChat(
 
       if (newlyAdded.length) {
         setMessages((prev) => {
-          // 히스토리 메시지가 있으면 초기 메시지(INITIAL_MESSAGE) 제거
           const filteredPrev = prev.filter(
-            (msg) =>
-              msg.content !== INITIAL_MESSAGE && msg.content !== UPDATE_MESSAGE
+            (msg) => msg.content !== UPDATE_MESSAGE
           );
           return [...filteredPrev, ...newlyAdded];
         });
@@ -309,6 +307,25 @@ export function usePlannerChat(
               // 새로운 추천이 오면 UPDATE_MESSAGE 숨기고 다시 생성하기 버튼 표시
               setShowUpdateMessage(false);
               return;
+            }
+
+            // RECREATE_LOOP 후 텍스트 응답 체크 (추천이 없는 텍스트 메시지면 입력 요청)
+            const content = messageData.content || "";
+            const hasRecommendations =
+              Array.isArray(messageData.recommendations) &&
+              messageData.recommendations.length > 0;
+
+            // RECREATE_LOOP를 보낸 후 텍스트 응답을 받았고 추천이 없으면 입력 필드 표시
+            if (
+              hasSentRecreateLoopRef.current &&
+              !hasRecommendations &&
+              content.trim() &&
+              messageData.authorType === "BOT"
+            ) {
+              setIsWaitingForRecreateInput(true);
+              setIsLoading(false);
+              setIsInputVisible(true);
+              hasSentRecreateLoopRef.current = false; // 플래그 초기화
             }
 
             // 일반 메시지 처리
@@ -403,7 +420,7 @@ export function usePlannerChat(
                   {
                     id: generateId(),
                     author: "assistant",
-                    content: UPDATE_MESSAGE,
+                    content: UPDATE_MESSAGE || "content",
                   },
                 ];
               }
@@ -501,12 +518,25 @@ export function usePlannerChat(
 
       try {
         // SSE는 단방향이므로 메시지 전송은 REST API 사용
+        // RECREATE_LOOP 후 입력 요청 메시지를 받았으면 CREATE_LOOP로 전송
+        const messageType = isWaitingForRecreateInput
+          ? "CREATE_LOOP"
+          : loopSelect === true
+            ? "UPDATE_LOOP"
+            : "CREATE_LOOP";
+
         await sendChatMessage({
           chatRoomId: plannerChatRoomId,
           clientMessageId: userMessage.id,
           content: trimmed,
-          messageType: loopSelect === true ? "UPDATE_LOOP" : "CREATE_LOOP",
+          messageType,
         });
+
+        // 메시지 전송 후 플래그 초기화
+        if (isWaitingForRecreateInput) {
+          setIsWaitingForRecreateInput(false);
+          hasSentRecreateLoopRef.current = false; // RECREATE_LOOP 플래그도 초기화
+        }
       } catch (error) {
         console.error("루프 추천 요청 실패", error);
         const message =
@@ -534,27 +564,50 @@ export function usePlannerChat(
         }
       }
     },
-    [isLoading, plannerChatRoomId, initializeSSE, loopSelect]
+    [
+      isLoading,
+      plannerChatRoomId,
+      initializeSSE,
+      loopSelect,
+      isWaitingForRecreateInput,
+    ]
   );
 
-  const handleRetry = useCallback(() => {
-    setIsLoading(false);
-    setIsInputVisible(true);
-    setShowUpdateMessage(true);
-    // INITIAL_MESSAGE가 없으면 다시 추가
-    setMessages((prev) => {
-      const hasInitialMessage = prev.some(
-        (msg) => msg.content === INITIAL_MESSAGE
-      );
-      if (!hasInitialMessage) {
-        return [
-          { id: generateId(), author: "assistant", content: INITIAL_MESSAGE },
-          ...prev,
-        ];
-      }
-      return prev;
-    });
-  }, []);
+  const handleRetry = useCallback(async () => {
+    if (!plannerChatRoomId) {
+      return;
+    }
+
+    // SSE 연결 확인
+    const eventSource = eventSourceRef.current;
+    if (!eventSource || eventSource.readyState !== EventSource.OPEN) {
+      initializeSSE();
+      return;
+    }
+
+    setIsLoading(true);
+    setIsInputVisible(false);
+    setRecommendations([]);
+    setUpdateRecommendation(null);
+    setIsWaitingForRecreateInput(false);
+
+    const retryMessageId = generateId();
+
+    try {
+      // RECREATE_LOOP 메시지 타입으로 전송
+      hasSentRecreateLoopRef.current = true; // RECREATE_LOOP 전송 플래그 설정
+      await sendChatMessage({
+        chatRoomId: plannerChatRoomId,
+        clientMessageId: retryMessageId,
+        content: "content",
+        messageType: "RECREATE_LOOP",
+      });
+    } catch (error) {
+      console.error("루프 재생성 요청 실패", error);
+      setIsInputVisible(true);
+      setIsLoading(false);
+    }
+  }, [plannerChatRoomId, initializeSSE]);
 
   return {
     messages,
