@@ -67,8 +67,10 @@ export function useAddLoopForm({
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
 
-      const normalizedScheduleType: RepeatValue = 
-        schedule.scheduleType === "" ? "NONE" : (schedule.scheduleType as RepeatValue);
+      const normalizedScheduleType: RepeatValue =
+        schedule.scheduleType === ""
+          ? "NONE"
+          : (schedule.scheduleType as RepeatValue);
       const isWeekly = normalizedScheduleType === "WEEKLY";
 
       const payload = {
@@ -77,7 +79,7 @@ export function useAddLoopForm({
         scheduleType: normalizedScheduleType,
         specificDate:
           normalizedScheduleType === "NONE"
-            ? (dateRange.startDate?.format("YYYY-MM-DD") || null)
+            ? dateRange.startDate?.format("YYYY-MM-DD") || null
             : null,
         daysOfWeek: isWeekly ? schedule.daysOfWeek : [],
         startDate: dateRange.startDate?.format("YYYY-MM-DD") || null,
@@ -130,7 +132,9 @@ export function useAddLoopForm({
     (e: React.PointerEvent<HTMLFormElement>) => {
       // 체크리스트 입력 필드가 아닌 곳을 클릭했을 때 체크리스트 추가
       const target = e.target as HTMLElement;
-      const isChecklistInput = target.closest('[data-checklist-input-container]');
+      const isChecklistInput = target.closest(
+        "[data-checklist-input-container]"
+      );
       const trimmedValue = checklist.newChecklistItem.trim();
 
       if (!isChecklistInput && trimmedValue) {
@@ -202,5 +206,3 @@ export function useAddLoopForm({
     onFormPointerDown: handleFormPointerDown,
   };
 }
-
-

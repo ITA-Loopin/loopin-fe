@@ -104,8 +104,6 @@ export default function PlannerChatPage() {
   const messageListPadding = isInputVisible
     ? MESSAGE_EXTRA_SPACE + INPUT_CONTAINER_HEIGHT
     : MESSAGE_EXTRA_SPACE;
-  const lastMessageAuthor = messages[messages.length - 1]?.author;
-  const isLoopinSpeaking = isLoading || lastMessageAuthor === "assistant";
 
   return (
     <div className="flex min-h-screen flex-col bg-[#F8F8F9]/40">
@@ -164,11 +162,18 @@ export default function PlannerChatPage() {
             paddingBottom: `calc(${messageListPadding}px)`,
           }}
         >
-          <div className="">
-            {isLoopinSpeaking ? <LoopinSpeakerIndicator /> : null}
-            {messages.map((message) => (
-              <MessageBubble key={message.id} message={message} />
-            ))}
+          <div className="space-y-4">
+            {messages.map((message, index) => {
+              const isAssistant = message.author === "assistant";
+              const showIndicator = index === 0 && isAssistant;
+
+              return (
+                <div key={message.id}>
+                  {showIndicator && <LoopinSpeakerIndicator />}
+                  <MessageBubble message={message} />
+                </div>
+              );
+            })}
             {isLoading ? <LoadingMessage /> : null}
           </div>
 
@@ -233,8 +238,10 @@ export default function PlannerChatPage() {
               ) : null}
               <form
                 onSubmit={formHandleSubmit(async (values) => {
-                  await handleSubmit(values.prompt);
-                  reset({ prompt: "" });
+                  if (values.prompt?.trim()) {
+                    await handleSubmit(values.prompt.trim());
+                    reset({ prompt: "" });
+                  }
                 })}
                 className="flex items-center rounded-2xl px-3 py-2 bg-[#F8F8F9]"
               >
@@ -247,21 +254,16 @@ export default function PlannerChatPage() {
                   }
                   rows={1}
                   className="max-h-32 flex-1 border-none text-sm text-[#2C2C2C] outline-none"
-                  aria-label={
-                    chatRoomLoopSelect
-                      ? "루프 수정 요청 입력란"
-                      : "루프 생성 요청 입력란"
-                  }
+                  aria-label="루프 생성 요청 입력란"
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
-                      const currentValue = watchedPrompt?.trim();
-                      if (currentValue) {
-                        formHandleSubmit(async (values) => {
-                          await handleSubmit(values.prompt);
+                      formHandleSubmit(async (values) => {
+                        if (values.prompt?.trim()) {
+                          await handleSubmit(values.prompt.trim());
                           reset({ prompt: "" });
-                        })();
-                      }
+                        }
+                      })();
                     }
                   }}
                 />

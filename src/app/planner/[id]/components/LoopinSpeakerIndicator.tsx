@@ -4,7 +4,7 @@ import Image from "next/image";
 
 export function LoopinSpeakerIndicator() {
   return (
-    <div className="inline-flex items-center gap-1 py-2">
+    <div className="inline-flex items-center gap-1 px-4">
       <Image
         src="/ai-planner/loopin-avatar.svg"
         alt="루핀 프로필"
