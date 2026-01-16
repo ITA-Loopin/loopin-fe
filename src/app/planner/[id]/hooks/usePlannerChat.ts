@@ -121,7 +121,6 @@ export function usePlannerChat(
     seenMessageIdsRef.current.clear();
     setMessages([]);
     setRecommendations([]);
-    recommendationMessageIdRef.current = null;
   }, [plannerChatRoomId]);
 
   const exampleLabel = useMemo(() => {
@@ -213,17 +212,15 @@ export function usePlannerChat(
 
         if (trimmedContent) {
           newlyAdded.push({
-            id: messageId,
+            id:
+              message.tempId ??
+              (message.id !== undefined ? String(message.id) : generateId()),
             author,
             content: trimmedContent,
           });
         }
 
         if (hasRecommendations) {
-          // 추천 카드와 함께 온 메시지 ID 저장
-          if (messageId) {
-            recommendationMessageIdRef.current = messageId;
-          }
           recommendationsToApply = message.recommendations!.map((item) => ({
             title: item.title,
             content: item.content,
@@ -468,22 +465,9 @@ export function usePlannerChat(
         content: trimmed,
       };
 
+      setMessages((prev) => [...prev, userMessage]);
       setInputValue("");
       setRecommendations([]);
-
-      // 추천 카드와 함께 온 메시지 제거하고 사용자 메시지 추가
-      const recommendationMessageId = recommendationMessageIdRef.current;
-      if (recommendationMessageId) {
-        recommendationMessageIdRef.current = null;
-      }
-
-      setMessages((prev) => {
-        const filtered = recommendationMessageId
-          ? prev.filter((msg) => msg.id !== recommendationMessageId)
-          : prev;
-        return [...filtered, userMessage];
-      });
-
       seenMessageIdsRef.current.add(userMessage.id);
 
       const queue = pendingUserMessageIdsRef.current.get(trimmed) ?? [];
@@ -589,10 +573,20 @@ export function usePlannerChat(
     ]
   );
 
-  const handleRetry = useCallback(() => {
-    // 입력 필드를 보여주고 RECREATE_LOOP 모드로 설정
-    setIsInputVisible(true);
-    setPendingMessageType("RECREATE_LOOP");
+  const handleRetry = useCallback(async () => {
+    if (!plannerChatRoomId) {
+      return;
+    }
+
+    // SSE 연결 확인
+    const eventSource = eventSourceRef.current;
+    if (!eventSource || eventSource.readyState !== EventSource.OPEN) {
+      initializeSSE();
+      return;
+    }
+
+    setIsLoading(true);
+    setIsInputVisible(false);
     setRecommendations([]);
     setUpdateRecommendation(null);
     setIsWaitingForRecreateInput(false);
@@ -627,9 +621,7 @@ export function usePlannerChat(
     handleInputChange,
     handleSubmit,
     handleRetry,
-    handleUpdateLoop,
     showUpdateMessage,
-    pendingMessageType,
   };
 }
 
