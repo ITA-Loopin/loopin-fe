@@ -29,6 +29,8 @@ export default function PlannerChatPage() {
   const chatRoomId = params?.id ? Number(params.id) : null;
   const [chatRoomTitle, setChatRoomTitle] = useState<string>("채팅방 이름");
   const [chatRoomLoopSelect, setChatRoomLoopSelect] = useState<boolean>(false);
+  const [chatRoomCallUpdateLoop, setChatRoomCallUpdateLoop] =
+    useState<boolean>(false);
   const [isAddLoopSheetOpen, setIsAddLoopSheetOpen] = useState(false);
   const [isLoopGroupEditSheetOpen, setIsLoopGroupEditSheetOpen] =
     useState(false);
@@ -47,6 +49,7 @@ export default function PlannerChatPage() {
     handleInputChange,
     handleSubmit,
     handleRetry,
+    handleUpdateLoop,
     showUpdateMessage,
   } = usePlannerChat(chatRoomId, chatRoomLoopSelect);
 
@@ -84,6 +87,7 @@ export default function PlannerChatPage() {
               setChatRoomTitle("채팅방 이름");
             }
             setChatRoomLoopSelect(chatRoom.loopSelect);
+            setChatRoomCallUpdateLoop(chatRoom.callUpdateLoop ?? false);
           }
         }
       } catch (error) {
@@ -210,15 +214,17 @@ export default function PlannerChatPage() {
                   <button
                     type="button"
                     onClick={() => {
-                      if (chatRoomLoopSelect && updateRecommendation) {
+                      if (chatRoomLoopSelect && chatRoomCallUpdateLoop) {
                         setIsLoopGroupEditSheetOpen(true);
+                      } else if (chatRoomLoopSelect) {
+                        handleUpdateLoop();
                       } else {
                         handleRetry();
                       }
                     }}
                     className="text-xs font-semibold text-[#737980]"
                   >
-                    {chatRoomLoopSelect && updateRecommendation
+                    {chatRoomLoopSelect && chatRoomCallUpdateLoop
                       ? "루프 수정 완료하기"
                       : chatRoomLoopSelect
                         ? "루프 수정하기"

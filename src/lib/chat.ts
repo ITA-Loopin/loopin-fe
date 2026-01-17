@@ -123,6 +123,7 @@ export type MessageType =
   | "CREATE_LOOP"
   | "RECREATE_LOOP"
   | "UPDATE_LOOP"
+  | "BEFORE_UPDATE_LOOP"
   | "READ_UP_TO";
 
 export type SendChatMessageParams = {
@@ -158,6 +159,7 @@ export type ChatRoom = {
   loopSelect: boolean;
   lastMessageAt?: string | null;
   lastReadAt?: string | null;
+  callUpdateLoop?: boolean;
 };
 
 export type ChatRoomListResponse = {
