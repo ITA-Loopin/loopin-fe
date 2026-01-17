@@ -33,7 +33,7 @@ export function AddLoopSheet({
     <BottomSheet
       isOpen={isOpen}
       onClose={onClose}
-      className="max-h-[90vh] overflow-y-auto"
+      className="max-h-[80vh] overflow-y-auto"
       title="루프 추가하기"
     >
       <div className="inline-flex items-center px-4 py-5">
