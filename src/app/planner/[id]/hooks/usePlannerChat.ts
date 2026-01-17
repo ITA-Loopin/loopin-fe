@@ -83,6 +83,7 @@ export function usePlannerChat(
   const [isWaitingForRecreateInput, setIsWaitingForRecreateInput] =
     useState(false);
   const hasSentRecreateLoopRef = useRef(false);
+  const hasSentBeforeUpdateLoopRef = useRef(false);
   const messageListRef = useRef<HTMLDivElement | null>(null);
   const seenMessageIdsRef = useRef<Set<string>>(new Set());
   const pendingUserMessageIdsRef = useRef<Map<string, string[]>>(new Map());
@@ -121,6 +122,8 @@ export function usePlannerChat(
     seenMessageIdsRef.current.clear();
     setMessages([]);
     setRecommendations([]);
+    hasSentRecreateLoopRef.current = false;
+    hasSentBeforeUpdateLoopRef.current = false;
   }, [plannerChatRoomId]);
 
   const exampleLabel = useMemo(() => {
@@ -248,15 +251,22 @@ export function usePlannerChat(
 
       if (recommendationsToApply) {
         const recs: RecommendationSchedule[] = recommendationsToApply;
+        // BEFORE_UPDATE_LOOP인 경우 첫 번째 추천을 updateRecommendation에 저장하고 showUpdateMessage를 true로 설정
         // UPDATE_LOOP인 경우 첫 번째 추천을 updateRecommendation에 저장하지만 추천도 표시
         if (loopSelect === true && recs.length > 0) {
           setUpdateRecommendation(recs[0]);
           setRecommendations(recs); // 추천도 무조건 표시
+          // BEFORE_UPDATE_LOOP 응답인지 확인 (BEFORE_UPDATE_LOOP를 보낸 후 recommendations가 1개인 경우)
+          if (hasSentBeforeUpdateLoopRef.current && recs.length === 1) {
+            setShowUpdateMessage(true);
+            hasSentBeforeUpdateLoopRef.current = false; // 플래그 초기화
+          } else {
+            setShowUpdateMessage(false);
+          }
         } else {
           setRecommendations(recs);
+          setShowUpdateMessage(false);
         }
-        // 새로운 추천이 오면 UPDATE_MESSAGE 숨기고 다시 생성하기 버튼 표시
-        setShowUpdateMessage(false);
       }
 
       return status;
@@ -609,6 +619,40 @@ export function usePlannerChat(
     }
   }, [plannerChatRoomId, initializeSSE]);
 
+  const handleUpdateLoop = useCallback(async () => {
+    if (!plannerChatRoomId) {
+      return;
+    }
+
+    // SSE 연결 확인
+    const eventSource = eventSourceRef.current;
+    if (!eventSource || eventSource.readyState !== EventSource.OPEN) {
+      initializeSSE();
+      return;
+    }
+
+    setIsLoading(true);
+    setIsInputVisible(false);
+
+    const updateMessageId = generateId();
+
+    try {
+      // BEFORE_UPDATE_LOOP 메시지 타입으로 전송
+      hasSentBeforeUpdateLoopRef.current = true; // BEFORE_UPDATE_LOOP 전송 플래그 설정
+      await sendChatMessage({
+        chatRoomId: plannerChatRoomId,
+        clientMessageId: updateMessageId,
+        content: "content",
+        messageType: "BEFORE_UPDATE_LOOP",
+      });
+    } catch (error) {
+      console.error("루프 수정 요청 실패", error);
+      setIsInputVisible(true);
+      setIsLoading(false);
+      hasSentBeforeUpdateLoopRef.current = false; // 실패 시 플래그 초기화
+    }
+  }, [plannerChatRoomId, initializeSSE]);
+
   return {
     messages,
     inputValue,
@@ -621,6 +665,7 @@ export function usePlannerChat(
     handleInputChange,
     handleSubmit,
     handleRetry,
+    handleUpdateLoop,
     showUpdateMessage,
   };
 }
