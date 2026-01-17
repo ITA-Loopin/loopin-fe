@@ -20,6 +20,8 @@ import type { RecommendationSchedule } from "./types";
 import { UPDATE_MESSAGE } from "./constants";
 import GroupIcon from "@/../public/Group.svg";
 import RetryIcon from "@/../public/retry.svg";
+import Header from "@/components/common/Header";
+
 const MESSAGE_EXTRA_SPACE = 32;
 const INPUT_CONTAINER_HEIGHT = 192;
 
@@ -113,7 +115,8 @@ export default function PlannerChatPage() {
   return (
     <div className="flex min-h-screen flex-col bg-[#F8F8F9]/40">
       {/* Header */}
-      <header className="sticky top-0 z-50 flex items-center justify-between bg-white px-6 py-4 shadow-sm">
+      <Header leftType="back" centerTitle={chatRoomTitle} rightType="none" />
+      {/* <header className="sticky top-0 z-50 flex items-center justify-between bg-white px-6 py-4 shadow-sm">
         <button
           onClick={() => router.back()}
           className="flex h-8 w-8 items-center justify-center"
@@ -142,22 +145,9 @@ export default function PlannerChatPage() {
           className="flex h-8 w-8 items-center justify-center"
           aria-label="메뉴"
         >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M4 6H20M4 12H20M4 18H20"
-              stroke="#2C2C2C"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
+   
         </button>
-      </header>
+      </header> */}
 
       <section className="flex flex-1 min-h-0 flex-col">
         <div
@@ -175,7 +165,7 @@ export default function PlannerChatPage() {
               return (
                 <div key={message.id}>
                   {showIndicator && <LoopinSpeakerIndicator />}
-                  <MessageBubble message={message} />
+                  <MessageBubble message={message} className={showIndicator ? "-mt-2" : ""} />
                 </div>
               );
             })}
@@ -205,13 +195,15 @@ export default function PlannerChatPage() {
               )}
 
               {!showUpdateMessage && (
-                <div className="mt-4 flex gap-2 rounded-sm bg-[#DDE0E3] px-4 py-3 w-fit justify-self-center">
-                  <Image
-                    src={chatRoomLoopSelect ? RetryIcon : GroupIcon}
-                    alt=""
-                    width={12}
-                    height={12}
-                  />
+                <div className={`mt-4 flex gap-2 rounded-sm ${chatRoomLoopSelect && (chatRoomCallUpdateLoop || sseCallUpdateLoop) ? "bg-[#FFE4E0]" : "bg-[#DDE0E3]"} px-4 py-3 w-fit justify-self-center`}>
+                  {!(chatRoomLoopSelect && (chatRoomCallUpdateLoop || sseCallUpdateLoop)) && (
+                    <Image
+                      src={chatRoomLoopSelect ? RetryIcon : GroupIcon}
+                      alt=""
+                      width={12}
+                      height={12}
+                    />
+                  )}
                   <button
                     type="button"
                     onClick={() => {
@@ -223,7 +215,7 @@ export default function PlannerChatPage() {
                         handleRetry();
                       }
                     }}
-                    className="text-xs font-semibold text-[#737980]"
+                    className={`text-sm font-semibold ${chatRoomLoopSelect && (chatRoomCallUpdateLoop || sseCallUpdateLoop) ? "text-[#FF543F] font-semibold" : "text-[#737980] font-semibold"}`}
                   >
                     {chatRoomLoopSelect && (chatRoomCallUpdateLoop || sseCallUpdateLoop)
                       ? "루프 수정 완료하기"

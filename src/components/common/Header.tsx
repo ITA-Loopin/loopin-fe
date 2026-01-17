@@ -116,7 +116,7 @@ export default function Header({
     if (centerSlot) return centerSlot;
     if (centerTitle)
       return (
-        <h1 className="text-center text-body-1-sb text-[var(--gray-800)]">
+        <h1 className="text-center text-body-1-sb text-[var(--gray-800)] whitespace-nowrap">
           {centerTitle}
         </h1>
       );
