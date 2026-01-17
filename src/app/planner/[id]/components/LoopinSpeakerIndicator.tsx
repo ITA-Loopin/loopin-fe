@@ -8,8 +8,8 @@ export function LoopinSpeakerIndicator() {
       <Image
         src="/ai-planner/loopin-avatar.svg"
         alt="루핀 프로필"
-        width={32}
-        height={32}
+        width={50}
+        height={50}
         className="h-8 w-8"
       />
       <div className="flex flex-col">
