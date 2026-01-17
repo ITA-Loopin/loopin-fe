@@ -25,6 +25,7 @@ export type ChatMessageDto = {
   recommendations?: ChatRecommendationDto[];
   loopRuleId?: number;
   deleteMessageId?: string;
+  callUpdateLoop?: boolean;
   createdAt?: string;
 };
 
