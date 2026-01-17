@@ -11,7 +11,7 @@ type UseEditChecklistReturn<T extends BaseChecklist> = {
   newChecklistItem: string;
   setNewChecklistItem: React.Dispatch<React.SetStateAction<string>>;
   handleAddChecklist: (createNewItem: (id: string, text: string) => T) => void;
-  handleChecklistChange: (index: number, text: string) => void;
+  handleChecklistChange: (id: string, text: string) => void;
   handleRemoveChecklist: (id: string) => void;
 };
 
@@ -32,12 +32,10 @@ export function useEditChecklist<T extends BaseChecklist>(): UseEditChecklistRet
     [newChecklistItem]
   );
 
-  const handleChecklistChange = useCallback((index: number, text: string) => {
-    setChecklists((prev) => {
-      const next = [...prev];
-      next[index] = { ...next[index], text };
-      return next;
-    });
+  const handleChecklistChange = useCallback((id: string, text: string) => {
+    setChecklists((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, text } : item))
+    );
   }, []);
 
   const handleRemoveChecklist = useCallback((id: string) => {

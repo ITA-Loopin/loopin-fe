@@ -1,10 +1,15 @@
 import { cn } from "@/lib/utils";
 
+const VARIANT_STYLES = {
+  primary: "bg-[var(--primary-500)]",
+  secondary: "bg-[var(--gray-800)]",
+} as const;
+
 type PrimaryButtonProps = {
   children: React.ReactNode;
-  onClick?: () => void;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
   type?: "button" | "submit" | "reset";
-  variant?: "primary" | "secondary";
+  variant?: keyof typeof VARIANT_STYLES;
   disabled?: boolean;
   className?: string;
 };
@@ -17,20 +22,16 @@ export function PrimaryButton({
   disabled = false,
   className,
 }: PrimaryButtonProps) {
-  const variantStyles = {
-    primary: "bg-[var(--primary-500,#FF7765)]",
-    secondary: "bg-[var(--gray-800,#3A3D40)]",
-  };
-
   return (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled}
+      aria-disabled={disabled}
       className={cn(
-        "flex w-full max-w-[420px] h-12 py-[15px] px-[121px] justify-center items-center gap-[10px] rounded-[30px] text-base font-semibold leading-[150%] tracking-[-0.32px] text-[var(--gray-white,#FFF)] whitespace-nowrap",
-        variantStyles[variant],
-        disabled && "opacity-50 cursor-not-allowed",
+        "flex w-full justify-center items-center h-12 gap-[10px] rounded-[30px] text-body-1-sb font-semibold text-[var(--gray-white)] whitespace-nowrap",
+        VARIANT_STYLES[variant],
+        disabled && "pointer-events-none opacity-50 cursor-not-allowed",
         className
       )}
     >
@@ -38,4 +39,3 @@ export function PrimaryButton({
     </button>
   );
 }
-

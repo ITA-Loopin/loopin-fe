@@ -1,5 +1,5 @@
 import type { Dayjs } from "dayjs";
-import { IconButton } from "@/components/common/IconButton";
+import Image from "next/image";
 import { MonthCalendar } from "@/components/calendar/MonthCalendar";
 import { cn } from "@/lib/utils";
 
@@ -10,8 +10,8 @@ type DateRangePickerProps = {
   isEndCalendarOpen: boolean;
   startCalendarMonth: Dayjs;
   endCalendarMonth: Dayjs;
-  selectedStartDate: Dayjs;
-  selectedEndDate: Dayjs;
+  selectedStartDate: Dayjs | null;
+  selectedEndDate: Dayjs | null;
   onToggleStartCalendar: () => void;
   onToggleEndCalendar: () => void;
   onSelectStartDate: (date: Dayjs) => void;
@@ -42,80 +42,91 @@ export function DateRangePicker({
 }: DateRangePickerProps) {
   return (
     <div className="flex flex-col items-start gap-2 self-stretch">
-      <p className="text-xs font-medium text-[#A0A9B1] leading-[140%] tracking-[-0.24px]">반복 기간</p>
-      <div className="flex w-full flex-col gap-3">
-          <div className="relative flex h-[40px] w-full items-center justify-between gap-[10px] rounded-2xl border border-[#F0F2F3] bg-[#F0F2F3] px-4 py-[9px]">
-            <span className="text-sm font-semibold leading-[150%] tracking-[-0.28px] text-[#3A3D40]">시작일</span>
-            <div className="flex items-center gap-[10px]">
-              <span className="text-sm font-semibold leading-[150%] tracking-[-0.28px] text-[#3A3D40]">
-                {formattedStartDate}
-              </span>
-              <IconButton
-                src="/addloopsheet/addloopsheet_dropdown.svg"
-                alt="시작일 선택"
-                width={14}
-                height={14}
-                onClick={onToggleStartCalendar}
-                className={cn(
-                  isStartCalendarOpen ? "rotate-180" : ""
-                )}
-              />
-            </div>
-          </div>
-          {isStartCalendarOpen && (
-            <div className="mt-[8px]">
-              <MonthCalendar
-                visibleMonth={startCalendarMonth}
-                selectedDate={selectedStartDate}
-                onSelectDate={onSelectStartDate}
-                onChangeMonth={onChangeStartMonth}
-              />
-            </div>
-          )}
-          
-
-        <div className="w-full">
-          <div className="relative flex h-[40px] w-full items-center justify-between gap-[10px] rounded-2xl border border-[#F0F2F3] bg-[#F0F2F3] px-4 py-[9px]">
-            <span className={cn(
-              "text-sm font-semibold leading-[150%] tracking-[-0.28px]",
-              disableEndDate ? "text-[#C6CCD1]" : "text-[#3A3D40]"
-            )}>종료일</span>
-            <div className="flex items-center gap-[10px]">
-              <span className={cn(
-                "text-sm font-semibold leading-[150%] tracking-[-0.28px]",
-                disableEndDate ? "text-[#C6CCD1]" : "text-[#3A3D40]"
-              )}>
-                {formattedEndDate}
-              </span>
-              <IconButton
-                src="/addloopsheet/addloopsheet_dropdown.svg"
-                alt="종료일 선택"
-                width={14}
-                height={14}
-                onClick={() => {
-                  if (disableEndDate) return;
-                  onToggleEndCalendar();
-                }}
-                className={cn(
-                  isEndCalendarOpen ? "rotate-180" : "",
-                  disableEndDate && "cursor-not-allowed"
-                )}
-              />
-            </div>
-          </div>
-          {isEndCalendarOpen && !disableEndDate && (
-            <div className="mt-[8px]">
-              <MonthCalendar
-                visibleMonth={endCalendarMonth}
-                selectedDate={selectedEndDate}
-                onSelectDate={onSelectEndDate}
-                onChangeMonth={onChangeEndMonth}
-                minDate={startDate ?? undefined}
-              />
-            </div>
-          )}
+      <p className="text-caption-r text-[var(--gray-500)]">반복 기간</p>
+      <button
+        type="button"
+        onClick={onToggleStartCalendar}
+        className="flex h-[40px] w-full items-center justify-between px-4 py-[9px] rounded-[10px] bg-[var(--gray-200)]"
+      >
+        <span className={cn("text-body-2-sb font-semibold text-[var(--gray-800)]")}>시작일</span>
+        <div className="flex items-center gap-[10px]">
+          <span className={cn("text-body-2-sb font-semibold text-[var(--gray-800)]")}>
+            {formattedStartDate}
+          </span>
+          <Image
+            src="/addloopsheet/addloopsheet_dropdown.svg"
+            alt=""
+            width={14}
+            height={14}
+            className={cn(
+              "transition-transform",
+              isStartCalendarOpen ? "rotate-180" : ""
+            )}
+          />
         </div>
-      </div>
+      </button>
+      {isStartCalendarOpen && (
+        <div className="w-full">
+          <MonthCalendar
+            visibleMonth={startCalendarMonth}
+            selectedDate={selectedStartDate}
+            onSelectDate={onSelectStartDate}
+            onChangeMonth={onChangeStartMonth}
+            hideOtherMonths={true}
+            isDropdown={true}
+          />
+        </div>
+      )}
+
+      <button
+        type="button"
+        onClick={() => {
+          if (disableEndDate) return;
+          onToggleEndCalendar();
+        }}
+        disabled={disableEndDate}
+        className={cn(
+          "flex h-[40px] w-full items-center justify-between px-4 py-[9px] rounded-[10px] bg-[var(--gray-200)]",
+          disableEndDate && "cursor-not-allowed"
+        )}
+      >
+        <span className={cn(
+          "text-body-2-sb font-semibold",
+          disableEndDate ? "text-[var(--gray-400)]" : "text-[var(--gray-800)]"
+        )}>종료일</span>
+        <div className="flex items-center gap-[10px]">
+          <span className={cn(
+            "text-body-2-sb font-semibold",
+            disableEndDate ? "text-[var(--gray-400)]" : "text-[var(--gray-800)]"
+          )}>
+            {formattedEndDate}
+          </span>
+          <Image
+            src="/addloopsheet/addloopsheet_dropdown.svg"
+            alt=""
+            width={14}
+            height={14}
+            className={cn(
+              "transition-transform",
+              isEndCalendarOpen ? "rotate-180" : "",
+              disableEndDate && "opacity-50"
+            )}
+          />
+        </div>
+      </button>
+      {isEndCalendarOpen && !disableEndDate && (
+        <div className="w-full">
+          <MonthCalendar
+            visibleMonth={endCalendarMonth}
+            selectedDate={selectedEndDate}
+            onSelectDate={onSelectEndDate}
+            onChangeMonth={onChangeEndMonth}
+            minDate={startDate ?? undefined}
+            hideOtherMonths={true}
+            isDropdown={true}
+          />
+        </div>
+      )}
     </div>
   );
 }

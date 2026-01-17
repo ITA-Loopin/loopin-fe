@@ -179,6 +179,13 @@ function HomeContent() {
             className="flex w-full items-center justify-between rounded-full bg-[#03C75A] px-6 py-4 text-left font-semibold text-white shadow-lg shadow-black/10"
           >
             <span className="flex items-center gap-3">
+              <Image
+                  src="/naver-simple.png"
+                  alt="Naver"
+                  width={24}
+                  height={24}
+                  className="h-6 w-6"
+              />
               네이버 로그인
             </span>
           </button>
@@ -188,6 +195,13 @@ function HomeContent() {
             className="flex w-full items-center justify-between rounded-full bg-white px-6 py-4 text-left font-semibold text-[#1F1F1F] shadow-lg shadow-black/10"
           >
             <span className="flex items-center gap-3">
+              <Image
+                  src="/google-simple.png"
+                  alt="Google"
+                  width={24}
+                  height={24}
+                  className="h-6 w-6"
+              />
               구글 로그인
             </span>
           </button>

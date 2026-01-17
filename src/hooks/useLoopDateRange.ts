@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
+import { RepeatValue, ScheduleType } from "@/components/common/add-loop/constants";
 
 interface UseLoopDateRangeProps {
   isOpen: boolean;
   defaultStartDate?: string;
   defaultEndDate?: string;
-  scheduleType?: string;
+  scheduleType?: ScheduleType;
 }
 
 export function useLoopDateRange({
@@ -37,11 +38,20 @@ export function useLoopDateRange({
   const formattedStartDate = startDate ? startDate.format("YYYY.MM.DD") : "없음";
 
   // 반복 주기가 "안함"일 때는 "종료일 없음" 표시
+  // 빈 문자열("")은 아직 선택 안 한 상태이므로 endDate가 있으면 표시
   const formattedEndDate =
-    scheduleType === "NONE" ? "없음" : endDate ? endDate.format("YYYY.MM.DD") : "없음";
+    scheduleType === "NONE"
+      ? "없음"
+      : endDate
+        ? endDate.format("YYYY.MM.DD")
+        : "없음";
 
-  const selectedStartDate = startDate ?? startCalendarMonth;
-  const selectedEndDate = endDate ?? endCalendarMonth;
+  // 선택된 날짜가 현재 보이는 달의 범위 내에 있는지 확인
+  const isStartDateInCurrentMonth = startDate?.isSame(startCalendarMonth, "month");
+  const isEndDateInCurrentMonth = endDate?.isSame(endCalendarMonth, "month");
+  
+  const selectedStartDate = isStartDateInCurrentMonth ? startDate : null;
+  const selectedEndDate = isEndDateInCurrentMonth ? endDate : null;
 
   const openStartCalendar = useCallback(() => {
     const base = startDate ?? dayjs();

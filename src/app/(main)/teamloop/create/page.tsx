@@ -53,7 +53,7 @@ export default function CreateTeamLoopPage() {
   };
 
   return (
-    <div className="flex flex-col bg-[var(--gray-white)]">
+    <div className="flex flex-col min-h-full bg-[var(--gray-white)]">
       <Header leftType="back" rightType="user" onBack={() => router.back()} centerTitle="팀 생성" />
 
       <form onSubmit={handleSubmit} className="flex-1 px-[16px] pt-[30px]">
@@ -78,7 +78,7 @@ export default function CreateTeamLoopPage() {
             onRemove={handleRemoveMember}
           />
 
-          <div className="flex justify-center">
+          <div className="flex justify-center mb-4">
             <PrimaryButton type="submit" disabled={isSubmitting}>
               팀 생성하기
             </PrimaryButton>

@@ -2,6 +2,7 @@
 
 import Modal from "@/components/common/Modal";
 import { IconButton } from "@/components/common/IconButton";
+import { cn } from "@/lib/utils";
 
 type LoopActionModalProps = {
   isOpen: boolean;
@@ -18,74 +19,83 @@ export function LoopActionModal({
   onPrimaryAction,
   onSecondaryAction,
 }: LoopActionModalProps) {
-  if (!isOpen) {
-    return null;
-  }
+  if (!isOpen) return null;
 
   const isDelete = type === "delete";
-  const isSingleMode = !onPrimaryAction; // onPrimaryAction이 없으면 단일 루프 모드
+  const isSingleMode = !onPrimaryAction;
+
+  const baseBtn =
+    "flex h-[42px] items-center justify-center rounded-[5px] text-body-2-sb font-semibold bg-[var(--gray-100)] px-[10px] py-[9px]";
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className={`relative w-[328px] ${isSingleMode ? "" : "h-[172px]"} rounded-[15px] bg-white pt-9 px-3 pb-3 text-center`}>
+      <div className="relative w-[328px] rounded-[15px] bg-white p-3">
+        {/* 닫기 버튼은 absolute 유지 */}
         <IconButton
           src="/loop/loop_delete.png"
           alt="닫기"
-          width={18}
-          height={18}
+          width={20}
+          height={20}
           onClick={onClose}
           className="absolute right-3 top-3"
         />
-        {isSingleMode ? (
-          <p className="text-base font-bold leading-[150%] tracking-[-0.32px] text-center text-[var(--gray-800,#3A3D40)]">
-            이 루프를 삭제할까요?
+
+        {/* 
+          아이콘은 흐름 밖(absolute)이므로 gap이 적용되지 않음.
+          -> 텍스트 블록에 "아이콘 영역 회피 + 16px 간격"을 직접 확보.
+        */}
+        <div className="mt-9 flex flex-col items-center gap-5">
+          <p className="text-center text-body-1-b text-[var(--gray-800)] min-h-[48px] flex items-center justify-center">
+            {isSingleMode ? (
+              "이 루프를 삭제할까요?"
+            ) : (
+              <>
+                이 루프는 반복되는 루프입니다
+                <br />
+                이 루프만 {isDelete ? "삭제" : "수정"}할까요?
+              </>
+            )}
           </p>
-        ) : (
-          <p className="text-base font-bold leading-[150%] tracking-[-0.32px] text-center text-[var(--gray-800,#3A3D40)]">
-            이 루프는 반복되는 루프입니다
-            <br />
-            이 루프만 {isDelete ? "삭제" : "수정"}할까요?
-          </p>
-        )}
-        <div className="mt-5 flex flex-row gap-2">
-          {isSingleMode ? (
-            <>
-              <button
-                type="button"
-                className="flex flex-1 h-[42px] px-[10px] py-[9px] justify-center items-center gap-[10px] rounded-[5px] bg-[var(--gray-100,#F8F8F9)] text-sm font-semibold leading-[150%] tracking-[-0.28px] text-center text-[var(--primary-main,#FF543F)]"
-                onClick={onSecondaryAction}
-              >
-                삭제
-              </button>
-              <button
-                type="button"
-                className="flex flex-1 h-[42px] px-[10px] py-[9px] justify-center items-center gap-[10px] rounded-[5px] bg-[var(--gray-100,#F8F8F9)] text-sm font-semibold leading-[150%] tracking-[-0.28px] text-center text-[var(--gray-800,#3A3D40)]"
-                onClick={onClose}
-              >
-                취소
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                type="button"
-                className="flex w-[148px] h-[42px] px-[10px] py-[9px] justify-center items-center gap-[10px] rounded-[5px] bg-[var(--gray-100,#F8F8F9)] text-sm font-semibold leading-[150%] tracking-[-0.28px] text-center text-[var(--primary-main,#FF543F)]"
-                onClick={onPrimaryAction}
-              >
-                {isDelete ? "모든 반복 루프 삭제" : "모든 반복 루프 수정"}
-              </button>
-              <button
-                type="button"
-                className="flex w-[148px] h-[42px] px-[10px] py-[9px] justify-center items-center gap-[10px] rounded-[5px] bg-[var(--gray-100,#F8F8F9)] text-sm font-semibold leading-[150%] tracking-[-0.28px] text-center text-[var(--gray-800,#3A3D40)]"
-                onClick={onSecondaryAction}
-              >
-                {isDelete ? "이 루프만 삭제" : "이 루프만 수정"}
-              </button>
-            </>
-          )}
+
+          <div className={cn("flex w-full gap-2", isSingleMode ? "" : "justify-center")}>
+            {isSingleMode ? (
+              <>
+                <button
+                  type="button"
+                  className={cn(baseBtn, "flex-1 text-[var(--primary-main)]")}
+                  onClick={onSecondaryAction}
+                >
+                  삭제
+                </button>
+                <button
+                  type="button"
+                  className={cn(baseBtn, "flex-1 text-[var(--gray-800)]")}
+                  onClick={onClose}
+                >
+                  취소
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  className={cn(baseBtn, "w-[148px] text-[var(--primary-main)]")}
+                  onClick={onPrimaryAction}
+                >
+                  {isDelete ? "모든 반복 루프 삭제" : "모든 반복 루프 수정"}
+                </button>
+                <button
+                  type="button"
+                  className={cn(baseBtn, "w-[148px] text-[var(--gray-800)]")}
+                  onClick={onSecondaryAction}
+                >
+                  {isDelete ? "이 루프만 삭제" : "이 루프만 수정"}
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </Modal>
   );
 }
-
