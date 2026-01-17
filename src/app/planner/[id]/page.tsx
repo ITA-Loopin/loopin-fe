@@ -51,6 +51,7 @@ export default function PlannerChatPage() {
     handleRetry,
     handleUpdateLoop,
     showUpdateMessage,
+    callUpdateLoop: sseCallUpdateLoop,
   } = usePlannerChat(chatRoomId, chatRoomLoopSelect);
 
   type PlannerFormValues = { prompt: string };
@@ -214,7 +215,7 @@ export default function PlannerChatPage() {
                   <button
                     type="button"
                     onClick={() => {
-                      if (chatRoomLoopSelect && chatRoomCallUpdateLoop) {
+                      if (chatRoomLoopSelect && (chatRoomCallUpdateLoop || sseCallUpdateLoop)) {
                         setIsLoopGroupEditSheetOpen(true);
                       } else if (chatRoomLoopSelect) {
                         handleUpdateLoop();
@@ -224,7 +225,7 @@ export default function PlannerChatPage() {
                     }}
                     className="text-xs font-semibold text-[#737980]"
                   >
-                    {chatRoomLoopSelect && chatRoomCallUpdateLoop
+                    {chatRoomLoopSelect && (chatRoomCallUpdateLoop || sseCallUpdateLoop)
                       ? "루프 수정 완료하기"
                       : chatRoomLoopSelect
                         ? "루프 수정하기"
