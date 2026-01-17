@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { fetchChatRooms, type ChatRoom } from "@/lib/chat";
 import LoopIcon from "@/../public/ai-planner/loop-icon.svg";
+import { PrimaryButton } from "@/components/common/PrimaryButton";
+import Header from "@/components/common/Header";
 
 type ChatLoop = {
   id: number;
@@ -79,10 +81,7 @@ export default function PlannerListPage() {
 
   return (
     <div className="flex h-full flex-col bg-white">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-white px-6 py-4 shadow-sm">
-        <h1 className="text-center text-lg font-semibold">루프 채팅 기록</h1>
-      </header>
+      <Header />
 
       {/* Content */}
       <main className="flex-1 px-6 py-6">
@@ -130,12 +129,11 @@ export default function PlannerListPage() {
       </main>
 
       <div className="px-6 pb-5 pt-4">
-        <button
+        <PrimaryButton
           onClick={handleStartNewLoop}
-          className="w-full rounded-full bg-[#FF5A45] px-6 py-4 text-base font-semibold text-white"
         >
           새로운 루프 시작하기
-        </button>
+        </PrimaryButton>
       </div>
     </div>
   );
