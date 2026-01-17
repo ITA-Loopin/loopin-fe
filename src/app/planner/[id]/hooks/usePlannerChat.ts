@@ -80,6 +80,7 @@ export function usePlannerChat(
   const [updateRecommendation, setUpdateRecommendation] =
     useState<RecommendationSchedule | null>(null);
   const [showUpdateMessage, setShowUpdateMessage] = useState(false);
+  const [callUpdateLoop, setCallUpdateLoop] = useState<boolean>(false);
   const [isWaitingForRecreateInput, setIsWaitingForRecreateInput] =
     useState(false);
   const hasSentRecreateLoopRef = useRef(false);
@@ -124,6 +125,7 @@ export function usePlannerChat(
     setRecommendations([]);
     hasSentRecreateLoopRef.current = false;
     hasSentBeforeUpdateLoopRef.current = false;
+    setCallUpdateLoop(false);
   }, [plannerChatRoomId]);
 
   const exampleLabel = useMemo(() => {
@@ -336,6 +338,11 @@ export function usePlannerChat(
               setIsLoading(false);
               setIsInputVisible(true);
               hasSentRecreateLoopRef.current = false; // 플래그 초기화
+            }
+
+            // callUpdateLoop 필드 처리
+            if (messageData.callUpdateLoop !== undefined) {
+              setCallUpdateLoop(messageData.callUpdateLoop);
             }
 
             // 일반 메시지 처리
@@ -667,6 +674,7 @@ export function usePlannerChat(
     handleRetry,
     handleUpdateLoop,
     showUpdateMessage,
+    callUpdateLoop,
   };
 }
 
