@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -69,19 +68,22 @@ export function BottomTab() {
                 item.key === "calendar" ? "calendar-icon-trigger" : ""
               }`}
             >
-              <Image
-                src={item.icon}
-                alt={item.label}
-                width={20}
-                height={20}
-                className={`transition-opacity ${
+              <div
+                className={`relative h-5 w-5 transition-opacity ${
                   isActive ? "opacity-100" : "opacity-80"
+                } ${
+                  isActive
+                    ? "bg-[var(--primary-main,#FF543F)]"
+                    : "bg-[var(--gray-300)]"
                 }`}
-                style={isActive ? { filter: "brightness(0) saturate(100%) invert(45%) sepia(96%) saturate(1352%) hue-rotate(340deg) brightness(100%) contrast(97%)" } : {}}
+                style={{
+                  maskImage: `url(${item.icon})`,
+                  WebkitMaskImage: `url(${item.icon})`,
+                }}
               />
               <span
                 className={`text-center text-[8px] font-bold leading-[150%] tracking-[-0.32px] transition-colors ${
-                  isActive ? "text-[var(--primary-main,#FF543F)]" : "text-[var(--gray-500)]"
+                  isActive ? "text-[var(--primary-main)]" : "text-[var(--gray-300)]"
                 }`}
               >
                 {item.label}
