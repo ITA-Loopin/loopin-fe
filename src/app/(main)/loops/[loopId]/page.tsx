@@ -97,10 +97,14 @@ export default function LoopDetailPage() {
                 const result = await checklist.handleCompleteLoop();
                 if (result?.success) {
                   if (result.alreadyComplete) {
-                    // 이미 100%인 경우 전 화면으로 이동
+                    // 이미 100%인 경우 즉시 전 화면으로 이동
                     router.back();
+                  } else {
+                    // 애니메이션 완료 후 이전 페이지로 이동 (3초 애니메이션 완료 후)
+                    setTimeout(() => {
+                      router.back();
+                    }, 3000); // LoopProgress의 duration-[3000ms] 완료 대기
                   }
-                  // 100% 미만인 경우는 원래 동작 유지 (토스트 없이, 이동 없이)
                 } else {
                   alert("루프 완료에 실패했습니다. 다시 시도해주세요.");
                 }

@@ -413,6 +413,7 @@ export default function TeamLoopDetailPage() {
 
     // 이미 100%인 경우
     if (detail.progress === 100) {
+      router.back();
       return { success: true, alreadyComplete: true };
     }
 
@@ -444,13 +445,28 @@ export default function TeamLoopDetailPage() {
     }, 100);
 
     try {
-      await completeTeamLoop(teamId, loopId);
+      const result = await completeTeamLoop(teamId, loopId);
+      // API 성공 확인
+      if (!result.success) {
+        // API가 실패했지만 예외를 던지지 않은 경우
+        setDetail(previousState);
+        console.error("팀 루프 완료 실패:", result.message);
+        alert(result.message || "팀 루프 완료에 실패했습니다.");
+        return { success: false };
+      }
       // Optimistic update로 이미 UI가 업데이트되었으므로 reload 불필요
       // 화면 깜빡임을 방지하기 위해 reload 제거
+      // 애니메이션 완료 후 이전 페이지로 이동 (3초 애니메이션 완료 후)
+      setTimeout(() => {
+        router.back();
+      }, 3100); // 100ms (progress 설정) + 3000ms (애니메이션 완료 대기 - LoopProgress의 duration-[3000ms])
       return { success: true, alreadyComplete: false };
     } catch (error) {
       // 에러 발생 시 이전 상태로 롤백
       setDetail(previousState);
+      const errorMessage = error instanceof Error ? error.message : "팀 루프 완료에 실패했습니다.";
+      console.error("팀 루프 완료 에러:", error);
+      alert(errorMessage);
       return { success: false };
     }
   };
