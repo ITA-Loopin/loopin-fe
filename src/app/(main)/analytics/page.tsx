@@ -138,9 +138,9 @@ export default function AnalyticsPage() {
         rightType="none"
         centerTitle="루프 리포트"
       />
-      {/* NONE 상태를 제외한 모든 경우에 초록색 원형 오버레이 */}
+      {/* NONE 상태를 제외한 모든 경우에 초록색 원형 오버레이 - 스크롤 계산에서 제외 */}
       {status !== "NONE" && (
-        <>
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div
             className="absolute pointer-events-none rounded-[379.346px] bg-[#E7FFBA] blur-[67px] w-[379.346px] h-[379.018px] rotate-[-57.544deg] top-1/2 left-1/2"
             style={{
@@ -153,7 +153,7 @@ export default function AnalyticsPage() {
               opacity: status === "GOOD" ? 0.3 : 0.2,
             }}
           />
-        </>
+        </div>
       )}
 
       {isLoading ? (
