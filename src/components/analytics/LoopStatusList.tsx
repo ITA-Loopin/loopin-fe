@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import type { ReportLoopItem, ReportStatus } from "@/types/report";
 
 type CalendarViewType = "week" | "month";
@@ -14,6 +13,7 @@ type LoopStatusListProps = {
   goodProgressMessage: string | null;
   badProgressMessage: string | null;
   onActionClick?: () => void;
+  onAddClick?: () => void;
 };
 
 type LoopItemCardProps = {
@@ -171,10 +171,10 @@ export function LoopStatusList({
   goodProgressMessage,
   badProgressMessage,
   onActionClick,
+  onAddClick,
 }: LoopStatusListProps) {
   const periodText = viewType === "week" ? "이번주" : "이번달";
   const isEmpty = status === "NONE";
-  const router = useRouter();
 
   const getOpacity = () => {
     switch (status) {
@@ -209,7 +209,7 @@ export function LoopStatusList({
         showSuggestion
         showAddButton={isEmpty}
         onActionClick={onActionClick}
-        onAddClick={() => router.push("/calendar")}
+        onAddClick={onAddClick}
         isEmpty={isEmpty}
         opacity={opacity}
       />

@@ -92,6 +92,7 @@ export function LoopReport({
             ? data.weekData.badProgressMessage
             : data.monthData.badProgressMessage
         }
+        onAddClick={() => setIsAddLoopSheetOpen(true)}
       />
       </section>
     </>

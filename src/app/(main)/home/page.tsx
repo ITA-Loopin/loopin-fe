@@ -60,6 +60,7 @@ export default function HomePage() {
     TooltipContent,
     TooltipTrigger,
   } from "@/components/ui/tooltip";
+  import { useRouter } from "next/navigation";
   
   dayjs.locale("ko");
   
@@ -71,7 +72,7 @@ export default function HomePage() {
       width: number;
       height: number;
     } | null>(null);
-  
+    const router = useRouter();
     // 오늘 날짜 표시
     const todayText = useMemo(() => {
       return dayjs().format("YYYY년 M월 D일 dddd");
@@ -244,6 +245,13 @@ export default function HomePage() {
                 </div>
   
                 <LoopList loops={loopList} />
+
+                {/* 팀 루프 보러가기 버튼 */}
+                <div className="flex w-full justify-center itema-center px-2 py-[6px] gap-2 roundeed-[5px] bg-[var(--primary-200)]">
+                  <button className="text-body-2-sb text-[var(--primary-main)] whitespace-nowrap" onClick={() => router.push("/teamloop")}>
+                    팀 루프 보러가기
+                  </button>
+                </div>
               </>
             )}
           </div>
