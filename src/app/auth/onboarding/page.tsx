@@ -227,7 +227,7 @@ export default function OnboardingPage() {
           </div>
 
           <div
-            className={`flex items-center gap-3 rounded-2xl border px-4 py-3 shadow-sm ${
+            className={`flex items-center gap-3 rounded-[10px] border px-4 py-3 ${
               alert?.type === "error"
                 ? "border-destructive"
                 : alert?.type === "success"
@@ -260,7 +260,7 @@ export default function OnboardingPage() {
       </div>
 
       <Modal isOpen={isModalOpen} onClose={closeModal} className="w-[90%]">
-        <div className="rounded-3xl bg-white p-4 text-center shadow-2xl flex flex-col items-center justify-center">
+        <div className="rounded-3xl bg-white p-4 text-center  flex flex-col items-center justify-center">
             <Image
               src="/onboarding/graphic_complete.svg"
               alt="완료"
