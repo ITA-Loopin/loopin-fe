@@ -125,7 +125,7 @@ function HomeContent() {
 
   return (
     <div
-      className="relative flex min-h-screen flex-col items-center justify-between overflow-hidden px-6 py-14 text-white"
+      className="relative flex min-h-screen flex-col items-center justify-between overflow-hidden px-4 py-14 text-white"
       style={{
         background: "linear-gradient(136deg, #FF5741 54.38%, #FFE4E0 118.92%)",
       }}
