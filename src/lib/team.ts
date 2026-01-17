@@ -809,7 +809,7 @@ export async function leaveTeam(
       message: string;
       data?: unknown;
     }>(`/rest-api/v1/teams/${teamId}/leave`, {
-      method: "DELETE",
+      method: "POST",
     });
 
     if (!response.success) {
