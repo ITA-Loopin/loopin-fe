@@ -9,7 +9,7 @@ import { TeamLoopList } from "@/components/team/TeamLoopList";
 import { MonthCalendar } from "@/components/calendar/MonthCalendar";
 import { PrimaryButton } from "@/components/common/PrimaryButton";
 import { AddTeamLoopSheet } from "@/components/team/AddTeamLoopSheet";
-import { fetchTeamDetail, fetchTeamLoops, type TeamLoopApiItem } from "@/lib/team";
+import { fetchTeamDetail, fetchTeamLoops, fetchTeamCalendarLoops, type TeamLoopApiItem } from "@/lib/team";
 import type { TeamItem } from "@/components/team/types";
 
 type TeamDetail = TeamItem & {
@@ -30,6 +30,8 @@ export default function TeamDetailPage() {
   const [isAddLoopSheetOpen, setIsAddLoopSheetOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
   const [visibleMonth, setVisibleMonth] = useState<Dayjs>(dayjs());
+  const [loopDays, setLoopDays] = useState<Map<string, boolean>>(new Map());
+  const [isLoadingLoopDays, setIsLoadingLoopDays] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -98,6 +100,40 @@ export default function TeamDetailPage() {
       cancelled = true;
     };
   }, [teamId, activeTab, selectedDate]);
+
+  // 팀 루프 캘린더 (루프가 있는 날짜) 가져오기
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadTeamCalendarLoops = async () => {
+      if (!teamId || activeTab !== "calendar") return;
+
+      try {
+        setIsLoadingLoopDays(true);
+        const year = visibleMonth.year();
+        const month = visibleMonth.month() + 1; // dayjs month는 0-based이므로 +1
+        const loopDaysMap = await fetchTeamCalendarLoops(Number(teamId), year, month);
+        if (!cancelled) {
+          setLoopDays(loopDaysMap);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          console.error("팀 루프 캘린더 조회 실패", err);
+          setLoopDays(new Map());
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoadingLoopDays(false);
+        }
+      }
+    };
+
+    loadTeamCalendarLoops();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [teamId, activeTab, visibleMonth]);
 
   if (isLoading) {
     return (
@@ -216,6 +252,7 @@ export default function TeamDetailPage() {
               onChangeMonth={(offset) => {
                 setVisibleMonth((prev) => prev.add(offset, "month"));
               }}
+              loopDays={loopDays}
             />
           </div>
         ) : (
@@ -287,6 +324,11 @@ export default function TeamDetailPage() {
           isOpen={isAddLoopSheetOpen}
           onClose={() => setIsAddLoopSheetOpen(false)}
           teamId={Number(teamId)}
+          defaultStartDate={
+            activeTab === "calendar" && selectedDate
+              ? selectedDate.format("YYYY-MM-DD")
+              : undefined
+          }
           onCreated={() => {
             setIsAddLoopSheetOpen(false);
             
@@ -319,9 +361,24 @@ export default function TeamDetailPage() {
                 setIsLoadingLoops(false);
               }
             };
+
+            // 루프 캘린더 새로고침 (캘린더 탭인 경우)
+            const loadTeamCalendarLoops = async () => {
+              if (!teamId || activeTab !== "calendar") return;
+              try {
+                const year = visibleMonth.year();
+                const month = visibleMonth.month() + 1;
+                const loopDaysMap = await fetchTeamCalendarLoops(Number(teamId), year, month);
+                setLoopDays(loopDaysMap);
+              } catch (err) {
+                console.error("팀 루프 캘린더 조회 실패", err);
+                setLoopDays(new Map());
+              }
+            };
             
             loadTeamDetail();
             loadTeamLoops();
+            loadTeamCalendarLoops();
           }}
         />
       )}

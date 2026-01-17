@@ -22,6 +22,7 @@ type AddTeamLoopSheetProps = {
   onClose: () => void;
   teamId: number;
   onCreated?: () => void;
+  defaultStartDate?: string;
 };
 
 export function AddTeamLoopSheet({
@@ -29,6 +30,7 @@ export function AddTeamLoopSheet({
   onClose,
   teamId,
   onCreated,
+  defaultStartDate,
 }: AddTeamLoopSheetProps) {
   const [loopType, setLoopType] = useState<"COMMON" | "INDIVIDUAL" | undefined>(undefined);
   const [importance, setImportance] = useState<"HIGH" | "MEDIUM" | "LOW" | undefined>(undefined);
@@ -46,7 +48,7 @@ export function AddTeamLoopSheet({
 
   const dateRange = useLoopDateRange({
     isOpen,
-    defaultStartDate: undefined,
+    defaultStartDate,
     defaultEndDate: undefined,
     scheduleType: schedule.scheduleType,
   });

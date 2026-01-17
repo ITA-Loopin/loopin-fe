@@ -273,6 +273,66 @@ export async function fetchTeamLoops(
 }
 
 /**
+ * 팀 루프 캘린더 API 응답 타입
+ */
+export type TeamCalendarLoopDay = {
+  date: string;
+  hasTeamLoop: boolean;
+};
+
+export type TeamCalendarLoopsApiResponse = {
+  success: boolean;
+  code: string;
+  message: string;
+  data: {
+    teamName: string;
+    days: TeamCalendarLoopDay[];
+  };
+  page: {
+    page: number;
+    size: number;
+    totalPages: number;
+    totalElements: number;
+    first: boolean;
+    last: boolean;
+    hasNext: boolean;
+  };
+  timestamp: string;
+  traceId: string;
+};
+
+/**
+ * 팀 루프 캘린더 조회 API
+ */
+export async function fetchTeamCalendarLoops(
+  teamId: number,
+  year: number,
+  month: number
+): Promise<Map<string, boolean>> {
+  const response = await apiFetch<TeamCalendarLoopsApiResponse>(
+    `/rest-api/v1/teams/${teamId}/loops/calendar`,
+    {
+      searchParams: {
+        year,
+        month,
+        teamId,
+      },
+    }
+  );
+
+  if (!response.success || !response.data) {
+    throw new Error(response.message || "팀 루프 캘린더 조회에 실패했습니다");
+  }
+
+  const loopMap = new Map<string, boolean>();
+  response.data.days.forEach((day) => {
+    loopMap.set(day.date, day.hasTeamLoop);
+  });
+
+  return loopMap;
+}
+
+/**
  * 팀원 정보 타입
  */
 export type TeamMember = {
