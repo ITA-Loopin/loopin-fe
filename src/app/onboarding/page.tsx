@@ -40,7 +40,7 @@ export default function OnboardingPage() {
           src={`/onboarding/onboarding${currentStep}.png`}
           alt={`온보딩 ${currentStep}단계`}
           fill
-          className="object-cover"
+          className="object-fill"
           priority
           quality={100}
           sizes="100vw"
