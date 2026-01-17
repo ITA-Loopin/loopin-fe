@@ -58,7 +58,8 @@ export function BottomTab() {
           const isActive =
             pathname === item.href ||
             (item.href !== "/home" && pathname.startsWith(`${item.href}/`)) ||
-            (item.href === "/calendar" && pathname.startsWith("/loops/"));
+            (item.href === "/calendar" && pathname.startsWith("/loops/")) ||
+            (item.key === "teamloop" && pathname.startsWith("/team/"));
 
           return (
             <Link
