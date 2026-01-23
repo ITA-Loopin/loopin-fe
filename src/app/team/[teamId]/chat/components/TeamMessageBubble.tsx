@@ -3,32 +3,91 @@
 import Image from "next/image";
 import type { TeamChatMessage } from "@/hooks/useTeamChat";
 import dayjs from "dayjs";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+import SearchButtonIcon from "@/../public/team/search_button.svg";
+import FileIcon from "@/../public/team/file.svg";
+import TrashIcon from "@/../public/team/trash.svg";
 
 type TeamMessageBubbleProps = {
   message: TeamChatMessage;
+  onCopy?: (content: string) => void;
+  onDelete?: (messageId: string) => void;
 };
 
-export function TeamMessageBubble({ message }: TeamMessageBubbleProps) {
+export function TeamMessageBubble({
+  message,
+  onCopy,
+  onDelete,
+}: TeamMessageBubbleProps) {
   const isMine = message.isMine;
   const time = message.createdAt
     ? dayjs(message.createdAt).format("HH:mm")
     : "";
 
+  const handleCopy = () => {
+    if (message.content && onCopy) {
+      onCopy(message.content);
+    }
+  };
+
+  const handleDelete = () => {
+    if (onDelete) {
+      onDelete(message.id);
+    }
+  };
+
+  // TODO: 공지 기능 구현 (API 필요)
+  const handleAnnounce = () => {
+    // TODO: 공지 API 구현 필요
+  };
+
   if (isMine) {
     // 내 메시지
     return (
-      <div className="flex justify-end mb-4">
-        <div className="flex items-end gap-1.5 max-w-[80%]">
-          {time && (
-            <span className="text-xs text-[var(--gray-400)] mb-0.5">
-              {time}
-            </span>
-          )}
-          <div className="rounded-2xl bg-[#FFE4E1] px-4 py-2.5 text-sm text-[#2C2C2C] whitespace-pre-line">
-            {message.content}
+      <ContextMenu>
+        <ContextMenuTrigger asChild>
+          <div className="flex justify-end mb-4">
+            <div className="flex items-end gap-1.5 max-w-[80%]">
+              {time && (
+                <span className="text-xs text-[var(--gray-400)] mb-0.5">
+                  {time}
+                </span>
+              )}
+              <div className="rounded-2xl bg-[#FFE4E1] px-4 py-2.5 text-sm text-[#2C2C2C] whitespace-pre-line">
+                {message.content}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </ContextMenuTrigger>
+        <ContextMenuContent className="w-32 bg-white rounded-lg shadow-lg border border-[var(--gray-200)]">
+          <ContextMenuItem
+            onClick={handleAnnounce}
+            className="flex items-center gap-2 px-3 py-2.5 text-sm text-[#2C2C2C] cursor-pointer hover:bg-[var(--gray-100)]"
+          >
+            <Image src={SearchButtonIcon} alt="공지" width={16} height={16} />
+            <span>공지</span>
+          </ContextMenuItem>
+          <ContextMenuItem
+            onClick={handleCopy}
+            className="flex items-center gap-2 px-3 py-2.5 text-sm text-[#2C2C2C] cursor-pointer hover:bg-[var(--gray-100)]"
+          >
+            <Image src={FileIcon} alt="복사" width={16} height={16} />
+            <span>복사</span>
+          </ContextMenuItem>
+          <ContextMenuItem
+            onClick={handleDelete}
+            className="flex items-center gap-2 px-3 py-2.5 text-sm text-[#2C2C2C] cursor-pointer hover:bg-[var(--gray-100)]"
+          >
+            <Image src={TrashIcon} alt="삭제" width={16} height={16} />
+            <span>삭제</span>
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
     );
   }
 
@@ -60,7 +119,7 @@ export function TeamMessageBubble({ message }: TeamMessageBubbleProps) {
             </span>
           )}
           <div className="flex items-end gap-1.5">
-            <div className="rounded-2xl bg-white)] px-4 py-2.5 text-sm text-[#2C2C2C] whitespace-pre-line">
+            <div className="rounded-2xl bg-white px-4 py-2.5 text-sm text-[#2C2C2C] whitespace-pre-line">
               {message.content}
             </div>
             {time && (
