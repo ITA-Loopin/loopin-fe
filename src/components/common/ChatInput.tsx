@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
 import { Controller, Control, FieldValues, Path } from "react-hook-form";
 
 export interface ChatInputProps<T extends FieldValues> {
@@ -28,6 +29,7 @@ export function ChatInput<T extends FieldValues>({
   sendButtonAriaLabel = "메시지 전송",
   onSubmit,
 }: ChatInputProps<T>) {
+  const [isComposing, setIsComposing] = useState(false);
 
   return (
     <div className="flex items-center gap-2 rounded-2xl bg-[#F8F8F9] px-3 py-2">
@@ -69,9 +71,13 @@ export function ChatInput<T extends FieldValues>({
               paddingBottom: "10px"
             }}
             aria-label={ariaLabel || "메시지 입력란"}
+            onCompositionStart={() => setIsComposing(true)}
+            onCompositionEnd={() => setIsComposing(false)}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
+                // 한글 조합 중이면 전송하지 않음
+                if (isComposing) return;
                 const currentValue = watchedValue?.trim();
                 if (currentValue && !disabled && onSubmit) {
                   onSubmit();

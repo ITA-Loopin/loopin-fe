@@ -20,7 +20,7 @@ type WebSocketMessage = {
   messageType: "MESSAGE" | "READ_UP_TO" | "DELETE";
   chatRoomId?: number;
   clientMessageId?: string;
-  chatMessageResponse?: {
+  teamChatMessageResponse?: {
     id: string;
     memberId: number;
     nickname: string;
@@ -148,8 +148,8 @@ export function useTeamChat(teamId: number | null) {
           try {
             const data: WebSocketMessage = JSON.parse(event.data);
 
-            if (data.messageType === "MESSAGE" && data.chatMessageResponse) {
-              const msg = data.chatMessageResponse;
+            if (data.messageType === "MESSAGE" && data.teamChatMessageResponse) {
+              const msg = data.teamChatMessageResponse;
               const messageId = msg.id;
 
               // 중복 메시지 체크
@@ -269,7 +269,7 @@ export function useTeamChat(teamId: number | null) {
         const message = {
           messageType: "MESSAGE" as const,
           clientMessageId,
-          chatMessageResponse: {
+          teamChatMessageResponse: {
             content: content.trim(),
           },
         };
