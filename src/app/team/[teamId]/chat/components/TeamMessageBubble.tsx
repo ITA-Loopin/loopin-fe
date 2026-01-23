@@ -18,13 +18,15 @@ export function TeamMessageBubble({ message }: TeamMessageBubbleProps) {
     // 내 메시지
     return (
       <div className="flex justify-end mb-4">
-        <div className="flex flex-col items-end max-w-[80%]">
-          <div className="rounded-2xl rounded-br-sm bg-[#FFE4E1] px-4 py-2.5 text-sm text-[#2C2C2C] whitespace-pre-line">
+        <div className="flex items-end gap-1.5 max-w-[80%]">
+          {time && (
+            <span className="text-xs text-[var(--gray-400)] mb-0.5">
+              {time}
+            </span>
+          )}
+          <div className="rounded-2xl bg-[#FFE4E1] px-4 py-2.5 text-sm text-[#2C2C2C] whitespace-pre-line">
             {message.content}
           </div>
-          {time && (
-            <span className="text-xs text-[var(--gray-400)] mt-1">{time}</span>
-          )}
         </div>
       </div>
     );
@@ -57,12 +59,16 @@ export function TeamMessageBubble({ message }: TeamMessageBubbleProps) {
               {message.nickname}
             </span>
           )}
-          <div className="rounded-2xl rounded-bl-sm bg-[var(--gray-200)] px-4 py-2.5 text-sm text-[#2C2C2C] whitespace-pre-line">
-            {message.content}
+          <div className="flex items-end gap-1.5">
+            <div className="rounded-2xl bg-white)] px-4 py-2.5 text-sm text-[#2C2C2C] whitespace-pre-line">
+              {message.content}
+            </div>
+            {time && (
+              <span className="text-xs text-[var(--gray-400)] mb-0.5">
+                {time}
+              </span>
+            )}
           </div>
-          {time && (
-            <span className="text-xs text-[var(--gray-400)] mt-1">{time}</span>
-          )}
         </div>
       </div>
     </div>
