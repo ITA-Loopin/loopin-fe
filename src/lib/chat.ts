@@ -107,14 +107,14 @@ export async function fetchChatMessages({
   currentUser,
 }: FetchChatMessagesParams) {
   return apiFetch<ChatRoomMessagesResponse>(
-    `/rest-api/v1/chat-message/${chatRoomId}`,
+    `/rest-api/v1/chat-message/ai/${chatRoomId}`,
     {
       searchParams: buildQueryParams({
         page,
         size,
         currentUser,
       }),
-    }
+    },
   );
 }
 
@@ -149,7 +149,7 @@ export async function sendChatMessage({
         clientMessageId,
         messageType,
       },
-    }
+    },
   );
 }
 
@@ -184,7 +184,7 @@ export type ChatRoomListResponse = {
 };
 
 export async function fetchChatRooms(
-  chatRoomType: "ALL" | "TEAM" | "AI" = "AI"
+  chatRoomType: "ALL" | "TEAM" | "AI" = "AI",
 ) {
   return apiFetch<ChatRoomListResponse>("/rest-api/v1/chat-room", {
     searchParams: {
@@ -212,6 +212,128 @@ export async function createChatRoom(params: CreateChatRoomParams) {
     method: "POST",
     json: params,
   });
+}
+
+/**
+ * 팀 채팅방 조회 API 응답 타입
+ */
+export type TeamChatRoomResponse = {
+  success?: boolean;
+  code?: string;
+  message?: string;
+  data?: {
+    id: number;
+    ownerId: number;
+    title: string;
+    loopSelect: boolean;
+    lastMessageAt?: string | null;
+    lastReadAt?: string | null;
+  };
+  page?: {
+    page?: number;
+    size?: number;
+    totalPages?: number;
+    totalElements?: number;
+    first?: boolean;
+    last?: boolean;
+    hasNext?: boolean;
+  };
+  timestamp?: string;
+  traceId?: string;
+};
+
+/**
+ * 팀 채팅방 조회 API
+ */
+export async function fetchTeamChatRoom(teamId: number) {
+  return apiFetch<TeamChatRoomResponse>(
+    `/rest-api/v1/chat-room/team/${teamId}`,
+  );
+}
+
+/**
+ * 팀 채팅 메시지 첨부파일 타입
+ */
+export type TeamChatMessageAttachment = {
+  type: "IMAGE" | string;
+  url: string;
+  originalFileName: string;
+  contentType: string;
+  size: number;
+};
+
+/**
+ * 팀 채팅 메시지 타입
+ */
+export type TeamChatMessageDto = {
+  id: string;
+  memberId: number;
+  nickname: string;
+  profileImageUrl: string;
+  content: string;
+  attachments?: TeamChatMessageAttachment[];
+  isMine: boolean;
+  createdAt: string;
+};
+
+/**
+ * 팀 채팅 메시지 조회 API 응답 타입
+ */
+export type TeamChatMessagesResponse = {
+  success?: boolean;
+  code?: string;
+  message?: string;
+  data?: TeamChatMessageDto[];
+  page?: {
+    page?: number;
+    size?: number;
+    totalPages?: number;
+    totalElements?: number;
+    first?: boolean;
+    last?: boolean;
+    hasNext?: boolean;
+  };
+  timestamp?: string;
+  traceId?: string;
+};
+
+/**
+ * 팀 채팅 메시지 조회 파라미터
+ */
+export type FetchTeamChatMessagesParams = {
+  chatRoomId: number;
+  page?: number;
+  size?: number;
+};
+
+/**
+ * 팀 채팅 메시지 조회 API
+ */
+export async function fetchTeamChatMessages({
+  chatRoomId,
+  page,
+  size,
+}: FetchTeamChatMessagesParams) {
+  const params: Record<string, Primitive> = {};
+
+  const requestPayload: Record<string, Primitive> = {};
+  if (page !== undefined) {
+    requestPayload.page = page;
+  }
+  if (size !== undefined) {
+    requestPayload.size = size;
+  }
+
+  if (Object.keys(requestPayload).length > 0) {
+    params.request = JSON.stringify(requestPayload);
+  }
+
+  return apiFetch<TeamChatMessagesResponse>(
+    `/rest-api/v1/chat-message/team/${chatRoomId}`,
+    {
+      searchParams: params,
+    },
+  );
 }
 
 function resolveSseBaseUrl() {
@@ -272,7 +394,7 @@ export function createChatSocket({
 
   // CONNECT 이벤트 처리
   eventSource.addEventListener("CONNECT", (event: MessageEvent) => {
-      onOpen?.();
+    onOpen?.();
   });
 
   // MESSAGE 이벤트 처리
