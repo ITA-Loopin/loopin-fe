@@ -83,7 +83,7 @@ export default function TeamChatPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex min-h-screen flex-col bg-[#F8F8F9]">
       {/* Header */}
       <Header leftType="back" centerTitle={teamName} rightType="none" />
     
