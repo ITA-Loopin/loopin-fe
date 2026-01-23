@@ -26,6 +26,7 @@ export default function TeamChatPage() {
     messageListRef,
     sendMessage,
     markAsRead,
+    deleteMessage,
   } = useTeamChat(teamId);
 
   type ChatFormValues = { message: string };
@@ -82,6 +83,19 @@ export default function TeamChatPage() {
     reset({ message: "" });
   };
 
+  const handleCopy = async (content: string) => {
+    try {
+      await navigator.clipboard.writeText(content);
+    } catch (error) {
+      console.error("복사 실패", error);
+    }
+  };
+
+  const handleDelete = (messageId: string) => {
+    // TODO: 삭제 API 구현 필요
+    deleteMessage(messageId);
+  };
+
   return (
     <div className="flex min-h-screen flex-col bg-[#F8F8F9]">
       {/* Header */}
@@ -110,7 +124,12 @@ export default function TeamChatPage() {
           ) : (
             <div className="space-y-1">
               {messages.map((message) => (
-                <TeamMessageBubble key={message.id} message={message} />
+                <TeamMessageBubble
+                  key={message.id}
+                  message={message}
+                  onCopy={handleCopy}
+                  onDelete={handleDelete}
+                />
               ))}
             </div>
           )}
