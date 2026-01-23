@@ -2,7 +2,11 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useAppSelector } from "@/store/hooks";
-import { fetchTeamChatRoom, fetchTeamChatMessages, type TeamChatMessageDto } from "@/lib/chat";
+import {
+  fetchTeamChatRoom,
+  fetchTeamChatMessages,
+  type TeamChatMessageDto,
+} from "@/lib/chat";
 import { v4 as uuidv4 } from "uuid";
 
 export type TeamChatMessage = {
@@ -13,7 +17,7 @@ export type TeamChatMessage = {
   content?: string;
   authorType?: "USER" | "SYSTEM";
   createdAt?: string;
-  isMine?: boolean;
+  isMine: boolean;
 };
 
 type WebSocketMessage = {
@@ -31,6 +35,7 @@ type WebSocketMessage = {
     loopRuleId?: number | null;
     authorType: "USER" | "SYSTEM";
     createdAt: string;
+    isMine: boolean;
   };
   memberId?: number | null;
   lastReadAt?: string | null;
@@ -135,7 +140,7 @@ export function useTeamChat(teamId: number | null) {
     const connectWebSocket = () => {
       try {
         const ws = new WebSocket(
-          `wss://api.loopin.co.kr/ws/chat?chatRoomId=${chatRoomId}`
+          `wss://api.loopin.co.kr/ws/chat?chatRoomId=${chatRoomId}`,
         );
 
         ws.onopen = () => {
@@ -148,7 +153,10 @@ export function useTeamChat(teamId: number | null) {
           try {
             const data: WebSocketMessage = JSON.parse(event.data);
 
-            if (data.messageType === "MESSAGE" && data.teamChatMessageResponse) {
+            if (
+              data.messageType === "MESSAGE" &&
+              data.teamChatMessageResponse
+            ) {
               const msg = data.teamChatMessageResponse;
               const messageId = msg.id;
 
@@ -158,8 +166,13 @@ export function useTeamChat(teamId: number | null) {
               }
 
               // pending 메시지 업데이트
-              if (data.clientMessageId && pendingMessageIdsRef.current.has(data.clientMessageId)) {
-                const tempId = pendingMessageIdsRef.current.get(data.clientMessageId);
+              if (
+                data.clientMessageId &&
+                pendingMessageIdsRef.current.has(data.clientMessageId)
+              ) {
+                const tempId = pendingMessageIdsRef.current.get(
+                  data.clientMessageId,
+                );
                 pendingMessageIdsRef.current.delete(data.clientMessageId);
 
                 setMessages((prev) =>
@@ -173,10 +186,10 @@ export function useTeamChat(teamId: number | null) {
                           profileImageUrl: msg.profileImageUrl,
                           content: msg.content,
                           createdAt: msg.createdAt,
-                          isMine: msg.memberId === Number(user?.id),
+                          isMine: msg.isMine,
                         }
-                      : m
-                  )
+                      : m,
+                  ),
                 );
                 seenMessageIdsRef.current.add(messageId);
                 return;
@@ -191,7 +204,7 @@ export function useTeamChat(teamId: number | null) {
                 content: msg.content,
                 authorType: msg.authorType,
                 createdAt: msg.createdAt,
-                isMine: msg.memberId === Number(user?.id),
+                isMine: msg.isMine,
               };
 
               setMessages((prev) => [...prev, newMessage]);
@@ -216,7 +229,10 @@ export function useTeamChat(teamId: number | null) {
           // 재연결 시도
           if (reconnectAttemptsRef.current < maxReconnectAttempts) {
             reconnectAttemptsRef.current += 1;
-            const delay = Math.min(1000 * Math.pow(2, reconnectAttemptsRef.current), 30000);
+            const delay = Math.min(
+              1000 * Math.pow(2, reconnectAttemptsRef.current),
+              30000,
+            );
             reconnectTimeoutRef.current = setTimeout(() => {
               connectWebSocket();
             }, delay);
@@ -284,7 +300,7 @@ export function useTeamChat(teamId: number | null) {
         pendingMessageIdsRef.current.delete(clientMessageId);
       }
     },
-    [chatRoomId, isConnected, user]
+    [chatRoomId, isConnected, user],
   );
 
   // 읽음 처리
@@ -327,7 +343,7 @@ export function useTeamChat(teamId: number | null) {
         console.error("메시지 삭제 실패", error);
       }
     },
-    [chatRoomId, isConnected]
+    [chatRoomId, isConnected],
   );
 
   // 스크롤을 맨 아래로
