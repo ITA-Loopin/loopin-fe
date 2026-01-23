@@ -3,13 +3,19 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import dayjs, { type Dayjs } from "dayjs";
+import Image from "next/image";
 import Header from "@/components/common/Header";
 import { LoopProgress } from "@/components/home/LoopProgress";
 import { TeamLoopList } from "@/components/team/TeamLoopList";
 import { MonthCalendar } from "@/components/calendar/MonthCalendar";
 import { PrimaryButton } from "@/components/common/PrimaryButton";
 import { AddTeamLoopSheet } from "@/components/team/AddTeamLoopSheet";
-import { fetchTeamDetail, fetchTeamLoops, type TeamLoopApiItem } from "@/lib/team";
+import { TeamLoopFAB } from "@/components/team/TeamLoopFAB";
+import {
+  fetchTeamDetail,
+  fetchTeamLoops,
+  type TeamLoopApiItem,
+} from "@/lib/team";
 import type { TeamItem } from "@/components/team/types";
 
 type TeamDetail = TeamItem & {
@@ -46,7 +52,11 @@ export default function TeamDetailPage() {
         }
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : "팀 정보를 불러오는데 실패했습니다");
+          setError(
+            err instanceof Error
+              ? err.message
+              : "팀 정보를 불러오는데 실패했습니다"
+          );
         }
       } finally {
         if (!cancelled) {
@@ -117,7 +127,9 @@ export default function TeamDetailPage() {
           centerTitle="팀 상세"
         />
         <div className="flex flex-1 items-center justify-center">
-          <p className="text-body-2-m text-red-500">{error || "팀 정보를 불러올 수 없습니다"}</p>
+          <p className="text-body-2-m text-red-500">
+            {error || "팀 정보를 불러올 수 없습니다"}
+          </p>
         </div>
       </div>
     );
@@ -126,9 +138,10 @@ export default function TeamDetailPage() {
   const teamName = team.title;
   const goal = team.description;
   // 탭에 따라 다른 진행률 사용
-  const progress = activeTab === "my" 
-    ? (team.myTotalProgress ?? 0)
-    : (team.teamTotalProgress ?? 0);
+  const progress =
+    activeTab === "my"
+      ? (team.myTotalProgress ?? 0)
+      : (team.teamTotalProgress ?? 0);
 
   return (
     <div className="flex flex-col">
@@ -282,7 +295,18 @@ export default function TeamDetailPage() {
           }}
         />
       )}
+
+      {/* 플로팅 버튼들 */}
+      <TeamLoopFAB
+        onClick={() => router.push(`/team/${teamId}/chat`)}
+        imageSrc="/team/GroupFAB.svg"
+        imageAlt="팀 채팅"
+        imageWidth={24}
+        imageHeight={24}
+        ariaLabel="팀 채팅"
+        right="right-4"
+        bottom="bottom-70"
+      />
     </div>
   );
 }
-

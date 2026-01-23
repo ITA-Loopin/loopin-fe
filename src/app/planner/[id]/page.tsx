@@ -12,6 +12,7 @@ import { usePlannerChat } from "./hooks/usePlannerChat";
 import { fetchChatRooms } from "@/lib/chat";
 import { AddLoopSheet } from "@/components/common/add-loop/AddLoopSheet";
 import { LoopGroupEditSheet } from "@/components/loop/LoopGroupEditSheet";
+import { ChatInput } from "@/components/common/ChatInput";
 import {
   recommendationToAddLoopDefaults,
   recommendationToLoopDetail,
@@ -53,7 +54,7 @@ export default function PlannerChatPage() {
   type PlannerFormValues = { prompt: string };
 
   const {
-    register,
+    control,
     handleSubmit: formHandleSubmit,
     watch,
     reset,
@@ -236,48 +237,31 @@ export default function PlannerChatPage() {
                   await handleSubmit(values.prompt);
                   reset({ prompt: "" });
                 })}
-                className="flex items-center rounded-2xl px-3 py-2 bg-[#F8F8F9]"
               >
-                <textarea
-                  {...register("prompt")}
+                <ChatInput
                   placeholder={
                     chatRoomLoopSelect
                       ? "수정하고 싶은 루프 내용을 입력해주세요."
                       : "만들고 싶은 루프를 입력해주세요."
                   }
-                  rows={1}
-                  className="max-h-32 flex-1 border-none text-sm text-[#2C2C2C] outline-none"
-                  aria-label={
+                  showAttachmentButton={false}
+                  sendButtonIcon="arrow"
+                  control={control}
+                  name="prompt"
+                  watchedValue={watchedPrompt}
+                  ariaLabel={
                     chatRoomLoopSelect
                       ? "루프 수정 요청 입력란"
                       : "루프 생성 요청 입력란"
                   }
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      const currentValue = watchedPrompt?.trim();
-                      if (currentValue) {
-                        formHandleSubmit(async (values) => {
-                          await handleSubmit(values.prompt);
-                          reset({ prompt: "" });
-                        })();
-                      }
-                    }
-                  }}
+                  sendButtonAriaLabel="루프 생성 요청 보내기"
+                  onSubmit={() =>
+                    formHandleSubmit(async (values) => {
+                      await handleSubmit(values.prompt);
+                      reset({ prompt: "" });
+                    })()
+                  }
                 />
-                <button
-                  type="submit"
-                  disabled={!watchedPrompt?.trim()}
-                  className="flex h-10 w-10 items-center justify-center text-white transition disabled:cursor-not-allowed disabled:opacity-50"
-                  aria-label="루프 생성 요청 보내기"
-                >
-                  <Image
-                    src="/ai-planner/arrows-up.svg"
-                    alt="send"
-                    width={24}
-                    height={24}
-                  />
-                </button>
               </form>
             </div>
           </div>

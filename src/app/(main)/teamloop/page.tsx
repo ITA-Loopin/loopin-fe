@@ -33,7 +33,9 @@ export default function TeamLoopPage() {
       } catch (err) {
         if (!cancelled) {
           setError(
-            err instanceof Error ? err.message : "팀 리스트를 불러오는데 실패했습니다"
+            err instanceof Error
+              ? err.message
+              : "팀 리스트를 불러오는데 실패했습니다"
           );
         }
       } finally {
@@ -94,7 +96,9 @@ export default function TeamLoopPage() {
           <TeamListSection title="내 팀 목록" viewAllHref="/teamloop/my">
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
-                <p className="text-caption-m text-[var(--gray-500)]">로딩 중...</p>
+                <p className="text-caption-m text-[var(--gray-500)]">
+                  로딩 중...
+                </p>
               </div>
             ) : error ? (
               <div className="flex items-center justify-center py-8">
@@ -130,10 +134,15 @@ export default function TeamLoopPage() {
         </div>
 
         {/* 모집 중인 팀 목록 */}
-        <TeamListSection title="다른 팀에 참여해보세요!" viewAllHref="/teamloop/recruiting">
+        <TeamListSection
+          title="다른 팀에 참여해보세요!"
+          viewAllHref="/teamloop/recruiting"
+        >
           {isLoadingRecruiting ? (
             <div className="flex items-center justify-center py-8">
-              <p className="text-caption-m text-[var(--gray-500)]">로딩 중...</p>
+              <p className="text-caption-m text-[var(--gray-500)]">
+                로딩 중...
+              </p>
             </div>
           ) : recruitingError ? (
             <div className="flex items-center justify-center py-8">
@@ -156,7 +165,15 @@ export default function TeamLoopPage() {
       </main>
 
       {/* 팀 루프 홈 FAB */}
-      <TeamLoopFAB onClick={() => router.push("/teamloop/create")} />
+      <TeamLoopFAB
+        onClick={() => router.push("/teamloop/create")}
+        imageSrc="/team/plus_white.png"
+        imageAlt="팀 루프 생성"
+        imageWidth={18}
+        imageHeight={18}
+        ariaLabel="팀 루프 생성"
+        right="right-4"
+      />
     </div>
   );
 }
