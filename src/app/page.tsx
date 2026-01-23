@@ -125,7 +125,7 @@ function HomeContent() {
 
   return (
     <div
-      className="relative flex min-h-screen flex-col items-center justify-between overflow-hidden px-6 py-14 text-white"
+      className="relative flex min-h-screen flex-col items-center justify-between overflow-hidden px-4 py-14 text-white"
       style={{
         background: "linear-gradient(136deg, #FF5741 54.38%, #FFE4E0 118.92%)",
       }}
@@ -179,6 +179,13 @@ function HomeContent() {
             className="flex w-full items-center justify-between rounded-full bg-[#03C75A] px-6 py-4 text-left font-semibold text-white shadow-lg shadow-black/10"
           >
             <span className="flex items-center gap-3">
+              <Image
+                  src="/naver-simple.png"
+                  alt="Naver"
+                  width={24}
+                  height={24}
+                  className="h-6 w-6"
+              />
               네이버 로그인
             </span>
           </button>
@@ -188,6 +195,13 @@ function HomeContent() {
             className="flex w-full items-center justify-between rounded-full bg-white px-6 py-4 text-left font-semibold text-[#1F1F1F] shadow-lg shadow-black/10"
           >
             <span className="flex items-center gap-3">
+              <Image
+                  src="/google-simple.png"
+                  alt="Google"
+                  width={24}
+                  height={24}
+                  className="h-6 w-6"
+              />
               구글 로그인
             </span>
           </button>

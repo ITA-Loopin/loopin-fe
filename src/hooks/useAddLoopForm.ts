@@ -1,8 +1,10 @@
-import { FormEvent, useCallback, useState } from "react";
+import { FormEvent, useCallback, useRef, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import {
   AddLoopDefaultValues,
   Checklist,
+  REPEAT_OPTIONS,
+  RepeatValue,
 } from "@/components/common/add-loop/constants";
 import { useLoopTitle } from "./useLoopTitle";
 import { useLoopSchedule } from "./useLoopSchedule";
@@ -25,6 +27,7 @@ export function useAddLoopForm({
   chatRoomId,
 }: UseAddLoopFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const lastCommitRef = useRef(0);
 
   const { title, handleTitleChange } = useLoopTitle({
     isOpen,
@@ -46,7 +49,7 @@ export function useAddLoopForm({
 
   // scheduleType이 "NONE"으로 변경될 때 종료일 초기화
   const handleScheduleTypeClick = useCallback(
-    (value: string) => {
+    (value: RepeatValue) => {
       schedule.handleScheduleTypeClick(value);
       if (value === "NONE") {
         dateRange.resetEndDate();
@@ -64,7 +67,10 @@ export function useAddLoopForm({
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
 
-      const normalizedScheduleType = schedule.scheduleType || "NONE";
+      const normalizedScheduleType: RepeatValue =
+        schedule.scheduleType === ""
+          ? "NONE"
+          : (schedule.scheduleType as RepeatValue);
       const isWeekly = normalizedScheduleType === "WEEKLY";
 
       const payload = {
@@ -122,6 +128,28 @@ export function useAddLoopForm({
     ]
   );
 
+  const handleFormPointerDown = useCallback(
+    (e: React.PointerEvent<HTMLFormElement>) => {
+      // 체크리스트 입력 필드가 아닌 곳을 클릭했을 때 체크리스트 추가
+      const target = e.target as HTMLElement;
+      const isChecklistInput = target.closest(
+        "[data-checklist-input-container]"
+      );
+      const trimmedValue = checklist.newChecklistItem.trim();
+
+      if (!isChecklistInput && trimmedValue) {
+        // 중복 실행 방지: 200ms 이내 재클릭 무시
+        const now = Date.now();
+        if (now - lastCommitRef.current < 200) {
+          return;
+        }
+        lastCommitRef.current = now;
+        checklist.handleAddChecklist();
+      }
+    },
+    [checklist.newChecklistItem, checklist.handleAddChecklist]
+  );
+
   return {
     title: {
       value: title,
@@ -175,5 +203,6 @@ export function useAddLoopForm({
       isSubmitting,
       onSubmit: handleSubmit,
     },
+    onFormPointerDown: handleFormPointerDown,
   };
 }

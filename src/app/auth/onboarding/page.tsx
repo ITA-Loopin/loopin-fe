@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import Modal from "@/components/common/Modal";
 import { apiFetch } from "@/lib/api";
 import { useAppDispatch } from "@/store/hooks";
@@ -226,7 +227,7 @@ export default function OnboardingPage() {
           </div>
 
           <div
-            className={`flex items-center gap-3 rounded-2xl border px-4 py-3 shadow-sm transition focus-within:border-primary focus-within:ring-2 focus-within:ring-[#FF5741]/20 ${
+            className={`flex items-center gap-3 rounded-[10px] border px-4 py-3 ${
               alert?.type === "error"
                 ? "border-destructive"
                 : alert?.type === "success"
@@ -246,7 +247,7 @@ export default function OnboardingPage() {
               type="button"
               onClick={checkNicknameDuplicate}
               disabled={isChecking || nickname.length === 0}
-              className="shrink-0 rounded-xl bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-60"
+              className="shrink-0 rounded-xl bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 transition"
             >
               {isChecking ? "확인 중..." : "중복확인"}
             </button>
@@ -258,24 +259,14 @@ export default function OnboardingPage() {
         </div>
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={closeModal}>
-        <div className="w-full max-w-xs rounded-3xl bg-white p-8 text-center shadow-2xl">
-          <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-[#FF7661] to-[#FFB199]">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2.5}
-              stroke="#fff"
-              className="h-12 w-12"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4.5 12.75l6 6 9-13.5"
-              />
-            </svg>
-          </div>
+      <Modal isOpen={isModalOpen} onClose={closeModal} className="w-[90%]">
+        <div className="rounded-3xl bg-white p-4 text-center  flex flex-col items-center justify-center">
+            <Image
+              src="/onboarding/graphic_complete.svg"
+              alt="완료"
+              width={136}
+              height={136}
+            />
 
           <div className="mt-8 space-y-2">
             <p className="text-lg font-semibold text-foreground">
@@ -294,7 +285,7 @@ export default function OnboardingPage() {
             type="button"
             onClick={handleCompleteSignup}
             disabled={isSubmitting}
-            className="mt-8 w-full rounded-full bg-[#2C2C2C] px-4 py-3 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-70"
+            className="mt-8 w-full rounded-full bg-[#2C2C2C] px-4 py-3 text-sm font-semibold text-white transition"
           >
             {isSubmitting ? "처리 중..." : "Loopin 시작하기"}
           </button>

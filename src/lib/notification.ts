@@ -79,3 +79,27 @@ export async function markNotificationsAsRead(notificationIds: number[]) {
     }
   );
 }
+
+/**
+ * 팀 초대 거절
+ */
+export async function rejectTeamInvitation(invitationId: number) {
+  return apiFetch<NotificationReadResponse>(
+    `/rest-api/v1/teams/invitations/${invitationId}/reject`,
+    {
+      method: "POST",
+    }
+  );
+}
+
+/**
+ * 팀 초대 수락
+ */
+export async function acceptTeamInvitation(invitationId: number) {
+  return apiFetch<NotificationReadResponse>(
+    `/rest-api/v1/teams/invitations/${invitationId}/accept`,
+    {
+      method: "POST",
+    }
+  );
+}

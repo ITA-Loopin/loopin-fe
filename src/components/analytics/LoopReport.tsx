@@ -6,6 +6,8 @@ import { ReportHeader } from "./ReportHeader";
 import { ProgressStatsCard } from "./ProgressStatsCard";
 import { CalendarView } from "./CalendarView";
 import { LoopStatusList } from "./LoopStatusList";
+import { PrimaryButton } from "@/components/common/PrimaryButton";
+import { AddLoopSheet } from "@/components/common/add-loop/AddLoopSheet";
 
 import type { LoopReportData, ReportStatus } from "@/types/report";
 
@@ -23,6 +25,7 @@ export function LoopReport({
   data,
 }: LoopReportProps) {
   const [calendarViewType, setCalendarViewType] = useState<CalendarViewType>("week");
+  const [isAddLoopSheetOpen, setIsAddLoopSheetOpen] = useState(false);
   const router = useRouter();
   
   return (
@@ -34,14 +37,23 @@ export function LoopReport({
       {/* NONE 상태일 때만 루프 추가하기 버튼 표시 */}
       {status === "NONE" && (
         <div className="flex justify-center px-6 mb-4">
-          <button
-            onClick={() => router.push("/calendar")}
-            className="flex w-full h-12 items-center justify-center whitespace-nowrap rounded-[30px] bg-[var(--gray-800,#3A3D40)] py-[15px] px-[15px] text-base font-semibold text-white transition-colors"
+          <PrimaryButton
+            variant="secondary"
+            onClick={() => setIsAddLoopSheetOpen(true)}
           >
             루프 추가하기
-          </button>
+          </PrimaryButton>
         </div>
       )}
+
+      <AddLoopSheet
+        isOpen={isAddLoopSheetOpen}
+        onClose={() => setIsAddLoopSheetOpen(false)}
+        onCreated={() => {
+          setIsAddLoopSheetOpen(false);
+          router.refresh();
+        }}
+      />
 
       <section className="flex flex-col gap-6 mb-8">
         <ProgressStatsCard status={status} data={data} />
@@ -80,6 +92,7 @@ export function LoopReport({
             ? data.weekData.badProgressMessage
             : data.monthData.badProgressMessage
         }
+        onAddClick={() => setIsAddLoopSheetOpen(true)}
       />
       </section>
     </>

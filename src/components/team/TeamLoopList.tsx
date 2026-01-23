@@ -34,13 +34,38 @@ export function TeamLoopList({ loops, isLoading, activeTab, teamId }: TeamLoopLi
     }
   });
 
+  // API 상태를 한국어로 변환
+  const formatStatus = (apiStatus: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED"): "완료됨" | "진행중" | "시작전" => {
+    switch (apiStatus) {
+      case "COMPLETED":
+        return "완료됨";
+      case "IN_PROGRESS":
+        return "진행중";
+      case "NOT_STARTED":
+        return "시작전";
+      default:
+        return "시작전";
+    }
+  };
+
   // API 데이터를 UI 형식으로 변환
   const displayLoops: LoopDisplayItem[] = filteredLoops.map((loop) => {
-    const progress = activeTab === "my" 
-      ? Math.round(loop.personalProgress * 100)
-      : Math.round(loop.teamProgress * 100);
+    // API의 personalProgress/teamProgress는 0~1 범위이므로 100을 곱하고, 0~100 범위로 제한
+    const rawProgress = activeTab === "my" 
+      ? loop.personalProgress
+      : loop.teamProgress;
     
-    const status = getProgressStatus(progress);
+    // 0~1 범위로 정규화 (이미 0~1 범위일 수도 있고, 0~100 범위일 수도 있음)
+    const normalizedProgress = rawProgress > 1 
+      ? Math.min(Math.max(rawProgress, 0), 100) // 이미 0~100 범위
+      : Math.min(Math.max(rawProgress * 100, 0), 100); // 0~1 범위를 0~100으로 변환
+    
+    const progress = Math.round(normalizedProgress);
+    // 내 루프 탭: personalStatus, 팀 루프 탭: teamStatus 사용
+    const apiStatus = activeTab === "my" 
+      ? loop.personalStatus 
+      : loop.teamStatus;
+    const status = formatStatus(apiStatus);
     const importance = formatImportance(loop.importance);
     const type = formatLoopType(loop.type);
     
@@ -49,7 +74,7 @@ export function TeamLoopList({ loops, isLoading, activeTab, teamId }: TeamLoopLi
       title: loop.title,
       status,
       importance,
-      schedule: "매주 월·금", // TODO: API에 schedule 정보가 없으면 제거하거나 다른 방식으로 처리
+      schedule: loop.repeatCycle || "",
       type,
       progress,
     };
@@ -78,9 +103,10 @@ export function TeamLoopList({ loops, isLoading, activeTab, teamId }: TeamLoopLi
                 key={loop.id}
                 className="flex items-center justify-between p-4 rounded-[10px] bg-[var(--gray-white)] cursor-pointer"
                 onClick={() => {
-                  if (activeTab === "my" && teamId) {
-                    // 내 루프 탭: 팀 루프 상세 페이지로 이동
-                    router.push(`/team/${teamId}/loops/${loop.id}`);
+                  if (teamId) {
+                    // 내 루프 탭 또는 팀 루프 탭: 팀 루프 상세 페이지로 이동 (탭 정보를 쿼리로 전달)
+                    const tabParam = activeTab === "my" ? "?view=my" : "?view=team";
+                    router.push(`/team/${teamId}/loops/${loop.id}${tabParam}`);
                   } else {
                     // 팀 루프 탭: 개별 루프 상세 페이지로 이동
                     router.push(`/loops/${loop.id}`);

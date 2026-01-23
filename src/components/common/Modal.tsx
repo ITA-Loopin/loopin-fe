@@ -1,7 +1,6 @@
 "use client";
 
 import { ReactNode } from "react";
-import { IconButton } from "./IconButton";
 
 type ModalProps = {
   isOpen: boolean;
@@ -19,7 +18,7 @@ export default function Modal({ isOpen, onClose, children, className }: ModalPro
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-6 w-full h-full"
       onClick={onClose}
     >
       <div

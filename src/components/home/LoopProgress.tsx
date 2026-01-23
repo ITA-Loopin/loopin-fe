@@ -23,10 +23,10 @@ export function LoopProgress({ progress }: LoopProgressProps) {
           className="h-80 w-80 drop-shadow-[0px_4px_12px_rgba(0,0,0,0.1)]"
         >
           <defs>
-            {/* 외곽 링 그라데이션 - 빨강-오렌지 */}
+            {/* 외곽 링 그라데이션 - 제공된 SVG 디자인 색상 (#FF3A21 -> #FFCAC3) */}
             <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#FF543F" />
-              <stop offset="100%" stopColor="#FF7A5F" />
+              <stop offset="0%" stopColor="#FF3A21" />
+              <stop offset="100%" stopColor="#FFCAC3" />
             </linearGradient>
             {/* 내부 방사형 그라데이션 - 중심에서 바깥으로 페이드 */}
             <radialGradient id="innerGradient" cx="50%" cy="50%" r="50%">
@@ -34,6 +34,17 @@ export function LoopProgress({ progress }: LoopProgressProps) {
               <stop offset="70%" stopColor="#FFF5F3" stopOpacity="0.4" />
               <stop offset="100%" stopColor="#FFFFFF" stopOpacity="1" />
             </radialGradient>
+            {/* 외곽 링 필터 */}
+            <filter id="filter0_d_3956_5318" x="0" y="0" width={size} height={size} filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+              <feFlood floodOpacity="0" result="BackgroundImageFix"/>
+              <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+              <feOffset/>
+              <feGaussianBlur stdDeviation="7.5"/>
+              <feComposite in2="hardAlpha" operator="out"/>
+              <feColorMatrix type="matrix" values="0 0 0 0 0.487248 0 0 0 0 0.487248 0 0 0 0 0.487248 0 0 0 0.12 0"/>
+              <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_3956_5318"/>
+              <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_3956_5318" result="shape"/>
+            </filter>
           </defs>
           
           {/* 내부 그라데이션 원 - 먼저 그려서 링 아래에 배치 */}
@@ -85,7 +96,14 @@ export function LoopProgress({ progress }: LoopProgressProps) {
         ></div>
         
         {/* 중앙 퍼센트 텍스트 */}
-        <span className="absolute flex h-[45px] w-[81px] items-center justify-center text-2xl font-bold text-[#FF543F]">
+        <span
+          className="
+            absolute flex items-center justify-center
+            text-[40px] font-extrabold leading-[140%] tracking-[-0.8px]
+            text-[var(--primary-main)]
+            text-center
+            drop-shadow-[0_0_18px_rgba(255,255,255,0.6)]"
+        >   
           {progress}%
         </span>
       </div>

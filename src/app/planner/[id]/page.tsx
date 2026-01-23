@@ -12,7 +12,6 @@ import { usePlannerChat } from "./hooks/usePlannerChat";
 import { fetchChatRooms } from "@/lib/chat";
 import { AddLoopSheet } from "@/components/common/add-loop/AddLoopSheet";
 import { LoopGroupEditSheet } from "@/components/loop/LoopGroupEditSheet";
-import { ChatInput } from "@/components/common/ChatInput";
 import {
   recommendationToAddLoopDefaults,
   recommendationToLoopDetail,
@@ -21,6 +20,8 @@ import type { RecommendationSchedule } from "./types";
 import { UPDATE_MESSAGE } from "./constants";
 import GroupIcon from "@/../public/Group.svg";
 import RetryIcon from "@/../public/retry.svg";
+import Header from "@/components/common/Header";
+
 const MESSAGE_EXTRA_SPACE = 32;
 const INPUT_CONTAINER_HEIGHT = 192;
 
@@ -30,6 +31,8 @@ export default function PlannerChatPage() {
   const chatRoomId = params?.id ? Number(params.id) : null;
   const [chatRoomTitle, setChatRoomTitle] = useState<string>("채팅방 이름");
   const [chatRoomLoopSelect, setChatRoomLoopSelect] = useState<boolean>(false);
+  const [chatRoomCallUpdateLoop, setChatRoomCallUpdateLoop] =
+    useState<boolean>(false);
   const [isAddLoopSheetOpen, setIsAddLoopSheetOpen] = useState(false);
   const [isLoopGroupEditSheetOpen, setIsLoopGroupEditSheetOpen] =
     useState(false);
@@ -48,13 +51,15 @@ export default function PlannerChatPage() {
     handleInputChange,
     handleSubmit,
     handleRetry,
+    handleUpdateLoop,
     showUpdateMessage,
+    callUpdateLoop: sseCallUpdateLoop,
   } = usePlannerChat(chatRoomId, chatRoomLoopSelect);
 
   type PlannerFormValues = { prompt: string };
 
   const {
-    control,
+    register,
     handleSubmit: formHandleSubmit,
     watch,
     reset,
@@ -76,7 +81,7 @@ export default function PlannerChatPage() {
         const response = await fetchChatRooms("AI");
         if (response.data?.chatRooms) {
           const chatRoom = response.data.chatRooms.find(
-            (room) => room.id === chatRoomId
+            (room) => room.id === chatRoomId,
           );
           if (chatRoom) {
             if (chatRoom.title) {
@@ -85,6 +90,7 @@ export default function PlannerChatPage() {
               setChatRoomTitle("채팅방 이름");
             }
             setChatRoomLoopSelect(chatRoom.loopSelect);
+            setChatRoomCallUpdateLoop(chatRoom.callUpdateLoop ?? false);
           }
         }
       } catch (error) {
@@ -96,7 +102,7 @@ export default function PlannerChatPage() {
   }, [chatRoomId]);
 
   const handleSelectRecommendation = (
-    recommendation: RecommendationSchedule
+    recommendation: RecommendationSchedule,
   ) => {
     setSelectedRecommendation(recommendation);
     setIsAddLoopSheetOpen(true);
@@ -105,13 +111,12 @@ export default function PlannerChatPage() {
   const messageListPadding = isInputVisible
     ? MESSAGE_EXTRA_SPACE + INPUT_CONTAINER_HEIGHT
     : MESSAGE_EXTRA_SPACE;
-  const lastMessageAuthor = messages[messages.length - 1]?.author;
-  const isLoopinSpeaking = isLoading || lastMessageAuthor === "assistant";
 
   return (
     <div className="flex min-h-screen flex-col bg-[#F8F8F9]/40">
       {/* Header */}
-      <header className="sticky top-0 z-50 flex items-center justify-between bg-white px-6 py-4 shadow-sm">
+      <Header leftType="back" centerTitle={chatRoomTitle} rightType="none" />
+      {/* <header className="sticky top-0 z-50 flex items-center justify-between bg-white px-6 py-4 shadow-sm">
         <button
           onClick={() => router.back()}
           className="flex h-8 w-8 items-center justify-center"
@@ -140,22 +145,9 @@ export default function PlannerChatPage() {
           className="flex h-8 w-8 items-center justify-center"
           aria-label="메뉴"
         >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M4 6H20M4 12H20M4 18H20"
-              stroke="#2C2C2C"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
+   
         </button>
-      </header>
+      </header> */}
 
       <section className="flex flex-1 min-h-0 flex-col">
         <div
@@ -166,21 +158,32 @@ export default function PlannerChatPage() {
           }}
         >
           <div className="">
-            {isLoopinSpeaking ? <LoopinSpeakerIndicator /> : null}
-            {messages.map((message) => (
-              <MessageBubble key={message.id} message={message} />
-            ))}
+            {messages.map((message, index) => {
+              const isAssistant = message.author === "assistant";
+              const showIndicator = index === 0 && isAssistant;
+
+              return (
+                <div key={message.id}>
+                  {showIndicator && <LoopinSpeakerIndicator />}
+                  <MessageBubble
+                    message={message}
+                    className={showIndicator ? "-mt-2" : ""}
+                  />
+                </div>
+              );
+            })}
             {isLoading ? <LoadingMessage /> : null}
           </div>
 
           {recommendations.length > 0 ? (
-            <div className="space-y-4">
+            <div className="">
               {recommendations.map((recommendation, index) => (
                 <RecommendationCard
                   key={recommendation.title}
                   recommendation={recommendation}
                   index={index + 1}
                   onSelect={handleSelectRecommendation}
+                  chatRoomLoopSelect={chatRoomLoopSelect}
                 />
               ))}
 
@@ -195,25 +198,38 @@ export default function PlannerChatPage() {
               )}
 
               {!showUpdateMessage && (
-                <div className="mt-4 flex gap-2 rounded-sm bg-[#DDE0E3] px-4 py-3 w-fit justify-self-center">
-                  <Image
-                    src={chatRoomLoopSelect ? RetryIcon : GroupIcon}
-                    alt=""
-                    width={12}
-                    height={12}
-                  />
+                <div
+                  className={`mt-4 flex gap-2 rounded-sm ${chatRoomLoopSelect && (chatRoomCallUpdateLoop || sseCallUpdateLoop) ? "bg-[#FFE4E0]" : "bg-[#DDE0E3]"} px-4 py-3 w-fit justify-self-center`}
+                >
+                  {!(
+                    chatRoomLoopSelect &&
+                    (chatRoomCallUpdateLoop || sseCallUpdateLoop)
+                  ) && (
+                    <Image
+                      src={chatRoomLoopSelect ? RetryIcon : GroupIcon}
+                      alt=""
+                      width={12}
+                      height={12}
+                    />
+                  )}
                   <button
                     type="button"
                     onClick={() => {
-                      if (chatRoomLoopSelect && updateRecommendation) {
+                      if (
+                        chatRoomLoopSelect &&
+                        (chatRoomCallUpdateLoop || sseCallUpdateLoop)
+                      ) {
                         setIsLoopGroupEditSheetOpen(true);
+                      } else if (chatRoomLoopSelect) {
+                        handleUpdateLoop();
                       } else {
                         handleRetry();
                       }
                     }}
-                    className="text-xs font-semibold text-[#737980]"
+                    className={`text-sm font-semibold ${chatRoomLoopSelect && (chatRoomCallUpdateLoop || sseCallUpdateLoop) ? "text-[#FF543F] font-semibold" : "text-[#737980] font-semibold"}`}
                   >
-                    {chatRoomLoopSelect && updateRecommendation
+                    {chatRoomLoopSelect &&
+                    (chatRoomCallUpdateLoop || sseCallUpdateLoop)
                       ? "루프 수정 완료하기"
                       : chatRoomLoopSelect
                         ? "루프 수정하기"
@@ -234,34 +250,46 @@ export default function PlannerChatPage() {
               ) : null}
               <form
                 onSubmit={formHandleSubmit(async (values) => {
-                  await handleSubmit(values.prompt);
-                  reset({ prompt: "" });
+                  if (values.prompt?.trim()) {
+                    await handleSubmit(values.prompt.trim());
+                    reset({ prompt: "" });
+                  }
                 })}
+                className="flex items-center rounded-2xl px-3 py-2 bg-[#F8F8F9]"
               >
-                <ChatInput
+                <textarea
+                  {...register("prompt")}
                   placeholder={
                     chatRoomLoopSelect
                       ? "수정하고 싶은 루프 내용을 입력해주세요."
                       : "만들고 싶은 루프를 입력해주세요."
                   }
-                  showAttachmentButton={false}
-                  sendButtonIcon="arrow"
-                  control={control}
-                  name="prompt"
-                  watchedValue={watchedPrompt}
-                  ariaLabel={
-                    chatRoomLoopSelect
-                      ? "루프 수정 요청 입력란"
-                      : "루프 생성 요청 입력란"
-                  }
-                  sendButtonAriaLabel="루프 생성 요청 보내기"
-                  onSubmit={() =>
-                    formHandleSubmit(async (values) => {
-                      await handleSubmit(values.prompt);
-                      reset({ prompt: "" });
-                    })()
-                  }
+                  rows={1}
+                  className="max-h-32 flex-1 border-none text-sm text-[#2C2C2C] outline-none resize-none"
+                  aria-label="루프 생성 요청 입력란"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      const form = e.currentTarget.form;
+                      if (form) {
+                        form.requestSubmit();
+                      }
+                    }
+                  }}
                 />
+                <button
+                  type="submit"
+                  disabled={!watchedPrompt?.trim()}
+                  className="flex h-10 w-10 items-center justify-center text-white transition disabled:cursor-not-allowed disabled:opacity-50"
+                  aria-label="루프 생성 요청 보내기"
+                >
+                  <Image
+                    src="/ai-planner/arrows-up.svg"
+                    alt="send"
+                    width={24}
+                    height={24}
+                  />
+                </button>
               </form>
             </div>
           </div>

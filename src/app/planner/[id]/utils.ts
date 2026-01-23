@@ -1,6 +1,10 @@
 import dayjs from "dayjs";
 import type { RecommendationSchedule } from "./types";
-import type { AddLoopDefaultValues } from "@/components/common/add-loop/constants";
+import type {
+  AddLoopDefaultValues,
+  RepeatValue,
+  Weekday,
+} from "@/components/common/add-loop/constants";
 
 export function generateId() {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
@@ -88,9 +92,13 @@ export function recommendationToAddLoopDefaults(
 
   return {
     title: recommendation.title,
-    scheduleType: recommendation.scheduleType,
+    scheduleType: recommendation.scheduleType
+      ? (recommendation.scheduleType as RepeatValue)
+      : undefined,
     specificDate: recommendation.specificDate,
-    daysOfWeek: recommendation.daysOfWeek,
+    daysOfWeek: recommendation.daysOfWeek
+      ? (recommendation.daysOfWeek as Weekday[])
+      : undefined,
     startDate: recommendation.startDate,
     endDate: recommendation.endDate,
     checklists,

@@ -24,6 +24,8 @@ export type ChatMessageDto = {
   authorType?: string;
   recommendations?: ChatRecommendationDto[];
   loopRuleId?: number;
+  deleteMessageId?: string;
+  callUpdateLoop?: boolean;
   createdAt?: string;
 };
 
@@ -120,7 +122,9 @@ export type MessageType =
   | "CONNECT"
   | "MESSAGE"
   | "CREATE_LOOP"
+  | "RECREATE_LOOP"
   | "UPDATE_LOOP"
+  | "BEFORE_UPDATE_LOOP"
   | "READ_UP_TO";
 
 export type SendChatMessageParams = {
@@ -156,6 +160,7 @@ export type ChatRoom = {
   loopSelect: boolean;
   lastMessageAt?: string | null;
   lastReadAt?: string | null;
+  callUpdateLoop?: boolean;
 };
 
 export type ChatRoomListResponse = {
