@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { EXAMPLE_PROMPTS, UPDATE_MESSAGE } from "../constants";
+import { EXAMPLE_PROMPTS } from "../constants";
 import type { ChatMessage, RecommendationSchedule } from "../types";
 import { generateId } from "../utils";
 import { useAppSelector } from "@/store/hooks";
@@ -244,10 +244,7 @@ export function usePlannerChat(
 
       if (newlyAdded.length) {
         setMessages((prev) => {
-          const filteredPrev = prev.filter(
-            (msg) => msg.content !== UPDATE_MESSAGE
-          );
-          return [...filteredPrev, ...newlyAdded];
+          return [...prev, ...newlyAdded];
         });
       }
 
@@ -316,7 +313,6 @@ export function usePlannerChat(
               setRecommendations(messageData.data as RecommendationSchedule[]);
               setIsLoading(false);
               setIsInputVisible(true);
-              // 새로운 추천이 오면 UPDATE_MESSAGE 숨기고 다시 생성하기 버튼 표시
               setShowUpdateMessage(false);
               return;
             }
@@ -424,26 +420,7 @@ export function usePlannerChat(
         });
 
         if (!isCancelled) {
-          const hasHistory = appendNewMessages(response.data);
-          // loopSelect가 true이고 히스토리가 있으면 UPDATE_MESSAGE 추가
-          if (loopSelect === true && hasHistory !== "none") {
-            setMessages((prev) => {
-              const hasUpdateMessage = prev.some(
-                (msg) => msg.content === UPDATE_MESSAGE
-              );
-              if (!hasUpdateMessage) {
-                return [
-                  ...prev,
-                  {
-                    id: generateId(),
-                    author: "assistant",
-                    content: UPDATE_MESSAGE || "content",
-                  },
-                ];
-              }
-              return prev;
-            });
-          }
+          appendNewMessages(response.data);
         }
       } catch (error) {
         if (!isCancelled) {
