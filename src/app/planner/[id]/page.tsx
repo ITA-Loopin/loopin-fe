@@ -81,7 +81,7 @@ export default function PlannerChatPage() {
         const response = await fetchChatRooms("AI");
         if (response.data?.chatRooms) {
           const chatRoom = response.data.chatRooms.find(
-            (room) => room.id === chatRoomId
+            (room) => room.id === chatRoomId,
           );
           if (chatRoom) {
             if (chatRoom.title) {
@@ -102,7 +102,7 @@ export default function PlannerChatPage() {
   }, [chatRoomId]);
 
   const handleSelectRecommendation = (
-    recommendation: RecommendationSchedule
+    recommendation: RecommendationSchedule,
   ) => {
     setSelectedRecommendation(recommendation);
     setIsAddLoopSheetOpen(true);
@@ -165,7 +165,10 @@ export default function PlannerChatPage() {
               return (
                 <div key={message.id}>
                   {showIndicator && <LoopinSpeakerIndicator />}
-                  <MessageBubble message={message} className={showIndicator ? "-mt-2" : ""} />
+                  <MessageBubble
+                    message={message}
+                    className={showIndicator ? "-mt-2" : ""}
+                  />
                 </div>
               );
             })}
@@ -195,8 +198,13 @@ export default function PlannerChatPage() {
               )}
 
               {!showUpdateMessage && (
-                <div className={`mt-4 flex gap-2 rounded-sm ${chatRoomLoopSelect && (chatRoomCallUpdateLoop || sseCallUpdateLoop) ? "bg-[#FFE4E0]" : "bg-[#DDE0E3]"} px-4 py-3 w-fit justify-self-center`}>
-                  {!(chatRoomLoopSelect && (chatRoomCallUpdateLoop || sseCallUpdateLoop)) && (
+                <div
+                  className={`mt-4 flex gap-2 rounded-sm ${chatRoomLoopSelect && (chatRoomCallUpdateLoop || sseCallUpdateLoop) ? "bg-[#FFE4E0]" : "bg-[#DDE0E3]"} px-4 py-3 w-fit justify-self-center`}
+                >
+                  {!(
+                    chatRoomLoopSelect &&
+                    (chatRoomCallUpdateLoop || sseCallUpdateLoop)
+                  ) && (
                     <Image
                       src={chatRoomLoopSelect ? RetryIcon : GroupIcon}
                       alt=""
@@ -207,7 +215,10 @@ export default function PlannerChatPage() {
                   <button
                     type="button"
                     onClick={() => {
-                      if (chatRoomLoopSelect && (chatRoomCallUpdateLoop || sseCallUpdateLoop)) {
+                      if (
+                        chatRoomLoopSelect &&
+                        (chatRoomCallUpdateLoop || sseCallUpdateLoop)
+                      ) {
                         setIsLoopGroupEditSheetOpen(true);
                       } else if (chatRoomLoopSelect) {
                         handleUpdateLoop();
@@ -217,7 +228,8 @@ export default function PlannerChatPage() {
                     }}
                     className={`text-sm font-semibold ${chatRoomLoopSelect && (chatRoomCallUpdateLoop || sseCallUpdateLoop) ? "text-[#FF543F] font-semibold" : "text-[#737980] font-semibold"}`}
                   >
-                    {chatRoomLoopSelect && (chatRoomCallUpdateLoop || sseCallUpdateLoop)
+                    {chatRoomLoopSelect &&
+                    (chatRoomCallUpdateLoop || sseCallUpdateLoop)
                       ? "루프 수정 완료하기"
                       : chatRoomLoopSelect
                         ? "루프 수정하기"
