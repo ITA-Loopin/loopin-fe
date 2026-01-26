@@ -17,7 +17,6 @@ import {
   recommendationToLoopDetail,
 } from "./utils";
 import type { RecommendationSchedule } from "./types";
-import { UPDATE_MESSAGE } from "./constants";
 import GroupIcon from "@/../public/Group.svg";
 import RetryIcon from "@/../public/retry.svg";
 import Header from "@/components/common/Header";
@@ -187,17 +186,7 @@ export default function PlannerChatPage() {
                 />
               ))}
 
-              {showUpdateMessage && (
-                <MessageBubble
-                  message={{
-                    id: "update-message",
-                    author: "assistant",
-                    content: UPDATE_MESSAGE,
-                  }}
-                />
-              )}
-
-              {!showUpdateMessage && (
+              {
                 <div
                   className={`mt-4 flex gap-2 rounded-sm ${chatRoomLoopSelect && (chatRoomCallUpdateLoop || sseCallUpdateLoop) ? "bg-[#FFE4E0]" : "bg-[#DDE0E3]"} px-4 py-3 w-fit justify-self-center`}
                 >
@@ -236,7 +225,7 @@ export default function PlannerChatPage() {
                         : "다시 생성하기"}
                   </button>
                 </div>
-              )}
+              }
             </div>
           ) : null}
         </div>

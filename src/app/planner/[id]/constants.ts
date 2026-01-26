@@ -1,6 +1,3 @@
-export const UPDATE_MESSAGE = `루프를 수정해볼까요?
-수정하고 싶은 루프 내용을 자세하게 알려주세요!`;
-
 export const LOOP_LOADING_MESSAGE = `루프를 만드는 중이에요.
 곧 추천 결과가 나올 거예요!`;
 
