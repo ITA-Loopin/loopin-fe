@@ -158,6 +158,8 @@ export type ChatRoom = {
   ownerId: number;
   title: string | null;
   loopSelect: boolean;
+  chatRoomStatus: string;
+  noticeMessageContent?: string;
   lastMessageAt?: string | null;
   lastReadAt?: string | null;
   callUpdateLoop?: boolean;
