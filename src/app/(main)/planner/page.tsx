@@ -72,9 +72,6 @@ export default function PlannerListPage() {
       }
     } catch (error) {
       console.error("채팅방 생성 실패", error);
-      // 에러 발생 시에도 임시로 이동 (개발 중)
-      const newChatRoomId = Date.now();
-      router.push(`/planner/${newChatRoomId}?new=true`);
     }
   };
 
