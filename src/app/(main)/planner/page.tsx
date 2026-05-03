@@ -37,21 +37,25 @@ export default function PlannerListPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchChatLoops = async () => {
+    (async () => {
       try {
         const response = await fetchChatRooms();
-        if (response.data?.chatRooms) {
-          const loops = response.data.chatRooms.map(mapChatRoomToChatLoop);
-          setChatLoops(loops);
+
+        if (!response.success) {
+          console.error("API 실패", response);
+          return;
         }
+
+        const rooms = response.data?.chatRooms ?? [];
+        const loops = rooms.map(mapChatRoomToChatLoop);
+        setChatLoops(loops);
+
       } catch (error) {
         console.error("채팅방 목록 불러오기 실패", error);
       } finally {
         setIsLoading(false);
       }
-    };
-
-    fetchChatLoops();
+    })();
   }, []);
 
   const handleStartNewLoop = async () => {
