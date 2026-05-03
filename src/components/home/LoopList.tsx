@@ -1,17 +1,25 @@
 import type { LoopItem } from "./types";
 import { LoopListItem } from "./LoopListItem";
+import { cn } from "@/lib/utils";
 
 type LoopListProps = {
   loops: LoopItem[];
+  isLoading?: boolean;
 };
 
-export function LoopList({ loops }: LoopListProps) {
+export function LoopList({ loops, isLoading = false }: LoopListProps) {
   return (
-    <section>
-      <h2 className="font-bold mb-2 text-[20px]">
-        Loop List <span className="text-gray-500" style={{ fontSize: "16px" }}>· {loops.length}</span>
+    <section
+      className={cn(
+        "w-full transition-opacity duration-300 ease-in-out",
+        isLoading ? "opacity-50 pointer-events-none" : "opacity-100"
+      )}
+    >
+      <h2 className="flex items-baseline gap-1 text-title-2-b text-[var(--gray-black)]">
+        Loop List <span className="text-body-2-sb font-semibold text-[var(--gray-600)]">· {loops.length}</span>
       </h2>
-      <ul className="flex flex-col gap-2">
+      
+      <ul className="flex flex-col gap-[10px] mt-4">
         {loops.map((item) => (
           <LoopListItem key={item.id} item={item} />
         ))}

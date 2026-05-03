@@ -23,6 +23,9 @@ export type ChatMessageDto = {
   content?: string;
   authorType?: string;
   recommendations?: ChatRecommendationDto[];
+  loopRuleId?: number;
+  deleteMessageId?: string;
+  callUpdateLoop?: boolean;
   createdAt?: string;
 };
 
@@ -94,66 +97,333 @@ function buildQueryParams(options: BuildParamsOptions = {}) {
 
 export type FetchChatMessagesParams = PageInfo & {
   chatRoomId: number;
-  access_token?: string | null;
   currentUser?: CurrentUserQuery;
 };
 
 export async function fetchChatMessages({
   chatRoomId,
-  access_token,
   page,
   size,
   currentUser,
 }: FetchChatMessagesParams) {
   return apiFetch<ChatRoomMessagesResponse>(
-    `/rest-api/v1/chatmessage/${chatRoomId}`,
+    `/rest-api/v1/chat-message/ai/${chatRoomId}`,
     {
       searchParams: buildQueryParams({
         page,
         size,
         currentUser,
       }),
-    }
+    },
   );
 }
 
-function resolveWsBaseUrl() {
-  // const configured = process.env.NEXT_PUBLIC_CHAT_WS_URL?.trim();
-  // if (configured && configured.length > 0) {
-  //   return configured;
-  // }
+export type MessageType =
+  | "CONNECT"
+  | "MESSAGE"
+  | "CREATE_LOOP"
+  | "RECREATE_LOOP"
+  | "UPDATE_LOOP"
+  | "BEFORE_UPDATE_LOOP"
+  | "READ_UP_TO";
 
-  return "wss://api.loopin.co.kr/ws/chat";
+export type SendChatMessageParams = {
+  chatRoomId: number;
+  clientMessageId: string; // required, uuid format
+  content: string; // required, >= 1 characters
+  messageType: MessageType; // required
+};
+
+export async function sendChatMessage({
+  chatRoomId,
+  clientMessageId,
+  content,
+  messageType,
+}: SendChatMessageParams) {
+  return apiFetch<{ success: boolean; message?: string }>(
+    `/rest-api/v1/chat-message/${chatRoomId}/chat`,
+    {
+      method: "POST",
+      json: {
+        content,
+        clientMessageId,
+        messageType,
+      },
+    },
+  );
 }
 
-export type CreateChatSocketOptions = {
+export type ChatRoom = {
+  id: number;
+  ownerId: number;
+  title: string | null;
+  loopSelect: boolean;
+  lastMessageAt?: string | null;
+  lastReadAt?: string | null;
+  callUpdateLoop?: boolean;
+};
+
+export type ChatRoomListResponse = {
+  success?: boolean;
+  code?: string;
+  message?: string;
+  data?: {
+    chatRooms?: ChatRoom[];
+  };
+  page?: {
+    page?: number;
+    size?: number;
+    totalPages?: number;
+    totalElements?: number;
+    first?: boolean;
+    last?: boolean;
+    hasNext?: boolean;
+  };
+  timestamp?: string;
+  traceId?: string;
+};
+
+export async function fetchChatRooms(
+  chatRoomType: "ALL" | "TEAM" | "AI" = "AI",
+) {
+  return apiFetch<ChatRoomListResponse>("/rest-api/v1/chat-room", {
+    searchParams: {
+      chatRoomType,
+    },
+  });
+}
+
+export type CreateChatRoomResponse = {
+  success?: boolean;
+  code?: string;
+  message?: string;
+  data?: ChatRoom;
+  timestamp?: string;
+  traceId?: string;
+};
+
+export type CreateChatRoomParams = {
+  title: string;
+  loopSelect?: boolean;
+};
+
+export async function createChatRoom(params: CreateChatRoomParams) {
+  return apiFetch<CreateChatRoomResponse>("/rest-api/v1/chat-room/create", {
+    method: "POST",
+    json: params,
+  });
+}
+
+/**
+ * 팀 채팅방 조회 API 응답 타입
+ */
+export type TeamChatRoomResponse = {
+  success?: boolean;
+  code?: string;
+  message?: string;
+  data?: {
+    id: number;
+    ownerId: number;
+    title: string;
+    loopSelect: boolean;
+    lastMessageAt?: string | null;
+    lastReadAt?: string | null;
+  };
+  page?: {
+    page?: number;
+    size?: number;
+    totalPages?: number;
+    totalElements?: number;
+    first?: boolean;
+    last?: boolean;
+    hasNext?: boolean;
+  };
+  timestamp?: string;
+  traceId?: string;
+};
+
+/**
+ * 팀 채팅방 조회 API
+ */
+export async function fetchTeamChatRoom(teamId: number) {
+  return apiFetch<TeamChatRoomResponse>(
+    `/rest-api/v1/chat-room/team/${teamId}`,
+  );
+}
+
+/**
+ * 팀 채팅 메시지 첨부파일 타입
+ */
+export type TeamChatMessageAttachment = {
+  type: "IMAGE" | string;
+  url: string;
+  originalFileName: string;
+  contentType: string;
+  size: number;
+};
+
+/**
+ * 팀 채팅 메시지 타입
+ */
+export type TeamChatMessageDto = {
+  id: string;
+  memberId: number;
+  nickname: string;
+  profileImageUrl: string;
+  content: string;
+  attachments?: TeamChatMessageAttachment[];
+  isMine: boolean;
+  createdAt: string;
+};
+
+/**
+ * 팀 채팅 메시지 조회 API 응답 타입
+ */
+export type TeamChatMessagesResponse = {
+  success?: boolean;
+  code?: string;
+  message?: string;
+  data?: TeamChatMessageDto[];
+  page?: {
+    page?: number;
+    size?: number;
+    totalPages?: number;
+    totalElements?: number;
+    first?: boolean;
+    last?: boolean;
+    hasNext?: boolean;
+  };
+  timestamp?: string;
+  traceId?: string;
+};
+
+/**
+ * 팀 채팅 메시지 조회 파라미터
+ */
+export type FetchTeamChatMessagesParams = {
   chatRoomId: number;
-  access_token: string;
+  page?: number;
+  size?: number;
+};
+
+/**
+ * 팀 채팅 메시지 조회 API
+ */
+export async function fetchTeamChatMessages({
+  chatRoomId,
+  page,
+  size,
+}: FetchTeamChatMessagesParams) {
+  const params: Record<string, Primitive> = {};
+
+  const requestPayload: Record<string, Primitive> = {};
+  if (page !== undefined) {
+    requestPayload.page = page;
+  }
+  if (size !== undefined) {
+    requestPayload.size = size;
+  }
+
+  if (Object.keys(requestPayload).length > 0) {
+    params.request = JSON.stringify(requestPayload);
+  }
+
+  return apiFetch<TeamChatMessagesResponse>(
+    `/rest-api/v1/chat-message/team/${chatRoomId}`,
+    {
+      searchParams: params,
+    },
+  );
+}
+
+function resolveSseBaseUrl() {
+  if (typeof window === "undefined") {
+    const configured = process.env.NEXT_PUBLIC_CHAT_SSE_URL;
+
+    if (configured && configured.length > 0) {
+      return configured;
+    }
+
+    return "https://api.loopin.co.kr";
+  }
+
+  return "https://api.loopin.co.kr";
+}
+
+export type SSEEventType = "CONNECT" | "MESSAGE";
+
+export type SSEEvent = {
+  id: string;
+  event: SSEEventType;
+  data: string | ChatMessageDto;
+};
+
+export type SSEEventType = "CONNECT" | "MESSAGE";
+
+export type SSEEvent = {
+  id: string;
+  event: SSEEventType;
+  data: string | ChatMessageDto;
+};
+
+export type CreateSSEOptions = {
+  chatRoomId: number;
+  lastEventId?: string;
+  onMessage?: (event: MessageEvent) => void;
+  onError?: (error: Event) => void;
+  onOpen?: () => void;
 };
 
 export function createChatSocket({
   chatRoomId,
-  access_token,
-}: CreateChatSocketOptions) {
-  const base = resolveWsBaseUrl();
+  lastEventId,
+  onMessage,
+  onError,
+  onOpen,
+}: CreateSSEOptions): EventSource {
+  const baseUrl = resolveSseBaseUrl();
+  let url = `${baseUrl}/rest-api/v1/sse/subscribe/${chatRoomId}`;
 
-  if (!base) {
-    throw new Error("웹소켓 베이스 URL이 설정되지 않았습니다.");
-  }
+  // EventSource는 커스텀 헤더를 설정할 수 없으므로,
+  // Last-Event-ID가 필요한 경우 fetch를 사용해야 하지만,
+  // EventSource의 간편함을 위해 일단 EventSource를 사용하고
+  // 재연결 시 자동으로 lastEventId가 사용되도록 합니다.
+  // 초기 연결 시 lastEventId가 필요한 경우를 위해
+  // URL 파라미터로 전달하는 방법도 있지만, 표준은 헤더입니다.
 
-  const rawParams = buildQueryParams({ chatRoomId });
-  const params = new URLSearchParams();
-
-  Object.entries(rawParams).forEach(([key, value]) => {
-    if (value === undefined || value === null) return;
-    params.set(key, String(value));
+  // EventSource는 withCredentials를 지원하므로 쿠키가 자동으로 전송됩니다.
+  const eventSource = new EventSource(url, {
+    withCredentials: true,
   });
 
-  if (access_token) {
-    params.set("access_token", access_token);
-  }
+  // EventSource는 재연결 시 자동으로 lastEventId를 사용하지만,
+  // 초기 연결 시에는 설정할 수 없습니다.
+  // 필요시 fetch + ReadableStream으로 변경할 수 있습니다.
 
-  const separator = base.includes("?") ? "&" : "?";
-  const url = `${base}${separator}${params.toString()}`;
-  return new WebSocket(url);
+  // CONNECT 이벤트 처리
+  eventSource.addEventListener("CONNECT", (event: MessageEvent) => {
+    onOpen?.();
+  });
+
+  // MESSAGE 이벤트 처리
+  eventSource.addEventListener("MESSAGE", (event: MessageEvent) => {
+    onMessage?.(event);
+  });
+
+  // 기본 message 이벤트도 처리 (이벤트 타입이 없는 경우)
+  eventSource.onmessage = (event: MessageEvent) => {
+    // event.type이 없으면 기본 message 이벤트
+    // 하지만 서버에서 명시적으로 event를 보내므로 이 핸들러는 거의 사용되지 않을 것입니다.
+    onMessage?.(event);
+  };
+
+  eventSource.onerror = (error: Event) => {
+    onError?.(error);
+  };
+
+  eventSource.onopen = () => {
+    onOpen?.();
+  };
+
+  return eventSource;
 }

@@ -7,29 +7,33 @@ import { cn } from "@/lib/utils";
 import { IconButton } from "./IconButton";
 
 type HeaderLeftType = "logo" | "back" | "none";
-type HeaderRightType = "user" | "menu" | "none";
+type HeaderRightType = "user" | "menu" | "edit" | "none";
 
 type HeaderProps = {
   leftType?: HeaderLeftType;
   rightType?: HeaderRightType;
   leftSlot?: ReactNode;
   rightSlot?: ReactNode;
+  centerTitle?: string;
+  centerSlot?: ReactNode;
   onBack?: () => void;
-  onProfileClick?: () => void;
   onNotificationClick?: () => void;
   onMenuClick?: () => void;
+  onEditClick?: () => void;
   className?: string;
 };
 
-export function Header({
+export default function Header({
   leftType = "logo",
   rightType = "user",
   leftSlot,
   rightSlot,
+  centerTitle,
+  centerSlot,
   onBack,
-  onProfileClick,
   onNotificationClick,
   onMenuClick,
+  onEditClick,
   className,
 }: HeaderProps) {
   const router = useRouter();
@@ -42,11 +46,27 @@ export function Header({
         return <LogoIcon />;
       case "back":
         return (
-          <IconButton src="/header/header_back.svg" alt="뒤로가기" onClick={onBack ?? router.back} />
+          <IconButton
+            src="/header/header_back.svg"
+            alt="뒤로가기"
+            onClick={onBack ?? router.back}
+          />
         );
       case "none":
       default:
         return null;
+    }
+  };
+
+  const handleProfileButtonClick = () => {
+    router.push("/my-page");
+  };
+
+  const handleNotificationClick = () => {
+    if (onNotificationClick) {
+      onNotificationClick();
+    } else {
+      router.push("/notification");
     }
   };
 
@@ -56,23 +76,63 @@ export function Header({
     switch (rightType) {
       case "user":
         return (
-          <div className="flex items-center gap-3">
-            <IconButton src="/header/header_profile.svg" alt="프로필" onClick={onProfileClick} />
-            <IconButton src="/header/header_bell.svg" alt="알림" onClick={onNotificationClick} />
+          <div className="flex items-center gap-4">
+            <IconButton
+              src="/header/header_profile.svg"
+              alt="프로필"
+              onClick={handleProfileButtonClick}
+            />
+
+            <IconButton
+              src="/header/header_bell.svg"
+              alt="알림"
+              onClick={handleNotificationClick}
+            />
           </div>
         );
       case "menu":
-        return <IconButton src="/header/header_menu.svg" alt="메뉴" onClick={onMenuClick} />;
+        return (
+          <IconButton
+            src="/header/header_menu.svg"
+            alt="메뉴"
+            onClick={onMenuClick}
+          />
+        );
+      case "edit":
+        return (
+          <IconButton
+            src="/header/header_edit.svg"
+            alt="수정"
+            onClick={onEditClick}
+          />
+        );
       case "none":
       default:
         return null;
     }
   };
 
+  const renderCenter = () => {
+    if (centerSlot) return centerSlot;
+    if (centerTitle)
+      return (
+        <h1 className="text-center text-body-1-sb text-[var(--gray-800)] whitespace-nowrap">
+          {centerTitle}
+        </h1>
+      );
+    return null;
+  };
+
   return (
-    <header className={cn("flex items-center justify-between px-4 pt-4 pb-2", className)}>
-      <div className="flex items-center">{renderLeft()}</div>
-      <div className="flex items-center gap-3">{renderRight()}</div>
+    <header
+      className={cn(
+        "grid grid-cols-3 items-center px-4 pt-[15px] pb-4 border border-[var(--gray-white)] bg-white/30 backdrop-blur-[7px]",
+        className
+      )}
+    >
+      <div className="flex items-center justify-start">{renderLeft()}</div>
+      <div className="flex items-center justify-center">{renderCenter()}</div>
+      <div className="flex items-center justify-end gap-3">{renderRight()}</div>
     </header>
   );
 }
@@ -90,5 +150,3 @@ function LogoIcon() {
     />
   );
 }
-
-export default Header;

@@ -3,60 +3,28 @@ import type { User } from "@/types/auth";
 
 interface AuthState {
   user: User | null;
-  accessToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
 }
 
 const initialState: AuthState = {
   user: null,
-  accessToken: null,
   isAuthenticated: false,
-  isLoading: true, // 초기 로딩 상태
+  isLoading: false,
 };
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    setCredentials: (
-      state,
-      action: PayloadAction<{ user: User; accessToken: string }>
-    ) => {
+    setCredentials: (state, action: PayloadAction<{ user: User }>) => {
       state.user = action.payload.user;
-      state.accessToken = action.payload.accessToken;
       state.isAuthenticated = true;
       state.isLoading = false;
-
-      // localStorage에 동기화
-      if (typeof window !== "undefined") {
-        localStorage.setItem(
-          "loopin_user",
-          JSON.stringify(action.payload.user)
-        );
-        localStorage.setItem("loopin_access_token", action.payload.accessToken);
-      }
     },
     logout: (state) => {
       state.user = null;
-      state.accessToken = null;
       state.isAuthenticated = false;
-      state.isLoading = false;
-
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("loopin_user");
-        localStorage.removeItem("loopin_access_token");
-      }
-    },
-    loadFromStorage: (
-      state,
-      action: PayloadAction<{ user: User | null; accessToken: string | null }>
-    ) => {
-      if (action.payload.user && action.payload.accessToken) {
-        state.user = action.payload.user;
-        state.accessToken = action.payload.accessToken;
-        state.isAuthenticated = true;
-      }
       state.isLoading = false;
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
@@ -65,6 +33,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { setCredentials, logout, loadFromStorage, setLoading } =
-  authSlice.actions;
+export const { setCredentials, logout, setLoading } = authSlice.actions;
 export default authSlice.reducer;

@@ -22,9 +22,3 @@ export interface User {
   followedMemberCount?: number;
   chatRoomId?: number;
 }
-
-export interface AuthResponse {
-  user: User;
-  accessToken: string;
-  refreshToken?: string;
-}

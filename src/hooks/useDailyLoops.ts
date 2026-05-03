@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { LoopItem } from "@/components/home";
-import { apiFetch, MissingAccessTokenError } from "@/lib/api";
-import { useAppSelector } from "@/store/hooks";
+import { apiFetch } from "@/lib/api";
 
 interface UseDailyLoopsParams {
   date: string;
@@ -20,9 +19,6 @@ export function useDailyLoops({ date, refreshKey }: UseDailyLoopsParams): UseDai
   const [loopList, setLoopList] = useState<LoopItem[]>([]);
   const [totalProgress, setTotalProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const { accessToken, isLoading: authLoading } = useAppSelector(
-    (state) => state.auth
-  );
 
   useEffect(() => {
     let cancelled = false;
@@ -32,7 +28,7 @@ export function useDailyLoops({ date, refreshKey }: UseDailyLoopsParams): UseDai
         if (!cancelled) {
           setIsLoading(true);
         }
-        const apiUrl = `/api-proxy/rest-api/v1/loops/date/${date}`;
+        const apiUrl = `/rest-api/v1/loops/date/${date}`;
         const result = await apiFetch<{
           success?: boolean;
           data?: { loops?: LoopItem[]; totalProgress?: number };
@@ -40,11 +36,13 @@ export function useDailyLoops({ date, refreshKey }: UseDailyLoopsParams): UseDai
 
         if (!cancelled) {
           if (result?.success !== false && result?.data) {
-            const loops = result.data.loops ?? [];
-            const { totalProgress: calculatedProgress, normalizedLoops } =
-              normalizeDailyProgress(loops);
-            setLoopList(normalizedLoops);
-            setTotalProgress(calculatedProgress);
+            setLoopList(result.data.loops ?? []);
+            const apiProgress = result.data.totalProgress;
+            setTotalProgress(
+              typeof apiProgress === "number"
+                ? Math.round(Math.min(Math.max(apiProgress, 0), 100))
+                : 0
+            );
           } else {
             // TODO: 데이터 없음 처리(UI 메시지, 재시도 등) 로직 추가
             setLoopList([]);
@@ -55,9 +53,7 @@ export function useDailyLoops({ date, refreshKey }: UseDailyLoopsParams): UseDai
         if (!cancelled) {
           setLoopList([]);
           setTotalProgress(0);
-          if (error instanceof MissingAccessTokenError) {
-            // TODO: 토큰 만료 시 재발급 또는 로그인 페이지로 리디렉션 처리
-          }
+          console.error("루프 목록 조회 실패", error);
         }
       } finally {
         if (!cancelled) {
@@ -66,71 +62,12 @@ export function useDailyLoops({ date, refreshKey }: UseDailyLoopsParams): UseDai
       }
     };
 
-    if (authLoading) {
-      setIsLoading(true);
-      return () => {
-        cancelled = true;
-      };
-    }
-
-    if (!accessToken) {
-      if (!cancelled) {
-        setLoopList([]);
-        setTotalProgress(0);
-        setIsLoading(false);
-      }
-      return () => {
-        cancelled = true;
-      };
-    }
-
     fetchLoops();
 
     return () => {
       cancelled = true;
     };
-  }, [date, accessToken, authLoading, refreshKey]);
+  }, [date, refreshKey]);
 
   return { loopList, totalProgress, isLoading };
-}
-
-function normalizeDailyProgress(loops: LoopItem[]): {
-  totalProgress: number;
-  normalizedLoops: LoopItem[];
-} {
-  if (!loops.length) {
-    return { totalProgress: 0, normalizedLoops: [] };
-  }
-
-  let totalChecklistCount = 0;
-  let totalCompletedCount = 0;
-
-  const normalizedLoops = loops.map((loop) => {
-    const safeTotal = Math.max(loop.totalChecklists, 0);
-    const safeCompleted = Math.min(
-      Math.max(loop.completedChecklists, 0),
-      safeTotal
-    );
-
-    totalChecklistCount += safeTotal;
-    totalCompletedCount += safeCompleted;
-
-    return {
-      ...loop,
-      totalChecklists: safeTotal,
-      completedChecklists: safeCompleted,
-    };
-  });
-
-  const progress =
-    totalChecklistCount > 0
-      ? Math.round(
-          Math.min(
-            Math.max((totalCompletedCount / totalChecklistCount) * 100, 0),
-            100
-          )
-        )
-      : 0;
-
-  return { totalProgress: progress, normalizedLoops };
 }

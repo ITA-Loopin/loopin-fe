@@ -1,3 +1,4 @@
+@import url("https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2/fonts/static/woff2/SUIT.css");
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -76,6 +77,25 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --gray-black: #121212;
+  --gray-white: #FFFFFF;
+  --gray-100: #F8F8F9;
+  --gray-200: #F0F2F3;
+  --gray-300: #DDE0E3;
+  --gray-400: #C6CCD1;
+  --gray-500: #A0A9B1;
+  --gray-600: #737980;
+  --gray-700: #4D5155;
+  --gray-800: #3A3D40;
+  --primary-100: #FFF3F1;
+  --primary-200: #FFE4E0;
+  --primary-300: #FFC2BA;
+  --primary-400: #FF9A8D;
+  --primary-500: #FF7765;
+  --primary-main: #FF543F;
+  --primary-700: #CC4432;
+  --primary-800: #9A3227;
+  --primary-900: #792A1E;
 }
 
 .dark {
@@ -112,11 +132,68 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+@layer components {
+  /* ---------- title ---------- */
+  .text-title-1-eb {
+    @apply text-[24px] font-extrabold leading-[33.6px] tracking-[-0.48px];
+  }
+  .text-title-1-b {
+    @apply text-[24px] font-bold leading-[33.6px] tracking-[-0.48px];
+  }
+
+  .text-title-2-eb {
+    @apply text-[20px] font-extrabold leading-[28px] tracking-[-0.4px];
+  }
+  .text-title-2-b {
+    @apply text-[20px] font-bold leading-[28px] tracking-[-0.4px];
+  }
+
+  /* ---------- body ---------- */
+  .text-body-1-eb {
+    @apply text-base font-extrabold leading-[24px] tracking-[-0.32px];
+  }
+  .text-body-1-sb {
+    @apply text-base font-semibold leading-[24px] tracking-[-0.32px];
+  }
+  .text-body-1-b {
+    @apply text-base font-bold leading-[24px] tracking-[-0.32px];
+  }
+  .text-body-1-m {
+    @apply text-base font-medium leading-[24px] tracking-[-0.32px];
+  }
+
+  .text-body-2-eb {
+    @apply text-sm font-extrabold leading-[21px] tracking-[-0.28px];
+  }
+  .text-body-2-sb {
+    @apply text-sm font-semibold leading-[21px] tracking-[-0.28px];
+  }
+  .text-body-2-b {
+    @apply text-sm font-bold leading-[21px] tracking-[-0.28px];
+  }
+  .text-body-2-m {
+    @apply text-sm font-medium leading-[21px] tracking-[-0.28px];
+  }
+
+  /* ---------- caption ---------- */
+  .text-caption-m {
+    @apply text-xs font-medium leading-[16.8px] tracking-[-0.24px];
+  }
+  .text-caption-r {
+    @apply text-xs font-normal leading-[16.8px] tracking-[-0.24px];
+  }
+  .text-caption-10-m {
+    @apply text-[10px] font-medium leading-[14px] tracking-[-0.2px];
+  }
+}
+
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
+    font-family: 'SUIT', sans-serif;
   }
 }

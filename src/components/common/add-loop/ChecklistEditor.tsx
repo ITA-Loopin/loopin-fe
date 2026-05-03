@@ -1,9 +1,10 @@
 import { IconButton } from "@/components/common/IconButton";
 import { Checklist } from "./constants";
+import { useRef } from "react";
 
 type ChecklistEditorProps = {
   checklists: Checklist[];
-  onChangeChecklist: (index: number, text: string) => void;
+  onChangeChecklist: (id: string, text: string) => void;
   onRemoveChecklist: (id: string) => void;
   newChecklistItem: string;
   onChangeNewChecklist: (value: string) => void;
@@ -18,51 +19,78 @@ export function ChecklistEditor({
   onChangeNewChecklist,
   onAddChecklist,
 }: ChecklistEditorProps) {
-  return (
-    <div className="space-y-3">
-      <p className="text-sm font-medium text-[#676A79]">체크리스트</p>
+  const inputRef = useRef<HTMLInputElement>(null);
 
-      {checklists.map((item, index) => (
-        <div
-          key={item.id}
-          className="flex items-center gap-2 rounded-2xl border bg-[#FFF7F5] px-4 py-3"
-        >
+  const itemContainerStyles =
+    "flex w-full items-start justify-between rounded-[10px] bg-[var(--gray-100)] p-4";
+  const baseInputStyles =
+    "flex-1 w-full border-none bg-transparent px-0 py-0 text-body-1-sb font-semibold text-[var(--gray-black)] placeholder:text-[var(--gray-400)] focus:outline-none";
+
+  const trimmedValue = newChecklistItem.trim();
+
+  const handleAddButtonClick = () => {
+    // 입력값이 있으면 추가, 없으면 포커스
+    if (trimmedValue) {
+      onAddChecklist();
+    } else {
+      inputRef.current?.focus();
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && trimmedValue) {
+      e.preventDefault();
+      onAddChecklist();
+    }
+  };
+
+  return (
+    <div 
+      className="flex flex-col items-start gap-2 self-stretch"
+    >
+      <p className="text-caption-r text-[var(--gray-500)]">
+        체크리스트
+      </p>
+
+      <div className="flex w-full flex-col items-start gap-[10px]">
+        {checklists.map((item) => (
+          <div key={item.id} className={itemContainerStyles}>
+            <input
+              type="text"
+              value={item.text}
+              onChange={(event) => onChangeChecklist(item.id, event.target.value)}
+              className={baseInputStyles}
+            />
+            <IconButton
+              src="/addloopsheet/addloopsheet_delete.svg"
+              alt="체크리스트 삭제"
+              width={20}
+              height={20}
+              onClick={() => onRemoveChecklist(item.id)}
+            />
+          </div>
+        ))}
+
+        <div className={itemContainerStyles} data-checklist-input-container>
           <input
+            ref={inputRef}
             type="text"
-            value={item.text}
-            onChange={(event) => onChangeChecklist(index, event.target.value)}
-            className="flex-1 border-none bg-transparent px-0 py-0 text-sm text-[#2C2C2C] placeholder:text-[#B7BAC7] focus:outline-none focus:ring-0"
+            value={newChecklistItem}
+            onChange={(event) => onChangeNewChecklist(event.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="새로운 루틴을 추가해보세요"
+            className={baseInputStyles}
+            data-checklist-input
           />
           <IconButton
-            src="/addloopsheet/addloopsheet_delete.svg"
-            alt="체크리스트 삭제"
+            src="/addloopsheet/addloopsheet_add.svg"
+            alt="체크리스트 추가"
             width={20}
             height={20}
-            onClick={() => onRemoveChecklist(item.id)}
-            className="text-[#FF7765]"
+            onClick={handleAddButtonClick}
           />
         </div>
-      ))}
-
-      <div className="flex items-center gap-2 rounded-2xl border border-dashed px-4 py-3">
-        <input
-          type="text"
-          value={newChecklistItem}
-          onChange={(event) => onChangeNewChecklist(event.target.value)}
-          placeholder="새로운 루틴을 추가해보세요"
-          className="flex-1 border-none bg-transparent px-0 py-0 text-sm text-[#2C2C2C] placeholder:text-[#B7BAC7] focus:outline-none focus:ring-0"
-        />
-        <IconButton
-          src="/addloopsheet/addloopsheet_add.svg"
-          alt="체크리스트 추가"
-          width={20}
-          height={20}
-          onClick={onAddChecklist}
-          imageClassName="text-white"
-        />
       </div>
     </div>
   );
 }
-
-

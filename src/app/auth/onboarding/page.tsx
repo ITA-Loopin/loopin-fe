@@ -2,17 +2,18 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import Modal from "@/components/common/Modal";
 import { apiFetch } from "@/lib/api";
 import { useAppDispatch } from "@/store/hooks";
 import { setCredentials } from "@/store/slices/authSlice";
 import type { User } from "@/types/auth";
 import { buildUserFromMemberProfile, fetchMemberProfile } from "@/lib/member";
+import { saveFCMTokenApi } from "@/lib/fcm";
+import { authFetch } from "@/utils/fetch";
 
 type SignupSession = {
-  email: string;
-  provider: string;
-  providerId: string;
+  ticket: string;
 };
 
 type AlertState = {
@@ -89,8 +90,8 @@ export default function OnboardingPage() {
         success?: boolean;
         data?: { available?: boolean };
       }>("/rest-api/v1/member/available", {
-        skipAuth: true,
         searchParams: { nickname },
+        skipCredentials: true, // 인증이 필요 없는 공개 엔드포인트
       });
 
       const isAvailable =
@@ -131,41 +132,34 @@ export default function OnboardingPage() {
     try {
       const data = await apiFetch<{
         user?: User;
-        accessToken: string;
-      }>("/api-proxy/rest-api/v1/auth/signup-login", {
+      }>("/rest-api/v1/auth/signup-login", {
         method: "POST",
-        skipAuth: true,
         json: {
-          email: signupData.email,
-          provider: signupData.provider,
-          providerId: signupData.providerId,
           nickname,
+          ticket: signupData.ticket,
         },
+        skipCredentials: false, // 회원가입 시에는 쿠키가 아직 없음
       });
 
       const fallbackUser: User = {
-        id: signupData.providerId,
-        email: signupData.email,
+        id: "user",
         nickname,
-        kakaoId: Number.isNaN(Number(signupData.providerId))
-          ? 0
-          : Number(signupData.providerId),
       };
 
       const baseUser: User = data.user
         ? {
             ...data.user,
-            id: data.user.id || signupData.providerId,
+            id: data.user.id || "user",
           }
         : fallbackUser;
 
       let finalUser = baseUser;
 
       try {
-        const memberResponse = await fetchMemberProfile(data.accessToken);
+        const memberResponse = await fetchMemberProfile();
         finalUser = buildUserFromMemberProfile(memberResponse.data, {
           ...baseUser,
-          id: baseUser.id || signupData.providerId,
+          id: baseUser.id || "user",
         });
       } catch (memberError) {
         console.error("회원 정보 동기화 실패", memberError);
@@ -174,13 +168,20 @@ export default function OnboardingPage() {
       dispatch(
         setCredentials({
           user: finalUser,
-          accessToken: data.accessToken,
         })
       );
 
+      // 회원가입/로그인 성공 후 FCM 토큰 저장
+      try {
+        await saveFCMTokenApi(authFetch);
+      } catch (error) {
+        console.error("FCM 토큰 저장 실패:", error);
+        // FCM 토큰 저장 실패는 회원가입 플로우를 중단하지 않음
+      }
+
       sessionStorage.removeItem("signup_data");
       setIsModalOpen(false);
-      router.replace("/home");
+      router.replace("/onboarding");
     } catch (error) {
       console.error("회원가입 처리 실패", error);
       setModalError(
@@ -226,7 +227,7 @@ export default function OnboardingPage() {
           </div>
 
           <div
-            className={`flex items-center gap-3 rounded-2xl border px-4 py-3 shadow-sm transition focus-within:border-primary focus-within:ring-2 focus-within:ring-[#FF5741]/20 ${
+            className={`flex items-center gap-3 rounded-[10px] border px-4 py-3 ${
               alert?.type === "error"
                 ? "border-destructive"
                 : alert?.type === "success"
@@ -239,14 +240,14 @@ export default function OnboardingPage() {
               value={nickname}
               onChange={handleInputChange}
               placeholder="닉네임을 입력해주세요"
-              className="flex-1 border-none bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground"
+              className="w-full flex-1 border-none bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground"
               aria-label="닉네임"
             />
             <button
               type="button"
               onClick={checkNicknameDuplicate}
               disabled={isChecking || nickname.length === 0}
-              className="shrink-0 rounded-xl bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-60"
+              className="shrink-0 rounded-xl bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 transition"
             >
               {isChecking ? "확인 중..." : "중복확인"}
             </button>
@@ -258,24 +259,14 @@ export default function OnboardingPage() {
         </div>
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={closeModal}>
-        <div className="w-full max-w-xs rounded-3xl bg-white p-8 text-center shadow-2xl">
-          <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-[#FF7661] to-[#FFB199]">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2.5}
-              stroke="#fff"
-              className="h-12 w-12"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4.5 12.75l6 6 9-13.5"
-              />
-            </svg>
-          </div>
+      <Modal isOpen={isModalOpen} onClose={closeModal} className="w-[90%]">
+        <div className="rounded-3xl bg-white p-4 text-center  flex flex-col items-center justify-center">
+            <Image
+              src="/onboarding/graphic_complete.svg"
+              alt="완료"
+              width={136}
+              height={136}
+            />
 
           <div className="mt-8 space-y-2">
             <p className="text-lg font-semibold text-foreground">
@@ -294,7 +285,7 @@ export default function OnboardingPage() {
             type="button"
             onClick={handleCompleteSignup}
             disabled={isSubmitting}
-            className="mt-8 w-full rounded-full bg-[#2C2C2C] px-4 py-3 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-70"
+            className="mt-8 w-full rounded-full bg-[#2C2C2C] px-4 py-3 text-sm font-semibold text-white transition"
           >
             {isSubmitting ? "처리 중..." : "Loopin 시작하기"}
           </button>

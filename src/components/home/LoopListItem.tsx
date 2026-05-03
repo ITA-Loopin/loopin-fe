@@ -9,6 +9,8 @@ export function LoopListItem({ item }: LoopListItemProps) {
   const progress =
     item.totalChecklists > 0
       ? Math.round((item.completedChecklists / item.totalChecklists) * 100)
+      : item.completed
+      ? 100
       : 0;
 
   // SVG 원형 진행률 표시기 (radius = 20, circumference ≈ 125.66)
@@ -20,39 +22,44 @@ export function LoopListItem({ item }: LoopListItemProps) {
     <li>
       <Link
         href={`/loops/${item.id}`}
-        className="flex items-center justify-between rounded-xl bg-white px-4 py-3 transition-transform duration-150 hover:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-[#FF7765]/40"
+        className="flex flex-col items-start gap-[10px] self-stretch py-3 px-4 rounded-[10px] bg-[var(--gray-white)]"
       >
-        <div>
-          <p className="font-medium text-[#2C2C2C]">{item.title}</p>
-          <p className="text-sm text-gray-500">
-            {item.totalChecklists}개 중 {item.completedChecklists}개 완료
-          </p>
-        </div>
-        {/* 원형 진행률 표시기 */}
-        <div className="relative flex h-12 w-12 items-center justify-center">
-          <svg className="h-12 w-12 -rotate-90">
-            {/* 배경 원 (연한 회색) */}
-            <circle
-              cx="24"
-              cy="24"
-              r={radius}
-              fill="none"
-              stroke="#E5E5E5"
-              strokeWidth="4"
-            />
-            {/* 진행률 원 (산호색) */}
-            <circle
-              cx="24"
-              cy="24"
-              r={radius}
-              fill="none"
-              stroke="#FF543F"
-              strokeWidth="4"
-              strokeDasharray={circumference}
-              strokeDashoffset={offset}
-              strokeLinecap="round"
-            />
-          </svg>
+        {/* 안 레이아웃 */}
+        <div className="flex w-full items-center justify-between gap-2">
+          <div className="flex flex-col gap-2 min-w-0 flex-1">
+            <p className="text-body-1-sb font-semibold text-[var(--gray-800)] line-clamp-2 break-words">{item.title}</p>
+            <p className="text-body-2-m text-[var(--gray-500)]">
+              {item.totalChecklists > 0
+                ? `${item.totalChecklists}개 중 ${item.completedChecklists}개 완료`
+                : "체크리스트 없음"}
+            </p>
+          </div>
+          {/* 원형 진행률 표시기 */}
+          <div className="relative flex h-9 w-9 items-center justify-center flex-shrink-0">
+            <svg className="h-9 w-9 -rotate-90" viewBox="0 0 48 48">
+              {/* 배경 원 (연한 회색) */}
+              <circle
+                cx="24"
+                cy="24"
+                r={radius}
+                fill="none"
+                stroke="var(--gray-200)"
+                strokeWidth="4.5"
+              />
+              {/* 진행률 원 (산호색) */}
+              <circle
+                cx="24"
+                cy="24"
+                r={radius}
+                fill="none"
+                stroke="var(--primary-500)"
+                strokeWidth="4.5"
+                strokeDasharray={circumference}
+                strokeDashoffset={offset}
+                strokeLinecap="round"
+              />
+            </svg>
+          </div>
         </div>
       </Link>
     </li>

@@ -13,6 +13,8 @@ import {
   type MemberResponse,
 } from "@/lib/member";
 import type { User } from "@/types/auth";
+import { saveFCMTokenApi } from "@/lib/fcm";
+import { authFetch } from "@/utils/fetch";
 
 export const dynamic = "force-dynamic";
 
@@ -31,88 +33,71 @@ function HomeContent() {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleLoginSuccess = useCallback(
-    async (accessToken: string) => {
-      const sanitizedAccessToken = accessToken.replace(/\s/g, "+").trim();
-
-      try {
-        const memberResponse = await fetchMemberProfile(sanitizedAccessToken);
-
-        const fallbackUser: User = {
-          id: sanitizedAccessToken,
-          nickname: "루프인",
-        };
-
-        const userData = buildUserFromMemberProfile(
-          memberResponse.data,
-          fallbackUser
-        );
-
-        dispatch(
-          setCredentials({
-            user: userData,
-            accessToken: sanitizedAccessToken,
-          })
-        );
-
-        router.replace("/home");
-      } catch (error) {
-        console.error("로그인 처리 실패:", error);
-        alert("로그인 처리 중 오류가 발생했습니다.");
-      }
-    },
-    [dispatch, router]
-  );
-
-  const handleKakaoLogin = async () => {
+  const handleLoginSuccess = useCallback(async () => {
     try {
-      const data = await apiFetch<{
-        success?: boolean;
-        data?: string;
-        redirectUrl?: string;
-        url?: string;
-      }>("/rest-api/v1/oauth/redirect-url/kakao", {
+      const memberResponse = await fetchMemberProfile();
 
-        skipAuth: true,
-      });
-      const redirectUrl = data.data || data.redirectUrl || data.url;
 
-      if (redirectUrl) {
-        window.location.href = redirectUrl;
-      } else {
-        throw new Error(
-          `리다이렉션 URL을 찾을 수 없습니다. 응답: ${JSON.stringify(data)}`
-        );
-      }
-    } catch (error) {
-      console.error("카카오 로그인 실패:", error);
-      alert(
-        `카카오 로그인에 실패했습니다.\n${
-          error instanceof Error ? error.message : "다시 시도해주세요."
-        }`
+      const fallbackUser: User = {
+        id: "user",
+        nickname: "루프인",
+      };
+
+
+      const userData = buildUserFromMemberProfile(
+        memberResponse.data,
+        fallbackUser
       );
+
+      dispatch(
+        setCredentials({
+          user: userData,
+        })
+      );
+
+      // 로그인 성공 후 FCM 토큰 저장
+      try {
+        await saveFCMTokenApi(authFetch);
+      } catch (error) {
+        console.error("FCM 토큰 저장 실패:", error);
+        // FCM 토큰 저장 실패는 로그인 플로우를 중단하지 않음
+      }
+
+      router.replace("/home");
+    } catch (error) {
+      console.error("로그인 처리 실패:", error);
+      alert("로그인 처리 중 오류가 발생했습니다.");
     }
+  }, [dispatch, router]);
+
+  const handleKakaoLogin = () => {
+    window.location.href =
+      "https://api.loopin.co.kr/oauth2/authorization/kakao";
+  };
+
+  const handleNaverLogin = () => {
+    window.location.href =
+      "https://api.loopin.co.kr/oauth2/authorization/naver";
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href =
+      "https://api.loopin.co.kr/oauth2/authorization/google";
   };
 
   useEffect(() => {
     const status = searchParams.get("status");
-    const accessToken = searchParams.get("access_token");
 
-    if (status === "LOGIN_SUCCESS" && accessToken) {
-      handleLoginSuccess(accessToken);
+    if (status === "LOGIN_SUCCESS") {
+      handleLoginSuccess();
       return;
     }
 
     if (status === "SIGNUP_REQUIRED") {
-      const email = searchParams.get("email");
-      const provider = searchParams.get("provider");
-      const providerId = searchParams.get("providerId");
+      const ticket = searchParams.get("ticket");
 
-      if (email && provider && providerId) {
-        sessionStorage.setItem(
-          "signup_data",
-          JSON.stringify({ email, provider, providerId })
-        );
+      if (ticket) {
+        sessionStorage.setItem("signup_data", JSON.stringify({ ticket }));
         router.push("/auth/onboarding");
       }
 
@@ -140,7 +125,7 @@ function HomeContent() {
 
   return (
     <div
-      className="relative flex min-h-screen flex-col items-center justify-between overflow-hidden px-6 py-14 text-white"
+      className="relative flex min-h-screen flex-col items-center justify-between overflow-hidden px-4 py-14 text-white"
       style={{
         background: "linear-gradient(136deg, #FF5741 54.38%, #FFE4E0 118.92%)",
       }}
@@ -163,7 +148,6 @@ function HomeContent() {
           priority
         />
       </div>
-
       <div
         className={`relative z-10 mt-16 w-full max-w-sm transition-all duration-700 ${
           showContent ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
@@ -190,15 +174,20 @@ function HomeContent() {
             </span>
           </button>
 
-          {/* <button
+          <button
             onClick={handleNaverLogin}
             className="flex w-full items-center justify-between rounded-full bg-[#03C75A] px-6 py-4 text-left font-semibold text-white shadow-lg shadow-black/10"
           >
             <span className="flex items-center gap-3">
-              <img src="/naver-icon.svg" alt="Naver" width={24} height={24} />
+              <Image
+                  src="/naver-simple.png"
+                  alt="Naver"
+                  width={24}
+                  height={24}
+                  className="h-6 w-6"
+              />
               네이버 로그인
             </span>
-            <span className="text-sm text-white/70">준비중</span>
           </button>
 
           <button
@@ -206,11 +195,16 @@ function HomeContent() {
             className="flex w-full items-center justify-between rounded-full bg-white px-6 py-4 text-left font-semibold text-[#1F1F1F] shadow-lg shadow-black/10"
           >
             <span className="flex items-center gap-3">
-              <img src="/google-icon.svg" alt="Google" width={24} height={24} />
+              <Image
+                  src="/google-simple.png"
+                  alt="Google"
+                  width={24}
+                  height={24}
+                  className="h-6 w-6"
+              />
               구글 로그인
             </span>
-            <span className="text-sm text-[#1F1F1F]/60">준비중</span>
-          </button> */}
+          </button>
         </div>
       </div>
     </div>

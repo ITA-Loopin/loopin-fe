@@ -19,6 +19,8 @@ export const DAY_OPTIONS = [...WEEKDAY_OPTIONS, "EVERYDAY"] as const;
 
 export type Weekday = (typeof WEEKDAY_OPTIONS)[number];
 export type DayOption = (typeof DAY_OPTIONS)[number];
+export type RepeatValue = (typeof REPEAT_OPTIONS)[number]["value"];
+export type ScheduleType = RepeatValue | "";
 
 export const DAY_LABELS: Record<DayOption, string> = {
   MONDAY: "월",
@@ -38,12 +40,13 @@ export type Checklist = {
 
 export interface AddLoopDefaultValues {
   title?: string;
-  scheduleType?: string;
+  scheduleType?: RepeatValue;
   specificDate?: string;
-  daysOfWeek?: string[];
+  daysOfWeek?: Weekday[];
   startDate?: string;
   endDate?: string;
   checklists?: Checklist[];
+  loopRuleId?: number;
 }
 
 export interface AddLoopFormPayload {

@@ -1,18 +1,22 @@
-import { IconButton } from "@/components/common/IconButton";
+import { useMemo } from "react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import {
   DAY_LABELS,
   DAY_OPTIONS,
   DayOption,
   REPEAT_OPTIONS,
+  RepeatValue,
+  ScheduleType,
   WEEKDAY_OPTIONS,
+  Weekday,
 } from "./constants";
 
 type ScheduleSelectorProps = {
-  scheduleType: string;
+  scheduleType: ScheduleType;
   isWeeklyDropdownOpen: boolean;
-  daysOfWeek: string[];
-  onSelectSchedule: (value: string) => void;
+  daysOfWeek: Weekday[];
+  onSelectSchedule: (value: RepeatValue) => void;
   onToggleDay: (day: DayOption) => void;
 };
 
@@ -23,73 +27,84 @@ export function ScheduleSelector({
   onSelectSchedule,
   onToggleDay,
 }: ScheduleSelectorProps) {
-  return (
-    <div className="space-y-3">
-      <p className="text-sm font-medium text-[#676A79]">반복 주기</p>
+  const activeButtonStyles =
+    "bg-[var(--primary-200)] text-[var(--primary-main)]";
+  const inactiveButtonStyles =
+    "bg-[var(--gray-200)] text-[var(--gray-400)]";
+  const buttonRowStyles = "flex w-full items-start gap-2";
 
-      <div className="grid grid-cols-2 gap-2">
-        {REPEAT_OPTIONS.slice(0, 2).map((option) => {
-          const isActive = scheduleType === option.value;
+  const isWeekly = scheduleType === "WEEKLY";
+  const selectedSet = useMemo(() => new Set(daysOfWeek), [daysOfWeek]);
+  const isEverydaySelected = useMemo(
+    () => WEEKDAY_OPTIONS.every((d) => selectedSet.has(d)),
+    [selectedSet]
+  );
 
-          if (option.value === "WEEKLY") {
-            return (
-              <div key={option.value} className="relative">
-                <button
-                  type="button"
-                  onClick={() => onSelectSchedule(option.value)}
-                  className={cn(
-                    "flex w-full items-center justify-center rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors",
-                    isActive
-                      ? "border-[#FFADA1] bg-[#FFF4F2] text-[#FF7765]"
-                      : "border-[#F0F2F3] bg-[#F0F2F3] text-[#8D91A1]"
-                  )}
-                >
-                  {option.label}
-                </button>
-                <IconButton
-                  src="/addloopsheet/addloopsheet_dropdown.svg"
-                  alt="요일 선택"
-                  width={14}
-                  height={14}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    onSelectSchedule(option.value);
-                  }}
-                  className={cn(
-                    "absolute right-3 top-1/2 -translate-y-1/2 transition-transform",
-                    isActive && isWeeklyDropdownOpen ? "rotate-180" : ""
-                  )}
-                />
-              </div>
-            );
-          }
+  const renderScheduleButton = (option: (typeof REPEAT_OPTIONS)[number]) => {
+    const isActive = scheduleType === option.value;
+    const isWeekly = option.value === "WEEKLY";
 
-          return (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() => onSelectSchedule(option.value)}
+    return (
+      <div key={option.value} className="flex-1">
+        <button
+          type="button"
+          onClick={() => onSelectSchedule(option.value)}
+          className={cn(
+            "relative flex h-[38px] w-full items-center justify-center rounded-[5px] px-4 py-[9px] text-body-2-sb font-semibold transition-colors",
+            isActive ? activeButtonStyles : inactiveButtonStyles
+          )}
+        >
+          <span>{option.label}</span>
+          {isWeekly && (
+            <Image
+              src="/addloopsheet/addloopsheet_dropdown.svg"
+              alt=""
+              width={14}
+              height={14}
               className={cn(
-                "rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors",
-                isActive
-                  ? "border-[#FFADA1] bg-[#FFF4F2] text-[#FF7765]"
-                  : "border-[#F0F2F3] bg-[#F0F2F3] text-[#8D91A1]"
+                "absolute right-3 top-1/2 -translate-y-1/2 transition-transform",
+                isActive && isWeeklyDropdownOpen ? "rotate-180" : ""
               )}
-            >
-              {option.label}
-            </button>
-          );
-        })}
+            />
+          )}
+        </button>
+      </div>
+    );
+  };
+
+  return (
+    <div className="flex flex-col items-start gap-2 self-stretch">
+      <p className="text-caption-r text-[var(--gray-500)]">
+        반복 주기
+      </p>
+
+      {/* 첫 번째 줄: 매주, 매달 */}
+      <div className={buttonRowStyles}>
+        {REPEAT_OPTIONS.slice(0, 2).map(renderScheduleButton)}
       </div>
 
-      {scheduleType === "WEEKLY" && isWeeklyDropdownOpen && (
-        <div className="grid grid-cols-8 gap-2">
+      {/* 매주 선택 시 요일 선택 영역 */}
+      {isWeekly && isWeeklyDropdownOpen && (
+        <div className="flex w-full items-center justify-between gap-[6px]">
           {DAY_OPTIONS.map((day) => {
-            const isEveryday = day === "EVERYDAY";
-            const isEverydaySelected = daysOfWeek.length === WEEKDAY_OPTIONS.length;
-            const isSelected = isEveryday
-              ? isEverydaySelected
-              : !isEverydaySelected && daysOfWeek.includes(day);
+            if (day === "EVERYDAY") {
+              return (
+                <button
+                  key={day}
+                  type="button"
+                  onClick={() => onToggleDay(day)}
+                  className={cn(
+                    "flex flex-1 aspect-square items-center justify-center px-1 py-2 text-body-2-sb font-semibold rounded-[5px]",
+                    isEverydaySelected ? activeButtonStyles : inactiveButtonStyles
+                  )}
+                >
+                  {DAY_LABELS[day]}
+                </button>
+              );
+            }
+
+            // 여기부터 day는 Weekday 타입
+            const isSelected = !isEverydaySelected && selectedSet.has(day);
 
             return (
               <button
@@ -97,10 +112,8 @@ export function ScheduleSelector({
                 type="button"
                 onClick={() => onToggleDay(day)}
                 className={cn(
-                  "rounded-xl border px-2 py-2 text-sm font-semibold tracking-[-0.02em] leading-[1.5]",
-                  isSelected
-                    ? "border-[#FFADA1] bg-[#FFF4F2] text-[#FF7765]"
-                    : "border-[#F0F2F3] bg-[#F0F2F3] text-[#8D91A1]"
+                  "flex flex-1 aspect-square items-center justify-center px-1 py-2 text-body-2-sb font-semibold rounded-[5px]",
+                  isSelected ? activeButtonStyles : inactiveButtonStyles
                 )}
               >
                 {DAY_LABELS[day]}
@@ -110,22 +123,9 @@ export function ScheduleSelector({
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-2">
-        {REPEAT_OPTIONS.slice(2).map((option) => (
-          <button
-            key={option.value}
-            type="button"
-            onClick={() => onSelectSchedule(option.value)}
-            className={cn(
-              "rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors",
-              scheduleType === option.value
-                ? "border-[#FFADA1] bg-[#FFF4F2] text-[#FF7765]"
-                : "border-[#F0F2F3] bg-[#F0F2F3] text-[#8D91A1]"
-            )}
-          >
-            {option.label}
-          </button>
-        ))}
+      {/* 두 번째 줄: 매년, 안함 */}
+      <div className={buttonRowStyles}>
+        {REPEAT_OPTIONS.slice(2).map(renderScheduleButton)}
       </div>
     </div>
   );

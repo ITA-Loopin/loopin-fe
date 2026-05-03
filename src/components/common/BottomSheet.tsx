@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useCallback } from "react";
+import { ReactNode } from "react";
 import {
   Sheet,
   SheetContent,
@@ -27,26 +27,23 @@ export function BottomSheet({
   overlayClassName,
   title = "Bottom sheet",
 }: BottomSheetProps) {
-  const handleOpenChange = useCallback(
-    (open: boolean) => {
-      if (!open) {
-        onClose?.();
-      }
-    },
-    [onClose]
-  );
-
   return (
-    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
+    <Sheet
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) {
+          onClose?.();
+        }
+      }}
+    >
       <SheetPortal>
         <SheetOverlay
-          className={cn("bg-black/60", overlayClassName)}
-          onClick={() => onClose?.()}
+          className={cn("bg-[rgba(18,18,18,0.70)]", overlayClassName)}
         />
         <SheetContent
           side="bottom"
           className={cn(
-            "mx-auto w-full max-w-[480px] gap-0 rounded-t-[32px] border-none px-6 pb-8 pt-4 shadow-[0px_-20px_44px_rgba(0,0,0,0.16)] [&_[data-slot=sheet-close]]:hidden",
+            "mx-auto w-full max-w-[480px] gap-0 rounded-t-[32px] border-none pb-8 pt-4 shadow-[0px_-20px_44px_rgba(0,0,0,0.16)]",
             className
           )}
         >
@@ -58,4 +55,3 @@ export function BottomSheet({
   );
 }
 
-export default BottomSheet;

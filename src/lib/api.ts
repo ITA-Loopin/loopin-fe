@@ -1,21 +1,15 @@
 "use client";
 
 import { store } from "@/store/store";
+import { setCredentials, logout } from "@/store/slices/authSlice";
+import { fetchMemberProfile, buildUserFromMemberProfile } from "./member";
+import type { User } from "@/types/auth";
 
 type ApiFetchInput = RequestInfo | URL;
 
 type SearchParamValue = string | number | boolean | null | undefined;
 
 interface ApiFetchOptions extends RequestInit {
-  /**
-   * 직접 토큰을 전달하고 싶을 때 사용합니다.
-   * 지정하지 않으면 Redux store의 accessToken을 자동으로 사용합니다.
-   */
-  accessToken?: string | null;
-  /**
-   * true면 Authorization 헤더를 추가하지 않습니다.
-   */
-  skipAuth?: boolean;
   /**
    * 쿼리 파라미터를 객체 형태로 전달할 수 있습니다.
    */
@@ -28,24 +22,57 @@ interface ApiFetchOptions extends RequestInit {
    * false로 설정하면 응답을 그대로 반환(Response)합니다.
    */
   parseJson?: boolean;
+  /**
+   * true로 설정하면 쿠키를 포함하지 않습니다. 기본값은 true (쿠키 포함)
+   */
+  skipCredentials?: boolean;
 }
 
-const AUTH_HEADER = "Authorization";
+const API_BASE_URL = "https://api.loopin.co.kr";
+
+// 리프레시 토큰 재인증 진행 중인지 추적
+let isRefreshing = false;
+let refreshPromise: Promise<boolean> | null = null;
 
 /**
- * Access Token이 필요한 요청인데, 토큰이 없을 경우 발생하는 에러
+ * 리프레시 토큰으로 재인증 시도
  */
-export class MissingAccessTokenError extends Error {
-  constructor() {
-    super("Access token is missing");
-    this.name = "MissingAccessTokenError";
+async function attemptTokenRefresh(): Promise<boolean> {
+  if (isRefreshing && refreshPromise) {
+    return refreshPromise;
   }
+
+  isRefreshing = true;
+  refreshPromise = (async () => {
+    try {
+      const refreshResponse = await fetch(
+        `${API_BASE_URL}/rest-api/v1/auth/refresh-token`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            Accept: "application/json",
+          },
+        }
+      );
+      if (!refreshResponse.ok) {
+        return false;
+      }
+      return true;
+    } catch (error) {
+      return false;
+    } finally {
+      isRefreshing = false;
+      refreshPromise = null;
+    }
+  })();
+
+  return refreshPromise;
 }
 
 /**
  *  apiFetch - fetch를 확장한 커스텀 함수
- * - Authorization 헤더 자동 추가
- * - Redux store에서 accessToken 가져옴
+ * - 쿠키 기반 인증 (자동으로 쿠키 전송)
  * - 제네릭 <T> 지원 → 응답 타입 지정 가능
  * - 응답 JSON 자동 파싱 + 타입 안전성
  */
@@ -54,12 +81,11 @@ export async function apiFetch<T = unknown>(
   options: ApiFetchOptions = {}
 ): Promise<T> {
   const {
-    accessToken,
-    skipAuth = false,
     headers,
     searchParams,
     json,
     parseJson = true,
+    skipCredentials = false,
     ...restOptions
   } = options;
 
@@ -76,25 +102,28 @@ export async function apiFetch<T = unknown>(
     return String(value);
   };
 
-  const withApiPrefix = (value: string) => {
+  const buildApiUrl = (value: string) => {
+    // 이미 전체 URL인 경우 그대로 사용
     if (/^https?:\/\//i.test(value)) {
       return value;
     }
 
-    const normalized = value.startsWith("/") ? value : `/${value}`;
-    // 이미 /api-proxy로 시작하는 경우 중복 추가하지 않음
-    if (normalized.startsWith("/api-proxy")) {
-      return normalized;
+    //todo: cors 에러 안뜨면 없애기
+
+    // Next.js API Route인 경우 그대로 사용 (서버 사이드 프록시)
+    if (value.startsWith("/api/")) {
+      return value;
     }
-    return `/api-proxy${normalized}`;
+
+    // 상대 경로인 경우 API 베이스 URL과 결합
+    const normalized = value.startsWith("/") ? value : `/${value}`;
+    return `${API_BASE_URL}${normalized}`;
   };
 
-  let requestInput = withApiPrefix(toRawUrl(input));
+  let requestInput = buildApiUrl(toRawUrl(input));
 
   if (searchParams && Object.keys(searchParams).length > 0) {
-    const createUrl = (value: string) => new URL(value, window.location.origin);
-
-    const url = createUrl(requestInput);
+    const url = new URL(requestInput);
 
     for (const [key, value] of Object.entries(searchParams)) {
       if (value === null || value === undefined) {
@@ -112,19 +141,12 @@ export async function apiFetch<T = unknown>(
     headerMap.set("Accept", "application/json");
   }
 
-  // 인증 필요 시 Authorization 헤더 자동 추가
-  if (!skipAuth) {
-    const token = accessToken ?? store.getState().auth.accessToken ?? undefined;
-
-    if (!token) {
-      throw new MissingAccessTokenError();
-    }
-    headerMap.set(AUTH_HEADER, `Bearer ${token}`);
-  }
-
   const fetchOptions: RequestInit = {
     ...restOptions,
     headers: headerMap,
+    // 쿠키 자동 전송 (credentials: 'include')
+    // skipCredentials가 true면 쿠키를 포함하지 않음 (CORS 이슈 방지)
+    credentials: skipCredentials ? "omit" : "include",
   };
 
   if (json !== undefined) {
@@ -135,7 +157,35 @@ export async function apiFetch<T = unknown>(
   }
 
   // 실제 fetch 요청
-  const response = await fetch(requestInput, fetchOptions);
+  let response = await fetch(requestInput, fetchOptions);
+
+  // 401 에러 발생 시 리프레시 토큰으로 재인증 시도
+  if (response.status === 401 && !skipCredentials) {
+    // 리프레시 토큰 재인증
+    const refreshSuccess = await attemptTokenRefresh();
+
+    if (refreshSuccess) {
+      // 재인증 성공 시 원래 요청 재시도
+      response = await fetch(requestInput, fetchOptions);
+    } else {
+      // 재인증 실패 시 로그아웃하고 로그인 페이지로 리다이렉트
+      store.dispatch(logout());
+      if (typeof window !== "undefined") {
+        window.location.href = "/";
+      }
+      let errorBody: Record<string, unknown> = {};
+      try {
+        errorBody = await response.json();
+      } catch {
+        // JSON 파싱 실패 시 무시
+      }
+      throw new Error(
+        typeof errorBody.message === "string"
+          ? errorBody.message
+          : "인증이 만료되었습니다. 다시 로그인해주세요."
+      );
+    }
+  }
 
   // 응답 상태 체크
   if (!response.ok) {
