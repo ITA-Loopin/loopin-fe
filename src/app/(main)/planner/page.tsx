@@ -35,6 +35,7 @@ export default function PlannerListPage() {
   const router = useRouter();
   const [chatLoops, setChatLoops] = useState<ChatLoop[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCreating, setIsCreating] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -59,6 +60,8 @@ export default function PlannerListPage() {
   }, []);
 
   const handleStartNewLoop = async () => {
+    if(isCreating) return;
+    setIsCreating(true);
     try {
       const response = await createChatRoom({
         title: "새 루프",
@@ -72,6 +75,8 @@ export default function PlannerListPage() {
       }
     } catch (error) {
       console.error("채팅방 생성 실패", error);
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -131,6 +136,7 @@ export default function PlannerListPage() {
       <div className="px-6 pb-5 pt-4">
         <PrimaryButton
           onClick={handleStartNewLoop}
+          disabled={isCreating}
         >
           새로운 루프 시작하기
         </PrimaryButton>
