@@ -32,7 +32,6 @@ export default function NotificationPage() {
       setIsLoading(true);
       setError(null);
       const response = await fetchNotifications({
-        page: 0,
         size: 20,
       });
 

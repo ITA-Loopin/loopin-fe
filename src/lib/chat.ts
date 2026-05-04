@@ -37,7 +37,7 @@ export type ChatRoomMessagesResponse = {
 };
 
 type PageInfo = {
-  page?: number;
+  cursor?: string | null;
   size?: number;
 };
 
@@ -53,26 +53,21 @@ export type CurrentUserQuery = {
 };
 
 type BuildParamsOptions = {
-  page?: number;
+  cursor?: string | null;
   size?: number;
   currentUser?: CurrentUserQuery;
   chatRoomId?: number;
 };
 
 function buildQueryParams(options: BuildParamsOptions = {}) {
-  const { page, size, currentUser, chatRoomId } = options;
+  const { cursor, size, currentUser, chatRoomId } = options;
   const params: Record<string, Primitive> = {};
 
-  const requestPayload: Record<string, Primitive> = {};
-  if (page !== undefined) {
-    requestPayload.page = page;
+  if (cursor) {
+    params.cursor = cursor;
   }
   if (size !== undefined) {
-    requestPayload.size = size;
-  }
-
-  if (Object.keys(requestPayload).length > 0) {
-    params.request = JSON.stringify(requestPayload);
+    params.size = size;
   }
 
   if (currentUser) {
@@ -102,7 +97,7 @@ export type FetchChatMessagesParams = PageInfo & {
 
 export async function fetchChatMessages({
   chatRoomId,
-  page,
+  cursor,
   size,
   currentUser,
 }: FetchChatMessagesParams) {
@@ -110,7 +105,7 @@ export async function fetchChatMessages({
     `/rest-api/v1/chat-message/ai/${chatRoomId}`,
     {
       searchParams: buildQueryParams({
-        page,
+        cursor,
         size,
         currentUser,
       }),
@@ -171,13 +166,9 @@ export type ChatRoomListResponse = {
     chatRooms?: ChatRoom[];
   };
   page?: {
-    page?: number;
     size?: number;
-    totalPages?: number;
-    totalElements?: number;
-    first?: boolean;
-    last?: boolean;
     hasNext?: boolean;
+    nextCursor?: string | null;
   };
   timestamp?: string;
   traceId?: string;
@@ -230,13 +221,9 @@ export type TeamChatRoomResponse = {
     lastReadAt?: string | null;
   };
   page?: {
-    page?: number;
     size?: number;
-    totalPages?: number;
-    totalElements?: number;
-    first?: boolean;
-    last?: boolean;
     hasNext?: boolean;
+    nextCursor?: string | null;
   };
   timestamp?: string;
   traceId?: string;
@@ -285,13 +272,9 @@ export type TeamChatMessagesResponse = {
   message?: string;
   data?: TeamChatMessageDto[];
   page?: {
-    page?: number;
     size?: number;
-    totalPages?: number;
-    totalElements?: number;
-    first?: boolean;
-    last?: boolean;
     hasNext?: boolean;
+    nextCursor?: string | null;
   };
   timestamp?: string;
   traceId?: string;
@@ -302,7 +285,7 @@ export type TeamChatMessagesResponse = {
  */
 export type FetchTeamChatMessagesParams = {
   chatRoomId: number;
-  page?: number;
+  cursor?: string | null;
   size?: number;
 };
 
@@ -311,21 +294,16 @@ export type FetchTeamChatMessagesParams = {
  */
 export async function fetchTeamChatMessages({
   chatRoomId,
-  page,
+  cursor,
   size,
 }: FetchTeamChatMessagesParams) {
   const params: Record<string, Primitive> = {};
 
-  const requestPayload: Record<string, Primitive> = {};
-  if (page !== undefined) {
-    requestPayload.page = page;
+  if (cursor) {
+    params.cursor = cursor;
   }
   if (size !== undefined) {
-    requestPayload.size = size;
-  }
-
-  if (Object.keys(requestPayload).length > 0) {
-    params.request = JSON.stringify(requestPayload);
+    params.size = size;
   }
 
   return apiFetch<TeamChatMessagesResponse>(
