@@ -97,17 +97,9 @@ function HomeContent() {
       const ticket = searchParams.get("ticket");
 
       if (ticket) {
-        // 온보딩에서 스와이프 백으로 돌아온 경우 → 로그인 페이지 표시
-        const existingData = sessionStorage.getItem("signup_data");
-        if (existingData) {
-          sessionStorage.removeItem("signup_data");
-          window.history.replaceState({}, "", "/");
-          return;
-        }
-
         sessionStorage.setItem("signup_data", JSON.stringify({ ticket }));
-        // WKWebView 히스토리 엔트리를 생성하기 위해 실제 페이지 전환 사용
-        window.location.href = "/auth/onboarding";
+        router.replace("/");
+        router.push("/auth/onboarding");
       }
 
       return;
