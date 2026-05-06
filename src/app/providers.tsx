@@ -52,7 +52,7 @@ function NativeBackHandler() {
   if (!showToast) return null;
 
   return (
-    <div className="fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-full bg-black/80 px-6 py-3">
+    <div className="fixed bottom-[146px] left-1/2 z-50 -translate-x-1/2 rounded-full bg-black/80 px-6 py-3">
       <p className="whitespace-nowrap text-sm text-white">
         한 번 더 누르면 종료합니다
       </p>
