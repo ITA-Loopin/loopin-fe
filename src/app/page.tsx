@@ -97,9 +97,17 @@ function HomeContent() {
       const ticket = searchParams.get("ticket");
 
       if (ticket) {
+        // iOS 스와이프 백으로 돌아온 경우 → 로그인 페이지 표시
+        const existingData = sessionStorage.getItem("signup_data");
+        if (existingData) {
+          sessionStorage.removeItem("signup_data");
+          window.history.replaceState({}, "", "/");
+          return;
+        }
+
         sessionStorage.setItem("signup_data", JSON.stringify({ ticket }));
-        router.replace("/");
-        router.push("/auth/onboarding");
+        // 실제 페이지 전환으로 WKWebView 히스토리 엔트리 생성 (iOS 스와이프 백 지원)
+        window.location.href = "/auth/onboarding";
       }
 
       return;
