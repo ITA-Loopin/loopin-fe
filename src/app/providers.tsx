@@ -15,7 +15,7 @@ const ROOT_PATHS = ["/home"];
 function NativeBackHandler() {
   const lastBackPressRef = useRef(0);
   const [showToast, setShowToast] = useState(false);
-  const toastTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const toastTimerRef = useRef<number | null>(null);
 
   const handleNativeBack = useCallback(() => {
     const currentPath = window.location.pathname;
@@ -38,15 +38,15 @@ function NativeBackHandler() {
 
     lastBackPressRef.current = now;
     setShowToast(true);
-    clearTimeout(toastTimerRef.current);
-    toastTimerRef.current = setTimeout(() => setShowToast(false), 2000);
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = window.setTimeout(() => setShowToast(false), 2000);
   }, []);
 
   useEffect(() => {
     window.addEventListener("interceptNativeBack", handleNativeBack);
     return () => {
       window.removeEventListener("interceptNativeBack", handleNativeBack);
-      clearTimeout(toastTimerRef.current);
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     };
   }, [handleNativeBack]);
 
