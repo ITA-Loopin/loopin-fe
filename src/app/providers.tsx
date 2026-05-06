@@ -10,7 +10,7 @@ import "dayjs/locale/ko";
 dayjs.locale("ko");
 import { FirebaseServiceWorker } from "@/components/common/FirebaseServiceWorker";
 
-const ROOT_PATHS = ["/home", "/calendar", "/planner", "/teamloop", "/notification", "/analytics"];
+const ROOT_PATHS = ["/home"];
 
 function NativeBackHandler() {
   const lastBackPressRef = useRef(0);
