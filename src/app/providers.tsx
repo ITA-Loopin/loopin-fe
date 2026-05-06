@@ -19,6 +19,7 @@ function NativeBackHandler() {
 
   const handleNativeBack = useCallback(() => {
     const currentPath = window.location.pathname;
+    alert("[DEBUG] pathname: " + currentPath);
     const isRootPage = ROOT_PATHS.some(
       (root) => currentPath === root || currentPath === root + "/"
     );
