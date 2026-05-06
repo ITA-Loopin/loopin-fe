@@ -98,6 +98,7 @@ function HomeContent() {
 
       if (ticket) {
         sessionStorage.setItem("signup_data", JSON.stringify({ ticket }));
+        router.replace("/");
         router.push("/auth/onboarding");
       }
 
