@@ -56,6 +56,19 @@ export default function OnboardingPage() {
     }
   }, [router]);
 
+  // Android 하드웨어 뒤로가기 버튼 처리
+  useEffect(() => {
+    const handleNativeBack = () => {
+      sessionStorage.removeItem("signup_data");
+      router.replace("/");
+    };
+
+    window.addEventListener("interceptNativeBack", handleNativeBack);
+    return () => {
+      window.removeEventListener("interceptNativeBack", handleNativeBack);
+    };
+  }, [router]);
+
   const hasAlert = useMemo(() => Boolean(alert), [alert]);
 
   const handleInputChange = useCallback(
