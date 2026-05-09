@@ -97,17 +97,8 @@ function HomeContent() {
       const ticket = searchParams.get("ticket");
 
       if (ticket) {
-        // iOS 스와이프 백으로 돌아온 경우 → 로그인 페이지 표시
-        const existingData = sessionStorage.getItem("signup_data");
-        if (existingData) {
-          sessionStorage.removeItem("signup_data");
-          window.history.replaceState({}, "", "/");
-          return;
-        }
-
         sessionStorage.setItem("signup_data", JSON.stringify({ ticket }));
-        // 실제 페이지 전환으로 WKWebView 히스토리 엔트리 생성 (iOS 스와이프 백 지원)
-        window.location.href = "/auth/onboarding";
+        router.push("/auth/onboarding");
       }
 
       return;
@@ -134,85 +125,109 @@ function HomeContent() {
 
   return (
     <div
-      className="relative flex min-h-screen flex-col items-center justify-between overflow-hidden px-4 py-14 text-white"
+      className="relative flex min-h-screen flex-col items-center overflow-hidden text-white"
       style={{
-        background: "linear-gradient(136deg, #FF5741 54.38%, #FFE4E0 118.92%)",
+        background: "linear-gradient(136deg, #FF5741 54%, #FFE4E0 100%)",
       }}
     >
-      <div className="relative z-10 flex w-full flex-row items-center justify-center gap-6 text-center">
+      {/* 장식 Ellipse */}
+      <div
+        className="absolute -left-[60px] -top-[258px] h-[539px] w-[619px] rounded-full bg-white opacity-40"
+        style={{ filter: "blur(230px)" }}
+      />
+      <div
+        className="absolute -left-[326px] top-[369px] h-[596px] w-[506px] rounded-full bg-white opacity-60"
+        style={{ filter: "blur(220px)" }}
+      />
+      <div
+        className="absolute left-[120px] -top-[96px] h-[233px] w-[403px] rounded-full opacity-40"
+        style={{ background: "#E7FFBA", filter: "blur(234px)" }}
+      />
+      <div
+        className="absolute left-[120px] top-[559px] h-[383px] w-[394px] rounded-full opacity-40"
+        style={{ background: "#E7FFBA", filter: "blur(194px)" }}
+      />
+
+      {/* 로고 영역 */}
+      <div className="relative z-10 mt-[21%] flex items-center gap-3">
+        <style>{`
+          @keyframes gentleSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
         <Image
           src="/loading-logo.svg"
           alt="Loopin loading emblem"
           width={70}
           height={70}
-          className="mb-6 drop-shadow-lg animate-[spin_10s_linear_infinite]"
+          className="drop-shadow-lg"
+          style={{ animation: "gentleSpin 20s ease-in-out infinite" }}
           priority
         />
         <Image
           src="/loopin-logo.svg"
           alt="Loopin logo"
           width={180}
-          height={70}
+          height={76}
           className="drop-shadow-lg"
           priority
         />
       </div>
+
+      {/* 하단 영역 */}
       <div
-        className={`relative z-10 mt-16 w-full max-w-sm transition-all duration-700 ${
+        className={`relative z-10 mt-auto flex flex-col items-center gap-5 pb-14 transition-all duration-700 ${
           showContent ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
         }`}
       >
-        <p className="mb-10 text-center text-base font-medium">
+        <p className="text-body-2-sb text-center text-white">
           간편 로그인으로 지금 바로 Loopin을 시작해보세요!
         </p>
 
-        <div className="space-y-3">
+        <div className="flex items-center gap-7">
           <button
             onClick={handleKakaoLogin}
-            className="flex w-full items-center justify-between rounded-full bg-[#FEE500] px-6 py-4 text-left font-semibold text-[#191919] shadow-lg shadow-black/10"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FEDC2C]"
           >
-            <span className="flex items-center gap-3">
-              <Image
-                src="/kakao-icon.svg"
-                alt="Kakao"
-                width={24}
-                height={24}
-                className="h-6 w-6"
-              />
-              카카오 로그인
-            </span>
+            <Image
+              src="/kakao-icon.svg"
+              alt="Kakao"
+              width={24}
+              height={24}
+            />
           </button>
-
-          <button
-            onClick={handleNaverLogin}
-            className="flex w-full items-center justify-between rounded-full bg-[#03C75A] px-6 py-4 text-left font-semibold text-white shadow-lg shadow-black/10"
-          >
-            <span className="flex items-center gap-3">
-              <Image
-                  src="/naver-simple.png"
-                  alt="Naver"
-                  width={24}
-                  height={24}
-                  className="h-6 w-6"
-              />
-              네이버 로그인
-            </span>
-          </button>
-
           <button
             onClick={handleGoogleLogin}
-            className="flex w-full items-center justify-between rounded-full bg-white px-6 py-4 text-left font-semibold text-[#1F1F1F] shadow-lg shadow-black/10"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-white"
           >
-            <span className="flex items-center gap-3">
-              <Image
-                  src="/google-simple.png"
-                  alt="Google"
-                  width={24}
-                  height={24}
-                  className="h-6 w-6"
-              />
-              구글 로그인
-            </span>
+            <Image
+              src="/google-simple.png"
+              alt="Google"
+              width={24}
+              height={24}
+            />
+          </button>
+          <button
+            onClick={handleNaverLogin}
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-[#03C75A]"
+          >
+            <Image
+              src="/naver-simple.png"
+              alt="Naver"
+              width={22}
+              height={22}
+            />
+          </button>
+          <button
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-black"
+          >
+            <Image
+              src="/icon-apple.png"
+              alt="Apple"
+              width={24}
+              height={24}
+            />
           </button>
         </div>
       </div>
