@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { MessageBubble } from "./components/MessageBubble";
@@ -9,7 +9,7 @@ import { LoadingMessage } from "./components/LoadingMessage";
 import { RecommendationCard } from "./components/RecommendationCard";
 import { LoopinSpeakerIndicator } from "./components/LoopinSpeakerIndicator";
 import { usePlannerChat } from "./hooks/usePlannerChat";
-import { fetchChatRooms } from "@/lib/chat";
+import { fetchChatRooms, type ChatRoomStatus } from "@/lib/chat";
 import { AddLoopSheet } from "@/components/common/add-loop/AddLoopSheet";
 import { LoopGroupEditSheet } from "@/components/loop/LoopGroupEditSheet";
 import {
@@ -29,9 +29,8 @@ export default function PlannerChatPage() {
   const router = useRouter();
   const chatRoomId = params?.id ? Number(params.id) : null;
   const [chatRoomTitle, setChatRoomTitle] = useState<string>("채팅방 이름");
-  const [chatRoomLoopSelect, setChatRoomLoopSelect] = useState<boolean>(false);
-  const [chatRoomCallUpdateLoop, setChatRoomCallUpdateLoop] =
-    useState<boolean>(false);
+  const [chatRoomStatus, setChatRoomStatus] =
+    useState<ChatRoomStatus>("DEFAULT");
   const [isAddLoopSheetOpen, setIsAddLoopSheetOpen] = useState(false);
   const [isLoopGroupEditSheetOpen, setIsLoopGroupEditSheetOpen] =
     useState(false);
@@ -52,8 +51,12 @@ export default function PlannerChatPage() {
     handleRetry,
     handleUpdateLoop,
     showUpdateMessage,
-    callUpdateLoop: sseCallUpdateLoop,
-  } = usePlannerChat(chatRoomId, chatRoomLoopSelect);
+  } = usePlannerChat(chatRoomId, chatRoomStatus);
+
+  const isUpdateChatRoom =
+    chatRoomStatus === "BEFORE_CLICK_UPDATE_LOOP" ||
+    chatRoomStatus === "AFTER_CLICK_UPDATE_LOOP";
+  const canOpenUpdateSheet = chatRoomStatus === "AFTER_CLICK_UPDATE_LOOP";
 
   type PlannerFormValues = { prompt: string };
 
@@ -88,8 +91,7 @@ export default function PlannerChatPage() {
             } else {
               setChatRoomTitle("채팅방 이름");
             }
-            setChatRoomLoopSelect(chatRoom.loopSelect);
-            setChatRoomCallUpdateLoop(chatRoom.callUpdateLoop ?? false);
+            setChatRoomStatus(chatRoom.chatRoomStatus ?? "DEFAULT");
           }
         }
       } catch (error) {
@@ -182,20 +184,17 @@ export default function PlannerChatPage() {
                   recommendation={recommendation}
                   index={index + 1}
                   onSelect={handleSelectRecommendation}
-                  chatRoomLoopSelect={chatRoomLoopSelect}
+                  chatRoomLoopSelect={isUpdateChatRoom}
                 />
               ))}
 
               {
                 <div
-                  className={`mt-4 flex gap-2 rounded-sm ${chatRoomLoopSelect && (chatRoomCallUpdateLoop || sseCallUpdateLoop) ? "bg-[#FFE4E0]" : "bg-[#DDE0E3]"} px-4 py-3 w-fit justify-self-center`}
+                  className={`mt-4 flex gap-2 rounded-sm ${canOpenUpdateSheet ? "bg-[#FFE4E0]" : "bg-[#DDE0E3]"} px-4 py-3 w-fit justify-self-center`}
                 >
-                  {!(
-                    chatRoomLoopSelect &&
-                    (chatRoomCallUpdateLoop || sseCallUpdateLoop)
-                  ) && (
+                  {!canOpenUpdateSheet && (
                     <Image
-                      src={chatRoomLoopSelect ? RetryIcon : GroupIcon}
+                      src={isUpdateChatRoom ? RetryIcon : GroupIcon}
                       alt=""
                       width={12}
                       height={12}
@@ -203,24 +202,23 @@ export default function PlannerChatPage() {
                   )}
                   <button
                     type="button"
-                    onClick={() => {
-                      if (
-                        chatRoomLoopSelect &&
-                        (chatRoomCallUpdateLoop || sseCallUpdateLoop)
-                      ) {
+                    onClick={async () => {
+                      if (canOpenUpdateSheet) {
                         setIsLoopGroupEditSheetOpen(true);
-                      } else if (chatRoomLoopSelect) {
-                        handleUpdateLoop();
+                      } else if (isUpdateChatRoom) {
+                        const didRequestUpdate = await handleUpdateLoop();
+                        if (didRequestUpdate) {
+                          setChatRoomStatus("AFTER_CLICK_UPDATE_LOOP");
+                        }
                       } else {
                         handleRetry();
                       }
                     }}
-                    className={`text-sm font-semibold ${chatRoomLoopSelect && (chatRoomCallUpdateLoop || sseCallUpdateLoop) ? "text-[#FF543F] font-semibold" : "text-[#737980] font-semibold"}`}
+                    className={`text-sm font-semibold ${canOpenUpdateSheet ? "text-[#FF543F] font-semibold" : "text-[#737980] font-semibold"}`}
                   >
-                    {chatRoomLoopSelect &&
-                    (chatRoomCallUpdateLoop || sseCallUpdateLoop)
+                    {canOpenUpdateSheet
                       ? "루프 수정 완료하기"
-                      : chatRoomLoopSelect
+                      : isUpdateChatRoom
                         ? "루프 수정하기"
                         : "다시 생성하기"}
                   </button>
@@ -249,7 +247,7 @@ export default function PlannerChatPage() {
                 <textarea
                   {...register("prompt")}
                   placeholder={
-                    chatRoomLoopSelect
+                    isUpdateChatRoom
                       ? "수정하고 싶은 루프 내용을 입력해주세요."
                       : "만들고 싶은 루프를 입력해주세요."
                   }
