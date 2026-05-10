@@ -26,6 +26,32 @@
 
 필요한 토큰이 정의돼 있지 않으면 `globals.css`에 먼저 추가한 뒤 사용합니다.
 
+### 토큰 체계
+
+이 저장소에는 두 종류의 토큰이 공존합니다.
+
+- **Loopin 토큰**: `gray-*`, `primary-*`, `sub-*`, `brand-*`. 자체 컴포넌트 및 페이지에서 사용하는 기본 토큰.
+- **shadcn 토큰**: `background`, `foreground`, `border`, `ring`, `card`, `popover`, `muted`, `accent`, `destructive`, `secondary`. shadcn 기반 컴포넌트(`components/ui/sheet`, `components/ui/context-menu` 등)와 base layer 글로벌 스타일 전용. 자체 컴포넌트에서는 사용하지 않음.
+
+### Primary 컬러 역할
+
+`primary-main`(#FF543F, 진함)과 `primary-500`(#FF7765, 밝음)은 Figma에서도 별개 토큰입니다. 합치지 말고 아래 4가지 컨텍스트 규칙에 따라 골라 씁니다.
+
+| 컨텍스트 | 텍스트 토큰 |
+|---|---|
+| `bg-primary-200` 배경 위 (라이트 톤 배지/버튼 selected) | `text-primary-main` (예외 없음) |
+| 흰 배경 카드/말풍선 안 본문 강조 | `text-primary-main` |
+| 자유 배치 단독 라벨/안내문 (스피커 이름, 로딩 메시지, 캘린더 일자) | `text-primary-500` |
+| 서브/캡션 텍스트 | `text-primary-400` |
+
+fill 배경:
+
+| 컨텍스트 | 배경 토큰 |
+|---|---|
+| Primary 액션 fill (Button, 활성 배지, 진행바) | `bg-primary-500` |
+| `primary-500` fill의 hover | `bg-primary-700` |
+| 라이트 톤 배지/태그 배경 | `bg-primary-200` |
+
 ### 기존 코드의 inline disable
 
 마이그레이션 전이라 기존 파일에는 다음과 같은 inline disable 주석이 부착돼 있습니다.

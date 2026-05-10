@@ -27,7 +27,7 @@ export function ImportanceSelector({ value, onChange }: ImportanceSelectorProps)
               className={`flex-1 rounded-[5px] px-[39px] py-[6px] text-body-2-sb transition-colors whitespace-nowrap ${
                 isSelected
                    
-                  ? "bg-primary-200 text-primary-500"
+                  ? "bg-primary-200 text-primary-main"
                    
                   : "bg-gray-200 text-gray-400"
               }`}

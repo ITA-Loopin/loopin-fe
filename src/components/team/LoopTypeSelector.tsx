@@ -29,7 +29,7 @@ export function LoopTypeSelector({ value, onChange }: LoopTypeSelectorProps) {
             className={`text-body-1-b whitespace-nowrap ${
               value === "COMMON"
                  
-                ? "text-primary-500"
+                ? "text-primary-main"
                  
                 : "text-gray-400"
             }`}
@@ -64,7 +64,7 @@ export function LoopTypeSelector({ value, onChange }: LoopTypeSelectorProps) {
             className={`text-body-1-b whitespace-nowrap ${
               value === "INDIVIDUAL"
                  
-                ? "text-primary-500"
+                ? "text-primary-main"
                  
                 : "text-gray-400"
             }`}
