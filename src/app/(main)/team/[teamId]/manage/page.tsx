@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { toast } from "react-toastify";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import { TeamMemberSearch } from "@/components/team/TeamMemberSearch";
 import { IconButton } from "@/components/common/IconButton";
 import ConfirmModal from "@/components/common/ConfirmModal";

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import { useChecklist } from "@/hooks/useChecklist";
 import { useLoopActions } from "@/hooks/useLoopActions";
 import { TeamLoopDetailContent } from "@/components/team/TeamLoopDetailContent";

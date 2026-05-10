@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { fetchChatRooms, type ChatRoom } from "@/lib/chat";
 import LoopIcon from "@/../public/ai-planner/loop-icon.svg";
 import { PrimaryButton } from "@/components/common/PrimaryButton";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 
 type ChatLoop = {
   id: number;

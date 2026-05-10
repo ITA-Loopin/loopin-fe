@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import { TeamListSection } from "@/components/team/TeamListSection";
 import { TeamCard } from "@/components/team/TeamCard";
 import { TeamLoopFAB } from "@/components/team/TeamLoopFAB";

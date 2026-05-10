@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import { fetchMemberProfile, type MemberProfile } from "@/lib/member";
 
 export default function MyPage() {

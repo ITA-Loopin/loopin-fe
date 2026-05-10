@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import { TeamCard } from "@/components/team/TeamCard";
 import type { TeamItem } from "@/components/team/types";
 import { fetchRecruitingTeams } from "@/lib/team";

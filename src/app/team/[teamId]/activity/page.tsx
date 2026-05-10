@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import { fetchTeamDetail, fetchTeamLoops, fetchTeamLoopAllDetail, fetchTeamMemberActivities, type TeamLoopApiItem } from "@/lib/team";
 import { formatImportance, formatLoopType, getProgressStatus, getStatusColor } from "@/lib/teamUtils";
 import { fetchMemberProfile } from "@/lib/member";

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import ActionButton from "@/components/common/ActionButton";
 import { fetchMemberProfile, type MemberProfile } from "@/lib/member";

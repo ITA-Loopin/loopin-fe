@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import { TeamTypeSelector } from "@/components/team/TeamTypeSelector";
 import { TeamNameInput } from "@/components/team/TeamNameInput";
 import { TeamGoalInput } from "@/components/team/TeamGoalInput";

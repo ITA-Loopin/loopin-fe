@@ -19,7 +19,7 @@ import {
 import type { RecommendationSchedule } from "./types";
 import GroupIcon from "@/../public/Group.svg";
 import RetryIcon from "@/../public/retry.svg";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 
 const MESSAGE_EXTRA_SPACE = 32;
 const INPUT_CONTAINER_HEIGHT = 192;

@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { useTeamChat } from "@/hooks/useTeamChat";
 import { TeamMessageBubble } from "./components/TeamMessageBubble";
 import { fetchTeamDetail } from "@/lib/team";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import { ChatInput } from "@/components/common/ChatInput";
 
 const INPUT_CONTAINER_HEIGHT = 80;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import { LoopReport } from "@/components/analytics/LoopReport";
 import type { LoopReportData, ReportStatus } from "@/types/report";
 import { fetchLoopReport } from "@/lib/report";

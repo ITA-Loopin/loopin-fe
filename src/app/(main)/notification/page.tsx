@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import {
   fetchNotifications,
   markNotificationsAsRead,

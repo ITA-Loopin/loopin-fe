@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import dayjs, { type Dayjs } from "dayjs";
 import Image from "next/image";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import { LoopProgress } from "@/components/home/LoopProgress";
 import { TeamLoopList } from "@/components/team/TeamLoopList";
 import { MonthCalendar } from "@/components/calendar/MonthCalendar";
