@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { IconButton } from "../IconButton";
 import HeaderLogo from "./HeaderLogo";
+import HeaderBackButton from "./HeaderBackButton";
 
 type HeaderLeftType = "logo" | "back" | "none";
 type HeaderRightType = "user" | "menu" | "edit" | "none";
@@ -44,13 +45,7 @@ export default function Header({
       case "logo":
         return <HeaderLogo />;
       case "back":
-        return (
-          <IconButton
-            src="/header/header_back.svg"
-            alt="뒤로가기"
-            onClick={onBack ?? router.back}
-          />
-        );
+        return <HeaderBackButton onClick={onBack} />;
       case "none":
       default:
         return null;
