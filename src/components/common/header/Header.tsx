@@ -15,12 +15,13 @@ type HeaderRightType = "user" | "menu" | "edit" | "none";
 type HeaderProps = {
   leftType?: HeaderLeftType;
   rightType?: HeaderRightType;
-  leftSlot?: ReactNode;
-  rightSlot?: ReactNode;
+  left?: ReactNode;
+  center?: ReactNode;
+  right?: ReactNode;
   centerTitle?: string;
-  centerSlot?: ReactNode;
   onBack?: () => void;
   onNotificationClick?: () => void;
+  onProfileClick?: () => void;
   onMenuClick?: () => void;
   onEditClick?: () => void;
   className?: string;
@@ -29,19 +30,18 @@ type HeaderProps = {
 export default function Header({
   leftType = "logo",
   rightType = "user",
-  leftSlot,
-  rightSlot,
   centerTitle,
-  centerSlot,
+  left,
+  right,
+  center,
   onBack,
   onNotificationClick,
+  onProfileClick,
   onMenuClick,
   onEditClick,
 }: HeaderProps) {
 
   const renderLeft = () => {
-    if (leftSlot) return leftSlot;
-
     switch (leftType) {
       case "logo":
         return <HeaderLogo />;
@@ -54,23 +54,21 @@ export default function Header({
   };
 
   const renderRight = () => {
-    if (rightSlot) return rightSlot;
-
     switch (rightType) {
       case "user":
         return (
           <>
-            <HeaderProfileButton />
+            <HeaderProfileButton onClick={onProfileClick}/>
             <HeaderNotificationButton onClick={onNotificationClick}/>
           </>
         );
       case "menu":
         return (
-          <HeaderMenuButton />
+          <HeaderMenuButton onClick={onMenuClick}/>
         );
       case "edit":
         return (
-          <HeaderEditButton />
+          <HeaderEditButton onClick={onEditClick}/>
         );
       case "none":
       default:
@@ -79,7 +77,6 @@ export default function Header({
   };
 
   const renderCenter = () => {
-    if (centerSlot) return centerSlot;
     if (centerTitle)
       return (
         <h1 className="text-center text-body-1-sb text-[var(--gray-800)] whitespace-nowrap">
