@@ -1,13 +1,13 @@
 "use client";
 
 import { ReactNode } from "react";
-import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { IconButton } from "../IconButton";
 import HeaderLogo from "./HeaderLogo";
 import HeaderBackButton from "./HeaderBackButton";
 import HeaderProfileButton from "./HeaderProfileButton";
 import HeaderNotificationButton from "./HeaderNotificationButton";
+import HeaderMenuButton from "./HeaderMenuButton";
+import HeaderEditButton from "./HeaderEditButton";
 
 type HeaderLeftType = "logo" | "back" | "none";
 type HeaderRightType = "user" | "menu" | "edit" | "none";
@@ -66,19 +66,11 @@ export default function Header({
         );
       case "menu":
         return (
-          <IconButton
-            src="/header/header_menu.svg"
-            alt="메뉴"
-            onClick={onMenuClick}
-          />
+          <HeaderMenuButton />
         );
       case "edit":
         return (
-          <IconButton
-            src="/header/header_edit.svg"
-            alt="수정"
-            onClick={onEditClick}
-          />
+          <HeaderEditButton />
         );
       case "none":
       default:
