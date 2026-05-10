@@ -29,7 +29,8 @@ export function TeamCard({ team, variant, onClick, isEditMode = false }: TeamCar
 
     return (
       <div 
-        className={`relative flex w-full flex-col items-start gap-[10px] rounded-[10px] bg-[var(--gray-white)] p-4 ${
+         
+        className={`relative flex w-full flex-col items-start gap-[10px] rounded-[10px] bg-gray-white p-4 ${
           !isEditMode ? "cursor-pointer" : ""
         }`}
         onClick={handleClick}
@@ -39,15 +40,18 @@ export function TeamCard({ team, variant, onClick, isEditMode = false }: TeamCar
           {/* 왼쪽 레이아웃 */}
           <div className="flex w-full flex-col items-start justify-between">
             <div>
-              <span className="text-caption-10-m rounded-[30px] bg-[var(--primary-400)] px-[7px] py-[5px] gap-[10px] text-[var(--gray-white)]">
+              { }
+              <span className="text-caption-10-m rounded-[30px] bg-primary-400 px-[7px] py-[5px] gap-[10px] text-gray-white">
                 {getTeamCategoryLabel(team.category)}
               </span>
             </div>
             <div className="flex flex-col items-start self-stretch gap-1 pt-2">
-              <h3 className="text-body-1-b text-[var(--gray-black)]">
+              { }
+              <h3 className="text-body-1-b text-gray-black">
                 {team.title}
               </h3>
-              <p className="text-body-2-m text-[var(--gray-600)]">{team.description}</p>
+              { }
+              <p className="text-body-2-m text-gray-600">{team.description}</p>
             </div>
           </div>
 
@@ -60,7 +64,7 @@ export function TeamCard({ team, variant, onClick, isEditMode = false }: TeamCar
                 cy="45"
                 r={radius}
                 fill="none"
-                stroke="var(--gray-200)"
+                className="stroke-gray-200"
                 strokeWidth="6.5"
               />
               {/* 진행률 원 */}
@@ -69,14 +73,15 @@ export function TeamCard({ team, variant, onClick, isEditMode = false }: TeamCar
                 cy="45"
                 r={radius}
                 fill="none"
-                stroke="var(--primary-500)"
+                className="stroke-primary-500"
                 strokeWidth="7" 
                 strokeDasharray={circumference}
                 strokeDashoffset={offset}
                 strokeLinecap="round"
               />
             </svg>
-            <span className="absolute inset-0 flex items-center justify-center text-body-1-b text-[var(--gray-black)]">
+            { }
+            <span className="absolute inset-0 flex items-center justify-center text-body-1-b text-gray-black">
               {progress}%
             </span>
           </div>
@@ -87,19 +92,22 @@ export function TeamCard({ team, variant, onClick, isEditMode = false }: TeamCar
 
   // 세로 리스트용 카드 (원형 프로그레스 없음)
   return (
-    <div className="flex w-full flex-col items-start gap-[10px] self-stretch rounded-[10px] bg-[var(--gray-white)] px-4 py-2.5">
+    <div className="flex w-full flex-col items-start gap-[10px] self-stretch rounded-[10px] bg-gray-white px-4 py-2.5">
       {/* 안 레이아웃 */}
       <div className="flex flex-col items-start gap-[10px]">
         <div className="flex items-center gap-[10px]">
-          <span className="text-caption-10-m rounded-[30px] bg-[var(--primary-400)] px-[7px] py-[5px] text-[var(--gray-white)]">
+          { }
+          <span className="text-caption-10-m rounded-[30px] bg-primary-400 px-[7px] py-[5px] text-gray-white">
             {getTeamCategoryLabel(team.category)}
           </span>
         </div>
         <div className="flex items-center gap-4">
-          <h3 className="text-body-1-b text-[var(--gray-black)]">
+          { }
+          <h3 className="text-body-1-b text-gray-black">
             {team.title}
           </h3>
-          <p className="text-body-2-m text-[var(--gray-600)]">
+          { }
+          <p className="text-body-2-m text-gray-600">
             {team.description}
           </p>
         </div>

@@ -118,6 +118,7 @@ export default function HomePage() {
           className="fixed inset-0 -z-10"
           style={{
             background:
+              // eslint-disable-next-line no-restricted-syntax
               "linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 228, 224, 0.3) 100%)",
           }}
         />
@@ -131,6 +132,7 @@ export default function HomePage() {
             transform: "rotate(30.835deg)",
             borderRadius: "360.827px",
             opacity: 0.5,
+            // eslint-disable-next-line no-restricted-syntax
             background: "var(--primary-300, #FFC2BA)",
             filter: "blur(67px)",
           }}
@@ -144,6 +146,7 @@ export default function HomePage() {
             transform: "rotate(7.014deg)",
             borderRadius: "379.346px",
             opacity: 0.2,
+            // eslint-disable-next-line no-restricted-syntax
             background: "#E7FFBA",
             filter: "blur(67px)",
           }}
@@ -157,6 +160,7 @@ export default function HomePage() {
             transform: "rotate(-42.799deg)",
             borderRadius: "379.346px",
             opacity: 0.2,
+            // eslint-disable-next-line no-restricted-syntax
             background: "#E7FFBA",
             filter: "blur(67px)",
           }}
@@ -170,6 +174,7 @@ export default function HomePage() {
             transform: "rotate(89.667deg)",
             borderRadius: "317.653px",
             opacity: 0.15,
+            // eslint-disable-next-line no-restricted-syntax
             background: "var(--primary-300, #FFC2BA)",
             filter: "blur(67px)",
           }}
@@ -196,13 +201,15 @@ export default function HomePage() {
                 <TooltipContent
                   side="top"
                   sideOffset={20}
-                  className="bg-[#FF7765] border-none shadow-none p-0 m-0 text-white relative [&_svg]:hidden [&_[data-slot='tooltip-arrow']]:hidden [&>svg]:hidden"
+                   
+                  className="bg-primary-500 border-none shadow-none p-0 m-0 text-white relative [&_svg]:hidden [&_[data-slot='tooltip-arrow']]:hidden [&>svg]:hidden"
                   style={{
                     display: "flex",
                     padding: "7px 12px",
                     justifyContent: "center",
                     alignItems: "center",
                     gap: "10px",
+                    // eslint-disable-next-line no-restricted-syntax
                     boxShadow: "0 0 7px 0 rgba(0, 0, 0, 0.05)",
                     borderRadius: "8px",
                   }}
@@ -213,6 +220,7 @@ export default function HomePage() {
                   <div
                     className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 z-10"
                     style={{
+                      // eslint-disable-next-line no-restricted-syntax
                       backgroundColor: "#FF7765",
                     }}
                   />
@@ -237,9 +245,11 @@ export default function HomePage() {
   
                 {/* 말풍선 형태의 메시지 */}
                 <div className="relative flex items-center justify-center">
-                  <div className="relative rounded-lg bg-white/90 px-4 py-3 text-sm font-semibold text-[#FF7765] shadow-[0px_2px_8px_rgba(0,0,0,0.1)]">
+                  {/* eslint-disable-next-line no-restricted-syntax */}
+                  <div className="relative rounded-lg bg-white/90 px-4 py-3 text-sm font-semibold text-primary-500 shadow-[0px_2px_8px_rgba(0,0,0,0.1)]">
                     <span>오늘 하루의 루프를 모두 채워보세요!</span>
                     {/* 위쪽 삼각형 포인터 */}
+                    {/* eslint-disable-next-line no-restricted-syntax */}
                     <div className="absolute -top-2 left-1/2 h-0 w-0 -translate-x-1/2 transform border-l-[8px] border-r-[8px] border-b-[8px] border-l-transparent border-r-transparent border-b-[rgba(255,255,255,0.9)] drop-shadow-[0px_2px_4px_rgba(0,0,0,0.1)]"></div>
                   </div>
                 </div>
@@ -247,8 +257,10 @@ export default function HomePage() {
                 <LoopList loops={loopList} />
 
                 {/* 팀 루프 보러가기 버튼 */}
-                <div className="flex w-full justify-center itema-center px-2 py-[6px] gap-2 roundeed-[5px] bg-[var(--primary-200)]">
-                  <button className="text-body-2-sb text-[var(--primary-main)] whitespace-nowrap" onClick={() => router.push("/teamloop")}>
+                { }
+                <div className="flex w-full justify-center itema-center px-2 py-[6px] gap-2 roundeed-[5px] bg-primary-100">
+                  { }
+                  <button className="text-body-2-sb text-primary-main whitespace-nowrap" onClick={() => router.push("/teamloop")}>
                     팀 루프 보러가기
                   </button>
                 </div>

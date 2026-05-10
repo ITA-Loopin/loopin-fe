@@ -352,7 +352,7 @@ export function createChatSocket({
   onOpen,
 }: CreateSSEOptions): EventSource {
   const baseUrl = resolveSseBaseUrl();
-  let url = `${baseUrl}/rest-api/v1/sse/subscribe/${chatRoomId}`;
+  const url = `${baseUrl}/rest-api/v1/sse/subscribe/${chatRoomId}`;
 
   // EventSource는 커스텀 헤더를 설정할 수 없으므로,
   // Last-Event-ID가 필요한 경우 fetch를 사용해야 하지만,

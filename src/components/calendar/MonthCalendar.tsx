@@ -99,7 +99,8 @@ export function MonthCalendar({
       <div className={cn(
         "flex flex-col items-center w-full rounded-[10px]",
         isDropdown 
-          ? "bg-[var(--gray-100)] gap-4 p-4" 
+           
+          ? "bg-gray-100 gap-4 p-4" 
           : "bg-transparent gap-[24px] pt-6"
       )}>
         {/* 달력 헤더 */}
@@ -107,26 +108,29 @@ export function MonthCalendar({
           <button
             type="button"
             onClick={() => onChangeMonth(-1)}
-            className="flex w-[25px] h-[25px] py-[9px] px-[10px] items-center gap-[10px] shrink-0 rounded-[12.5px] bg-[var(--gray-white)]"
+             
+            className="flex w-[25px] h-[25px] py-[9px] px-[10px] items-center gap-[10px] shrink-0 rounded-[12.5px] bg-gray-white"
             aria-label="이전 달"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="6" height="8" viewBox="0 0 6 8" fill="none" >
-              <path d="M4.75928 0.5L0.759277 4L4.75928 7.5" stroke="#3A3D40" strokeLinecap="round"/>
+              <path d="M4.75928 0.5L0.759277 4L4.75928 7.5" className="stroke-gray-800" strokeLinecap="round"/>
             </svg>
           </button>
           <div className="text-center">
-            <p className="text-body-1-b text-[var(--gray-800)]">
+            { }
+            <p className="text-body-1-b text-gray-800">
               {monthLabel}
             </p>
           </div>
           <button
             type="button"
             onClick={() => onChangeMonth(1)}
-            className="flex w-[25px] h-[25px] py-[9px] px-[10px] items-center gap-[10px] shrink-0 rounded-[12.5px] bg-[var(--gray-white)]"
+             
+            className="flex w-[25px] h-[25px] py-[9px] px-[10px] items-center gap-[10px] shrink-0 rounded-[12.5px] bg-gray-white"
             aria-label="다음 달"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="6" height="8" viewBox="0 0 6 8" fill="none" className="-scale-x-100">
-              <path d="M4.75928 0.5L0.759277 4L4.75928 7.5" stroke="#3A3D40" strokeLinecap="round"/>
+              <path d="M4.75928 0.5L0.759277 4L4.75928 7.5" className="stroke-gray-800" strokeLinecap="round"/>
             </svg>
           </button>
         </header>
@@ -134,7 +138,8 @@ export function MonthCalendar({
         {/* 겉 레이아웃 */}
         <div className={cn(
           "flex flex-col flex-shrink items-start w-full gap-[10px] rounded-[10px]",
-          !isDropdown ? "bg-[var(--gray-white)] p-4" : ""
+           
+          !isDropdown ? "bg-gray-white p-4" : ""
         )}>
         {/* 안 레이아웃 - 요일과 날짜를 함께 감싸는 grid */}
         <div 
@@ -150,8 +155,10 @@ export function MonthCalendar({
               key={index}
               className={`text-center text-body-2-sb font-semibold ${
                 index === 0 
-                  ? "text-[var(--primary-main)]" 
-                  : "text-[var(--gray-800)]"
+                   
+                  ? "text-primary-main" 
+                   
+                  : "text-gray-800"
               }`}
             >
               {day}

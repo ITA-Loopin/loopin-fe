@@ -3,8 +3,8 @@ import type { LoopDetail, LoopChecklist } from "@/types/loop";
 import type { TeamLoopApiItem } from "@/lib/team";
 import { LoopProgress } from "@/components/home/LoopProgress";
 import { Checklist } from "@/components/loop/Checklist";
-import { IconButton } from "@/components/common/IconButton";
-import { PrimaryButton } from "@/components/common/PrimaryButton";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
 import { DropdownEditDelete } from "@/components/loop/DropdownEditDelete";
 import { formatImportance, formatLoopType, getStatus } from "@/lib/teamUtils";
 
@@ -100,9 +100,9 @@ export function TeamLoopDetailContent({
       <section className="flex flex-col gap-2 pt-6">
         {/* 중요도, 스케줄, 타입 */}
         {(importanceText || scheduleText || typeText) && (
-          <div className="text-body-2-m text-[var(--gray-500)] flex items-center gap-2">
+          <div className="text-body-2-m text-gray-500 flex items-center gap-2">
             {importanceText && (
-              <span className={importanceText === "높음" ? "text-[var(--primary-main)]" : ""}>
+              <span className={importanceText === "높음" ? "text-primary-main" : ""}>
                 중요도 {importanceText}
               </span>
             )}
@@ -116,19 +116,22 @@ export function TeamLoopDetailContent({
         {/* 루프 제목, 완료 여부, 케밥 버튼 */}
         <div className="flex items-center justify-between self-stretch">
           <div className="flex items-center gap-2 flex-wrap flex-1">
-            <h1 className="text-title-2-b text-[var(--gray-black)]">{detail.title}</h1>
+            { }
+            <h1 className="text-title-2-b text-gray-black">{detail.title}</h1>
             <span className={`text-caption-m px-2 py-0.5 rounded-full ${status.color}`}>
               {status.text}
             </span>
           </div>
           <div className="relative">
-            <IconButton
-              src="/loop/loop_kebab.svg"
-              alt="메뉴"
-              width={20}
-              height={20}
-              onClick={onMenuClick}
-            />
+            <Button variant="icon" onClick={onMenuClick} aria-label="메뉴">
+              <Image
+                src="/loop/loop_kebab.svg"
+                alt="메뉴"
+                width={20}
+                height={20}
+                style={{ width: 20, height: 20 }}
+              />
+            </Button>
             {isMenuOpen && (
               <DropdownEditDelete
                 onClose={onMenuClose}
@@ -158,7 +161,8 @@ export function TeamLoopDetailContent({
       {/* 팀원별 진행 상황 (팀 루프 탭일 때만 표시) */}
       {isTeamView && memberProgresses && memberProgresses.length > 0 && (
         <section className="flex flex-col gap-4 w-full max-w-[420px]">
-          <h2 className="text-body-1-b text-[var(--gray-black)]">진행 상황</h2>
+          { }
+          <h2 className="text-body-1-b text-gray-black">진행 상황</h2>
           <div className="flex flex-col gap-3">
             {memberProgresses.map((member) => {
               // API 응답 상태를 기준으로 프로그레스 계산
@@ -173,27 +177,35 @@ export function TeamLoopDetailContent({
                 member.status === "IN_PROGRESS" ? "진행중" :
                 "시작전";
               const statusColor =
-                member.status === "COMPLETED" ? "bg-[#E1FF9B] text-[var(--gray-600)]" :
-                member.status === "IN_PROGRESS" ? "bg-[var(--primary-500)] text-[var(--gray-white)]" :
-                "bg-[var(--gray-400)] text-[var(--gray-white)]";
+                // eslint-disable-next-line no-restricted-syntax
+                member.status === "COMPLETED" ? "bg-[#E1FF9B] text-gray-600" :
+                 
+                member.status === "IN_PROGRESS" ? "bg-primary-500 text-gray-white" :
+                 
+                "bg-gray-400 text-gray-white";
 
               // 원형 프로그레스 바 설정
               const radius = 18;
               const circumference = 2 * Math.PI * radius;
               const offset = circumference - (progressPercent / 100) * circumference;
               const strokeColor = 
+                // eslint-disable-next-line no-restricted-syntax
                 member.status === "COMPLETED" ? "var(--primary-500)" :
+                // eslint-disable-next-line no-restricted-syntax
                 member.status === "IN_PROGRESS" ? "var(--primary-500)" :
+                // eslint-disable-next-line no-restricted-syntax
                 "var(--gray-200)";
 
               return (
                 <div
                   key={member.memberId}
-                  className="flex items-center justify-between p-4 rounded-[10px] bg-[var(--gray-white)] cursor-pointer"
+                   
+                  className="flex items-center justify-between p-4 rounded-[10px] bg-gray-white cursor-pointer"
                   onClick={() => onMemberClick?.(member.memberId, member.nickname)}
                 >
                   <div className="flex items-center gap-2 flex-1">
-                    <span className="text-body-2-sb text-[var(--gray-800)]">
+                    { }
+                    <span className="text-body-2-sb text-gray-800">
                       {member.nickname}
                     </span>
                     <span className={`text-caption-m px-2 py-0.5 rounded-full ${statusColor}`}>
@@ -208,7 +220,7 @@ export function TeamLoopDetailContent({
                         cy="24"
                         r={radius}
                         fill="none"
-                        stroke="var(--gray-200)"
+                        className="stroke-gray-200"
                         strokeWidth="4.5"
                       />
                       <circle
@@ -234,9 +246,14 @@ export function TeamLoopDetailContent({
       {/* 루프 완료하기 버튼 (내 루프 탭일 때만 표시) */}
       {!isTeamView && (
         <div className="flex justify-center">
-          <PrimaryButton variant="primary" onClick={onCompleteLoop}>
+          <Button
+            variant="primary"
+            size="lg"
+            className="w-full rounded-[30px] text-body-1-sb"
+            onClick={onCompleteLoop}
+          >
             루프 완료하기
-          </PrimaryButton>
+          </Button>
         </div>
       )}
     </>

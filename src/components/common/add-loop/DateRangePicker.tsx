@@ -42,15 +42,19 @@ export function DateRangePicker({
 }: DateRangePickerProps) {
   return (
     <div className="flex flex-col items-start gap-2 self-stretch">
-      <p className="text-caption-r text-[var(--gray-500)]">반복 기간</p>
+      { }
+      <p className="text-caption-r text-gray-500">반복 기간</p>
       <button
         type="button"
         onClick={onToggleStartCalendar}
-        className="flex h-[40px] w-full items-center justify-between px-4 py-[9px] rounded-[10px] bg-[var(--gray-200)]"
+         
+        className="flex h-[40px] w-full items-center justify-between px-4 py-[9px] rounded-[10px] bg-gray-200"
       >
-        <span className={cn("text-body-2-sb font-semibold text-[var(--gray-800)]")}>시작일</span>
+        { }
+        <span className={cn("text-body-2-sb font-semibold text-gray-800")}>시작일</span>
         <div className="flex items-center gap-[10px]">
-          <span className={cn("text-body-2-sb font-semibold text-[var(--gray-800)]")}>
+          { }
+          <span className={cn("text-body-2-sb font-semibold text-gray-800")}>
             {formattedStartDate}
           </span>
           <Image
@@ -86,18 +90,21 @@ export function DateRangePicker({
         }}
         disabled={disableEndDate}
         className={cn(
-          "flex h-[40px] w-full items-center justify-between px-4 py-[9px] rounded-[10px] bg-[var(--gray-200)]",
+           
+          "flex h-[40px] w-full items-center justify-between px-4 py-[9px] rounded-[10px] bg-gray-200",
           disableEndDate && "cursor-not-allowed"
         )}
       >
         <span className={cn(
           "text-body-2-sb font-semibold",
-          disableEndDate ? "text-[var(--gray-400)]" : "text-[var(--gray-800)]"
+           
+          disableEndDate ? "text-gray-400" : "text-gray-800"
         )}>종료일</span>
         <div className="flex items-center gap-[10px]">
           <span className={cn(
             "text-body-2-sb font-semibold",
-            disableEndDate ? "text-[var(--gray-400)]" : "text-[var(--gray-800)]"
+             
+            disableEndDate ? "text-gray-400" : "text-gray-800"
           )}>
             {formattedEndDate}
           </span>
