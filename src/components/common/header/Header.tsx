@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils";
 import { IconButton } from "../IconButton";
 import HeaderLogo from "./HeaderLogo";
 import HeaderBackButton from "./HeaderBackButton";
+import HeaderProfileButton from "./HeaderProfileButton";
+import HeaderNotificationButton from "./HeaderNotificationButton";
 
 type HeaderLeftType = "logo" | "back" | "none";
 type HeaderRightType = "user" | "menu" | "edit" | "none";
@@ -36,7 +38,6 @@ export default function Header({
   onMenuClick,
   onEditClick,
 }: HeaderProps) {
-  const router = useRouter();
 
   const renderLeft = () => {
     if (leftSlot) return leftSlot;
@@ -52,37 +53,16 @@ export default function Header({
     }
   };
 
-  const handleProfileButtonClick = () => {
-    router.push("/my-page");
-  };
-
-  const handleNotificationClick = () => {
-    if (onNotificationClick) {
-      onNotificationClick();
-    } else {
-      router.push("/notification");
-    }
-  };
-
   const renderRight = () => {
     if (rightSlot) return rightSlot;
 
     switch (rightType) {
       case "user":
         return (
-          <div className="flex items-center gap-4">
-            <IconButton
-              src="/header/header_profile.svg"
-              alt="프로필"
-              onClick={handleProfileButtonClick}
-            />
-
-            <IconButton
-              src="/header/header_bell.svg"
-              alt="알림"
-              onClick={handleNotificationClick}
-            />
-          </div>
+          <>
+            <HeaderProfileButton />
+            <HeaderNotificationButton onClick={onNotificationClick}/>
+          </>
         );
       case "menu":
         return (
