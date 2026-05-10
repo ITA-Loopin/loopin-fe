@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, FormEvent } from "react";
 import { BottomSheet } from "@/components/common/BottomSheet";
-import { PrimaryButton } from "@/components/common/PrimaryButton";
+import { Button } from "@/components/ui/button";
 import { TitleInput } from "@/components/common/add-loop/TitleInput";
 import { ScheduleSelector } from "@/components/common/add-loop/ScheduleSelector";
 import { DateRangePicker } from "@/components/common/add-loop/DateRangePicker";
@@ -153,7 +153,8 @@ export function AddTeamLoopSheet({
       <div className="inline-flex items-center gap-2.5 px-4 py-5">
         <div className="flex w-full flex-col items-center gap-6">
           {/* 바텀시트 제목 */}
-          <h2 className="text-center text-body-1-sb text-[var(--gray-600)]">
+          { }
+          <h2 className="text-center text-body-1-sb text-gray-600">
             루프 추가하기
           </h2>
 
@@ -173,10 +174,12 @@ export function AddTeamLoopSheet({
             {/* 개인 루프 선택 시 팀원 목록 표시 */}
             {loopType === "INDIVIDUAL" && (
               <div className="flex flex-col items-start gap-2 self-stretch">
-                <p className="text-caption-r text-[var(--gray-500)]">팀원 선택</p>
+                { }
+                <p className="text-caption-r text-gray-500">팀원 선택</p>
                 {isLoadingMembers ? (
                   <div className="flex items-center justify-center py-4 w-full">
-                    <p className="text-body-2-m text-[var(--gray-500)]">로딩 중...</p>
+                    { }
+                    <p className="text-body-2-m text-gray-500">로딩 중...</p>
                   </div>
                 ) : (
                   <div className="flex w-full flex-col gap-2">
@@ -185,10 +188,12 @@ export function AddTeamLoopSheet({
                       return (
                         <div
                           key={member.memberId}
-                          className="flex items-center gap-3 self-stretch h-[44px] px-4 py-[9px] rounded-[10px] bg-[var(--gray-100)]"
+                           
+                          className="flex items-center gap-3 self-stretch h-[44px] px-4 py-[9px] rounded-[10px] bg-gray-100"
                         >
                           {/* 프로필 이미지 */}
-                          <div className="w-8 h-8 rounded-full bg-[var(--gray-200)] flex items-center justify-center overflow-hidden">
+                          { }
+                          <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
                             {member.profileImage ? (
                               <img
                                 src={member.profileImage}
@@ -196,13 +201,14 @@ export function AddTeamLoopSheet({
                                 className="w-full h-full object-cover"
                               />
                             ) : (
-                              <span className="text-body-2-sb text-[var(--gray-400)]">
+                              <span className="text-body-2-sb text-gray-400">
                                 {member.nickname.charAt(0)}
                               </span>
                             )}
                           </div>
                           {/* 닉네임 */}
-                          <span className="flex-1 text-body-2-m text-[var(--gray-800)]">
+                          { }
+                          <span className="flex-1 text-body-2-m text-gray-800">
                             {member.nickname}
                           </span>
                           {/* 체크박스 */}
@@ -211,13 +217,16 @@ export function AddTeamLoopSheet({
                             onClick={() => handleMemberToggle(member.memberId)}
                             className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
                               isSelected
-                                ? "bg-[var(--primary-500)] border-[var(--primary-500)]"
-                                : "bg-[var(--gray-white)] border-[var(--gray-300)]"
+                                 
+                                ? "bg-primary-500 border-primary-500"
+                                 
+                                : "bg-gray-white border-gray-300"
                             }`}
                           >
                             {isSelected && (
                               <svg
-                                className="w-3 h-3 text-[var(--gray-white)]"
+                                 
+                                className="w-3 h-3 text-gray-white"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -291,13 +300,15 @@ export function AddTeamLoopSheet({
               disableEndDate={schedule.scheduleType === "NONE"}
             />
 
-            <PrimaryButton
+            <Button
+              variant="primary"
+              size="lg"
               type="submit"
+              className="w-full rounded-[30px] text-body-1-sb"
               disabled={isSubmitting}
-              className="primary"
             >
               루프 추가하기
-            </PrimaryButton>
+            </Button>
           </form>
         </div>
       </div>

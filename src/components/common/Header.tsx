@@ -4,7 +4,7 @@ import Image from "next/image";
 import { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { IconButton } from "./IconButton";
+import { Button } from "@/components/ui/button";
 
 type HeaderLeftType = "logo" | "back" | "none";
 type HeaderRightType = "user" | "menu" | "edit" | "none";
@@ -46,11 +46,19 @@ export default function Header({
         return <LogoIcon />;
       case "back":
         return (
-          <IconButton
-            src="/header/header_back.svg"
-            alt="뒤로가기"
+          <Button
+            variant="icon"
             onClick={onBack ?? router.back}
-          />
+            aria-label="뒤로가기"
+          >
+            <Image
+              src="/header/header_back.svg"
+              alt="뒤로가기"
+              width={24}
+              height={24}
+              className="h-6 w-6"
+            />
+          </Button>
         );
       case "none":
       default:
@@ -77,34 +85,58 @@ export default function Header({
       case "user":
         return (
           <div className="flex items-center gap-4">
-            <IconButton
-              src="/header/header_profile.svg"
-              alt="프로필"
+            <Button
+              variant="icon"
               onClick={handleProfileButtonClick}
-            />
+              aria-label="프로필"
+            >
+              <Image
+                src="/header/header_profile.svg"
+                alt="프로필"
+                width={24}
+                height={24}
+                className="h-6 w-6"
+              />
+            </Button>
 
-            <IconButton
-              src="/header/header_bell.svg"
-              alt="알림"
+            <Button
+              variant="icon"
               onClick={handleNotificationClick}
-            />
+              aria-label="알림"
+            >
+              <Image
+                src="/header/header_bell.svg"
+                alt="알림"
+                width={24}
+                height={24}
+                className="h-6 w-6"
+              />
+            </Button>
           </div>
         );
       case "menu":
         return (
-          <IconButton
-            src="/header/header_menu.svg"
-            alt="메뉴"
-            onClick={onMenuClick}
-          />
+          <Button variant="icon" onClick={onMenuClick} aria-label="메뉴">
+            <Image
+              src="/header/header_menu.svg"
+              alt="메뉴"
+              width={24}
+              height={24}
+              className="h-6 w-6"
+            />
+          </Button>
         );
       case "edit":
         return (
-          <IconButton
-            src="/header/header_edit.svg"
-            alt="수정"
-            onClick={onEditClick}
-          />
+          <Button variant="icon" onClick={onEditClick} aria-label="수정">
+            <Image
+              src="/header/header_edit.svg"
+              alt="수정"
+              width={24}
+              height={24}
+              className="h-6 w-6"
+            />
+          </Button>
         );
       case "none":
       default:
@@ -116,7 +148,7 @@ export default function Header({
     if (centerSlot) return centerSlot;
     if (centerTitle)
       return (
-        <h1 className="text-center text-body-1-sb text-[var(--gray-800)] whitespace-nowrap">
+        <h1 className="text-center text-body-1-sb text-gray-800 whitespace-nowrap">
           {centerTitle}
         </h1>
       );
@@ -126,7 +158,8 @@ export default function Header({
   return (
     <header
       className={cn(
-        "grid grid-cols-3 items-center px-4 pt-[15px] pb-4 border border-[var(--gray-white)] bg-white/30 backdrop-blur-[7px]",
+         
+        "grid grid-cols-3 items-center px-4 pt-[15px] pb-4 border border-gray-white bg-white/30 backdrop-blur-[7px]",
         className
       )}
     >

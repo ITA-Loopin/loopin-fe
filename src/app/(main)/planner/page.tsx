@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { fetchChatRooms, type ChatRoom } from "@/lib/chat";
 import LoopIcon from "@/../public/ai-planner/loop-icon.svg";
-import { PrimaryButton } from "@/components/common/PrimaryButton";
+import { Button } from "@/components/ui/button";
 import Header from "@/components/common/Header";
 
 type ChatLoop = {
@@ -87,14 +87,17 @@ export default function PlannerListPage() {
       <main className="flex-1 px-6 py-6">
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <p className="text-sm text-[#8F8A87]">로딩 중...</p>
+            { }
+            <p className="text-sm text-gray-500">로딩 중...</p>
           </div>
         ) : chatLoops.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <p className="mb-2 text-center text-sm text-[#8F8A87]">
+            { }
+            <p className="mb-2 text-center text-sm text-gray-500">
               아직 생성된 루프가 없습니다
             </p>
-            <p className="mb-8 text-center text-sm text-[#8F8A87]">
+            { }
+            <p className="mb-8 text-center text-sm text-gray-500">
               새 채팅을 만들어 첫 루프를 시작해보세요!
             </p>
           </div>
@@ -104,22 +107,25 @@ export default function PlannerListPage() {
               <button
                 key={loop.id}
                 onClick={() => handleChatLoopClick(loop.id)}
-                className="w-full border-b border-[#F0F2F3] p-4 "
+                 
+                className="w-full border-b border-gray-200 p-4 "
               >
                 <div className="flex items-center gap-4">
                   <Image src={LoopIcon} alt="loop" width={24} height={24} />
                   <div className="flex-1 text-left">
-                    <h3 className="text-base font-semibold text-[#2C2C2C]">
+                    { }
+                    <h3 className="text-base font-semibold text-gray-800">
                       {loop.name}
                     </h3>
                     {loop.lastMessage && (
-                      <p className="text-sm text-[#8F8A87]">
+                      <p className="text-sm text-gray-500">
                         {loop.lastMessage}
                       </p>
                     )}
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-[#8F8A87]">{loop.date}</p>
+                    { }
+                    <p className="text-sm text-gray-500">{loop.date}</p>
                   </div>
                 </div>
               </button>
@@ -129,11 +135,14 @@ export default function PlannerListPage() {
       </main>
 
       <div className="px-6 pb-5 pt-4">
-        <PrimaryButton
+        <Button
+          variant="primary"
+          size="lg"
+          className="w-full rounded-[30px] text-body-1-sb"
           onClick={handleStartNewLoop}
         >
           새로운 루프 시작하기
-        </PrimaryButton>
+        </Button>
       </div>
     </div>
   );

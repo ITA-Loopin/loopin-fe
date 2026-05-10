@@ -1,7 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import Modal from "./Modal";
-import { IconButton } from "./IconButton";
+import { Button } from "@/components/ui/button";
 
 type ConfirmModalProps = {
   isOpen: boolean;
@@ -27,14 +28,21 @@ export default function ConfirmModal({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="relative w-[328px] rounded-[15px] bg-white pt-9 px-3 pb-3 text-center">
-        <IconButton
-          src="/loop/loop_delete.png"
-          alt="닫기"
-          width={18}
-          height={18}
+        <Button
+          variant="icon"
           onClick={onClose}
+          aria-label="닫기"
           className="absolute right-3 top-3"
-        />
+        >
+          <Image
+            src="/loop/loop_delete.png"
+            alt="닫기"
+            width={18}
+            height={18}
+            style={{ width: 18, height: 18 }}
+          />
+        </Button>
+        {/* eslint-disable-next-line no-restricted-syntax */}
         <p className="text-base font-bold leading-[150%] tracking-[-0.32px] text-center text-[var(--gray-800,#3A3D40)] whitespace-pre-line">
           {title}
         </p>
@@ -43,7 +51,8 @@ export default function ConfirmModal({
             type="button"
             onClick={onConfirm}
             className={`flex-1 rounded-lg py-3 text-sm font-semibold bg-gray-100  ${
-              isDanger ? "text-red-600" : "text-[var(--gray-800)]"
+               
+              isDanger ? "text-red-600" : "text-gray-800"
             }`}
           >
             {confirmText}

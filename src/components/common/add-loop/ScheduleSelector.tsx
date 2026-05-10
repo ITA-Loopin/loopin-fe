@@ -28,9 +28,11 @@ export function ScheduleSelector({
   onToggleDay,
 }: ScheduleSelectorProps) {
   const activeButtonStyles =
-    "bg-[var(--primary-200)] text-[var(--primary-main)]";
+     
+    "bg-primary-200 text-primary-main";
   const inactiveButtonStyles =
-    "bg-[var(--gray-200)] text-[var(--gray-400)]";
+     
+    "bg-gray-200 text-gray-400";
   const buttonRowStyles = "flex w-full items-start gap-2";
 
   const isWeekly = scheduleType === "WEEKLY";
@@ -74,7 +76,8 @@ export function ScheduleSelector({
 
   return (
     <div className="flex flex-col items-start gap-2 self-stretch">
-      <p className="text-caption-r text-[var(--gray-500)]">
+      { }
+      <p className="text-caption-r text-gray-500">
         반복 주기
       </p>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { BottomSheet } from "@/components/common/BottomSheet";
-import { PrimaryButton } from "@/components/common/PrimaryButton";
+import { Button } from "@/components/ui/button";
 import { TitleInput } from "@/components/common/add-loop/TitleInput";
 import { ChecklistEditor } from "@/components/common/add-loop/ChecklistEditor";
 import { DateRangePicker } from "@/components/common/add-loop/DateRangePicker";
@@ -38,7 +38,8 @@ export function LoopEditSheet({
       <div className="inline-flex items-center gap-2.5 px-4 py-5">
         <div className="flex w-full flex-col items-center gap-6">
           {/* 바텀시트 제목 */}
-          <h2 className="text-center text-base font-semibold text-[#737980] leading-[150%] tracking-[-0.32px]">
+          { }
+          <h2 className="text-center text-base font-semibold text-gray-600 leading-[150%] tracking-[-0.32px]">
             루프 수정하기
           </h2>
 
@@ -77,13 +78,15 @@ export function LoopEditSheet({
               onAddChecklist={checklist.onAddChecklist}
             />
 
-            <PrimaryButton
+            <Button
+              variant="primary"
+              size="lg"
               type="submit"
+              className="w-full rounded-[30px] text-body-1-sb"
               disabled={submit.isSubmitting}
-              className="primary"
             >
               수정 완료하기
-            </PrimaryButton>
+            </Button>
           </form>
         </div>
       </div>

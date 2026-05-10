@@ -25,7 +25,8 @@ export function TitleInput({
 
   return (
     <label htmlFor={inputId} className="flex flex-col gap-2 mb-10">
-      <span className="text-caption-r text-[var(--gray-500)]">루프 이름</span>
+      { }
+      <span className="text-caption-r text-gray-500">루프 이름</span>
       <input
         id={inputId}
         type="text"
@@ -35,7 +36,8 @@ export function TitleInput({
         maxLength={maxLength}
         disabled={disabled}
         className={cn(
-          "flex h-[50px] w-full items-center gap-2.5 rounded-[10px] border border-[var(--gray-300)] bg-[var(--gray-white)] px-4 py-[13px] text-body-1-sb font-semibold text-[var(--gray-black)] placeholder:text-[var(--gray-400)] focus:outline-none",
+           
+          "flex h-[50px] w-full items-center gap-2.5 rounded-[10px] border border-gray-300 bg-gray-white px-4 py-[13px] text-body-1-sb font-semibold text-gray-black placeholder:text-gray-400 focus:outline-none",
           className
         )}
       />

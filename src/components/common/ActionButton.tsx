@@ -24,9 +24,9 @@ export default function ActionButton({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "text-[var(--primary-main,#FF543F)] inline-flex py-[6px] px-2 justify-center items-center gap-2 rounded-[5px] bg-[var(--primary-200,#FFE4E0)]",
+        "text-primary-main inline-flex py-[6px] px-2 justify-center items-center gap-2 rounded-[5px] bg-primary-200",
         disabled && "opacity-50 cursor-not-allowed",
-        className
+        className,
       )}
     >
       {icon && <span className="flex items-center justify-center">{icon}</span>}

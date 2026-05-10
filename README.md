@@ -19,7 +19,17 @@ sudo vi /etc/hosts
 127.0.0.1   local.loopin.co.kr
 ```
 
-개발 서버 실행
+HTTPS 인증서 발급 (`pnpm dev:https` 실행 시 필요)
+
+```bash
+# mkcert 설치 (최초 1회)
+brew install mkcert
+mkcert -install
+
+# 프로젝트 루트에서 인증서 생성
+mkdir -p certs
+mkcert -key-file certs/local-loopin-key.pem -cert-file certs/local-loopin-cert.pem local.loopin.co.kr
+```
 
 ```bash
 pnpm dev
