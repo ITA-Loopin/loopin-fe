@@ -3,8 +3,8 @@ import type { LoopDetail, LoopChecklist } from "@/types/loop";
 import type { TeamLoopApiItem } from "@/lib/team";
 import { LoopProgress } from "@/components/home/LoopProgress";
 import { Checklist } from "@/components/loop/Checklist";
-import { IconButton } from "@/components/common/IconButton";
-import { PrimaryButton } from "@/components/common/PrimaryButton";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
 import { DropdownEditDelete } from "@/components/loop/DropdownEditDelete";
 import { formatImportance, formatLoopType, getStatus } from "@/lib/teamUtils";
 
@@ -122,13 +122,15 @@ export function TeamLoopDetailContent({
             </span>
           </div>
           <div className="relative">
-            <IconButton
-              src="/loop/loop_kebab.svg"
-              alt="메뉴"
-              width={20}
-              height={20}
-              onClick={onMenuClick}
-            />
+            <Button variant="icon" onClick={onMenuClick} aria-label="메뉴">
+              <Image
+                src="/loop/loop_kebab.svg"
+                alt="메뉴"
+                width={20}
+                height={20}
+                style={{ width: 20, height: 20 }}
+              />
+            </Button>
             {isMenuOpen && (
               <DropdownEditDelete
                 onClose={onMenuClose}
@@ -234,9 +236,14 @@ export function TeamLoopDetailContent({
       {/* 루프 완료하기 버튼 (내 루프 탭일 때만 표시) */}
       {!isTeamView && (
         <div className="flex justify-center">
-          <PrimaryButton variant="primary" onClick={onCompleteLoop}>
+          <Button
+            variant="primary"
+            size="lg"
+            className="w-full rounded-[30px] text-body-1-sb"
+            onClick={onCompleteLoop}
+          >
             루프 완료하기
-          </PrimaryButton>
+          </Button>
         </div>
       )}
     </>

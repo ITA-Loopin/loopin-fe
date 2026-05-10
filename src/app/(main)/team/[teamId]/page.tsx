@@ -8,7 +8,7 @@ import Header from "@/components/common/Header";
 import { LoopProgress } from "@/components/home/LoopProgress";
 import { TeamLoopList } from "@/components/team/TeamLoopList";
 import { MonthCalendar } from "@/components/calendar/MonthCalendar";
-import { PrimaryButton } from "@/components/common/PrimaryButton";
+import { Button } from "@/components/ui/button";
 import { AddTeamLoopSheet } from "@/components/team/AddTeamLoopSheet";
 import { TeamLoopFAB } from "@/components/team/TeamLoopFAB";
 import {
@@ -334,13 +334,14 @@ export default function TeamDetailPage() {
               팀 활동 기록보기
             </button>
           ) : (
-            <PrimaryButton
+            <Button
               variant="secondary"
+              size="lg"
               onClick={() => setIsAddLoopSheetOpen(true)}
-              className="max-w-[400px]"
+              className="w-full rounded-[30px] text-body-1-sb max-w-[400px]"
             >
               루프 추가하기
-            </PrimaryButton>
+            </Button>
           )}
         </div>
       </main>

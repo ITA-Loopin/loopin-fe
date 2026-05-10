@@ -3,8 +3,8 @@ import dayjs from "dayjs";
 import type { LoopDetail, LoopChecklist } from "@/types/loop";
 import { LoopProgress } from "@/components/home/LoopProgress";
 import { Checklist } from "@/components/loop/Checklist";
-import { IconButton } from "@/components/common/IconButton";
-import { PrimaryButton } from "@/components/common/PrimaryButton";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
 import { DropdownEditDelete } from "@/components/loop/DropdownEditDelete";
 
 interface LoopDetailContentProps {
@@ -54,13 +54,15 @@ export function LoopDetailContent({
             <h1 className="text-title-2-b text-[var(--gray-black)] truncate w-full">{detail.title}</h1>
           </div>
           <div className="relative flex-shrink-0">
-            <IconButton
-              src="/loop/loop_kebab.svg"
-              alt="메뉴"
-              width={20}
-              height={20}
-              onClick={onMenuClick}
-            />
+            <Button variant="icon" onClick={onMenuClick} aria-label="메뉴">
+              <Image
+                src="/loop/loop_kebab.svg"
+                alt="메뉴"
+                width={20}
+                height={20}
+                style={{ width: 20, height: 20 }}
+              />
+            </Button>
             {isMenuOpen && (
               <DropdownEditDelete
                 onClose={onMenuClose}
@@ -88,13 +90,15 @@ export function LoopDetailContent({
       </section>
 
       <div className="flex justify-center">
-        <PrimaryButton
+        <Button
           variant="primary"
+          size="lg"
+          className="w-full rounded-[30px] text-body-1-sb"
           onClick={onCompleteLoop}
           disabled={isCompletingLoop}
         >
           {isCompletingLoop ? "완료 중..." : "루프 완료하기"}
-        </PrimaryButton>
+        </Button>
       </div>
 
     </>

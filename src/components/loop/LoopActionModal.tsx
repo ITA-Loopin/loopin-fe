@@ -1,7 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import Modal from "@/components/common/Modal";
-import { IconButton } from "@/components/common/IconButton";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 type LoopActionModalProps = {
@@ -31,14 +32,20 @@ export function LoopActionModal({
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="relative w-[328px] rounded-[15px] bg-white p-3">
         {/* 닫기 버튼은 absolute 유지 */}
-        <IconButton
-          src="/loop/loop_delete.png"
-          alt="닫기"
-          width={20}
-          height={20}
+        <Button
+          variant="icon"
           onClick={onClose}
+          aria-label="닫기"
           className="absolute right-3 top-3"
-        />
+        >
+          <Image
+            src="/loop/loop_delete.png"
+            alt="닫기"
+            width={20}
+            height={20}
+            style={{ width: 20, height: 20 }}
+          />
+        </Button>
 
         {/* 
           아이콘은 흐름 밖(absolute)이므로 gap이 적용되지 않음.

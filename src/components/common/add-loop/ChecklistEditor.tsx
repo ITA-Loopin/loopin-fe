@@ -1,4 +1,5 @@
-import { IconButton } from "@/components/common/IconButton";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
 import { Checklist } from "./constants";
 import { useRef } from "react";
 
@@ -61,13 +62,19 @@ export function ChecklistEditor({
               onChange={(event) => onChangeChecklist(item.id, event.target.value)}
               className={baseInputStyles}
             />
-            <IconButton
-              src="/addloopsheet/addloopsheet_delete.svg"
-              alt="체크리스트 삭제"
-              width={20}
-              height={20}
+            <Button
+              variant="icon"
               onClick={() => onRemoveChecklist(item.id)}
-            />
+              aria-label="체크리스트 삭제"
+            >
+              <Image
+                src="/addloopsheet/addloopsheet_delete.svg"
+                alt="체크리스트 삭제"
+                width={20}
+                height={20}
+                style={{ width: 20, height: 20 }}
+              />
+            </Button>
           </div>
         ))}
 
@@ -82,13 +89,19 @@ export function ChecklistEditor({
             className={baseInputStyles}
             data-checklist-input
           />
-          <IconButton
-            src="/addloopsheet/addloopsheet_add.svg"
-            alt="체크리스트 추가"
-            width={20}
-            height={20}
+          <Button
+            variant="icon"
             onClick={handleAddButtonClick}
-          />
+            aria-label="체크리스트 추가"
+          >
+            <Image
+              src="/addloopsheet/addloopsheet_add.svg"
+              alt="체크리스트 추가"
+              width={20}
+              height={20}
+              style={{ width: 20, height: 20 }}
+            />
+          </Button>
         </div>
       </div>
     </div>

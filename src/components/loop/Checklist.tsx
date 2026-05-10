@@ -1,8 +1,9 @@
 "use client";
 
 import type { LoopChecklist } from "@/types/loop";
+import Image from "next/image";
 import { ChecklistItem } from "./ChecklistItem";
-import { IconButton } from "@/components/common/IconButton";
+import { Button } from "@/components/ui/button";
 import { useEffect, useState, useRef } from "react";
 
 type ChecklistProps = {
@@ -128,13 +129,19 @@ export function Checklist({
               />
 
               <div onMouseDown={(e) => e.preventDefault()}>
-                <IconButton
-                  src="/addloopsheet/addloopsheet_add.svg"
-                  alt="루틴 추가"
-                  width={20}
-                  height={20}
+                <Button
+                  variant="icon"
                   onClick={handleAddButtonClick}
-                />
+                  aria-label="루틴 추가"
+                >
+                  <Image
+                    src="/addloopsheet/addloopsheet_add.svg"
+                    alt="루틴 추가"
+                    width={20}
+                    height={20}
+                    style={{ width: 20, height: 20 }}
+                  />
+                </Button>
               </div>
             </div>
           </li>

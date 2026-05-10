@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import type { LoopChecklist } from "@/types/loop";
-import { IconButton } from "@/components/common/IconButton";
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
@@ -120,15 +120,20 @@ export function ChecklistItem({ item, onToggle, onDelete }: ChecklistItemProps) 
           </span>
 
           {onToggle && (
-            <IconButton
-              src={item.completed ? "/loop/loop_btn_complete.svg" : "/loop/loop_btn.svg"}
-              alt={item.completed ? "체크리스트 완료" : "체크리스트 미완료"}
-              width={24}
-              height={24}
+            <Button
+              variant="icon"
               onClick={handleToggleClick}
+              aria-label={item.completed ? "체크리스트 완료" : "체크리스트 미완료"}
               className="h-6 w-6"
-              imageClassName="h-6 w-6"
-            />
+            >
+              <Image
+                src={item.completed ? "/loop/loop_btn_complete.svg" : "/loop/loop_btn.svg"}
+                alt={item.completed ? "체크리스트 완료" : "체크리스트 미완료"}
+                width={24}
+                height={24}
+                className="h-6 w-6"
+              />
+            </Button>
           )}
         </div>
       </div>

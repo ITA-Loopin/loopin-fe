@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { IconButton } from "@/components/common/IconButton";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
 import { useSearchMembers } from "@/hooks/useSearchMembers";
 
 type TeamMember = {
@@ -61,13 +62,15 @@ export function TeamMemberSearch({
           placeholder="닉네임을 검색해주세요"
           className="flex-1 bg-transparent outline-none text-body-1-m text-[var(--gray-black)] placeholder:text-[16px] placeholder:text-body-2-m placeholder:text-[var(--gray-400)]"
         />
-        <IconButton
-          src="/team/search.svg"
-          alt="검색"
-          width={20}
-          height={20}
-          onClick={handleSearchSubmit}
-        />
+        <Button variant="icon" onClick={handleSearchSubmit} aria-label="검색">
+          <Image
+            src="/team/search.svg"
+            alt="검색"
+            width={20}
+            height={20}
+            style={{ width: 20, height: 20 }}
+          />
+        </Button>
       </div>
 
       {/* 검색 결과 */}

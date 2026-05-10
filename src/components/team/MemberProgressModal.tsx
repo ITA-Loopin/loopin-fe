@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import Modal from "@/components/common/Modal";
-import { IconButton } from "@/components/common/IconButton";
+import { Button } from "@/components/ui/button";
 import { LoopProgress } from "@/components/home/LoopProgress";
 import { fetchTeamLoopMemberChecklist } from "@/lib/team";
 
@@ -65,14 +66,20 @@ export function MemberProgressModal({
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="relative w-full max-w-[420px] rounded-[15px] bg-white p-6">
         {/* 닫기 버튼 */}
-        <IconButton
-          src="/loop/loop_delete.png"
-          alt="닫기"
-          width={20}
-          height={20}
+        <Button
+          variant="icon"
           onClick={onClose}
+          aria-label="닫기"
           className="absolute right-6 top-6"
-        />
+        >
+          <Image
+            src="/loop/loop_delete.png"
+            alt="닫기"
+            width={20}
+            height={20}
+            style={{ width: 20, height: 20 }}
+          />
+        </Button>
 
         <div className="flex flex-col items-center gap-6">
           {/* 제목 */}
@@ -111,23 +118,33 @@ export function MemberProgressModal({
                       </span>
                       <div className="flex-shrink-0 ml-4">
                         {item.isChecked ? (
-                          <IconButton
-                            src="/loop/loop_btn_complete.svg"
-                            alt="완료됨"
-                            width={24}
-                            height={24}
+                          <Button
+                            variant="icon"
+                            aria-label="완료됨"
                             className="h-6 w-6"
-                            imageClassName="h-6 w-6"
-                          />
+                          >
+                            <Image
+                              src="/loop/loop_btn_complete.svg"
+                              alt="완료됨"
+                              width={24}
+                              height={24}
+                              className="h-6 w-6"
+                            />
+                          </Button>
                         ) : (
-                          <IconButton
-                            src="/loop/loop_btn.svg"
-                            alt="미완료"
-                            width={24}
-                            height={24}
+                          <Button
+                            variant="icon"
+                            aria-label="미완료"
                             className="h-6 w-6"
-                            imageClassName="h-6 w-6"
-                          />
+                          >
+                            <Image
+                              src="/loop/loop_btn.svg"
+                              alt="미완료"
+                              width={24}
+                              height={24}
+                              className="h-6 w-6"
+                            />
+                          </Button>
                         )}
                       </div>
                     </li>

@@ -1,6 +1,7 @@
 "use client";
 
-import { IconButton } from "@/components/common/IconButton";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
 
 type TeamMember = {
   id: number;
@@ -36,13 +37,19 @@ export function InvitedMemberList({
               {member.nickname} {member.email}
             </span>
             {onRemove && (
-              <IconButton
-                src="/loop/loop_delete.png"
-                alt="팀원 제거"
-                width={20}
-                height={20}
+              <Button
+                variant="icon"
                 onClick={() => onRemove(member.id)}
-              />
+                aria-label="팀원 제거"
+              >
+                <Image
+                  src="/loop/loop_delete.png"
+                  alt="팀원 제거"
+                  width={20}
+                  height={20}
+                  style={{ width: 20, height: 20 }}
+                />
+              </Button>
             )}
           </div>
         ))}

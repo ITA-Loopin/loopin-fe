@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, FormEvent } from "react";
 import { BottomSheet } from "@/components/common/BottomSheet";
-import { PrimaryButton } from "@/components/common/PrimaryButton";
+import { Button } from "@/components/ui/button";
 import { TitleInput } from "@/components/common/add-loop/TitleInput";
 import { ScheduleSelector } from "@/components/common/add-loop/ScheduleSelector";
 import { DateRangePicker } from "@/components/common/add-loop/DateRangePicker";
@@ -291,13 +291,15 @@ export function AddTeamLoopSheet({
               disableEndDate={schedule.scheduleType === "NONE"}
             />
 
-            <PrimaryButton
+            <Button
+              variant="primary"
+              size="lg"
               type="submit"
+              className="w-full rounded-[30px] text-body-1-sb"
               disabled={isSubmitting}
-              className="primary"
             >
               루프 추가하기
-            </PrimaryButton>
+            </Button>
           </form>
         </div>
       </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { BottomSheet } from "@/components/common/BottomSheet";
-import { PrimaryButton } from "@/components/common/PrimaryButton";
+import { Button } from "@/components/ui/button";
 import { TitleInput } from "@/components/common/add-loop/TitleInput";
 import { ChecklistEditor } from "@/components/common/add-loop/ChecklistEditor";
 import { DateRangePicker } from "@/components/common/add-loop/DateRangePicker";
@@ -77,13 +77,15 @@ export function LoopEditSheet({
               onAddChecklist={checklist.onAddChecklist}
             />
 
-            <PrimaryButton
+            <Button
+              variant="primary"
+              size="lg"
               type="submit"
+              className="w-full rounded-[30px] text-body-1-sb"
               disabled={submit.isSubmitting}
-              className="primary"
             >
               수정 완료하기
-            </PrimaryButton>
+            </Button>
           </form>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import { BottomSheet } from "@/components/common/BottomSheet";
-import { PrimaryButton } from "@/components/common/PrimaryButton";
+import { Button } from "@/components/ui/button";
 import { AddLoopDefaultValues } from "./constants";
 import { ChecklistEditor } from "./ChecklistEditor";
 import { DateRangePicker } from "./DateRangePicker";
@@ -83,13 +83,15 @@ export function AddLoopSheet({
               startDate={dateRange.startDate}
             />
 
-            <PrimaryButton
-              type="submit"
-              disabled={submit.isSubmitting}
+            <Button
               variant="secondary"
+              size="lg"
+              type="submit"
+              className="w-full rounded-[30px] text-body-1-sb"
+              disabled={submit.isSubmitting}
             >
               루프 추가하기
-            </PrimaryButton>
+            </Button>
           </form>
         </div>
       </div>

@@ -5,7 +5,8 @@ import { useRouter, useParams } from "next/navigation";
 import { toast } from "react-toastify";
 import Header from "@/components/common/Header";
 import { TeamMemberSearch } from "@/components/team/TeamMemberSearch";
-import { IconButton } from "@/components/common/IconButton";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import {
   fetchTeamDetail,
@@ -280,13 +281,19 @@ export default function TeamManagePage() {
                            팀원
                          </span>
                          {isLeader && (
-                           <IconButton
-                             src="/loop/loop_delete.png"
-                             alt="팀원 제거"
-                             width={10}
-                             height={10}
+                           <Button
+                             variant="icon"
                              onClick={() => handleRemoveMemberClick(member.memberId, member.nickname)}
-                           />
+                             aria-label="팀원 제거"
+                           >
+                             <Image
+                               src="/loop/loop_delete.png"
+                               alt="팀원 제거"
+                               width={10}
+                               height={10}
+                               style={{ width: 10, height: 10 }}
+                             />
+                           </Button>
                          )}
                        </>
                      )}
