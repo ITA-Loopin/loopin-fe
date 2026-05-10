@@ -93,15 +93,15 @@ export default function Header({
       )}
     >
       <div className="flex flex-1 items-center justify-start">
-        {renderLeft()}
+        {left ?? renderLeft()}
       </div>
 
       <div className="absolute left-1/2 -translate-x-1/2 max-w-[40%] truncate">
-        {renderCenter()}
+        {center ?? renderCenter()}
       </div>
 
       <div className="flex flex-1 items-center justify-end">
-        {renderRight()}
+        {right ?? renderRight()}
       </div>
     </header>
   );
