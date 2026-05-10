@@ -10,6 +10,7 @@ import {
   fetchChatMessages,
   sendChatMessage,
   type ChatMessageDto,
+  type ChatRoomStatus,
 } from "@/lib/chat";
 
 type AppendStatus = "none" | "assistant" | "recommendations";
@@ -67,7 +68,7 @@ function normalizeChatMessages(input: unknown): ChatMessageDto[] {
 
 export function usePlannerChat(
   chatRoomId?: number | null,
-  loopSelect?: boolean
+  chatRoomStatus: ChatRoomStatus = "DEFAULT",
 ) {
   const { user } = useAppSelector((state) => state.auth);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -92,6 +93,9 @@ export function usePlannerChat(
   const eventSourceRef = useRef<EventSource | null>(null);
   const lastEventIdRef = useRef<string | null>(null);
   const isConnectedRef = useRef(false);
+  const isUpdateChatRoom =
+    chatRoomStatus === "BEFORE_CLICK_UPDATE_LOOP" ||
+    chatRoomStatus === "AFTER_CLICK_UPDATE_LOOP";
 
   const plannerChatRoomId = useMemo(() => {
     if (chatRoomId !== undefined && chatRoomId !== null) {
@@ -252,7 +256,7 @@ export function usePlannerChat(
         const recs: RecommendationSchedule[] = recommendationsToApply;
         // BEFORE_UPDATE_LOOP인 경우 첫 번째 추천을 updateRecommendation에 저장하고 showUpdateMessage를 true로 설정
         // UPDATE_LOOP인 경우 첫 번째 추천을 updateRecommendation에 저장하지만 추천도 표시
-        if (loopSelect === true && recs.length > 0) {
+        if (isUpdateChatRoom && recs.length > 0) {
           setUpdateRecommendation(recs[0]);
           setRecommendations(recs); // 추천도 무조건 표시
           // BEFORE_UPDATE_LOOP 응답인지 확인 (BEFORE_UPDATE_LOOP를 보낸 후 recommendations가 1개인 경우)
@@ -270,7 +274,7 @@ export function usePlannerChat(
 
       return status;
     },
-    [loopSelect]
+    [isUpdateChatRoom]
   );
 
   const handleSSEMessage = useCallback(
@@ -434,7 +438,7 @@ export function usePlannerChat(
     return () => {
       isCancelled = true;
     };
-  }, [plannerChatRoomId, appendNewMessages, loopSelect]);
+  }, [plannerChatRoomId, appendNewMessages, chatRoomStatus]);
 
   useEffect(() => {
     initializeSSE();
@@ -515,7 +519,7 @@ export function usePlannerChat(
         // RECREATE_LOOP 후 입력 요청 메시지를 받았으면 CREATE_LOOP로 전송
         const messageType = isWaitingForRecreateInput
           ? "CREATE_LOOP"
-          : loopSelect === true
+          : isUpdateChatRoom
             ? "UPDATE_LOOP"
             : "CREATE_LOOP";
 
@@ -562,7 +566,7 @@ export function usePlannerChat(
       isLoading,
       plannerChatRoomId,
       initializeSSE,
-      loopSelect,
+      isUpdateChatRoom,
       isWaitingForRecreateInput,
     ]
   );
@@ -605,14 +609,14 @@ export function usePlannerChat(
 
   const handleUpdateLoop = useCallback(async () => {
     if (!plannerChatRoomId) {
-      return;
+      return false;
     }
 
     // SSE 연결 확인
     const eventSource = eventSourceRef.current;
     if (!eventSource || eventSource.readyState !== EventSource.OPEN) {
       initializeSSE();
-      return;
+      return false;
     }
 
     setIsLoading(true);
@@ -629,11 +633,13 @@ export function usePlannerChat(
         content: "content",
         messageType: "BEFORE_UPDATE_LOOP",
       });
+      return true;
     } catch (error) {
       console.error("루프 수정 요청 실패", error);
       setIsInputVisible(true);
       setIsLoading(false);
       hasSentBeforeUpdateLoopRef.current = false; // 실패 시 플래그 초기화
+      return false;
     }
   }, [plannerChatRoomId, initializeSSE]);
 

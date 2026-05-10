@@ -65,7 +65,7 @@ export default function PlannerListPage() {
     try {
       const response = await createChatRoom({
         title: "새 루프",
-        loopSelect: true,
+        loopSelect: false,
       });
 
       if (response.data?.id) {
