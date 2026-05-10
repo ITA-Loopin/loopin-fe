@@ -86,7 +86,7 @@ export default function PlannerListPage() {
 
   return (
     <div className="flex h-full flex-col bg-white">
-      <Header leftType="none" centerTitle="루프 채팅 기록"/>
+      <Header leftType="none" centerTitle="루프 채팅 기록" rightType="none"/>
 
       {/* Content */}
       <main className="flex-1 px-6 py-6">
