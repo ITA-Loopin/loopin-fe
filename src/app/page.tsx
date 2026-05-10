@@ -15,6 +15,7 @@ import {
 import type { User } from "@/types/auth";
 import { saveFCMTokenApi } from "@/lib/fcm";
 import { authFetch } from "@/utils/fetch";
+import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
 
@@ -186,9 +187,11 @@ function HomeContent() {
         </p>
 
         <div className="flex items-center gap-7">
-          <button
+          <Button
+            variant="icon"
             onClick={handleKakaoLogin}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FEDC2C]"
+            aria-label="카카오 로그인"
+            className="h-10 w-10 bg-[#FEDC2C]"
           >
             <Image
               src="/kakao-icon.svg"
@@ -196,10 +199,12 @@ function HomeContent() {
               width={24}
               height={24}
             />
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="icon"
             onClick={handleGoogleLogin}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-white"
+            aria-label="구글 로그인"
+            className="h-10 w-10 bg-white"
           >
             <Image
               src="/google-simple.png"
@@ -207,10 +212,12 @@ function HomeContent() {
               width={24}
               height={24}
             />
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="icon"
             onClick={handleNaverLogin}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-[#03C75A]"
+            aria-label="네이버 로그인"
+            className="h-10 w-10 bg-[#03C75A]"
           >
             <Image
               src="/naver-simple.png"
@@ -218,9 +225,11 @@ function HomeContent() {
               width={22}
               height={22}
             />
-          </button>
-          <button
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-black"
+          </Button>
+          <Button
+            variant="icon"
+            aria-label="애플 로그인"
+            className="h-10 w-10 bg-black"
           >
             <Image
               src="/icon-apple.png"
@@ -228,7 +237,7 @@ function HomeContent() {
               width={24}
               height={24}
             />
-          </button>
+          </Button>
         </div>
       </div>
     </div>

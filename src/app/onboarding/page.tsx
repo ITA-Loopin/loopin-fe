@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
 
 function EntryStep({ onNext }: { onNext: () => void }) {
   const [showIllust, setShowIllust] = useState(false);
@@ -86,13 +87,13 @@ function EntryStep({ onNext }: { onNext: () => void }) {
           showButton ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
         }`}
       >
-        <button
+        <Button
+          variant="primary"
           onClick={onNext}
-          className="w-full rounded-full py-4 text-body-1-sb text-white transition-opacity active:opacity-80"
-          style={{ background: "#FF7765" }}
+          className="w-full h-auto rounded-full py-4 px-0 text-body-1-sb bg-[#FF7765] hover:bg-[#FF7765]"
         >
           루핀 시작하기
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -144,12 +145,13 @@ function OnboardingSlide({
 
       {/* CTA 버튼 */}
       <div className="w-full px-6 pb-12">
-        <button
+        <Button
+          variant="primary"
           onClick={onNext}
-          className="w-full rounded-full bg-[#FF7765] py-4 text-body-1-sb text-white transition-opacity active:opacity-80"
+          className="w-full h-auto rounded-full py-4 px-0 text-body-1-sb bg-[#FF7765] hover:bg-[#FF7765]"
         >
           다음
-        </button>
+        </Button>
       </div>
     </div>
   );
