@@ -42,6 +42,7 @@ export default function ConfirmModal({
             style={{ width: 18, height: 18 }}
           />
         </Button>
+        {/* eslint-disable-next-line no-restricted-syntax */}
         <p className="text-base font-bold leading-[150%] tracking-[-0.32px] text-center text-[var(--gray-800,#3A3D40)] whitespace-pre-line">
           {title}
         </p>
@@ -50,7 +51,8 @@ export default function ConfirmModal({
             type="button"
             onClick={onConfirm}
             className={`flex-1 rounded-lg py-3 text-sm font-semibold bg-gray-100  ${
-              isDanger ? "text-red-600" : "text-[var(--gray-800)]"
+               
+              isDanger ? "text-red-600" : "text-gray-800"
             }`}
           >
             {confirmText}

@@ -44,7 +44,8 @@ export function LoopGroupEditSheet({
       <div className="inline-flex items-center gap-2.5 px-4 py-5">
         <div className="flex w-full flex-col items-center gap-6">
           {/* 바텀시트 제목 */}
-          <h2 className="text-center text-base font-semibold text-[#737980] leading-[150%] tracking-[-0.32px]">
+          { }
+          <h2 className="text-center text-base font-semibold text-gray-600 leading-[150%] tracking-[-0.32px]">
             루프 수정하기
           </h2>
 

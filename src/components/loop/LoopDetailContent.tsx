@@ -50,8 +50,10 @@ export function LoopDetailContent({
       <section className="flex flex-col gap-2 pt-6">
         <div className="flex items-end justify-between self-stretch gap-2">
           <div className="flex flex-col items-start gap-1.5 min-w-0 flex-1">
-            <div className="text-body-2-m text-[var(--gray-600)]">{formattedDate}</div>
-            <h1 className="text-title-2-b text-[var(--gray-black)] truncate w-full">{detail.title}</h1>
+            { }
+            <div className="text-body-2-m text-gray-600">{formattedDate}</div>
+            { }
+            <h1 className="text-title-2-b text-gray-black truncate w-full">{detail.title}</h1>
           </div>
           <div className="relative flex-shrink-0">
             <Button variant="icon" onClick={onMenuClick} aria-label="메뉴">

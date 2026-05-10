@@ -148,7 +148,7 @@ export default function Header({
     if (centerSlot) return centerSlot;
     if (centerTitle)
       return (
-        <h1 className="text-center text-body-1-sb text-[var(--gray-800)] whitespace-nowrap">
+        <h1 className="text-center text-body-1-sb text-gray-800 whitespace-nowrap">
           {centerTitle}
         </h1>
       );
@@ -158,7 +158,8 @@ export default function Header({
   return (
     <header
       className={cn(
-        "grid grid-cols-3 items-center px-4 pt-[15px] pb-4 border border-[var(--gray-white)] bg-white/30 backdrop-blur-[7px]",
+         
+        "grid grid-cols-3 items-center px-4 pt-[15px] pb-4 border border-gray-white bg-white/30 backdrop-blur-[7px]",
         className
       )}
     >

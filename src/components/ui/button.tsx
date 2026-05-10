@@ -9,14 +9,13 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary:
-          "bg-[var(--primary-main)] text-[var(--gray-white)] hover:bg-[var(--primary-700)]",
-        secondary:
-          "bg-[var(--gray-800)] text-[var(--gray-white)] hover:bg-[var(--gray-700)]",
+        primary: "bg-primary-500 text-gray-white hover:bg-primary-700",
+        secondary: "bg-gray-800 text-gray-white hover:bg-gray-700",
         outline:
-          "border border-[var(--gray-300)] bg-transparent text-[var(--gray-800)] hover:bg-[var(--gray-100)]",
+          "border border-gray-300 bg-transparent text-gray-800 hover:bg-gray-100",
         ghost: "bg-transparent",
-        icon: "bg-transparent text-[var(--gray-800)] rounded-full",
+
+        icon: "bg-transparent text-gray-800 rounded-full",
       },
       size: {
         sm: "h-8 px-3 text-sm",
@@ -33,7 +32,7 @@ const buttonVariants = cva(
       variant: "primary",
       size: "md",
     },
-  }
+  },
 );
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &

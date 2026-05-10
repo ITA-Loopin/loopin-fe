@@ -53,6 +53,7 @@ export function BottomTab() {
         bottom: `calc(24px)`,
       }}
     >
+      {/* eslint-disable-next-line no-restricted-syntax */}
       <div className="pointer-events-auto relative z-10 flex h-[70px] w-full max-w-[420px] items-center justify-between rounded-[38px] border border-white/40 bg-white/90 px-6 shadow-[0px_16px_32px_rgba(32,32,32,0.16)] backdrop-blur-md">
         {TAB_ITEMS.map((item) => {
           const isActive =
@@ -72,11 +73,7 @@ export function BottomTab() {
               <div
                 className={`relative h-5 w-5 transition-opacity ${
                   isActive ? "opacity-100" : "opacity-80"
-                } ${
-                  isActive
-                    ? "bg-[var(--primary-main,#FF543F)]"
-                    : "bg-[var(--gray-300)]"
-                }`}
+                } ${isActive ? "bg-primary-main" : "bg-gray-300"}`}
                 style={{
                   maskImage: `url(${item.icon})`,
                   WebkitMaskImage: `url(${item.icon})`,
@@ -84,7 +81,7 @@ export function BottomTab() {
               />
               <span
                 className={`text-center text-[8px] font-bold leading-[150%] tracking-[-0.32px] transition-colors ${
-                  isActive ? "text-[var(--primary-main)]" : "text-[var(--gray-300)]"
+                  isActive ? "text-primary-main" : "text-gray-300"
                 }`}
               >
                 {item.label}

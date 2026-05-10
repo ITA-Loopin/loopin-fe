@@ -26,7 +26,8 @@ export function LoopActionModal({
   const isSingleMode = !onPrimaryAction;
 
   const baseBtn =
-    "flex h-[42px] items-center justify-center rounded-[5px] text-body-2-sb font-semibold bg-[var(--gray-100)] px-[10px] py-[9px]";
+     
+    "flex h-[42px] items-center justify-center rounded-[5px] text-body-2-sb font-semibold bg-gray-100 px-[10px] py-[9px]";
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -52,7 +53,8 @@ export function LoopActionModal({
           -> 텍스트 블록에 "아이콘 영역 회피 + 16px 간격"을 직접 확보.
         */}
         <div className="mt-9 flex flex-col items-center gap-5">
-          <p className="text-center text-body-1-b text-[var(--gray-800)] min-h-[48px] flex items-center justify-center">
+          { }
+          <p className="text-center text-body-1-b text-gray-800 min-h-[48px] flex items-center justify-center">
             {isSingleMode ? (
               "이 루프를 삭제할까요?"
             ) : (
@@ -69,14 +71,16 @@ export function LoopActionModal({
               <>
                 <button
                   type="button"
-                  className={cn(baseBtn, "flex-1 text-[var(--primary-main)]")}
+                   
+                  className={cn(baseBtn, "flex-1 text-primary-main")}
                   onClick={onSecondaryAction}
                 >
                   삭제
                 </button>
                 <button
                   type="button"
-                  className={cn(baseBtn, "flex-1 text-[var(--gray-800)]")}
+                   
+                  className={cn(baseBtn, "flex-1 text-gray-800")}
                   onClick={onClose}
                 >
                   취소
@@ -86,14 +90,16 @@ export function LoopActionModal({
               <>
                 <button
                   type="button"
-                  className={cn(baseBtn, "w-[148px] text-[var(--primary-main)]")}
+                   
+                  className={cn(baseBtn, "w-[148px] text-primary-main")}
                   onClick={onPrimaryAction}
                 >
                   {isDelete ? "모든 반복 루프 삭제" : "모든 반복 루프 수정"}
                 </button>
                 <button
                   type="button"
-                  className={cn(baseBtn, "w-[148px] text-[var(--gray-800)]")}
+                   
+                  className={cn(baseBtn, "w-[148px] text-gray-800")}
                   onClick={onSecondaryAction}
                 >
                   {isDelete ? "이 루프만 삭제" : "이 루프만 수정"}

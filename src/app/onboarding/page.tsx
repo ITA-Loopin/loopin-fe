@@ -22,6 +22,7 @@ function EntryStep({ onNext }: { onNext: () => void }) {
     <div
       className="relative flex h-full w-full flex-col items-center justify-between overflow-hidden"
       style={{
+        // eslint-disable-next-line no-restricted-syntax
         background: "linear-gradient(136deg, #FF5741 54%, #FFE4E0 100%)",
       }}
     >
@@ -37,13 +38,11 @@ function EntryStep({ onNext }: { onNext: () => void }) {
       />
       {/* 장식 Ellipse - 우상단 (연두) */}
       <div
-        className="absolute left-[120px] -top-[96px] h-[233px] w-[403px] rounded-full opacity-40"
-        style={{ background: "#E7FFBA", filter: "blur(234px)" }}
+        className="absolute left-[120px] -top-[96px] h-[233px] w-[403px] rounded-full opacity-40 bg-sub-mint blur-[234px]"
       />
       {/* 장식 Ellipse - 우하단 (연두) */}
       <div
-        className="absolute left-[120px] top-[559px] h-[383px] w-[394px] rounded-full opacity-40"
-        style={{ background: "#E7FFBA", filter: "blur(194px)" }}
+        className="absolute left-[120px] top-[559px] h-[383px] w-[394px] rounded-full opacity-40 bg-sub-mint blur-[194px]"
       />
 
       {/* 텍스트 영역 - 즉시 표시 */}
@@ -90,7 +89,8 @@ function EntryStep({ onNext }: { onNext: () => void }) {
         <Button
           variant="primary"
           onClick={onNext}
-          className="w-full h-auto rounded-full py-4 px-0 text-body-1-sb bg-[#FF7765] hover:bg-[#FF7765]"
+           
+          className="w-full h-auto rounded-full py-4 px-0 text-body-1-sb bg-primary-500 hover:bg-primary-500"
         >
           루핀 시작하기
         </Button>
@@ -102,9 +102,10 @@ function EntryStep({ onNext }: { onNext: () => void }) {
 function ProgressBar({ step, total }: { step: number; total: number }) {
   const progressWidth = `${(step / total) * 100}%`;
   return (
-    <div className="absolute left-4 right-4 top-[69px] h-1 rounded-[10px] bg-[#C6CCD1]">
+    <div className="absolute left-4 right-4 top-[69px] h-1 rounded-[10px] bg-gray-400">
       <div
-        className="h-full rounded-[10px] bg-[#FF7765] transition-all duration-300"
+         
+        className="h-full rounded-[10px] bg-primary-500 transition-all duration-300"
         style={{ width: progressWidth }}
       />
     </div>
@@ -130,10 +131,12 @@ function OnboardingSlide({
 
       {/* 텍스트 영역 */}
       <div className="mt-[105px] flex flex-col items-center gap-3 px-10">
-        <h2 className="text-title-2-b whitespace-pre-line text-center text-[#121212]">
+        { }
+        <h2 className="text-title-2-b whitespace-pre-line text-center text-gray-black">
           {title}
         </h2>
-        <p className="text-caption-r whitespace-pre-line text-center text-[#737980]">
+        { }
+        <p className="text-caption-r whitespace-pre-line text-center text-gray-600">
           {subtitle}
         </p>
       </div>
@@ -148,7 +151,8 @@ function OnboardingSlide({
         <Button
           variant="primary"
           onClick={onNext}
-          className="w-full h-auto rounded-full py-4 px-0 text-body-1-sb bg-[#FF7765] hover:bg-[#FF7765]"
+           
+          className="w-full h-auto rounded-full py-4 px-0 text-body-1-sb bg-primary-500 hover:bg-primary-500"
         >
           다음
         </Button>
@@ -169,9 +173,11 @@ function PhoneMockup({
   return (
     <div className={`relative mx-auto h-[440px] w-[210px] ${className}`}>
       {/* 폰 프레임 */}
-      <div className="absolute inset-0 rounded-[24px] border-[6px] border-[#2C2C2C] bg-black shadow-xl">
+      { }
+      <div className="absolute inset-0 rounded-[24px] border-[6px] border-gray-800 bg-black shadow-xl">
         {/* 노치 */}
-        <div className="absolute left-1/2 top-0 z-[1] h-[18px] w-[60px] -translate-x-1/2 rounded-b-[10px] bg-[#2C2C2C]" />
+        { }
+        <div className="absolute left-1/2 top-0 z-[1] h-[18px] w-[60px] -translate-x-1/2 rounded-b-[10px] bg-gray-800" />
         {/* 스크린 */}
         <div className="absolute inset-[2px] overflow-hidden rounded-[18px]">
           <Image
@@ -199,6 +205,7 @@ function ChatCard({
     <div
       className={`absolute top-[-10px] z-10 rounded-lg bg-white p-2 ${position === "left" ? "-left-[60px]" : "-right-[60px]"}`}
       style={{
+        // eslint-disable-next-line no-restricted-syntax
         boxShadow: "0px 2px 35px rgba(94, 94, 94, 0.2)",
         width: "190px",
       }}
@@ -213,7 +220,8 @@ function ChatCard({
             sizes="28px"
           />
         </div>
-        <span className="text-[11px] font-semibold text-[#FF7765]">loopin</span>
+        { }
+        <span className="text-[11px] font-semibold text-primary-500">loopin</span>
       </div>
       <div className="rounded-md">
         <p className="whitespace-pre-line text-[11px] font-semibold">
@@ -228,20 +236,26 @@ function TeamChatGroup() {
   return (
     <div
       className="absolute -left-[40px] -right-[40px] top-[-20px] z-10 rounded-lg bg-white px-3 py-2.5"
+      // eslint-disable-next-line no-restricted-syntax
       style={{ boxShadow: "0px 2px 35px rgba(94, 94, 94, 0.15)" }}
     >
       {/* 공지 카드 */}
+      {/* eslint-disable-next-line no-restricted-syntax */}
       <div className="mb-2 flex items-start gap-1.5 rounded-md border border-[#F0F0F0] bg-[#FAFAFA] px-2.5 py-2">
-        <span className="text-[10px] text-[#FF7765]">📌</span>
-        <p className="text-[10px] font-medium leading-[1.4] text-[#3A3D40]">
+        { }
+        <span className="text-[10px] text-primary-500">📌</span>
+        { }
+        <p className="text-[10px] font-medium leading-[1.4] text-gray-800">
           각자 맡은 파트 루프 완료하기 해주시고, 채팅방에 파일 공유해주세요!
         </p>
       </div>
 
       {/* 발신 메시지 (오른쪽) */}
       <div className="mb-2 flex justify-end">
-        <div className="rounded-lg bg-[#FFE4E0] px-2.5 py-1.5">
-          <p className="text-[10px] font-semibold leading-[1.4] text-[#3A3D40]">
+        { }
+        <div className="rounded-lg bg-primary-200 px-2.5 py-1.5">
+          { }
+          <p className="text-[10px] font-semibold leading-[1.4] text-gray-800">
             오늘까지 스터디 자료 완료해봐요!
           </p>
         </div>
@@ -249,16 +263,21 @@ function TeamChatGroup() {
 
       {/* 수신 메시지 (왼쪽) */}
       <div className="flex items-start gap-1.5">
-        <div className="h-5 w-5 flex-shrink-0 rounded-full bg-[#C6CCD1]" />
+        { }
+        <div className="h-5 w-5 flex-shrink-0 rounded-full bg-gray-400" />
         <div>
           <div className="mb-0.5 flex items-center gap-1.5">
-            <span className="text-[9px] font-semibold text-[#3A3D40]">
+            { }
+            <span className="text-[9px] font-semibold text-gray-800">
               루핑
             </span>
-            <span className="text-[8px] text-[#C6CCD1]">12:00</span>
+            { }
+            <span className="text-[8px] text-gray-400">12:00</span>
           </div>
+          {/* eslint-disable-next-line no-restricted-syntax */}
           <div className="rounded-lg bg-[#F3F4F6] px-2.5 py-1.5">
-            <p className="text-[10px] font-semibold text-[#3A3D40]">
+            { }
+            <p className="text-[10px] font-semibold text-gray-800">
               넵 파이팅!
             </p>
           </div>
@@ -283,11 +302,13 @@ function FeedbackCard({
           : "-right-[20px] top-[410px]"
       }`}
       style={{
+        // eslint-disable-next-line no-restricted-syntax
         boxShadow: "0px 2px 35px rgba(94, 94, 94, 0.19)",
         width: "200px",
       }}
     >
-      <p className="text-[10px] font-semibold leading-[1.5] text-[#3A3D40]">
+      { }
+      <p className="text-[10px] font-semibold leading-[1.5] text-gray-800">
         {message}
       </p>
     </div>

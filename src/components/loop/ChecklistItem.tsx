@@ -107,7 +107,8 @@ export function ChecklistItem({ item, onToggle, onDelete }: ChecklistItemProps) 
       <div
         className={cn(
           "flex w-full flex-col items-start gap-[10px] rounded-[10px] p-4",
-          item.completed ? "bg-[var(--gray-200)]" : "bg-[var(--gray-white)]"
+           
+          item.completed ? "bg-gray-200" : "bg-gray-white"
         )}
         style={{
           transform: `translateX(${translateX}px)`,
@@ -115,7 +116,8 @@ export function ChecklistItem({ item, onToggle, onDelete }: ChecklistItemProps) 
         }}
       >
         <div className="flex w-full items-center justify-between">
-          <span className="text-body-1-sb font-semibold text-[var(--gray-800)] truncate">
+          { }
+          <span className="text-body-1-sb font-semibold text-gray-800 truncate">
             {item.content}
           </span>
 

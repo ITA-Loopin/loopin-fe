@@ -285,7 +285,8 @@ export default function OnboardingPage() {
             type="button"
             onClick={handleCompleteSignup}
             disabled={isSubmitting}
-            className="mt-8 w-full rounded-full bg-[#2C2C2C] px-4 py-3 text-sm font-semibold text-white transition"
+             
+            className="mt-8 w-full rounded-full bg-gray-800 px-4 py-3 text-sm font-semibold text-white transition"
           >
             {isSubmitting ? "처리 중..." : "Loopin 시작하기"}
           </button>

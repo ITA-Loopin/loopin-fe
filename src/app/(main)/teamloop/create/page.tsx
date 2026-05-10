@@ -53,8 +53,13 @@ export default function CreateTeamLoopPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-full bg-[var(--gray-white)]">
-      <Header leftType="back" rightType="user" onBack={() => router.back()} centerTitle="팀 생성" />
+    <div className="flex flex-col min-h-full bg-gray-white">
+      <Header
+        leftType="back"
+        rightType="user"
+        onBack={() => router.back()}
+        centerTitle="팀 생성"
+      />
 
       <form onSubmit={handleSubmit} className="flex-1 px-[16px] pt-[30px]">
         <div className="flex flex-col gap-10">
@@ -94,4 +99,3 @@ export default function CreateTeamLoopPage() {
     </div>
   );
 }
-

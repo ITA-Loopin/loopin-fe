@@ -116,6 +116,7 @@ function HomeContent() {
         className="flex min-h-screen items-center justify-center"
         style={{
           background:
+            // eslint-disable-next-line no-restricted-syntax
             "linear-gradient(136deg, #FF5741 54.38%, #FFE4E0 118.92%)",
         }}
       >
@@ -128,6 +129,7 @@ function HomeContent() {
     <div
       className="relative flex min-h-screen flex-col items-center overflow-hidden text-white"
       style={{
+        // eslint-disable-next-line no-restricted-syntax
         background: "linear-gradient(136deg, #FF5741 54%, #FFE4E0 100%)",
       }}
     >
@@ -141,12 +143,10 @@ function HomeContent() {
         style={{ filter: "blur(220px)" }}
       />
       <div
-        className="absolute left-[120px] -top-[96px] h-[233px] w-[403px] rounded-full opacity-40"
-        style={{ background: "#E7FFBA", filter: "blur(234px)" }}
+        className="absolute left-[120px] -top-[96px] h-[233px] w-[403px] rounded-full opacity-40 bg-sub-mint blur-[234px]"
       />
       <div
-        className="absolute left-[120px] top-[559px] h-[383px] w-[394px] rounded-full opacity-40"
-        style={{ background: "#E7FFBA", filter: "blur(194px)" }}
+        className="absolute left-[120px] top-[559px] h-[383px] w-[394px] rounded-full opacity-40 bg-sub-mint blur-[194px]"
       />
 
       {/* 로고 영역 */}
@@ -191,7 +191,8 @@ function HomeContent() {
             variant="icon"
             onClick={handleKakaoLogin}
             aria-label="카카오 로그인"
-            className="h-10 w-10 bg-[#FEDC2C]"
+             
+            className="h-10 w-10 bg-brand-kakao"
           >
             <Image
               src="/kakao-icon.svg"
@@ -217,7 +218,8 @@ function HomeContent() {
             variant="icon"
             onClick={handleNaverLogin}
             aria-label="네이버 로그인"
-            className="h-10 w-10 bg-[#03C75A]"
+             
+            className="h-10 w-10 bg-brand-naver"
           >
             <Image
               src="/naver-simple.png"

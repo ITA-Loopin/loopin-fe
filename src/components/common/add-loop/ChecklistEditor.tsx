@@ -23,9 +23,11 @@ export function ChecklistEditor({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const itemContainerStyles =
-    "flex w-full items-start justify-between rounded-[10px] bg-[var(--gray-100)] p-4";
+     
+    "flex w-full items-start justify-between rounded-[10px] bg-gray-100 p-4";
   const baseInputStyles =
-    "flex-1 w-full border-none bg-transparent px-0 py-0 text-body-1-sb font-semibold text-[var(--gray-black)] placeholder:text-[var(--gray-400)] focus:outline-none";
+     
+    "flex-1 w-full border-none bg-transparent px-0 py-0 text-body-1-sb font-semibold text-gray-black placeholder:text-gray-400 focus:outline-none";
 
   const trimmedValue = newChecklistItem.trim();
 
@@ -49,7 +51,8 @@ export function ChecklistEditor({
     <div 
       className="flex flex-col items-start gap-2 self-stretch"
     >
-      <p className="text-caption-r text-[var(--gray-500)]">
+      { }
+      <p className="text-caption-r text-gray-500">
         체크리스트
       </p>
 
