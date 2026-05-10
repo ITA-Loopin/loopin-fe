@@ -419,7 +419,6 @@ export function usePlannerChat(
       try {
         const response = await fetchChatMessages({
           chatRoomId: plannerChatRoomId,
-          page: 0,
           size: 20,
         });
 

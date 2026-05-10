@@ -98,7 +98,6 @@ export function useTeamChat(teamId: number | null) {
       try {
         const response = await fetchTeamChatMessages({
           chatRoomId,
-          page: 0,
           size: 50,
         });
 
