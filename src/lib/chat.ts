@@ -360,14 +360,6 @@ export type SSEEvent = {
   data: string | ChatMessageDto;
 };
 
-export type SSEEventType = "CONNECT" | "MESSAGE";
-
-export type SSEEvent = {
-  id: string;
-  event: SSEEventType;
-  data: string | ChatMessageDto;
-};
-
 export type CreateSSEOptions = {
   chatRoomId: number;
   lastEventId?: string;
