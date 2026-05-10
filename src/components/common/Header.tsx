@@ -34,7 +34,6 @@ export default function Header({
   onNotificationClick,
   onMenuClick,
   onEditClick,
-  className,
 }: HeaderProps) {
   const router = useRouter();
 
@@ -126,13 +125,20 @@ export default function Header({
   return (
     <header
       className={cn(
-        "grid grid-cols-3 items-center px-4 pt-[15px] pb-4 border border-[var(--gray-white)] bg-white/30 backdrop-blur-[7px]",
-        className
+        "relative flex items-center px-4 py-[15px] border border-[var(--gray-white)] bg-white/30 backdrop-blur-[7px]"
       )}
     >
-      <div className="flex items-center justify-start">{renderLeft()}</div>
-      <div className="flex items-center justify-center">{renderCenter()}</div>
-      <div className="flex items-center justify-end gap-3">{renderRight()}</div>
+      <div className="flex flex-1 items-center justify-start">
+        {renderLeft()}
+      </div>
+
+      <div className="absolute left-1/2 -translate-x-1/2 max-w-[40%] truncate">
+        {renderCenter()}
+      </div>
+
+      <div className="flex flex-1 items-center justify-end">
+        {renderRight()}
+      </div>
     </header>
   );
 }
