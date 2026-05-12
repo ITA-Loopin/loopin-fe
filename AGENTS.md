@@ -6,11 +6,11 @@
 
 직접 색상값을 코드에 박지 않습니다. 다음 패턴은 ESLint 룰 `no-restricted-syntax`로 모두 **error**로 차단됩니다.
 
-| 패턴 | 예시 |
-|---|---|
-| 6자리 hex | `bg-[#FF5741]`, `style={{ color: "#000000" }}` |
-| CSS 변수 arbitrary | `bg-[var(--primary-main)]`, `text-[var(--gray-800)]` |
-| rgb / rgba / hsl / hsla | `style={{ color: "rgb(255, 0, 0)" }}` |
+| 패턴                    | 예시                                                 |
+| ----------------------- | ---------------------------------------------------- |
+| 6자리 hex               | `bg-[#FF5741]`, `style={{ color: "#000000" }}`       |
+| CSS 변수 arbitrary      | `bg-[var(--primary-main)]`, `text-[var(--gray-800)]` |
+| rgb / rgba / hsl / hsla | `style={{ color: "rgb(255, 0, 0)" }}`                |
 
 ### 대안
 
@@ -37,20 +37,20 @@
 
 `primary-main`(#FF543F, 진함)과 `primary-500`(#FF7765, 밝음)은 Figma에서도 별개 토큰입니다. 합치지 말고 아래 4가지 컨텍스트 규칙에 따라 골라 씁니다.
 
-| 컨텍스트 | 텍스트 토큰 |
-|---|---|
-| `bg-primary-200` 배경 위 (라이트 톤 배지/버튼 selected) | `text-primary-main` (예외 없음) |
-| 흰 배경 카드/말풍선 안 본문 강조 | `text-primary-main` |
-| 자유 배치 단독 라벨/안내문 (스피커 이름, 로딩 메시지, 캘린더 일자) | `text-primary-500` |
-| 서브/캡션 텍스트 | `text-primary-400` |
+| 컨텍스트                                                           | 텍스트 토큰                     |
+| ------------------------------------------------------------------ | ------------------------------- |
+| `bg-primary-200` 배경 위 (라이트 톤 배지/버튼 selected)            | `text-primary-main` (예외 없음) |
+| 흰 배경 카드/말풍선 안 본문 강조                                   | `text-primary-main`             |
+| 자유 배치 단독 라벨/안내문 (스피커 이름, 로딩 메시지, 캘린더 일자) | `text-primary-500`              |
+| 서브/캡션 텍스트                                                   | `text-primary-400`              |
 
 fill 배경:
 
-| 컨텍스트 | 배경 토큰 |
-|---|---|
+| 컨텍스트                                      | 배경 토큰        |
+| --------------------------------------------- | ---------------- |
 | Primary 액션 fill (Button, 활성 배지, 진행바) | `bg-primary-500` |
-| `primary-500` fill의 hover | `bg-primary-700` |
-| 라이트 톤 배지/태그 배경 | `bg-primary-200` |
+| `primary-500` fill의 hover                    | `bg-primary-700` |
+| 라이트 톤 배지/태그 배경                      | `bg-primary-200` |
 
 ### 기존 코드의 inline disable
 
@@ -74,9 +74,55 @@ fill 배경:
 
 ## 공통 컴포넌트
 
-- 공통 Button: `@/components/ui/button`의 `<Button />`을 사용합니다. variants: `primary | secondary | outline | ghost | icon`, sizes: `sm | md | lg`.
-- 이전의 `PrimaryButton`, `IconButton`은 제거됐습니다 (디자인 시스템으로 통합).
+### 공통 컴포넌트 우선 사용
 
-## 커밋 / 자동화
+`components/ui/` 또는 `components/common/`에 같은 역할의 공통 컴포넌트가 있으면 가급적 그걸 씁니다. raw HTML 요소나 페이지 내 ad-hoc 구현보다 공통 컴포넌트를 먼저 고려합니다.
 
-- 자동화 에이전트는 사용자 명시 지시 없이 `git commit`을 실행하지 않습니다 (사용자 직접 수행).
+| 역할               | 우선 사용                       |
+| ------------------ | ------------------------------- |
+| 버튼               | `<Button />`                    |
+| 세그먼트/선택 그룹 | `<SegmentedControl />`          |
+| 모달               | `<Modal />`, `<ConfirmModal />` |
+| 바텀시트           | `<BottomSheet />`               |
+| 헤더               | `<Header />`                    |
+
+공통 컴포넌트가 디자인 요구를 못 따라가면 새 variant를 추가하거나 별도 공통 컴포넌트를 만든 뒤 그것을 씁니다. 일회성 ad-hoc 구현은 지양합니다.
+
+## 코드 스타일
+
+### JSX 변수 추출로 가독성 향상
+
+return 안에 같은 종류의 JSX 블록이 여러 개 늘어서거나 조건부 분기가 복잡해지면, **각 JSX 블록을 변수로 추출**해서 return을 평탄화합니다.
+
+```tsx
+// 권장
+const saveButton = (
+  <Button variant="primary" onClick={onSave}>
+    저장
+  </Button>
+);
+
+const deleteButton = (
+  <Button variant="secondary" onClick={onDelete}>
+    삭제
+  </Button>
+);
+
+const cancelButton = (
+  <Button variant="outline" onClick={onCancel}>
+    취소
+  </Button>
+);
+
+return (
+  <div className="flex gap-2">
+    {saveButton}
+    {deleteButton}
+    {cancelButton}
+  </div>
+);
+```
+
+- return 안에서 props/className이 길어지면 시각 구조가 가려집니다. 변수로 빼면 return은 레이아웃만 표현하게 됩니다.
+- 조건부 분기(`isEditing ? <X /> : <Y />`)도 변수로 분리하면 가독성이 좋아집니다.
+- 한 줄짜리 단순 JSX는 굳이 추출하지 않습니다.
