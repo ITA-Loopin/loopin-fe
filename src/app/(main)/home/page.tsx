@@ -246,7 +246,7 @@ export default function HomePage() {
                 {/* 말풍선 형태의 메시지 */}
                 <div className="relative flex items-center justify-center">
                   {/* eslint-disable-next-line no-restricted-syntax */}
-                  <div className="relative rounded-lg bg-white/90 px-4 py-3 text-sm font-semibold text-primary-500 shadow-[0px_2px_8px_rgba(0,0,0,0.1)]">
+                  <div className="relative rounded-lg bg-white/90 px-4 py-3 text-sm font-semibold text-primary-main shadow-[0px_2px_8px_rgba(0,0,0,0.1)]">
                     <span>오늘 하루의 루프를 모두 채워보세요!</span>
                     {/* 위쪽 삼각형 포인터 */}
                     {/* eslint-disable-next-line no-restricted-syntax */}

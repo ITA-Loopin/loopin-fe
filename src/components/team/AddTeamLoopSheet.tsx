@@ -14,8 +14,7 @@ import { useLoopChecklist } from "@/hooks/useLoopChecklist";
 import { useTeamMemberSelection } from "@/hooks/useTeamMemberSelection";
 import { useCreateTeamLoop } from "@/hooks/useCreateTeamLoop";
 import { RepeatValue } from "@/components/common/add-loop/constants";
-import { LoopTypeSelector } from "./LoopTypeSelector";
-import { ImportanceSelector } from "./ImportanceSelector";
+import { SegmentedControl } from "@/components/ui/segmented-control";
 
 type AddTeamLoopSheetProps = {
   isOpen: boolean;
@@ -32,8 +31,12 @@ export function AddTeamLoopSheet({
   onCreated,
   defaultStartDate,
 }: AddTeamLoopSheetProps) {
-  const [loopType, setLoopType] = useState<"COMMON" | "INDIVIDUAL" | undefined>(undefined);
-  const [importance, setImportance] = useState<"HIGH" | "MEDIUM" | "LOW" | undefined>(undefined);
+  const [loopType, setLoopType] = useState<"COMMON" | "INDIVIDUAL" | undefined>(
+    undefined,
+  );
+  const [importance, setImportance] = useState<
+    "HIGH" | "MEDIUM" | "LOW" | undefined
+  >(undefined);
 
   const { title, handleTitleChange } = useLoopTitle({
     isOpen,
@@ -58,12 +61,16 @@ export function AddTeamLoopSheet({
     defaultChecklists: undefined,
   });
 
-  const { teamMembers, selectedMemberIds, isLoadingMembers, handleMemberToggle } =
-    useTeamMemberSelection({
-      isOpen,
-      loopType,
-      teamId,
-    });
+  const {
+    teamMembers,
+    selectedMemberIds,
+    isLoadingMembers,
+    handleMemberToggle,
+  } = useTeamMemberSelection({
+    isOpen,
+    loopType,
+    teamId,
+  });
 
   const { createTeamLoop, isSubmitting } = useCreateTeamLoop({
     teamId,
@@ -76,8 +83,10 @@ export function AddTeamLoopSheet({
   // 바텀 시트가 열릴 때 초기화
   useEffect(() => {
     if (isOpen) {
-      setLoopType(undefined);
-      setImportance(undefined);
+      queueMicrotask(() => {
+        setLoopType(undefined);
+        setImportance(undefined);
+      });
     }
   }, [isOpen]);
 
@@ -89,7 +98,7 @@ export function AddTeamLoopSheet({
         dateRange.resetEndDate();
       }
     },
-    [schedule, dateRange]
+    [schedule, dateRange],
   );
 
   // 폼 내 다른 영역 클릭 시 체크리스트 추가
@@ -97,7 +106,9 @@ export function AddTeamLoopSheet({
     (e: React.PointerEvent<HTMLFormElement>) => {
       // 체크리스트 입력 필드가 아닌 곳을 클릭했을 때 체크리스트 추가
       const target = e.target as HTMLElement;
-      const isChecklistInput = target.closest('[data-checklist-input-container]');
+      const isChecklistInput = target.closest(
+        "[data-checklist-input-container]",
+      );
       const trimmedValue = checklist.newChecklistItem.trim();
 
       if (!isChecklistInput && trimmedValue) {
@@ -110,7 +121,7 @@ export function AddTeamLoopSheet({
         checklist.handleAddChecklist();
       }
     },
-    [checklist.newChecklistItem, checklist.handleAddChecklist]
+    [checklist.newChecklistItem, checklist.handleAddChecklist],
   );
 
   const handleSubmit = useCallback(
@@ -119,7 +130,8 @@ export function AddTeamLoopSheet({
 
       await createTeamLoop({
         title,
-        scheduleType: schedule.scheduleType === "" ? undefined : schedule.scheduleType,
+        scheduleType:
+          schedule.scheduleType === "" ? undefined : schedule.scheduleType,
         daysOfWeek: schedule.daysOfWeek,
         startDate: dateRange.startDate,
         endDate: dateRange.endDate,
@@ -140,7 +152,7 @@ export function AddTeamLoopSheet({
       loopType,
       importance,
       selectedMemberIds,
-    ]
+    ],
   );
 
   return (
@@ -153,46 +165,60 @@ export function AddTeamLoopSheet({
       <div className="inline-flex items-center gap-2.5 px-4 py-5">
         <div className="flex w-full flex-col items-center gap-6">
           {/* 바텀시트 제목 */}
-          { }
+          {}
           <h2 className="text-center text-body-1-sb text-gray-600">
             루프 추가하기
           </h2>
 
           {/* 루프 추가 폼 */}
-          <form 
-            className="w-full space-y-10" 
+          <form
+            className="w-full space-y-10"
             onSubmit={handleSubmit}
             onPointerDownCapture={handleFormPointerDown}
           >
             <TitleInput value={title} onChange={handleTitleChange} />
 
-            <LoopTypeSelector 
-              value={loopType} 
-              onChange={(value) => setLoopType(value)} 
+            <SegmentedControl
+              label="루프 유형"
+              value={loopType}
+              onChange={setLoopType}
+              options={[
+                {
+                  value: "COMMON",
+                  label: "팀 공동 루프",
+                  description: "전원 수행",
+                },
+                {
+                  value: "INDIVIDUAL",
+                  label: "개인 루프",
+                  description: "지정된 사람만",
+                },
+              ]}
             />
 
             {/* 개인 루프 선택 시 팀원 목록 표시 */}
             {loopType === "INDIVIDUAL" && (
               <div className="flex flex-col items-start gap-2 self-stretch">
-                { }
+                {}
                 <p className="text-caption-r text-gray-500">팀원 선택</p>
                 {isLoadingMembers ? (
                   <div className="flex items-center justify-center py-4 w-full">
-                    { }
+                    {}
                     <p className="text-body-2-m text-gray-500">로딩 중...</p>
                   </div>
                 ) : (
                   <div className="flex w-full flex-col gap-2">
                     {teamMembers.map((member) => {
-                      const isSelected = selectedMemberIds.includes(member.memberId);
+                      const isSelected = selectedMemberIds.includes(
+                        member.memberId,
+                      );
                       return (
                         <div
                           key={member.memberId}
-                           
                           className="flex items-center gap-3 self-stretch h-[44px] px-4 py-[9px] rounded-[10px] bg-gray-100"
                         >
                           {/* 프로필 이미지 */}
-                          { }
+                          {}
                           <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
                             {member.profileImage ? (
                               <img
@@ -207,7 +233,7 @@ export function AddTeamLoopSheet({
                             )}
                           </div>
                           {/* 닉네임 */}
-                          { }
+                          {}
                           <span className="flex-1 text-body-2-m text-gray-800">
                             {member.nickname}
                           </span>
@@ -217,15 +243,12 @@ export function AddTeamLoopSheet({
                             onClick={() => handleMemberToggle(member.memberId)}
                             className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
                               isSelected
-                                 
                                 ? "bg-primary-500 border-primary-500"
-                                 
                                 : "bg-gray-white border-gray-300"
                             }`}
                           >
                             {isSelected && (
                               <svg
-                                 
                                 className="w-3 h-3 text-gray-white"
                                 fill="none"
                                 stroke="currentColor"
@@ -257,9 +280,15 @@ export function AddTeamLoopSheet({
               onAddChecklist={checklist.handleAddChecklist}
             />
 
-            <ImportanceSelector 
-              value={importance} 
-              onChange={(value) => setImportance(value)} 
+            <SegmentedControl
+              label="중요도"
+              value={importance}
+              onChange={setImportance}
+              options={[
+                { value: "HIGH", label: "높음" },
+                { value: "MEDIUM", label: "보통" },
+                { value: "LOW", label: "낮음" },
+              ]}
             />
 
             <ScheduleSelector
@@ -315,4 +344,3 @@ export function AddTeamLoopSheet({
     </BottomSheet>
   );
 }
-

@@ -242,8 +242,13 @@ function TeamChatGroup() {
       {/* 공지 카드 */}
       {/* eslint-disable-next-line no-restricted-syntax */}
       <div className="mb-2 flex items-start gap-1.5 rounded-md border border-[#F0F0F0] bg-[#FAFAFA] px-2.5 py-2">
-        { }
-        <span className="text-[10px] text-primary-500">📌</span>
+        <Image
+          src="/onboarding/icon-pin.svg"
+          alt=""
+          width={10}
+          height={10}
+          className="mt-0.5 shrink-0"
+        />
         { }
         <p className="text-[10px] font-medium leading-[1.4] text-gray-800">
           각자 맡은 파트 루프 완료하기 해주시고, 채팅방에 파일 공유해주세요!
