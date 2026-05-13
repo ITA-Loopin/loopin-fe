@@ -2,14 +2,13 @@
 // 이 파일은 public 폴더에 있어야 하며, 브라우저에서 자동으로 등록됩니다.
 // Firebase SDK 없이 기본 Web Push API를 사용합니다.
 
-// body JSON에서 content 텍스트 추출
-function extractContent(bodyStr) {
-  if (!bodyStr || typeof bodyStr !== 'string') return '';
+// body JSON 파싱
+function parseBody(bodyStr) {
+  if (!bodyStr || typeof bodyStr !== 'string') return { content: '' };
   try {
-    const parsed = JSON.parse(bodyStr);
-    return parsed.content || bodyStr;
+    return JSON.parse(bodyStr);
   } catch {
-    return bodyStr;
+    return { content: bodyStr };
   }
 }
 
@@ -40,7 +39,10 @@ self.addEventListener('push', (event) => {
     data.body ||
     notificationData.body ||
     '';
-  const body = extractContent(rawBody);
+  const parsed = parseBody(rawBody);
+  const body = parsed.content || rawBody;
+  const targetObject = parsed.targetObject || null;
+  const objectId = parsed.objectId ?? null;
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
@@ -49,7 +51,7 @@ self.addEventListener('push', (event) => {
       if (visibleClient) {
         // 포그라운드: 페이지로 메시지 전달 → 인앱 알림 표시
         clientList.forEach((client) => {
-          client.postMessage({ type: 'PUSH_NOTIFICATION', title, body });
+          client.postMessage({ type: 'PUSH_NOTIFICATION', title, body, targetObject, objectId });
         });
       } else {
         // 백그라운드: 시스템 알림 표시
