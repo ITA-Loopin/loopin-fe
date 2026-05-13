@@ -7,13 +7,39 @@ interface SaveFCMTokenRequest {
   fcmToken: string;
 }
 
+// 네이티브 WebView 내 실행 여부 확인
+function isNativeWebView(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    !!(window as any).ReactNativeWebView
+  );
+}
+
+// 네이티브 FCM 토큰 가져오기
+function getNativeFCMToken(): string | null {
+  if (typeof window !== "undefined" && (window as any).__NATIVE_FCM_TOKEN__) {
+    return (window as any).__NATIVE_FCM_TOKEN__;
+  }
+  return null;
+}
+
 // FCM 토큰 저장 API
 export const saveFCMTokenApi = async (
   authFetch: AuthFetch
 ): Promise<boolean> => {
   try {
-    const token = await getFCMToken();
-    
+    // 네이티브 WebView인 경우 네이티브 FCM 토큰 사용
+    let token: string | null = null;
+
+    if (isNativeWebView()) {
+      token = getNativeFCMToken();
+    }
+
+    // 네이티브 토큰이 없으면 웹 FCM 토큰 시도
+    if (!token) {
+      token = await getFCMToken();
+    }
+
     if (!token) {
       console.warn("FCM 토큰을 가져올 수 없어 저장하지 않습니다.");
       return false;
@@ -32,6 +58,22 @@ export const saveFCMTokenApi = async (
     return false;
   }
 };
+
+// 네이티브 FCM 토큰 리프레시 리스너 등록
+export function setupNativeFCMTokenListener(authFetch: AuthFetch) {
+  if (typeof window === "undefined" || !isNativeWebView()) {
+    return;
+  }
+
+  (window as any).__onNativeFCMToken = async (token: string) => {
+    try {
+      (window as any).__NATIVE_FCM_TOKEN__ = token;
+      await saveFCMTokenApi(authFetch);
+    } catch (err) {
+      console.error("네이티브 FCM 토큰 재등록 실패:", err);
+    }
+  };
+}
 
 // FCM 토큰 삭제 API
 export const deleteFCMTokenApi = async (

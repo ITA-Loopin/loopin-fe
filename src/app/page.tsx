@@ -13,7 +13,7 @@ import {
   type MemberResponse,
 } from "@/lib/member";
 import type { User } from "@/types/auth";
-import { saveFCMTokenApi } from "@/lib/fcm";
+import { saveFCMTokenApi, setupNativeFCMTokenListener } from "@/lib/fcm";
 import { authFetch } from "@/utils/fetch";
 import { Button } from "@/components/ui/button";
 
@@ -90,6 +90,11 @@ function HomeContent() {
     window.location.href =
       "https://api.loopin.co.kr/oauth2/authorization/apple";
   };
+
+  // 네이티브 FCM 토큰 리프레시 리스너 등록
+  useEffect(() => {
+    setupNativeFCMTokenListener(authFetch);
+  }, []);
 
   useEffect(() => {
     const status = searchParams.get("status");
