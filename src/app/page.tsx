@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
@@ -25,6 +25,7 @@ function HomeContent() {
   const dispatch = useAppDispatch();
   const { isLoading, isAuthenticated } = useAppSelector((state) => state.auth);
   const [showContent, setShowContent] = useState(false);
+  const loginProcessedRef = useRef(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -100,6 +101,8 @@ function HomeContent() {
     const status = searchParams.get("status");
 
     if (status === "LOGIN_SUCCESS") {
+      if (loginProcessedRef.current) return;
+      loginProcessedRef.current = true;
       handleLoginSuccess();
       return;
     }
