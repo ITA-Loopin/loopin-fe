@@ -5,13 +5,16 @@
 // Push 이벤트 리스너
 self.addEventListener('push', (event) => {
   console.log('[firebase-messaging-sw.js] Push 이벤트 수신');
-  
+  console.log('[firebase-messaging-sw.js] event.data 존재:', !!event.data);
+
   let notificationData = {};
-  
+
   if (event.data) {
     try {
       notificationData = event.data.json();
+      console.log('[firebase-messaging-sw.js] 파싱된 데이터:', JSON.stringify(notificationData));
     } catch (e) {
+      console.log('[firebase-messaging-sw.js] json() 파싱 실패:', e.message);
       try {
         notificationData = JSON.parse(event.data.text());
       } catch (e2) {
@@ -19,29 +22,35 @@ self.addEventListener('push', (event) => {
       }
     }
   }
-  
-  // FCM 메시지 형식 처리
-  const notificationTitle = 
-    notificationData.notification?.title || 
-    notificationData.title || 
+
+  // FCM 메시지 형식 처리 - data 래핑도 처리
+  const data = notificationData.data || {};
+  const notificationTitle =
+    notificationData.notification?.title ||
+    data.title ||
+    notificationData.title ||
     'Loopin 알림';
-    
-  const notificationBody = 
-    notificationData.notification?.body || 
-    notificationData.body || 
+
+  const notificationBody =
+    notificationData.notification?.body ||
+    data.body ||
+    notificationData.body ||
     '';
-  
+
+  console.log('[firebase-messaging-sw.js] title:', notificationTitle, 'body:', notificationBody);
+
   const notificationOptions = {
-    body: notificationBody,
+    body: notificationBody || '새로운 알림이 있습니다.',
     icon: '/loopin-logo.svg',
     badge: '/loopin-logo.svg',
-    tag: 'loopin-notification',
     requireInteraction: false,
-    data: notificationData.data || notificationData || {},
+    data: data,
   };
 
   event.waitUntil(
     self.registration.showNotification(notificationTitle, notificationOptions)
+      .then(() => console.log('[firebase-messaging-sw.js] showNotification 성공'))
+      .catch((err) => console.error('[firebase-messaging-sw.js] showNotification 실패:', err))
   );
 });
 
