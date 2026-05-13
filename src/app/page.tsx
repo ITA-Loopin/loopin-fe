@@ -86,6 +86,11 @@ function HomeContent() {
       "https://api.loopin.co.kr/oauth2/authorization/google";
   };
 
+  const handleAppleLogin = () => {
+    window.location.href =
+      "https://api.loopin.co.kr/oauth2/authorization/apple";
+  };
+
   useEffect(() => {
     const status = searchParams.get("status");
 
@@ -230,6 +235,7 @@ function HomeContent() {
           </Button>
           <Button
             variant="icon"
+            onClick={handleAppleLogin}
             aria-label="애플 로그인"
             className="h-10 w-10 bg-black"
           >
