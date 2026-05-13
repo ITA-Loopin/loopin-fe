@@ -2,19 +2,25 @@
 // 이 파일은 public 폴더에 있어야 하며, 브라우저에서 자동으로 등록됩니다.
 // Firebase SDK 없이 기본 Web Push API를 사용합니다.
 
+// body JSON에서 content 텍스트 추출
+function extractContent(bodyStr) {
+  if (!bodyStr || typeof bodyStr !== 'string') return '';
+  try {
+    const parsed = JSON.parse(bodyStr);
+    return parsed.content || bodyStr;
+  } catch {
+    return bodyStr;
+  }
+}
+
 // Push 이벤트 리스너
 self.addEventListener('push', (event) => {
-  console.log('[firebase-messaging-sw.js] Push 이벤트 수신');
-  console.log('[firebase-messaging-sw.js] event.data 존재:', !!event.data);
-
   let notificationData = {};
 
   if (event.data) {
     try {
       notificationData = event.data.json();
-      console.log('[firebase-messaging-sw.js] 파싱된 데이터:', JSON.stringify(notificationData));
     } catch (e) {
-      console.log('[firebase-messaging-sw.js] json() 파싱 실패:', e.message);
       try {
         notificationData = JSON.parse(event.data.text());
       } catch (e2) {
@@ -23,34 +29,39 @@ self.addEventListener('push', (event) => {
     }
   }
 
-  // FCM 메시지 형식 처리 - data 래핑도 처리
   const data = notificationData.data || {};
-  const notificationTitle =
+  const title =
     notificationData.notification?.title ||
     data.title ||
     notificationData.title ||
     'Loopin 알림';
-
-  const notificationBody =
+  const rawBody =
     notificationData.notification?.body ||
     data.body ||
     notificationData.body ||
     '';
-
-  console.log('[firebase-messaging-sw.js] title:', notificationTitle, 'body:', notificationBody);
-
-  const notificationOptions = {
-    body: notificationBody || '새로운 알림이 있습니다.',
-    icon: '/loopin-logo.svg',
-    badge: '/loopin-logo.svg',
-    requireInteraction: false,
-    data: data,
-  };
+  const body = extractContent(rawBody);
 
   event.waitUntil(
-    self.registration.showNotification(notificationTitle, notificationOptions)
-      .then(() => console.log('[firebase-messaging-sw.js] showNotification 성공'))
-      .catch((err) => console.error('[firebase-messaging-sw.js] showNotification 실패:', err))
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      const visibleClient = clientList.find((c) => c.visibilityState === 'visible');
+
+      if (visibleClient) {
+        // 포그라운드: 페이지로 메시지 전달 → 인앱 알림 표시
+        clientList.forEach((client) => {
+          client.postMessage({ type: 'PUSH_NOTIFICATION', title, body });
+        });
+      } else {
+        // 백그라운드: 시스템 알림 표시
+        return self.registration.showNotification(title, {
+          body: body || '새로운 알림이 있습니다.',
+          icon: '/loopin-logo.svg',
+          badge: '/loopin-logo.svg',
+          requireInteraction: false,
+          data: data,
+        });
+      }
+    })
   );
 });
 

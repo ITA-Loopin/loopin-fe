@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { onForegroundMessage } from "@/lib/firebase";
 
 interface ForegroundNotification {
   id: number;
@@ -63,42 +62,30 @@ export function FirebaseServiceWorker() {
     });
   }, []);
 
-  // 포그라운드 메시지 수신 핸들러
+  // 서비스 워커에서 전달받은 포그라운드 푸시 메시지 수신
   useEffect(() => {
-    const unsubscribe = onForegroundMessage((payload: any) => {
-      const title =
-        payload?.notification?.title ||
-        payload?.data?.title ||
-        "Loopin 알림";
+    if (typeof window === "undefined" || !("serviceWorker" in navigator)) {
+      return;
+    }
 
-      let body =
-        payload?.notification?.body ||
-        payload?.data?.body ||
-        "";
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type !== "PUSH_NOTIFICATION") return;
 
-      // data.body가 JSON 문자열인 경우 content 추출
-      if (body && typeof body === "string") {
-        try {
-          const parsed = JSON.parse(body);
-          if (parsed.content) {
-            body = parsed.content;
-          }
-        } catch {
-          // JSON이 아니면 그대로 사용
-        }
-      }
-
+      const { title, body } = event.data;
       const id = ++notificationId;
-      setNotifications((prev) => [...prev, { id, title, body }]);
+      setNotifications((prev) => [
+        ...prev,
+        { id, title: title || "Loopin 알림", body: body || "" },
+      ]);
 
-      // 5초 후 자동 제거
       setTimeout(() => {
         setNotifications((prev) => prev.filter((n) => n.id !== id));
       }, 5000);
-    });
+    };
 
+    navigator.serviceWorker.addEventListener("message", handleMessage);
     return () => {
-      unsubscribe?.();
+      navigator.serviceWorker.removeEventListener("message", handleMessage);
     };
   }, []);
 
