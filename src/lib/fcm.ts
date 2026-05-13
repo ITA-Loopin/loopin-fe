@@ -28,15 +28,18 @@ export const saveFCMTokenApi = async (
   authFetch: AuthFetch
 ): Promise<boolean> => {
   try {
-    // 네이티브 WebView인 경우 네이티브 FCM 토큰 사용
     let token: string | null = null;
 
     if (isNativeWebView()) {
+      // 네이티브 WebView: 네이티브 FCM 토큰만 사용 (웹 토큰으로 폴백하지 않음)
       token = getNativeFCMToken();
-    }
-
-    // 네이티브 토큰이 없으면 웹 FCM 토큰 시도
-    if (!token) {
+      if (!token) {
+        // 네이티브 토큰이 아직 inject 안 됨 - 저장 건너뜀
+        console.log("네이티브 FCM 토큰 대기 중, 저장 건너뜀");
+        return false;
+      }
+    } else {
+      // 웹 브라우저: 웹 FCM 토큰 사용
       token = await getFCMToken();
     }
 
