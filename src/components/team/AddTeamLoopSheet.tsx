@@ -14,7 +14,7 @@ import { useLoopChecklist } from "@/hooks/useLoopChecklist";
 import { useTeamMemberSelection } from "@/hooks/useTeamMemberSelection";
 import { useCreateTeamLoop } from "@/hooks/useCreateTeamLoop";
 import { RepeatValue } from "@/components/common/add-loop/constants";
-import { SegmentedControl } from "@/components/ui/segmented-control";
+import { SegmentedControl } from "@/components/common/SegmentedControl";
 
 type AddTeamLoopSheetProps = {
   isOpen: boolean;
