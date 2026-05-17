@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Modal from "@/components/common/Modal";
+import { Dialog } from "@/components/common/Dialog";
 import { Button } from "@/components/common/Button";
 import { cn } from "@/lib/utils";
 
@@ -30,7 +30,7 @@ export function LoopActionModal({
     "flex h-[42px] items-center justify-center rounded-[5px] text-body-2-sb font-semibold bg-gray-100 px-[10px] py-[9px]";
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Dialog isOpen={isOpen} onClose={onClose}>
       <div className="relative w-[328px] rounded-[15px] bg-white p-3">
         {/* 닫기 버튼은 absolute 유지 */}
         <Button
@@ -109,6 +109,6 @@ export function LoopActionModal({
           </div>
         </div>
       </div>
-    </Modal>
+    </Dialog>
   );
 }

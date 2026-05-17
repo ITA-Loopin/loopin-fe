@@ -103,6 +103,16 @@ fill 배경:
 
 공통 컴포넌트가 디자인 요구를 못 따라가면 새 variant를 추가하거나 별도 공통 컴포넌트를 만든 뒤 그것을 씁니다. 일회성 ad-hoc 구현은 지양합니다.
 
+### Storybook
+
+`components/common/`의 모든 컴포넌트는 같은 디렉토리에 `*.stories.tsx`를 함께 둡니다 (예: `common/Button.tsx` ↔ `common/Button.stories.tsx`).
+
+- 신규 공통 컴포넌트를 추가할 때 스토리 파일을 함께 만듭니다.
+- 기존 컴포넌트에 variant/size/모드를 추가하면 해당 스토리에도 케이스를 추가합니다.
+- 스토리는 모든 variant × size 조합과 주요 상태(disabled, loading, with icon 등)를 카탈로그로 보여주는 것을 기본으로 합니다.
+- `components/ui/`(shadcn primitive)에는 스토리를 만들지 않습니다.
+- Storybook 실행: `pnpm storybook` (포트 6006).
+
 ## 코드 스타일
 
 ### JSX 변수 추출로 가독성 향상
