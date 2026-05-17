@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Header from "@/components/common/Header";
-import ConfirmModal from "@/components/common/ConfirmModal";
+import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { Button } from "@/components/common/Button";
 import { fetchMemberProfile, type MemberProfile } from "@/lib/member";
 import { useAccount } from "@/hooks/useAccount";
@@ -113,7 +113,7 @@ export default function AccountPage() {
         </div>
       </div>
 
-      <ConfirmModal
+      <ConfirmDialog
         isOpen={isWithdrawModalOpen}
         onClose={() => setIsWithdrawModalOpen(false)}
         onConfirm={handleWithdraw}

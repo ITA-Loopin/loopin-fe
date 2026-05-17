@@ -7,7 +7,7 @@ import Header from "@/components/common/Header";
 import { TeamMemberSearch } from "@/components/team/TeamMemberSearch";
 import Image from "next/image";
 import { Button } from "@/components/common/Button";
-import ConfirmModal from "@/components/common/ConfirmModal";
+import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import {
   fetchTeamDetail,
   fetchTeamMembers,
@@ -484,7 +484,7 @@ export default function TeamManagePage() {
         )}
 
         {/* 팀원 삭제 확인 모달 */}
-        <ConfirmModal
+        <ConfirmDialog
           isOpen={memberToRemove !== null}
           onClose={() => setMemberToRemove(null)}
           onConfirm={handleRemoveMember}
