@@ -15,7 +15,7 @@ import {
 import type { User } from "@/types/auth";
 import { saveFCMTokenApi, setupNativeFCMTokenListener } from "@/lib/fcm";
 import { authFetch } from "@/utils/fetch";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/common/Button";
 
 export const dynamic = "force-dynamic";
 

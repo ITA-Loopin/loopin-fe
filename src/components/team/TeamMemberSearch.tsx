@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/common/Button";
 import { useSearchMembers } from "@/hooks/useSearchMembers";
 
 type TeamMember = {

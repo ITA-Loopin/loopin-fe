@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/common/Button";
 
 function EntryStep({ onNext }: { onNext: () => void }) {
   const [showIllust, setShowIllust] = useState(false);

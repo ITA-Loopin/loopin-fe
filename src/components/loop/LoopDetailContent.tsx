@@ -4,7 +4,7 @@ import type { LoopDetail, LoopChecklist } from "@/types/loop";
 import { LoopProgress } from "@/components/home/LoopProgress";
 import { Checklist } from "@/components/loop/Checklist";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/common/Button";
 import { DropdownEditDelete } from "@/components/loop/DropdownEditDelete";
 
 interface LoopDetailContentProps {

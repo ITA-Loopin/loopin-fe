@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import Header from "@/components/common/Header";
 import { TeamMemberSearch } from "@/components/team/TeamMemberSearch";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/common/Button";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import {
   fetchTeamDetail,

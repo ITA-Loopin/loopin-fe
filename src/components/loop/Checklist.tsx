@@ -3,7 +3,7 @@
 import type { LoopChecklist } from "@/types/loop";
 import Image from "next/image";
 import { ChecklistItem } from "./ChecklistItem";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/common/Button";
 import { useEffect, useState, useRef } from "react";
 
 type ChecklistProps = {

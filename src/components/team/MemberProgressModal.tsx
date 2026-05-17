@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Modal from "@/components/common/Modal";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/common/Button";
 import { LoopProgress } from "@/components/home/LoopProgress";
 import { fetchTeamLoopMemberChecklist } from "@/lib/team";
 

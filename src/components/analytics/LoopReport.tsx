@@ -6,7 +6,7 @@ import { ReportHeader } from "./ReportHeader";
 import { ProgressStatsCard } from "./ProgressStatsCard";
 import { CalendarView } from "./CalendarView";
 import { LoopStatusList } from "./LoopStatusList";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/common/Button";
 import { AddLoopSheet } from "@/components/common/add-loop/AddLoopSheet";
 
 import type { LoopReportData, ReportStatus } from "@/types/report";
