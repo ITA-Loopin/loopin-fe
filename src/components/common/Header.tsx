@@ -4,7 +4,7 @@ import Image from "next/image";
 import { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/common/Button";
 
 type HeaderLeftType = "logo" | "back" | "none";
 type HeaderRightType = "user" | "menu" | "edit" | "none";

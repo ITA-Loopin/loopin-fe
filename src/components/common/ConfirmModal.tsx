@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Modal from "./Modal";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/common/Button";
 
 type ConfirmModalProps = {
   isOpen: boolean;
