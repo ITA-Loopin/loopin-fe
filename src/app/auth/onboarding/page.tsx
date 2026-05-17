@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import Modal from "@/components/common/Modal";
+import { Dialog } from "@/components/common/Dialog";
 import { apiFetch } from "@/lib/api";
 import { useAppDispatch } from "@/store/hooks";
 import { setCredentials } from "@/store/slices/authSlice";
@@ -259,7 +259,7 @@ export default function OnboardingPage() {
         </div>
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={closeModal} className="w-[90%]">
+      <Dialog isOpen={isModalOpen} onClose={closeModal} className="w-[90%]">
         <div className="rounded-3xl bg-white p-4 text-center  flex flex-col items-center justify-center">
             <Image
               src="/onboarding/graphic_complete.svg"
@@ -291,7 +291,7 @@ export default function OnboardingPage() {
             {isSubmitting ? "처리 중..." : "Loopin 시작하기"}
           </button>
         </div>
-      </Modal>
+      </Dialog>
     </div>
   );
 }

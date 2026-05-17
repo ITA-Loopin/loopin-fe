@@ -1,10 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import Modal from "./Modal";
+import { Dialog } from "./Dialog";
 import { Button } from "@/components/common/Button";
+import { cn } from "@/lib/utils";
 
-type ConfirmModalProps = {
+type ConfirmDialogProps = {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
@@ -14,7 +15,7 @@ type ConfirmModalProps = {
   variant?: "default" | "danger";
 };
 
-export default function ConfirmModal({
+export function ConfirmDialog({
   isOpen,
   onClose,
   onConfirm,
@@ -22,11 +23,11 @@ export default function ConfirmModal({
   confirmText = "확인",
   cancelText = "취소",
   variant = "default",
-}: ConfirmModalProps) {
+}: ConfirmDialogProps) {
   const isDanger = variant === "danger";
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Dialog isOpen={isOpen} onClose={onClose} title={title}>
       <div className="relative w-[328px] rounded-[15px] bg-white pt-9 px-3 pb-3 text-center">
         <Button
           variant="icon"
@@ -42,18 +43,17 @@ export default function ConfirmModal({
             style={{ width: 18, height: 18 }}
           />
         </Button>
-        {/* eslint-disable-next-line no-restricted-syntax */}
-        <p className="text-base font-bold leading-[150%] tracking-[-0.32px] text-center text-[var(--gray-800,#3A3D40)] whitespace-pre-line">
+        <p className="text-body-1-b text-gray-800 text-center whitespace-pre-line">
           {title}
         </p>
         <div className="mt-5 flex flex-row gap-2">
           <button
             type="button"
             onClick={onConfirm}
-            className={`flex-1 rounded-lg py-3 text-sm font-semibold bg-gray-100  ${
-               
-              isDanger ? "text-red-600" : "text-gray-800"
-            }`}
+            className={cn(
+              "flex-1 rounded-lg py-3 text-sm font-semibold bg-gray-100",
+              isDanger ? "text-red-600" : "text-gray-800",
+            )}
           >
             {confirmText}
           </button>
@@ -66,6 +66,6 @@ export default function ConfirmModal({
           </button>
         </div>
       </div>
-    </Modal>
+    </Dialog>
   );
 }

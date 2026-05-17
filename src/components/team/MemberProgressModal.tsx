@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import Modal from "@/components/common/Modal";
+import { Dialog } from "@/components/common/Dialog";
 import { Button } from "@/components/common/Button";
 import { LoopProgress } from "@/components/home/LoopProgress";
 import { fetchTeamLoopMemberChecklist } from "@/lib/team";
@@ -63,7 +63,7 @@ export function MemberProgressModal({
   if (!isOpen) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Dialog isOpen={isOpen} onClose={onClose}>
       <div className="relative w-full max-w-[420px] rounded-[15px] bg-white p-6">
         {/* 닫기 버튼 */}
         <Button
@@ -161,6 +161,6 @@ export function MemberProgressModal({
           )}
         </div>
       </div>
-    </Modal>
+    </Dialog>
   );
 }

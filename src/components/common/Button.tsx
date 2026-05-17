@@ -14,7 +14,7 @@ const buttonVariants = cva(
         outline:
           "border border-gray-300 bg-transparent text-gray-800 hover:bg-gray-100",
         ghost: "bg-transparent",
-
+        tonal: "bg-primary-200 text-primary-main",
         icon: "bg-transparent text-gray-800 rounded-full",
       },
       size: {
@@ -27,6 +27,21 @@ const buttonVariants = cva(
       { variant: "icon", size: "sm", className: "h-auto w-auto p-0" },
       { variant: "icon", size: "md", className: "h-auto w-auto p-0" },
       { variant: "icon", size: "lg", className: "h-auto w-auto p-0" },
+      {
+        variant: "tonal",
+        size: "sm",
+        className: "h-auto py-[6px] px-2 rounded-[5px]",
+      },
+      {
+        variant: "tonal",
+        size: "md",
+        className: "h-auto py-[6px] px-2 rounded-[5px]",
+      },
+      {
+        variant: "tonal",
+        size: "lg",
+        className: "h-auto py-[6px] px-2 rounded-[5px]",
+      },
     ],
     defaultVariants: {
       variant: "primary",
