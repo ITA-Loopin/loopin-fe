@@ -10,7 +10,7 @@ const meta = {
   argTypes: {
     variant: {
       control: "select",
-      options: ["primary", "secondary", "outline", "ghost", "icon"],
+      options: ["primary", "secondary", "outline", "ghost", "tonal", "icon"],
     },
     size: {
       control: "select",
@@ -35,6 +35,19 @@ export const Primary: Story = { args: { variant: "primary" } };
 export const Secondary: Story = { args: { variant: "secondary" } };
 export const Outline: Story = { args: { variant: "outline" } };
 export const Ghost: Story = { args: { variant: "ghost", children: "Ghost" } };
+export const Tonal: Story = { args: { variant: "tonal", children: "로그아웃" } };
+
+export const TonalWithIcon: Story = {
+  args: {
+    variant: "tonal",
+    children: (
+      <>
+        <Bell className="h-5 w-5" />
+        알림
+      </>
+    ),
+  },
+};
 
 export const Disabled: Story = { args: { disabled: true } };
 
@@ -60,7 +73,7 @@ export const IconOnly: Story = {
 export const VariantMatrix: Story = {
   parameters: { layout: "padded" },
   render: () => {
-    const variants = ["primary", "secondary", "outline", "ghost"] as const;
+    const variants = ["primary", "secondary", "outline", "ghost", "tonal"] as const;
     const sizes = ["sm", "md", "lg"] as const;
     return (
       <div className="flex flex-col gap-6">
