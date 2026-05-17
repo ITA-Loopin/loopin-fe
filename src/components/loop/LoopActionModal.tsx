@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Modal from "@/components/common/Modal";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/common/Button";
 import { cn } from "@/lib/utils";
 
 type LoopActionModalProps = {

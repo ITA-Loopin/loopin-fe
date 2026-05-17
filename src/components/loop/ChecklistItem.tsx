@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import type { LoopChecklist } from "@/types/loop";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/common/Button";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 

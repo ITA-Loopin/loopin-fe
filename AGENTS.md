@@ -74,9 +74,24 @@ fill 배경:
 
 ## 공통 컴포넌트
 
+### 폴더 역할 (`ui/` vs `common/`)
+
+디자인 시스템 컴포넌트는 두 폴더로 나뉘며 역할이 다릅니다.
+
+| 폴더                | 정체                                                   | 디자인 결정 포함 | 페이지/feature에서 직접 import |
+| ------------------- | ------------------------------------------------------ | ---------------- | ------------------------------ |
+| `components/ui/`    | shadcn 원본(primitive). Radix 래퍼에 가까운 상태로 유지 | 없음/최소        | ❌ (원칙적으로 `common/`만 사용) |
+| `components/common/` | loopin 디자인이 입혀진 공통 컴포넌트. `ui/` primitive를 조립·확장 | 있음 (토큰, variant, 사이즈) | ✅                              |
+
+원칙:
+
+- shadcn CLI로 받은 컴포넌트는 `ui/`에 그대로 둡니다. loopin 토큰/variant를 입히는 순간 `common/`으로 이동합니다.
+- 새 공통 컴포넌트는 가능한 한 `ui/` primitive를 기반으로 만듭니다. 대응되는 shadcn primitive가 없을 때만 자체 구현합니다 (`Header`, `LoadingSpinner` 등).
+- `common/` 컴포넌트는 named export, PascalCase 파일명 (`Button.tsx`)을 따릅니다.
+
 ### 공통 컴포넌트 우선 사용
 
-`components/ui/` 또는 `components/common/`에 같은 역할의 공통 컴포넌트가 있으면 가급적 그걸 씁니다. raw HTML 요소나 페이지 내 ad-hoc 구현보다 공통 컴포넌트를 먼저 고려합니다.
+`components/common/`에 같은 역할의 공통 컴포넌트가 있으면 가급적 그걸 씁니다. raw HTML 요소나 페이지 내 ad-hoc 구현보다 공통 컴포넌트를 먼저 고려합니다.
 
 | 역할               | 우선 사용                       |
 | ------------------ | ------------------------------- |

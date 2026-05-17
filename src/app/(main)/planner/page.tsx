@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { fetchChatRooms, type ChatRoom } from "@/lib/chat";
 import LoopIcon from "@/../public/ai-planner/loop-icon.svg";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/common/Button";
 import Header from "@/components/common/Header";
 
 type ChatLoop = {

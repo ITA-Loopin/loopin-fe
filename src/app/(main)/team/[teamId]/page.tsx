@@ -8,7 +8,7 @@ import Header from "@/components/common/Header";
 import { LoopProgress } from "@/components/home/LoopProgress";
 import { TeamLoopList } from "@/components/team/TeamLoopList";
 import { MonthCalendar } from "@/components/calendar/MonthCalendar";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/common/Button";
 import { AddTeamLoopSheet } from "@/components/team/AddTeamLoopSheet";
 import { TeamLoopFAB } from "@/components/team/TeamLoopFAB";
 import {

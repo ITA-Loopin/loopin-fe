@@ -8,7 +8,7 @@ import { TeamNameInput } from "@/components/team/TeamNameInput";
 import { TeamGoalInput } from "@/components/team/TeamGoalInput";
 import { TeamMemberSearch } from "@/components/team/TeamMemberSearch";
 import { InvitedMemberList } from "@/components/team/InvitedMemberList";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/common/Button";
 import type { TeamCategoryString } from "@/components/team/types";
 import { useCreateTeam } from "@/hooks/useCreateTeam";
 

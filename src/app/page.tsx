@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
@@ -13,9 +13,9 @@ import {
   type MemberResponse,
 } from "@/lib/member";
 import type { User } from "@/types/auth";
-import { saveFCMTokenApi } from "@/lib/fcm";
+import { saveFCMTokenApi, setupNativeFCMTokenListener } from "@/lib/fcm";
 import { authFetch } from "@/utils/fetch";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/common/Button";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +25,7 @@ function HomeContent() {
   const dispatch = useAppDispatch();
   const { isLoading, isAuthenticated } = useAppSelector((state) => state.auth);
   const [showContent, setShowContent] = useState(false);
+  const loginProcessedRef = useRef(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -86,10 +87,22 @@ function HomeContent() {
       "https://api.loopin.co.kr/oauth2/authorization/google";
   };
 
+  const handleAppleLogin = () => {
+    window.location.href =
+      "https://api.loopin.co.kr/oauth2/authorization/apple";
+  };
+
+  // 네이티브 FCM 토큰 리프레시 리스너 등록
+  useEffect(() => {
+    setupNativeFCMTokenListener(authFetch);
+  }, []);
+
   useEffect(() => {
     const status = searchParams.get("status");
 
     if (status === "LOGIN_SUCCESS") {
+      if (loginProcessedRef.current) return;
+      loginProcessedRef.current = true;
       handleLoginSuccess();
       return;
     }
@@ -230,6 +243,7 @@ function HomeContent() {
           </Button>
           <Button
             variant="icon"
+            onClick={handleAppleLogin}
             aria-label="애플 로그인"
             className="h-10 w-10 bg-black"
           >
