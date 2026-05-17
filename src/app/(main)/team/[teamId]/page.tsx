@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import dayjs, { type Dayjs } from "dayjs";
-import Image from "next/image";
 import Header from "@/components/common/header/Header";
 import { LoopProgress } from "@/components/home/LoopProgress";
 import { TeamLoopList } from "@/components/team/TeamLoopList";
@@ -162,10 +161,12 @@ export default function TeamDetailPage() {
     return (
       <div className="flex min-h-screen flex-col">
         <Header
-          leftType="back"
-          rightType="none"
-          onBack={() => router.back()}
-          centerTitle="팀 상세"
+          left={<Header.BackButton />}
+          center={
+            <h1 className="whitespace-nowrap text-body-1-sb text-gray-800">
+              팀 상세
+            </h1>
+          }
         />
         <div className="flex flex-1 items-center justify-center">
           <p className="text-body-2-m text-red-500">
@@ -189,11 +190,19 @@ export default function TeamDetailPage() {
       {/* 확장된 헤더 영역 (Header + 탭) */}
       <div className="bg-white/30 backdrop-blur-[7px] flex-shrink-0">
         <Header
-          leftType="back"
-          rightType="user"
-          onBack={() => router.back()}
-          centerTitle={teamName}
-          className="bg-transparent backdrop-blur-none border-none"
+          left={<Header.BackButton />}
+          center={
+            <h1 className="whitespace-nowrap text-body-1-sb text-gray-800">
+              {teamName}
+            </h1>
+          }
+          right={
+            <>
+              <Header.ProfileButton />
+              <Header.NotificationButton />
+            </>
+          }
+          className="border-none bg-transparent backdrop-blur-none"
         />
 
         {/* 탭 */}

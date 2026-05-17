@@ -54,7 +54,20 @@ export default function CreateTeamLoopPage() {
 
   return (
     <div className="flex flex-col min-h-full bg-[var(--gray-white)]">
-      <Header leftType="back" rightType="user" onBack={() => router.back()} centerTitle="팀 생성" />
+      <Header
+        left={<Header.BackButton />}
+        center={
+          <h1 className="whitespace-nowrap text-body-1-sb text-gray-800">
+            팀 생성
+          </h1>
+        }
+        right={
+          <>
+            <Header.ProfileButton />
+            <Header.NotificationButton />
+          </>
+        }
+      />
 
       <form onSubmit={handleSubmit} className="flex-1 px-[16px] pt-[30px]">
         <div className="flex flex-col gap-10">

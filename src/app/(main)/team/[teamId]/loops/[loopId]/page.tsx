@@ -483,9 +483,13 @@ export default function TeamLoopDetailPage() {
 
       <div className="relative flex flex-col">
         <Header
-          leftType="back"
-          rightType="user"
-          onBack={() => router.back()}
+          left={<Header.BackButton />}
+          right={
+            <>
+              <Header.ProfileButton />
+              <Header.NotificationButton />
+            </>
+          }
         />
 
         <main className="flex flex-col gap-6 px-4 pb-8">

@@ -99,7 +99,10 @@ export default function TeamChatPage() {
   return (
     <div className="flex min-h-screen flex-col bg-[#F8F8F9]">
       {/* Header */}
-      <Header leftType="back" centerTitle={teamName} rightType="none" />
+      <Header
+        left={<Header.BackButton />}
+        center={<Header.Title> {teamName} </Header.Title>}
+      />
     
 
       {/* 메시지 리스트 */}

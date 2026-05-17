@@ -47,7 +47,14 @@ export default function ProfileEditPage() {
   return (
     <>
       <div className="flex h-full flex-col">
-        <Header centerTitle="프로필 편집" leftType="back" rightType="none" />
+        <Header
+          left={<Header.BackButton />}
+          center={
+            <h1 className="whitespace-nowrap text-body-1-sb text-gray-800">
+              프로필 편집
+            </h1>
+          }
+        />
         <div className="flex-1 flex flex-col overflow-y-auto px-4 py-6">
           {/* 프로필 사진 영역 */}
           <div className="mb-8 flex flex-col items-center">

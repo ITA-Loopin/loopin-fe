@@ -45,7 +45,20 @@ export default function RecruitingTeamListPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <div className="relative">
-        <Header leftType="back" rightType="user" onBack={() => router.back()} centerTitle="모집 중인 팀" />
+        <Header
+          left={<Header.BackButton />}
+          center={
+            <h1 className="whitespace-nowrap text-body-1-sb text-gray-800">
+              모집 중인 팀
+            </h1>
+          }
+          right={
+            <>
+              <Header.ProfileButton />
+              <Header.NotificationButton />
+            </>
+          }
+        />
       </div>
 
       <main className="flex-1 px-[16px] py-6">

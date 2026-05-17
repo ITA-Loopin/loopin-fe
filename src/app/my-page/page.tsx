@@ -38,7 +38,10 @@ export default function MyPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <Header centerTitle="마이페이지" leftType="back" rightType="none" />
+      <Header
+        left={<Header.BackButton />}
+        center={<Header.Title>마이페이지</Header.Title>}
+      />
       <div className="flex-1 overflow-y-auto px-4 py-6">
         {/* 사용자 정보 섹션 */}
         <div className="mb-8 p-4 flex flex-row items-center bg-[#F8F8F9] rounded-lg gap-2">
