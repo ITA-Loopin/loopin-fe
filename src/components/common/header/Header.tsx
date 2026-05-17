@@ -1,108 +1,102 @@
 "use client";
 
 import { ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import HeaderLogo from "./HeaderLogo";
-import HeaderBackButton from "./HeaderBackButton";
-import HeaderProfileButton from "./HeaderProfileButton";
-import HeaderNotificationButton from "./HeaderNotificationButton";
-import HeaderMenuButton from "./HeaderMenuButton";
-import HeaderEditButton from "./HeaderEditButton";
-
-type HeaderLeftType = "logo" | "back" | "none";
-type HeaderRightType = "user" | "menu" | "edit" | "none";
+import { IconButton } from "../IconButton";
 
 type HeaderProps = {
-  leftType?: HeaderLeftType;
-  rightType?: HeaderRightType;
   left?: ReactNode;
   center?: ReactNode;
   right?: ReactNode;
-  centerTitle?: string;
-  onBack?: () => void;
-  onNotificationClick?: () => void;
-  onProfileClick?: () => void;
-  onMenuClick?: () => void;
-  onEditClick?: () => void;
   className?: string;
 };
 
-export default function Header({
-  leftType = "logo",
-  rightType = "user",
-  centerTitle,
-  left,
-  right,
-  center,
-  onBack,
-  onNotificationClick,
-  onProfileClick,
-  onMenuClick,
-  onEditClick,
-}: HeaderProps) {
-
-  const renderLeft = () => {
-    switch (leftType) {
-      case "logo":
-        return <HeaderLogo />;
-      case "back":
-        return <HeaderBackButton onClick={onBack} />;
-      case "none":
-      default:
-        return null;
-    }
-  };
-
-  const renderRight = () => {
-    switch (rightType) {
-      case "user":
-        return (
-          <>
-            <HeaderProfileButton onClick={onProfileClick}/>
-            <HeaderNotificationButton onClick={onNotificationClick}/>
-          </>
-        );
-      case "menu":
-        return (
-          <HeaderMenuButton onClick={onMenuClick}/>
-        );
-      case "edit":
-        return (
-          <HeaderEditButton onClick={onEditClick}/>
-        );
-      case "none":
-      default:
-        return null;
-    }
-  };
-
-  const renderCenter = () => {
-    if (centerTitle)
-      return (
-        <h1 className="text-center text-body-1-sb text-[var(--gray-800)] whitespace-nowrap">
-          {centerTitle}
-        </h1>
-      );
-    return null;
-  };
-
+const Header = ({ left, center, right, className }: HeaderProps) => {
   return (
     <header
       className={cn(
-        "relative flex items-center px-4 py-[15px] border border-[var(--gray-white)] bg-white/30 backdrop-blur-[7px]"
+        "relative flex items-center border border-gray-white bg-white/30 px-4 py-[15px] backdrop-blur-[7px]",
+        className
       )}
     >
-      <div className="flex flex-1 items-center justify-start">
-        {left ?? renderLeft()}
-      </div>
-
-      <div className="absolute left-1/2 -translate-x-1/2 max-w-[40%] truncate">
-        {center ?? renderCenter()}
-      </div>
-
-      <div className="flex flex-1 items-center justify-end">
-        {right ?? renderRight()}
-      </div>
+      <div className="flex flex-1 items-center justify-start">{left}</div>
+      <div className="absolute left-1/2 max-w-[40%] -translate-x-1/2 truncate">{center}</div>
+      <div className="flex flex-1 items-center justify-end gap-1">{right}</div>
     </header>
   );
-}
+};
+
+Header.Title = function HeaderTitle({ children }: { children: ReactNode }) {
+  return (
+    <h1 className="whitespace-nowrap text-body-1-sb text-gray-800">{children}</h1>
+  );
+};
+
+Header.Logo = function HeaderLogo({ onClick }: { onClick?: () => void }) {
+  return (
+    <IconButton
+      src="/header/header_logo.svg"
+      alt="Loopin 홈"
+      width={68}
+      height={30}
+      onClick={onClick}
+      imageClassName="h-8 w-auto"
+    />
+  );
+};
+
+Header.BackButton = function HeaderBackButton({ onClick }: { onClick?: () => void }) {
+  const router = useRouter();
+  return (
+    <IconButton
+      src="/header/header_back.svg"
+      alt="뒤로가기"
+      onClick={onClick ?? (() => router.back())}
+    />
+  );
+};
+
+Header.EditButton = function HeaderEditButton({ onClick }: { onClick?: () => void }) {
+  return (
+    <IconButton src="/header/header_edit.svg" alt="수정" onClick={onClick} />
+  );
+};
+
+Header.MenuButton = function HeaderMenuButton({ onClick }: { onClick?: () => void }) {
+  return (
+    <IconButton src="/header/header_menu.svg" alt="메뉴" onClick={onClick} />
+  );
+};
+
+Header.NotificationButton = function HeaderNotificationButton({
+  onClick,
+}: {
+  onClick?: () => void;
+}) {
+  const router = useRouter();
+  return (
+    <IconButton
+      src="/header/header_bell.svg"
+      alt="알림"
+      onClick={onClick ?? (() => router.push("/notification"))}
+    />
+  );
+};
+
+Header.ProfileButton = function HeaderProfileButton({
+  onClick,
+}: {
+  onClick?: () => void;
+}) {
+  const router = useRouter();
+  return (
+    <IconButton
+      src="/header/header_profile.svg"
+      alt="프로필"
+      onClick={onClick ?? (() => router.push("/my-page"))}
+    />
+  );
+};
+
+export default Header;
