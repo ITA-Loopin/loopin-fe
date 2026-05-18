@@ -3,17 +3,17 @@
 import { useState, useEffect, useCallback, useRef, FormEvent } from "react";
 import { BottomSheet } from "@/components/common/BottomSheet";
 import { Button } from "@/components/common/Button";
-import { TitleInput } from "@/components/common/add-loop/TitleInput";
-import { ScheduleSelector } from "@/components/common/add-loop/ScheduleSelector";
-import { DateRangePicker } from "@/components/common/add-loop/DateRangePicker";
-import { ChecklistEditor } from "@/components/common/add-loop/ChecklistEditor";
+import { TitleInput } from "@/components/loop/add-loop/TitleInput";
+import { ScheduleSelector } from "@/components/loop/add-loop/ScheduleSelector";
+import { DateRangePicker } from "@/components/loop/add-loop/DateRangePicker";
+import { ChecklistEditor } from "@/components/loop/add-loop/ChecklistEditor";
 import { useLoopTitle } from "@/hooks/useLoopTitle";
 import { useLoopSchedule } from "@/hooks/useLoopSchedule";
 import { useLoopDateRange } from "@/hooks/useLoopDateRange";
 import { useLoopChecklist } from "@/hooks/useLoopChecklist";
 import { useTeamMemberSelection } from "@/hooks/useTeamMemberSelection";
 import { useCreateTeamLoop } from "@/hooks/useCreateTeamLoop";
-import { RepeatValue } from "@/components/common/add-loop/constants";
+import { RepeatValue } from "@/components/loop/add-loop/constants";
 import { SegmentedControl } from "@/components/common/SegmentedControl";
 
 type AddTeamLoopSheetProps = {

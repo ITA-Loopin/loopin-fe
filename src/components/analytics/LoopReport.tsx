@@ -7,7 +7,7 @@ import { ProgressStatsCard } from "./ProgressStatsCard";
 import { CalendarView } from "./CalendarView";
 import { LoopStatusList } from "./LoopStatusList";
 import { Button } from "@/components/common/Button";
-import { AddLoopSheet } from "@/components/common/add-loop/AddLoopSheet";
+import { AddLoopSheet } from "@/components/loop/add-loop/AddLoopSheet";
 
 import type { LoopReportData, ReportStatus } from "@/types/report";
 
