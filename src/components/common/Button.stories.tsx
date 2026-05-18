@@ -10,7 +10,17 @@ const meta = {
   argTypes: {
     variant: {
       control: "select",
-      options: ["primary", "secondary", "outline", "ghost", "tonal", "icon"],
+      options: [
+        "primary",
+        "secondary",
+        "outline",
+        "ghost",
+        "tonal",
+        "subtle",
+        "subtleAccent",
+        "subtleDanger",
+        "icon",
+      ],
     },
     size: {
       control: "select",
@@ -36,6 +46,13 @@ export const Secondary: Story = { args: { variant: "secondary" } };
 export const Outline: Story = { args: { variant: "outline" } };
 export const Ghost: Story = { args: { variant: "ghost", children: "Ghost" } };
 export const Tonal: Story = { args: { variant: "tonal", children: "로그아웃" } };
+export const Subtle: Story = { args: { variant: "subtle", children: "취소" } };
+export const SubtleAccent: Story = {
+  args: { variant: "subtleAccent", children: "이 루프만 삭제" },
+};
+export const SubtleDanger: Story = {
+  args: { variant: "subtleDanger", children: "탈퇴하기" },
+};
 
 export const TonalWithIcon: Story = {
   args: {
@@ -73,7 +90,16 @@ export const IconOnly: Story = {
 export const VariantMatrix: Story = {
   parameters: { layout: "padded" },
   render: () => {
-    const variants = ["primary", "secondary", "outline", "ghost", "tonal"] as const;
+    const variants = [
+      "primary",
+      "secondary",
+      "outline",
+      "ghost",
+      "tonal",
+      "subtle",
+      "subtleAccent",
+      "subtleDanger",
+    ] as const;
     const sizes = ["sm", "md", "lg"] as const;
     return (
       <div className="flex flex-col gap-6">

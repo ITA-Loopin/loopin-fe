@@ -7,7 +7,7 @@ import { useLoopDetail } from "@/hooks/useLoopDetail";
 import { useChecklist } from "@/hooks/useChecklist";
 import { useLoopActions } from "@/hooks/useLoopActions";
 import { LoopDetailContent } from "@/components/loop/LoopDetailContent";
-import { LoopActionModal } from "@/components/loop/LoopActionModal";
+import { LoopActionDialog } from "@/components/loop/LoopActionDialog";
 import { LoopEditSheet } from "@/components/loop/LoopEditSheet";
 import { LoopGroupEditSheet } from "@/components/loop/LoopGroupEditSheet";
 
@@ -127,7 +127,7 @@ export default function LoopDetailPage() {
       </div>
 
 
-      <LoopActionModal
+      <LoopActionDialog
         isOpen={actionModal.isOpen}
         type={actionModal.type}
         onClose={() => setActionModal((prev) => ({ ...prev, isOpen: false }))}

@@ -15,6 +15,9 @@ const buttonVariants = cva(
           "border border-gray-300 bg-transparent text-gray-800 hover:bg-gray-100",
         ghost: "bg-transparent",
         tonal: "bg-primary-200 text-primary-main",
+        subtle: "bg-gray-100 text-gray-800",
+        subtleAccent: "bg-gray-100 text-primary-main",
+        subtleDanger: "bg-gray-100 text-red-600",
         icon: "bg-transparent text-gray-800 rounded-full",
       },
       size: {
@@ -41,6 +44,51 @@ const buttonVariants = cva(
         variant: "tonal",
         size: "lg",
         className: "h-auto py-[6px] px-2 rounded-[5px]",
+      },
+      {
+        variant: "subtle",
+        size: "sm",
+        className: "h-[42px] py-[9px] px-[10px] rounded-[5px] text-body-2-sb",
+      },
+      {
+        variant: "subtle",
+        size: "md",
+        className: "h-[42px] py-[9px] px-[10px] rounded-[5px] text-body-2-sb",
+      },
+      {
+        variant: "subtle",
+        size: "lg",
+        className: "h-[42px] py-[9px] px-[10px] rounded-[5px] text-body-2-sb",
+      },
+      {
+        variant: "subtleAccent",
+        size: "sm",
+        className: "h-[42px] py-[9px] px-[10px] rounded-[5px] text-body-2-sb",
+      },
+      {
+        variant: "subtleAccent",
+        size: "md",
+        className: "h-[42px] py-[9px] px-[10px] rounded-[5px] text-body-2-sb",
+      },
+      {
+        variant: "subtleAccent",
+        size: "lg",
+        className: "h-[42px] py-[9px] px-[10px] rounded-[5px] text-body-2-sb",
+      },
+      {
+        variant: "subtleDanger",
+        size: "sm",
+        className: "h-[42px] py-[9px] px-[10px] rounded-[5px] text-body-2-sb",
+      },
+      {
+        variant: "subtleDanger",
+        size: "md",
+        className: "h-[42px] py-[9px] px-[10px] rounded-[5px] text-body-2-sb",
+      },
+      {
+        variant: "subtleDanger",
+        size: "lg",
+        className: "h-[42px] py-[9px] px-[10px] rounded-[5px] text-body-2-sb",
       },
     ],
     defaultVariants: {
