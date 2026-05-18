@@ -6,12 +6,12 @@ import Header from "@/components/common/Header";
 import { useChecklist } from "@/hooks/useChecklist";
 import { useLoopActions } from "@/hooks/useLoopActions";
 import { TeamLoopDetailContent } from "@/components/team/TeamLoopDetailContent";
-import { LoopActionModal } from "@/components/loop/LoopActionModal";
+import { LoopActionDialog } from "@/components/loop/LoopActionDialog";
 import { LoopEditSheet } from "@/components/loop/LoopEditSheet";
 import { LoopGroupEditSheet } from "@/components/loop/LoopGroupEditSheet";
 import { fetchTeamLoops, fetchTeamLoopChecklists, fetchTeamLoopMyDetail, fetchTeamLoopAllDetail, createTeamLoopChecklist, toggleTeamLoopChecklist, deleteTeamLoopChecklist, completeTeamLoop, type TeamLoopApiItem } from "@/lib/team";
 import type { LoopDetail } from "@/types/loop";
-import { MemberProgressModal } from "@/components/team/MemberProgressModal";
+import { MemberProgressDialog } from "@/components/team/MemberProgressDialog";
 
 export default function TeamLoopDetailPage() {
   const params = useParams<{ teamId: string; loopId: string }>();
@@ -533,7 +533,7 @@ export default function TeamLoopDetailPage() {
         </main>
       </div>
 
-      <LoopActionModal
+      <LoopActionDialog
         isOpen={actionModal.isOpen}
         type={actionModal.type}
         onClose={() => setActionModal((prev) => ({ ...prev, isOpen: false }))}
@@ -572,7 +572,7 @@ export default function TeamLoopDetailPage() {
           }
         }}
       />
-      <MemberProgressModal
+      <MemberProgressDialog
         isOpen={!!selectedMember}
         loopId={loopId}
         memberId={selectedMember?.memberId ?? 0}
