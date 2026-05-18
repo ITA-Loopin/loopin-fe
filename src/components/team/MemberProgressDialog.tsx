@@ -7,7 +7,7 @@ import { Button } from "@/components/common/Button";
 import { LoopProgress } from "@/components/home/LoopProgress";
 import { fetchTeamLoopMemberChecklist } from "@/lib/team";
 
-type MemberProgressModalProps = {
+type MemberProgressDialogProps = {
   isOpen: boolean;
   loopId: number;
   memberId: number;
@@ -15,13 +15,13 @@ type MemberProgressModalProps = {
   onClose: () => void;
 };
 
-export function MemberProgressModal({
+export function MemberProgressDialog({
   isOpen,
   loopId,
   memberId,
   memberNickname,
   onClose,
-}: MemberProgressModalProps) {
+}: MemberProgressDialogProps) {
   const [checklists, setChecklists] = useState<Array<{
     id: number;
     content: string;

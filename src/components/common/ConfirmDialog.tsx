@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { Dialog } from "./Dialog";
 import { Button } from "@/components/common/Button";
-import { cn } from "@/lib/utils";
 
 type ConfirmDialogProps = {
   isOpen: boolean;
@@ -47,23 +46,16 @@ export function ConfirmDialog({
           {title}
         </p>
         <div className="mt-5 flex flex-row gap-2">
-          <button
-            type="button"
+          <Button
+            variant={isDanger ? "subtleDanger" : "subtle"}
             onClick={onConfirm}
-            className={cn(
-              "flex-1 rounded-lg py-3 text-sm font-semibold bg-gray-100",
-              isDanger ? "text-red-600" : "text-gray-800",
-            )}
+            className="flex-1"
           >
             {confirmText}
-          </button>
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex-1 rounded-lg bg-gray-100 py-3 text-sm font-semibold text-gray-600"
-          >
+          </Button>
+          <Button variant="subtle" onClick={onClose} className="flex-1">
             {cancelText}
-          </button>
+          </Button>
         </div>
       </div>
     </Dialog>
