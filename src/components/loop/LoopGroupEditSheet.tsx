@@ -2,13 +2,13 @@
 
 import { BottomSheet } from "@/components/common/BottomSheet";
 import { Button } from "@/components/common/Button";
-import { TitleInput } from "@/components/common/add-loop/TitleInput";
-import { ScheduleSelector } from "@/components/common/add-loop/ScheduleSelector";
-import { DateRangePicker } from "@/components/common/add-loop/DateRangePicker";
-import { ChecklistEditor } from "@/components/common/add-loop/ChecklistEditor";
+import { TitleInput } from "@/components/loop/add-loop/TitleInput";
+import { ScheduleSelector } from "@/components/loop/add-loop/ScheduleSelector";
+import { DateRangePicker } from "@/components/loop/add-loop/DateRangePicker";
+import { ChecklistEditor } from "@/components/loop/add-loop/ChecklistEditor";
 import type { LoopDetail } from "@/types/loop";
 import { useLoopGroupEditForm } from "../../hooks/useLoopGroupEditForm";
-import type { ScheduleType, Weekday } from "@/components/common/add-loop/constants";
+import type { ScheduleType, Weekday } from "@/components/loop/add-loop/constants";
 
 type LoopGroupEditSheetProps = {
   isOpen: boolean;

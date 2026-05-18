@@ -7,7 +7,7 @@ import {
   Checklist,
   DayOption,
   WEEKDAY_OPTIONS,
-} from "@/components/common/add-loop/constants";
+} from "@/components/loop/add-loop/constants";
 
 interface UseLoopGroupEditFormProps {
   isOpen: boolean;

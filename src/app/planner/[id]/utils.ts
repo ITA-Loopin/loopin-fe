@@ -4,7 +4,7 @@ import type {
   AddLoopDefaultValues,
   RepeatValue,
   Weekday,
-} from "@/components/common/add-loop/constants";
+} from "@/components/loop/add-loop/constants";
 
 export function generateId() {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {

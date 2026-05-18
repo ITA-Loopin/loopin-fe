@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
-import { RepeatValue, ScheduleType } from "@/components/common/add-loop/constants";
+import { RepeatValue, ScheduleType } from "@/components/loop/add-loop/constants";
 
 interface UseLoopDateRangeProps {
   isOpen: boolean;
