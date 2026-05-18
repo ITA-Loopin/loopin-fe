@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { apiFetch } from "@/lib/api";
-import type { Checklist } from "@/components/common/add-loop/constants";
+import type { Checklist } from "@/components/loop/add-loop/constants";
 import type { Dayjs } from "dayjs";
 
 type CreateTeamLoopPayload = {

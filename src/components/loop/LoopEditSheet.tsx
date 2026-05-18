@@ -2,9 +2,9 @@
 
 import { BottomSheet } from "@/components/common/BottomSheet";
 import { Button } from "@/components/common/Button";
-import { TitleInput } from "@/components/common/add-loop/TitleInput";
-import { ChecklistEditor } from "@/components/common/add-loop/ChecklistEditor";
-import { DateRangePicker } from "@/components/common/add-loop/DateRangePicker";
+import { TitleInput } from "@/components/loop/add-loop/TitleInput";
+import { ChecklistEditor } from "@/components/loop/add-loop/ChecklistEditor";
+import { DateRangePicker } from "@/components/loop/add-loop/DateRangePicker";
 import type { LoopDetail } from "@/types/loop";
 import { useLoopEditForm } from "../../hooks/useLoopEditForm";
 

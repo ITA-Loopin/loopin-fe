@@ -8,7 +8,7 @@ import "dayjs/locale/ko";
 
 // 전역 dayjs locale 설정
 dayjs.locale("ko");
-import { FirebaseServiceWorker } from "@/components/common/FirebaseServiceWorker";
+import { FirebaseServiceWorker } from "@/components/notification/FirebaseServiceWorker";
 
 const ROOT_PATHS = ["/home"];
 
