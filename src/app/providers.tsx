@@ -8,7 +8,8 @@ import "dayjs/locale/ko";
 
 // 전역 dayjs locale 설정
 dayjs.locale("ko");
-import { FirebaseServiceWorker } from "@/components/notification/FirebaseServiceWorker";
+import { PushNotificationToast } from "@/components/notification/PushNotificationToast";
+import { useFirebaseServiceWorker } from "@/hooks/useFirebaseServiceWorker";
 
 const ROOT_PATHS = ["/home"];
 
@@ -61,9 +62,10 @@ function NativeBackHandler() {
 }
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  useFirebaseServiceWorker();
   return (
     <Provider store={store}>
-      <FirebaseServiceWorker />
+      <PushNotificationToast />
       <NativeBackHandler />
       {children}
     </Provider>
