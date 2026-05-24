@@ -22,13 +22,16 @@ export function LoopListItem({ item }: LoopListItemProps) {
     <li>
       <Link
         href={`/loops/${item.id}`}
-        className="flex flex-col items-start gap-[10px] self-stretch py-3 px-4 rounded-[10px] bg-[var(--gray-white)]"
+         
+        className="flex flex-col items-start gap-[10px] self-stretch py-3 px-4 rounded-[10px] bg-gray-white"
       >
         {/* 안 레이아웃 */}
         <div className="flex w-full items-center justify-between gap-2">
           <div className="flex flex-col gap-2 min-w-0 flex-1">
-            <p className="text-body-1-sb font-semibold text-[var(--gray-800)] line-clamp-2 break-words">{item.title}</p>
-            <p className="text-body-2-m text-[var(--gray-500)]">
+            { }
+            <p className="text-body-1-sb font-semibold text-gray-800 line-clamp-2 break-words">{item.title}</p>
+            { }
+            <p className="text-body-2-m text-gray-500">
               {item.totalChecklists > 0
                 ? `${item.totalChecklists}개 중 ${item.completedChecklists}개 완료`
                 : "체크리스트 없음"}
@@ -43,7 +46,7 @@ export function LoopListItem({ item }: LoopListItemProps) {
                 cy="24"
                 r={radius}
                 fill="none"
-                stroke="var(--gray-200)"
+                className="stroke-gray-200"
                 strokeWidth="4.5"
               />
               {/* 진행률 원 (산호색) */}
@@ -52,7 +55,7 @@ export function LoopListItem({ item }: LoopListItemProps) {
                 cy="24"
                 r={radius}
                 fill="none"
-                stroke="var(--primary-500)"
+                className="stroke-primary-500"
                 strokeWidth="4.5"
                 strokeDasharray={circumference}
                 strokeDashoffset={offset}

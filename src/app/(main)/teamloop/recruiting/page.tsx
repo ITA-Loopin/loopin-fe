@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import { TeamCard } from "@/components/team/TeamCard";
 import type { TeamItem } from "@/components/team/types";
 import { fetchRecruitingTeams } from "@/lib/team";
@@ -45,13 +45,27 @@ export default function RecruitingTeamListPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <div className="relative">
-        <Header leftType="back" rightType="user" onBack={() => router.back()} centerTitle="모집 중인 팀" />
+        <Header
+          left={<Header.BackButton />}
+          center={
+            <h1 className="whitespace-nowrap text-body-1-sb text-gray-800">
+              모집 중인 팀
+            </h1>
+          }
+          right={
+            <>
+              <Header.ProfileButton />
+              <Header.NotificationButton />
+            </>
+          }
+        />
       </div>
 
       <main className="flex-1 px-[16px] py-6">
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
-            <p className="text-sm text-[#A0A9B1]">로딩 중...</p>
+            { }
+            <p className="text-sm text-gray-500">로딩 중...</p>
           </div>
         ) : error ? (
           <div className="flex items-center justify-center py-8">
@@ -59,7 +73,8 @@ export default function RecruitingTeamListPage() {
           </div>
         ) : teams.length === 0 ? (
           <div className="flex items-center justify-center py-8">
-            <p className="text-sm text-[#A0A9B1]">모집 중인 팀이 없습니다</p>
+            { }
+            <p className="text-sm text-gray-500">모집 중인 팀이 없습니다</p>
           </div>
         ) : (
           <div className="flex w-full flex-col gap-4">

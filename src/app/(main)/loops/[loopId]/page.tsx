@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import { useLoopDetail } from "@/hooks/useLoopDetail";
 import { useChecklist } from "@/hooks/useChecklist";
 import { useLoopActions } from "@/hooks/useLoopActions";
 import { LoopDetailContent } from "@/components/loop/LoopDetailContent";
-import { LoopActionModal } from "@/components/loop/LoopActionModal";
+import { LoopActionDialog } from "@/components/loop/LoopActionDialog";
 import { LoopEditSheet } from "@/components/loop/LoopEditSheet";
 import { LoopGroupEditSheet } from "@/components/loop/LoopGroupEditSheet";
 
@@ -59,15 +59,20 @@ export default function LoopDetailPage() {
         className="fixed inset-0 -z-10"
         style={{
           background:
+            // eslint-disable-next-line no-restricted-syntax
             "linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,228,224,0.35) 100%)",
         }}
       />
 
       <div className="relative flex flex-col">
         <Header
-          leftType="back"
-          rightType="user"
-          onBack={() => router.back()}
+          left={<Header.BackButton />}
+          right={
+            <>
+              <Header.ProfileButton />
+              <Header.NotificationButton />
+            </>
+          }
         />
 
         <main className="flex flex-col gap-6 px-4 pb-8">
@@ -79,7 +84,8 @@ export default function LoopDetailPage() {
             <div className="flex flex-col items-center justify-center gap-4 min-h-[calc(100dvh-120px)]">
               <p className="text-sm text-red-500">{errorMessage || actions.errorMessage}</p>
               <button
-                className="rounded-3xl bg-[#2C2C2C] px-4 py-2 text-sm font-semibold text-white"
+                 
+                className="rounded-3xl bg-gray-800 px-4 py-2 text-sm font-semibold text-white"
                 onClick={() => router.back()}
               >
                 돌아가기
@@ -125,7 +131,7 @@ export default function LoopDetailPage() {
       </div>
 
 
-      <LoopActionModal
+      <LoopActionDialog
         isOpen={actionModal.isOpen}
         type={actionModal.type}
         onClose={() => setActionModal((prev) => ({ ...prev, isOpen: false }))}

@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { IconButton } from "@/components/common/IconButton";
+import Image from "next/image";
+import { Button } from "@/components/common/Button";
 import { useSearchMembers } from "@/hooks/useSearchMembers";
 
 type TeamMember = {
@@ -48,10 +49,12 @@ export function TeamMemberSearch({
 
   return (
     <div className="flex flex-col items-start gap-2 self-stretch">
-      <p className="text-caption-r text-[var(--gray-500)]">
+      { }
+      <p className="text-caption-r text-gray-500">
         팀원 추가하기
       </p>
-      <div className="flex h-[44px] w-full items-center gap-2.5 rounded-[10px] bg-[var(--gray-100)] px-4 py-[6px]">
+      { }
+      <div className="flex h-[44px] w-full items-center gap-2.5 rounded-[10px] bg-gray-100 px-4 py-[6px]">
         <input
           ref={inputRef}
           type="text"
@@ -59,15 +62,18 @@ export function TeamMemberSearch({
           onChange={(event) => handleSearch(event.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="닉네임을 검색해주세요"
-          className="flex-1 bg-transparent outline-none text-body-1-m text-[var(--gray-black)] placeholder:text-[16px] placeholder:text-body-2-m placeholder:text-[var(--gray-400)]"
+           
+          className="flex-1 bg-transparent outline-none text-body-1-m text-gray-black placeholder:text-[16px] placeholder:text-body-2-m placeholder:text-gray-400"
         />
-        <IconButton
-          src="/team/search.svg"
-          alt="검색"
-          width={20}
-          height={20}
-          onClick={handleSearchSubmit}
-        />
+        <Button variant="icon" onClick={handleSearchSubmit} aria-label="검색">
+          <Image
+            src="/team/search.svg"
+            alt="검색"
+            width={20}
+            height={20}
+            style={{ width: 20, height: 20 }}
+          />
+        </Button>
       </div>
 
       {/* 검색 결과 */}
@@ -77,10 +83,12 @@ export function TeamMemberSearch({
             searchResults.map((member) => (
               <div
                 key={member.id}
-                className="flex items-center justify-between self-stretch h-[44px] px-4 py-[9px] rounded-[10px] bg-[var(--primary-100)]"
+                 
+                className="flex items-center justify-between self-stretch h-[44px] px-4 py-[9px] rounded-[10px] bg-primary-100"
               >
                 <div className="flex flex-col gap-1">
-                  <span className="text-body-2-m text-[var(--gray-800)]">
+                  { }
+                  <span className="text-body-2-m text-gray-800">
                     {member.nickname + " " + member.email + ""}
                   </span>
                 </div>
@@ -91,7 +99,8 @@ export function TeamMemberSearch({
                     clearSearchResults();
                     setHasSearched(false);
                   }}
-                  className="flex h-[24px] items-center justify-center gap-[5px] rounded-[5px] bg-[var(--primary-500)] px-2 text-[var(--gray-white)] text-caption-m"
+                   
+                  className="flex h-[24px] items-center justify-center gap-[5px] rounded-[5px] bg-primary-500 px-2 text-gray-white text-caption-m"
                 >
                   초대하기
                 </button>
@@ -99,6 +108,7 @@ export function TeamMemberSearch({
             ))
           ) : (
             <div className="flex items-center justify-center h-[44px] px-4 py-[9px]">
+              {/* eslint-disable-next-line no-restricted-syntax */}
               <p className="text-caption-r text-[var(--gray-600,#737980)]">
                 해당하는 닉네임이 없습니다
               </p>

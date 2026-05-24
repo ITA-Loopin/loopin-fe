@@ -1,14 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import { TeamCard } from "@/components/team/TeamCard";
 import type { TeamItem } from "@/components/team/types";
 import { fetchMyTeamList, updateTeamOrder } from "@/lib/team";
 
 export default function MyTeamListPage() {
-  const router = useRouter();
   const [teams, setTeams] = useState<TeamItem[]>([]);
   const [originalTeams, setOriginalTeams] = useState<TeamItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -200,11 +198,17 @@ export default function MyTeamListPage() {
     <div className="flex flex-col">
       <div className="relative">
         <Header
-          leftType="back"
-          rightType={isEditMode ? "none" : "edit"}
-          onBack={() => router.back()}
-          onEditClick={handleEditClick}
-          centerTitle="내 팀 목록"
+          left={<Header.BackButton />}
+          center={
+            <h1 className="whitespace-nowrap text-body-1-sb text-gray-800">
+              내 팀 목록
+            </h1>
+          }
+          right={
+            !isEditMode ? (
+              <Header.EditButton onClick={handleEditClick} />
+            ) : null
+          }
         />
 
         {isEditMode && (
@@ -212,7 +216,8 @@ export default function MyTeamListPage() {
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="text-body-1-sb text-[var(--primary-main)] disabled:opacity-50"
+               
+              className="text-body-1-sb text-primary-main disabled:opacity-50"
             >
               {isSaving ? "저장 중..." : "완료"}
             </button>
@@ -223,7 +228,8 @@ export default function MyTeamListPage() {
       <main className="flex-1 px-[16px] py-6">
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
-            <p className="text-sm text-[#A0A9B1]">로딩 중...</p>
+            { }
+            <p className="text-sm text-gray-500">로딩 중...</p>
           </div>
         ) : error ? (
           <div className="flex items-center justify-center py-8">
@@ -231,7 +237,8 @@ export default function MyTeamListPage() {
           </div>
         ) : teams.length === 0 ? (
           <div className="flex items-center justify-center py-8">
-            <p className="text-sm text-[#A0A9B1]">
+            { }
+            <p className="text-sm text-gray-500">
               아직 참여 중인 팀이 없어요 <br /> 새로운 팀을 생성해보세요!
             </p>
           </div>
@@ -255,7 +262,8 @@ export default function MyTeamListPage() {
                   isEditMode ? "cursor-move touch-none" : ""
                 } ${draggedIndex === index ? "opacity-50" : ""} ${
                   dragOverIndex === index && draggedIndex !== index
-                    ? "translate-y-2 border-t-2 border-[var(--primary-main)]"
+                     
+                    ? "translate-y-2 border-t-2 border-primary-main"
                     : ""
                 }`}
                 style={isEditMode ? { touchAction: "none" } : undefined}
@@ -265,16 +273,22 @@ export default function MyTeamListPage() {
                   {isEditMode && (
                     <div className="flex shrink-0 flex-col gap-1">
                       <div className="flex gap-1">
-                        <div className="h-1 w-1 rounded-full bg-[var(--gray-500)]" />
-                        <div className="h-1 w-1 rounded-full bg-[var(--gray-500)]" />
+                        { }
+                        <div className="h-1 w-1 rounded-full bg-gray-500" />
+                        { }
+                        <div className="h-1 w-1 rounded-full bg-gray-500" />
                       </div>
                       <div className="flex gap-1">
-                        <div className="h-1 w-1 rounded-full bg-[var(--gray-500)]" />
-                        <div className="h-1 w-1 rounded-full bg-[var(--gray-500)]" />
+                        { }
+                        <div className="h-1 w-1 rounded-full bg-gray-500" />
+                        { }
+                        <div className="h-1 w-1 rounded-full bg-gray-500" />
                       </div>
                       <div className="flex gap-1">
-                        <div className="h-1 w-1 rounded-full bg-[var(--gray-500)]" />
-                        <div className="h-1 w-1 rounded-full bg-[var(--gray-500)]" />
+                        { }
+                        <div className="h-1 w-1 rounded-full bg-gray-500" />
+                        { }
+                        <div className="h-1 w-1 rounded-full bg-gray-500" />
                       </div>
                     </div>
                   )}

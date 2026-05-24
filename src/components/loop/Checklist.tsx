@@ -1,8 +1,9 @@
 "use client";
 
 import type { LoopChecklist } from "@/types/loop";
+import Image from "next/image";
 import { ChecklistItem } from "./ChecklistItem";
-import { IconButton } from "@/components/common/IconButton";
+import { Button } from "@/components/common/Button";
 import { useEffect, useState, useRef } from "react";
 
 type ChecklistProps = {
@@ -92,9 +93,11 @@ export function Checklist({
   return (
     <section className="w-full">
       {/* 체크리스트 개수 */}
-      <h2 className="mb-4 text-title-2-b text-[var(--gray-black)]">
+      { }
+      <h2 className="mb-4 text-title-2-b text-gray-black">
         {"Checklist"}
-        <span className="text-center text-body-2-sb font-semibold text-[var(--gray-600)]">
+        { }
+        <span className="text-center text-body-2-sb font-semibold text-gray-600">
           · {items.length}
         </span>
       </h2>
@@ -124,17 +127,24 @@ export function Checklist({
                 }
                 onKeyDown={handleKeyDown}
                 onBlur={handleInputBlur}
-                className="flex-1 border-none bg-transparent text-body-1-sb font-semibold placeholder:text-[var(--gray-400)] outline-none focus:outline-none"
+                 
+                className="flex-1 border-none bg-transparent text-body-1-sb font-semibold placeholder:text-gray-400 outline-none focus:outline-none"
               />
 
               <div onMouseDown={(e) => e.preventDefault()}>
-                <IconButton
-                  src="/addloopsheet/addloopsheet_add.svg"
-                  alt="루틴 추가"
-                  width={20}
-                  height={20}
+                <Button
+                  variant="icon"
                   onClick={handleAddButtonClick}
-                />
+                  aria-label="루틴 추가"
+                >
+                  <Image
+                    src="/addloopsheet/addloopsheet_add.svg"
+                    alt="루틴 추가"
+                    width={20}
+                    height={20}
+                    style={{ width: 20, height: 20 }}
+                  />
+                </Button>
               </div>
             </div>
           </li>

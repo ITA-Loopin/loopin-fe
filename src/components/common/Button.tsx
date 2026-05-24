@@ -1,0 +1,125 @@
+"use client";
+
+import type { ButtonHTMLAttributes, Ref } from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[10px] font-semibold cursor-pointer transition-transform duration-100 active:scale-95 disabled:pointer-events-none disabled:opacity-50 disabled:active:scale-100",
+  {
+    variants: {
+      variant: {
+        primary: "bg-primary-500 text-gray-white hover:bg-primary-700",
+        secondary: "bg-gray-800 text-gray-white hover:bg-gray-700",
+        outline:
+          "border border-gray-300 bg-transparent text-gray-800 hover:bg-gray-100",
+        ghost: "bg-transparent",
+        tonal: "bg-primary-200 text-primary-main",
+        subtle: "bg-gray-100 text-gray-800",
+        subtleAccent: "bg-gray-100 text-primary-main",
+        subtleDanger: "bg-gray-100 text-red-600",
+        icon: "bg-transparent text-gray-800 rounded-full",
+      },
+      size: {
+        sm: "h-8 px-3 text-sm",
+        md: "h-10 px-4 text-base",
+        lg: "h-12 px-6 text-base",
+      },
+    },
+    compoundVariants: [
+      { variant: "icon", size: "sm", className: "h-auto w-auto p-0" },
+      { variant: "icon", size: "md", className: "h-auto w-auto p-0" },
+      { variant: "icon", size: "lg", className: "h-auto w-auto p-0" },
+      {
+        variant: "tonal",
+        size: "sm",
+        className: "h-auto py-[6px] px-2 rounded-[5px]",
+      },
+      {
+        variant: "tonal",
+        size: "md",
+        className: "h-auto py-[6px] px-2 rounded-[5px]",
+      },
+      {
+        variant: "tonal",
+        size: "lg",
+        className: "h-auto py-[6px] px-2 rounded-[5px]",
+      },
+      {
+        variant: "subtle",
+        size: "sm",
+        className: "h-[42px] py-[9px] px-[10px] rounded-[5px] text-body-2-sb",
+      },
+      {
+        variant: "subtle",
+        size: "md",
+        className: "h-[42px] py-[9px] px-[10px] rounded-[5px] text-body-2-sb",
+      },
+      {
+        variant: "subtle",
+        size: "lg",
+        className: "h-[42px] py-[9px] px-[10px] rounded-[5px] text-body-2-sb",
+      },
+      {
+        variant: "subtleAccent",
+        size: "sm",
+        className: "h-[42px] py-[9px] px-[10px] rounded-[5px] text-body-2-sb",
+      },
+      {
+        variant: "subtleAccent",
+        size: "md",
+        className: "h-[42px] py-[9px] px-[10px] rounded-[5px] text-body-2-sb",
+      },
+      {
+        variant: "subtleAccent",
+        size: "lg",
+        className: "h-[42px] py-[9px] px-[10px] rounded-[5px] text-body-2-sb",
+      },
+      {
+        variant: "subtleDanger",
+        size: "sm",
+        className: "h-[42px] py-[9px] px-[10px] rounded-[5px] text-body-2-sb",
+      },
+      {
+        variant: "subtleDanger",
+        size: "md",
+        className: "h-[42px] py-[9px] px-[10px] rounded-[5px] text-body-2-sb",
+      },
+      {
+        variant: "subtleDanger",
+        size: "lg",
+        className: "h-[42px] py-[9px] px-[10px] rounded-[5px] text-body-2-sb",
+      },
+    ],
+    defaultVariants: {
+      variant: "primary",
+      size: "md",
+    },
+  },
+);
+
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
+  VariantProps<typeof buttonVariants> & {
+    ref?: Ref<HTMLButtonElement>;
+  };
+
+export function Button({
+  className,
+  variant,
+  size,
+  type = "button",
+  ref,
+  ...props
+}: ButtonProps) {
+  return (
+    <button
+      ref={ref}
+      type={type}
+      className={cn(buttonVariants({ variant, size }), className)}
+      {...props}
+    />
+  );
+}
+
+export { buttonVariants };
+export type { ButtonProps };

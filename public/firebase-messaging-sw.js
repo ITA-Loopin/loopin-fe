@@ -2,12 +2,20 @@
 // 이 파일은 public 폴더에 있어야 하며, 브라우저에서 자동으로 등록됩니다.
 // Firebase SDK 없이 기본 Web Push API를 사용합니다.
 
+// body JSON 파싱
+function parseBody(bodyStr) {
+  if (!bodyStr || typeof bodyStr !== 'string') return { content: '' };
+  try {
+    return JSON.parse(bodyStr);
+  } catch {
+    return { content: bodyStr };
+  }
+}
+
 // Push 이벤트 리스너
 self.addEventListener('push', (event) => {
-  console.log('[firebase-messaging-sw.js] Push 이벤트 수신');
-  
   let notificationData = {};
-  
+
   if (event.data) {
     try {
       notificationData = event.data.json();
@@ -19,29 +27,43 @@ self.addEventListener('push', (event) => {
       }
     }
   }
-  
-  // FCM 메시지 형식 처리
-  const notificationTitle = 
-    notificationData.notification?.title || 
-    notificationData.title || 
+
+  const data = notificationData.data || {};
+  const title =
+    notificationData.notification?.title ||
+    data.title ||
+    notificationData.title ||
     'Loopin 알림';
-    
-  const notificationBody = 
-    notificationData.notification?.body || 
-    notificationData.body || 
+  const rawBody =
+    notificationData.notification?.body ||
+    data.body ||
+    notificationData.body ||
     '';
-  
-  const notificationOptions = {
-    body: notificationBody,
-    icon: '/loopin-logo.svg',
-    badge: '/loopin-logo.svg',
-    tag: 'loopin-notification',
-    requireInteraction: false,
-    data: notificationData.data || notificationData || {},
-  };
+  const parsed = parseBody(rawBody);
+  const body = parsed.content || rawBody;
+  const targetObject = parsed.targetObject || null;
+  const objectId = parsed.objectId ?? null;
 
   event.waitUntil(
-    self.registration.showNotification(notificationTitle, notificationOptions)
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      const visibleClient = clientList.find((c) => c.visibilityState === 'visible');
+
+      if (visibleClient) {
+        // 포그라운드: 페이지로 메시지 전달 → 인앱 알림 표시
+        clientList.forEach((client) => {
+          client.postMessage({ type: 'PUSH_NOTIFICATION', title, body, targetObject, objectId });
+        });
+      } else {
+        // 백그라운드: 시스템 알림 표시
+        return self.registration.showNotification(title, {
+          body: body || '새로운 알림이 있습니다.',
+          icon: '/loopin-logo.svg',
+          badge: '/loopin-logo.svg',
+          requireInteraction: false,
+          data: data,
+        });
+      }
+    })
   );
 });
 

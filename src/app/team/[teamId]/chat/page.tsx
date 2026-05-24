@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { useTeamChat } from "@/hooks/useTeamChat";
 import { TeamMessageBubble } from "./components/TeamMessageBubble";
 import { fetchTeamDetail } from "@/lib/team";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import { ChatInput } from "@/components/common/ChatInput";
 
 const INPUT_CONTAINER_HEIGHT = 80;
@@ -50,7 +50,7 @@ export default function TeamChatPage() {
   useEffect(() => {
     if (!teamId) return;
 
-    let cancelled = false;
+    const cancelled = false;
 
     const loadTeamName = async () => {
       try {
@@ -97,9 +97,12 @@ export default function TeamChatPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#F8F8F9]">
+    <div className="flex min-h-screen flex-col bg-gray-100">
       {/* Header */}
-      <Header leftType="back" centerTitle={teamName} rightType="none" />
+      <Header
+        left={<Header.BackButton />}
+        center={<Header.Title> {teamName} </Header.Title>}
+      />
     
 
       {/* 메시지 리스트 */}
@@ -113,11 +116,13 @@ export default function TeamChatPage() {
         >
           {isLoading && messages.length === 0 ? (
             <div className="flex items-center justify-center py-8">
-              <p className="text-sm text-[var(--gray-500)]">로딩 중...</p>
+              { }
+              <p className="text-sm text-gray-500">로딩 중...</p>
             </div>
           ) : messages.length === 0 ? (
             <div className="flex items-center justify-center py-8">
-              <p className="text-sm text-[var(--gray-500)]">
+              { }
+              <p className="text-sm text-gray-500">
                 메시지가 없습니다
               </p>
             </div>
@@ -135,7 +140,8 @@ export default function TeamChatPage() {
           )}
         </div>
 
-        <div className="fixed inset-x-0 bottom-0 z-40 flex justify-center bg-white border-t border-[var(--gray-200)]">
+        { }
+        <div className="fixed inset-x-0 bottom-0 z-40 flex justify-center bg-white border-t border-gray-200">
           <div className="pointer-events-auto w-full max-w-xl p-4">
             <form onSubmit={formHandleSubmit(handleSubmit)}>
               <ChatInput
