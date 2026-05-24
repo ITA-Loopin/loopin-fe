@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { Button } from "@/components/common/Button";
 import { fetchMemberProfile, type MemberProfile } from "@/lib/member";
@@ -47,7 +47,14 @@ export default function AccountPage() {
   return (
     <>
       <div className="flex h-full flex-col">
-        <Header centerTitle="계정 관리" leftType="back" rightType="none" />
+        <Header
+          left={<Header.BackButton />}
+          center={
+            <h1 className="whitespace-nowrap text-body-1-sb text-gray-800">
+              계정 관리
+            </h1>
+          }
+/>
         <div className="flex-1 flex flex-col overflow-y-auto px-4 py-6">
           {/* 프로필 영역 */}
           <div className="mb-8 flex flex-col items-center">

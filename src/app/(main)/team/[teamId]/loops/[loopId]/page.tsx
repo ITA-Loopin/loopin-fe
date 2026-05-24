@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import { useChecklist } from "@/hooks/useChecklist";
 import { useLoopActions } from "@/hooks/useLoopActions";
 import { TeamLoopDetailContent } from "@/components/team/TeamLoopDetailContent";
@@ -484,9 +484,13 @@ export default function TeamLoopDetailPage() {
 
       <div className="relative flex flex-col">
         <Header
-          leftType="back"
-          rightType="user"
-          onBack={() => router.back()}
+          left={<Header.BackButton />}
+          right={
+            <>
+              <Header.ProfileButton />
+              <Header.NotificationButton />
+            </>
+          }
         />
 
         <main className="flex flex-col gap-6 px-4 pb-8">

@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import {
   fetchNotifications,
   markNotificationsAsRead,
@@ -124,7 +124,10 @@ export default function NotificationPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
-      <Header leftType="back" centerTitle="알림" onBack={() => router.back()} />
+      <Header
+        left={<Header.BackButton />}
+        center={<Header.Title>알림</Header.Title>}
+      />
 
       <div className="flex-1 px-4 py-6 overflow-y-auto">
         {isLoading ? (

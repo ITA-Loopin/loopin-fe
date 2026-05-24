@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import {
   fetchTeamDetail,
   fetchTeamLoops,
@@ -185,10 +185,9 @@ export default function TeamActivityPage() {
     return (
       <div className="flex min-h-full flex-col">
         <Header
-          leftType="back"
-          rightType="edit"
-          onBack={() => router.back()}
-          centerTitle="팀 활동 기록"
+          left={<Header.BackButton/>}
+          center={<Header.Title>팀 활동 기록</Header.Title>}
+          right={<Header.EditButton />}
           className="flex-shrink-0"
         />
         <div className="flex flex-1 items-center justify-center">
@@ -203,10 +202,9 @@ export default function TeamActivityPage() {
   return (
     <div className="flex flex-col min-h-full bg-gray-100">
       <Header
-        leftType="back"
-        rightType="edit"
-        onBack={() => router.back()}
-        centerTitle="팀 활동 기록"
+        left={<Header.BackButton/>}
+        center={<Header.Title>팀 활동 기록</Header.Title>}
+        right={<Header.EditButton />}
         className="flex-shrink-0"
       />
 

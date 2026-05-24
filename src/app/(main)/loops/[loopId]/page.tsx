@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import { useLoopDetail } from "@/hooks/useLoopDetail";
 import { useChecklist } from "@/hooks/useChecklist";
 import { useLoopActions } from "@/hooks/useLoopActions";
@@ -66,9 +66,13 @@ export default function LoopDetailPage() {
 
       <div className="relative flex flex-col">
         <Header
-          leftType="back"
-          rightType="user"
-          onBack={() => router.back()}
+          left={<Header.BackButton />}
+          right={
+            <>
+              <Header.ProfileButton />
+              <Header.NotificationButton />
+            </>
+          }
         />
 
         <main className="flex flex-col gap-6 px-4 pb-8">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import { LoopReport } from "@/components/analytics/LoopReport";
 import type { LoopReportData, ReportStatus } from "@/types/report";
 import { fetchLoopReport } from "@/lib/report";
@@ -146,9 +146,7 @@ export default function AnalyticsPage() {
   return (
     <div className="relative flex flex-col min-h-full overflow-x-hidden" style={getBackgroundStyle(status)}>
       <Header
-        leftType="none"
-        rightType="none"
-        centerTitle="루프 리포트"
+        center={<Header.Title>루프 리포트</Header.Title>}
       />
       {/* NONE 상태를 제외한 모든 경우에 초록색 원형 오버레이 - 스크롤 계산에서 제외 */}
       {status !== "NONE" && (

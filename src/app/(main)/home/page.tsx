@@ -53,7 +53,7 @@ export default function HomePage() {
     LoopProgress,
     LoopList,
   } from "@/components/home";
-  import Header from "@/components/common/Header";
+  import Header from "@/components/common/header/Header";
   import { useDailyLoops } from "@/hooks/useDailyLoops";
   import {
     Tooltip,

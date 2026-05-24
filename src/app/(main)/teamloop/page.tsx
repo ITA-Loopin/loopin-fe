@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import { TeamListSection } from "@/components/team/TeamListSection";
 import { TeamCard } from "@/components/team/TeamCard";
 import { TeamLoopFAB } from "@/components/team/TeamLoopFAB";
@@ -80,7 +80,19 @@ export default function TeamLoopPage() {
   return (
     <div className="flex flex-col">
       {/* 헤더 */}
-      <Header leftType="none" rightType="user" centerTitle="팀 루프" />
+      <Header
+        center={
+          <h1 className="whitespace-nowrap text-body-1-sb text-gray-800">
+            팀 루프
+          </h1>
+        }
+        right={
+          <>
+            <Header.ProfileButton />
+            <Header.NotificationButton />
+          </>
+        }
+      />
 
       {/* 팀 루프 홈 타이틀 */}
       <div className="flex w-full flex-col items-start gap-[6px] px-[16px] pb-6 pt-6">

@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import { AddLoopSheet } from "@/components/loop/add-loop/AddLoopSheet";
 import { LoopList } from "@/components/home";
 import { MonthCalendar } from "@/components/calendar/MonthCalendar";

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { toast } from "react-toastify";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import { TeamMemberSearch } from "@/components/team/TeamMemberSearch";
 import Image from "next/image";
 import { Button } from "@/components/common/Button";
@@ -217,10 +217,12 @@ export default function TeamManagePage() {
     return (
       <div className="flex min-h-screen flex-col">
         <Header
-          leftType="back"
-          rightType="none"
-          onBack={() => router.back()}
-          centerTitle="팀 루프 관리하기"
+          left={<Header.BackButton />}
+          center={
+            <h1 className="whitespace-nowrap text-body-1-sb text-gray-800">
+              팀 루프 관리하기
+            </h1>
+          }
         />
         <div className="flex flex-1 items-center justify-center">
           <p className="text-body-2-m text-red-500">팀 정보를 불러올 수 없습니다</p>
@@ -235,10 +237,18 @@ export default function TeamManagePage() {
   return (
     <div className="flex flex-col bg-gray-white">
       <Header
-        leftType="back"
-        rightType="user"
-        onBack={() => router.back()}
-        centerTitle="팀 루프 관리하기"
+        left={<Header.BackButton />}
+        center={
+          <h1 className="whitespace-nowrap text-body-1-sb text-gray-800">
+            팀 루프 관리하기
+          </h1>
+        }
+        right={
+          <>
+            <Header.ProfileButton />
+            <Header.NotificationButton />
+          </>
+        }
       />
 
       {/* 팀원 목록 */}

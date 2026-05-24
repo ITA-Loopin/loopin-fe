@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import { fetchMemberProfile, type MemberProfile } from "@/lib/member";
 
 export default function MyPage() {
@@ -38,7 +38,10 @@ export default function MyPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <Header centerTitle="마이페이지" leftType="back" rightType="none" />
+      <Header
+        left={<Header.BackButton />}
+        center={<Header.Title>마이페이지</Header.Title>}
+      />
       <div className="flex-1 overflow-y-auto px-4 py-6">
         {/* 사용자 정보 섹션 */}
         { }

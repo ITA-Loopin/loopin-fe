@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { fetchChatRooms, type ChatRoom } from "@/lib/chat";
 import LoopIcon from "@/../public/ai-planner/loop-icon.svg";
 import { Button } from "@/components/common/Button";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 
 type ChatLoop = {
   id: number;
@@ -81,7 +81,9 @@ export default function PlannerListPage() {
 
   return (
     <div className="flex h-full flex-col bg-white">
-      <Header leftType="none" centerTitle="루프 채팅 기록"/>
+      <Header
+        center={<Header.Title>루프 채팅 기록</Header.Title>}
+      />
 
       {/* Content */}
       <main className="flex-1 px-6 py-6">

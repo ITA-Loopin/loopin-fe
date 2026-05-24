@@ -19,7 +19,7 @@ import {
 import type { RecommendationSchedule } from "./types";
 import GroupIcon from "@/../public/Group.svg";
 import RetryIcon from "@/../public/retry.svg";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 
 const MESSAGE_EXTRA_SPACE = 32;
 const INPUT_CONTAINER_HEIGHT = 192;
@@ -114,39 +114,10 @@ export default function PlannerChatPage() {
   return (
     <div className="flex min-h-screen flex-col bg-gray-100/40">
       {/* Header */}
-      <Header leftType="back" centerTitle={chatRoomTitle} rightType="none" />
-      {/* <header className="sticky top-0 z-50 flex items-center justify-between bg-white px-6 py-4 shadow-sm">
-        <button
-          onClick={() => router.back()}
-          className="flex h-8 w-8 items-center justify-center"
-          aria-label="뒤로가기"
-        >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M15 18L9 12L15 6"
-              className="stroke-gray-800"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
-        <h1 className="text-lg font-semibold text-gray-800">
-          {chatRoomTitle}
-        </h1>
-        <button
-          className="flex h-8 w-8 items-center justify-center"
-          aria-label="메뉴"
-        >
-   
-        </button>
-      </header> */}
+      <Header
+        left={<Header.BackButton />}
+        center={<Header.Title>{chatRoomTitle}</Header.Title>}
+      />
 
       <section className="flex flex-1 min-h-0 flex-col">
         <div
