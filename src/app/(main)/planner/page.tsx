@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { fetchChatRooms, type ChatRoom } from "@/lib/chat";
+import { fetchChatRooms, createChatRoom, type ChatRoom } from "@/lib/chat";
 import LoopIcon from "@/../public/ai-planner/loop-icon.svg";
 import { Button } from "@/components/common/Button";
 import Header from "@/components/common/header/Header";
@@ -35,31 +35,37 @@ export default function PlannerListPage() {
   const router = useRouter();
   const [chatLoops, setChatLoops] = useState<ChatLoop[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCreating, setIsCreating] = useState(false);
 
   useEffect(() => {
-    const fetchChatLoops = async () => {
+    (async () => {
       try {
         const response = await fetchChatRooms();
-        if (response.data?.chatRooms) {
-          const loops = response.data.chatRooms.map(mapChatRoomToChatLoop);
-          setChatLoops(loops);
+
+        if (!response.success) {
+          console.error("API 실패", response);
+          return;
         }
+
+        const rooms = response.data?.chatRooms ?? [];
+        const loops = rooms.map(mapChatRoomToChatLoop);
+        setChatLoops(loops);
+
       } catch (error) {
         console.error("채팅방 목록 불러오기 실패", error);
       } finally {
         setIsLoading(false);
       }
-    };
-
-    fetchChatLoops();
+    })();
   }, []);
 
   const handleStartNewLoop = async () => {
+    if(isCreating) return;
+    setIsCreating(true);
     try {
-      const { createChatRoom } = await import("@/lib/chat");
       const response = await createChatRoom({
         title: "새 루프",
-        loopSelect: true,
+        loopSelect: false,
       });
 
       if (response.data?.id) {
@@ -69,9 +75,8 @@ export default function PlannerListPage() {
       }
     } catch (error) {
       console.error("채팅방 생성 실패", error);
-      // 에러 발생 시에도 임시로 이동 (개발 중)
-      const newChatRoomId = Date.now();
-      router.push(`/planner/${newChatRoomId}?new=true`);
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -142,6 +147,7 @@ export default function PlannerListPage() {
           size="lg"
           className="w-full rounded-[30px] text-body-1-sb"
           onClick={handleStartNewLoop}
+          disabled={isCreating}
         >
           새로운 루프 시작하기
         </Button>
