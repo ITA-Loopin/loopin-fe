@@ -56,8 +56,9 @@ export async function fetchMyTeamList(params?: {
   const response = await apiFetch<TeamListApiResponse>(
     "/rest-api/v1/teams/my",
     {
-      searchParams: Object.keys(searchParams).length > 0 ? searchParams : undefined,
-    }
+      searchParams:
+        Object.keys(searchParams).length > 0 ? searchParams : undefined,
+    },
   );
 
   if (!response.success || !response.data) {
@@ -84,9 +85,8 @@ export type CreateTeamRequest = {
  * 팀 생성 API
  */
 export async function createTeam(
-  data: CreateTeamRequest
+  data: CreateTeamRequest,
 ): Promise<{ success: boolean; message?: string }> {
-
   try {
     const response = await apiFetch<{
       success: boolean;
@@ -136,11 +136,13 @@ export type RecruitingTeamListApiResponse = {
  */
 export async function fetchRecruitingTeams(): Promise<TeamItem[]> {
   const response = await apiFetch<RecruitingTeamListApiResponse>(
-    "/rest-api/v1/teams/recruiting"
+    "/rest-api/v1/teams/recruiting",
   );
 
   if (!response.success || !response.data) {
-    throw new Error(response.message || "모집 중인 팀 리스트 조회에 실패했습니다");
+    throw new Error(
+      response.message || "모집 중인 팀 리스트 조회에 실패했습니다",
+    );
   }
 
   // category, name, goal만 사용하여 TeamItem으로 변환
@@ -173,14 +175,16 @@ export type TeamDetailApiResponse = {
 /**
  * 팀 상세 정보 조회 API
  */
-export async function fetchTeamDetail(teamId: number): Promise<TeamItem & { 
-  myTotalProgress: number; 
-  teamTotalProgress: number;
-  leaderId: number;
-  createdAt: string;
-  visibility: "PUBLIC" | "PRIVATE";
-  totalLoopCount: number;
-}> {
+export async function fetchTeamDetail(teamId: number): Promise<
+  TeamItem & {
+    myTotalProgress: number;
+    teamTotalProgress: number;
+    leaderId: number;
+    createdAt: string;
+    visibility: "PUBLIC" | "PRIVATE";
+    totalLoopCount: number;
+  }
+> {
   const response = await apiFetch<{
     success: boolean;
     code: string;
@@ -200,8 +204,12 @@ export async function fetchTeamDetail(teamId: number): Promise<TeamItem & {
     title: data.name,
     description: data.goal,
     progress: Math.round(Math.min(Math.max(data.myTotalProgress, 0), 100)), // 내 루프 진행률 사용 (정수로 변환)
-    myTotalProgress: Math.round(Math.min(Math.max(data.myTotalProgress, 0), 100)),
-    teamTotalProgress: Math.round(Math.min(Math.max(data.teamTotalProgress, 0), 100)),
+    myTotalProgress: Math.round(
+      Math.min(Math.max(data.myTotalProgress, 0), 100),
+    ),
+    teamTotalProgress: Math.round(
+      Math.min(Math.max(data.teamTotalProgress, 0), 100),
+    ),
     leaderId: data.leaderId,
     createdAt: data.createdAt,
     visibility: data.visibility,
@@ -246,23 +254,23 @@ export type TeamLoopListApiResponse = {
 export async function fetchTeamLoops(
   teamId: number,
   date?: string,
-  status?: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED"
+  status?: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED",
 ): Promise<TeamLoopApiItem[]> {
   const searchParams = new URLSearchParams();
-  
+
   if (date) {
     searchParams.append("date", date);
   }
-  
+
   if (status) {
     searchParams.append("status", status);
   }
-  
+
   const queryString = searchParams.toString();
   const url = queryString
     ? `/rest-api/v1/teams/${teamId}/loops?${queryString}`
     : `/rest-api/v1/teams/${teamId}/loops`;
-  
+
   const response = await apiFetch<TeamLoopListApiResponse>(url);
 
   if (!response.success || !response.data) {
@@ -303,7 +311,7 @@ export type TeamCalendarLoopsApiResponse = {
 export async function fetchTeamCalendarLoops(
   teamId: number,
   year: number,
-  month: number
+  month: number,
 ): Promise<Map<string, boolean>> {
   const response = await apiFetch<TeamCalendarLoopsApiResponse>(
     `/rest-api/v1/teams/${teamId}/loops/calendar`,
@@ -313,7 +321,7 @@ export async function fetchTeamCalendarLoops(
         month,
         teamId,
       },
-    }
+    },
   );
 
   if (!response.success || !response.data) {
@@ -359,7 +367,7 @@ export type TeamMemberListApiResponse = {
  */
 export async function fetchTeamMembers(teamId: number): Promise<TeamMember[]> {
   const response = await apiFetch<TeamMemberListApiResponse>(
-    `/rest-api/v1/teams/${teamId}/members`
+    `/rest-api/v1/teams/${teamId}/members`,
   );
 
   if (!response.success || !response.data) {
@@ -390,14 +398,16 @@ export type TeamLoopChecklistApiResponse = {
  * 팀 루프 체크리스트 조회 API
  */
 export async function fetchTeamLoopChecklists(
-  loopId: number
+  loopId: number,
 ): Promise<TeamLoopChecklistApiItem[]> {
   const response = await apiFetch<TeamLoopChecklistApiResponse>(
-    `/rest-api/v1/teams/loops/${loopId}/checklists`
+    `/rest-api/v1/teams/loops/${loopId}/checklists`,
   );
 
   if (!response.success || !response.data) {
-    throw new Error(response.message || "팀 루프 체크리스트 조회에 실패했습니다");
+    throw new Error(
+      response.message || "팀 루프 체크리스트 조회에 실패했습니다",
+    );
   }
 
   return response.data;
@@ -415,7 +425,7 @@ export type UpdateTeamOrderRequest = {
  * 팀 목록 순서 변경 API
  */
 export async function updateTeamOrder(
-  data: UpdateTeamOrderRequest
+  data: UpdateTeamOrderRequest,
 ): Promise<{ success: boolean; message?: string }> {
   try {
     const response = await apiFetch<{
@@ -478,14 +488,16 @@ export type TeamLoopMyDetailApiResponse = {
  */
 export async function fetchTeamLoopMyDetail(
   teamId: number,
-  loopId: number
+  loopId: number,
 ): Promise<TeamLoopMyDetailApiResponse["data"]> {
   const response = await apiFetch<TeamLoopMyDetailApiResponse>(
-    `/rest-api/v1/teams/${teamId}/loops/${loopId}/my`
+    `/rest-api/v1/teams/${teamId}/loops/${loopId}/my`,
   );
 
   if (!response.success || !response.data) {
-    throw new Error(response.message || "팀 루프 상세 정보 조회에 실패했습니다");
+    throw new Error(
+      response.message || "팀 루프 상세 정보 조회에 실패했습니다",
+    );
   }
 
   return response.data;
@@ -533,14 +545,16 @@ export type TeamLoopAllDetailApiResponse = {
  */
 export async function fetchTeamLoopAllDetail(
   teamId: number,
-  loopId: number
+  loopId: number,
 ): Promise<TeamLoopAllDetailApiResponse["data"]> {
   const response = await apiFetch<TeamLoopAllDetailApiResponse>(
-    `/rest-api/v1/teams/${teamId}/loops/${loopId}/all`
+    `/rest-api/v1/teams/${teamId}/loops/${loopId}/all`,
   );
 
   if (!response.success || !response.data) {
-    throw new Error(response.message || "팀 루프 상세 정보 조회에 실패했습니다");
+    throw new Error(
+      response.message || "팀 루프 상세 정보 조회에 실패했습니다",
+    );
   }
 
   return response.data;
@@ -551,7 +565,7 @@ export async function fetchTeamLoopAllDetail(
  */
 export async function createTeamLoopChecklist(
   loopId: number,
-  content: string
+  content: string,
 ): Promise<{ id: number; content: string; completed: boolean }> {
   try {
     const response = await apiFetch<{
@@ -584,7 +598,7 @@ export async function createTeamLoopChecklist(
  * 팀 루프 체크리스트 체크/해제 API
  */
 export async function toggleTeamLoopChecklist(
-  checklistId: number
+  checklistId: number,
 ): Promise<{ id: number; content: string; isChecked: boolean }> {
   try {
     const response = await apiFetch<{
@@ -601,13 +615,17 @@ export async function toggleTeamLoopChecklist(
     });
 
     if (!response.success || !response.data) {
-      throw new Error(response.message || "체크리스트 상태 변경에 실패했습니다");
+      throw new Error(
+        response.message || "체크리스트 상태 변경에 실패했습니다",
+      );
     }
 
     return response.data;
   } catch (error) {
     const errorMessage =
-      error instanceof Error ? error.message : "체크리스트 상태 변경에 실패했습니다";
+      error instanceof Error
+        ? error.message
+        : "체크리스트 상태 변경에 실패했습니다";
     throw new Error(errorMessage);
   }
 }
@@ -616,7 +634,7 @@ export async function toggleTeamLoopChecklist(
  * 팀 루프 체크리스트 삭제 API
  */
 export async function deleteTeamLoopChecklist(
-  checklistId: number
+  checklistId: number,
 ): Promise<{ success: boolean; message?: string }> {
   try {
     const response = await apiFetch<{
@@ -671,12 +689,12 @@ export type TeamLoopMemberChecklistApiResponse = {
  */
 export async function fetchTeamLoopMemberChecklist(
   loopId: number,
-  memberId?: number
+  memberId?: number,
 ): Promise<TeamLoopMemberChecklistApiResponse["data"]> {
   const url = memberId
     ? `/rest-api/v1/teams/loops/${loopId}/checklists?memberId=${memberId}`
     : `/rest-api/v1/teams/loops/${loopId}/checklists`;
-  
+
   const response = await apiFetch<TeamLoopMemberChecklistApiResponse>(url);
 
   if (!response.success || !response.data) {
@@ -686,13 +704,12 @@ export async function fetchTeamLoopMemberChecklist(
   return response.data;
 }
 
-
 /**
  * 팀 루프 완료 API
  */
 export async function completeTeamLoop(
   teamId: number,
-  loopId: number
+  loopId: number,
 ): Promise<{ success: boolean; message?: string }> {
   try {
     const response = await apiFetch<{
@@ -720,8 +737,123 @@ export async function completeTeamLoop(
 /**
  * 팀 삭제 API
  */
+export type TeamLoopUpdateRequest = {
+  title?: string;
+  content?: string | null;
+  specificDate?: string | null;
+  checklists?: string[];
+  type?: "COMMON" | "INDIVIDUAL";
+  importance?: "HIGH" | "MEDIUM" | "LOW";
+  targetMemberIds?: number[];
+};
+
+export type TeamLoopGroupUpdateRequest = TeamLoopUpdateRequest & {
+  scheduleType: string;
+  daysOfWeek?: string[];
+  startDate?: string | null;
+  endDate?: string | null;
+  type: "COMMON" | "INDIVIDUAL";
+  importance: "HIGH" | "MEDIUM" | "LOW";
+};
+
+export async function updateTeamLoop(
+  teamId: number,
+  loopId: number,
+  data: TeamLoopUpdateRequest,
+): Promise<{ success: boolean; message?: string }> {
+  const response = await apiFetch<{
+    success: boolean;
+    code: string;
+    message: string;
+    data?: unknown;
+  }>(`/rest-api/v1/teams/${teamId}/loops/${loopId}`, {
+    method: "PUT",
+    json: data,
+  });
+
+  if (!response.success) {
+    throw new Error(response.message || "팀 루프 수정에 실패했습니다.");
+  }
+
+  return {
+    success: true,
+    message: response.message,
+  };
+}
+
+export async function updateTeamLoopGroup(
+  teamId: number,
+  loopRuleId: number,
+  data: TeamLoopGroupUpdateRequest,
+): Promise<{ success: boolean; message?: string }> {
+  const response = await apiFetch<{
+    success: boolean;
+    code: string;
+    message: string;
+    data?: unknown;
+  }>(`/rest-api/v1/teams/${teamId}/loops/${loopRuleId}/group`, {
+    method: "PUT",
+    json: data,
+  });
+
+  if (!response.success) {
+    throw new Error(response.message || "팀 루프 그룹 수정에 실패했습니다.");
+  }
+
+  return {
+    success: true,
+    message: response.message,
+  };
+}
+
+export async function deleteTeamLoop(
+  teamId: number,
+  loopId: number,
+): Promise<{ success: boolean; message?: string }> {
+  const response = await apiFetch<{
+    success: boolean;
+    code: string;
+    message: string;
+    data?: unknown;
+  }>(`/rest-api/v1/teams/${teamId}/loops/${loopId}`, {
+    method: "DELETE",
+  });
+
+  if (!response.success) {
+    throw new Error(response.message || "팀 루프 삭제에 실패했습니다.");
+  }
+
+  return {
+    success: true,
+    message: response.message,
+  };
+}
+
+export async function deleteTeamLoopGroup(
+  teamId: number,
+  loopId: number,
+): Promise<{ success: boolean; message?: string }> {
+  const response = await apiFetch<{
+    success: boolean;
+    code: string;
+    message: string;
+    data?: unknown;
+  }>(`/rest-api/v1/teams/${teamId}/loops/${loopId}/group`, {
+    method: "DELETE",
+  });
+
+  if (!response.success) {
+    throw new Error(response.message || "팀 루프 그룹 삭제에 실패했습니다.");
+  }
+
+  return {
+    success: true,
+    message: response.message,
+  };
+}
+
 export async function deleteTeam(
-  teamId: number
+  teamId: number,
 ): Promise<{ success: boolean; message?: string }> {
   try {
     const response = await apiFetch<{
@@ -751,7 +883,7 @@ export async function deleteTeam(
  */
 export async function removeTeamMember(
   teamId: number,
-  memberId: number
+  memberId: number,
 ): Promise<{ success: boolean; message?: string }> {
   try {
     const response = await apiFetch<{
@@ -780,7 +912,7 @@ export async function removeTeamMember(
  * 팀 나가기 API
  */
 export async function leaveTeam(
-  teamId: number
+  teamId: number,
 ): Promise<{ success: boolean; message?: string }> {
   try {
     const response = await apiFetch<{
@@ -810,7 +942,7 @@ export async function leaveTeam(
  */
 export async function inviteTeamMember(
   teamId: number,
-  memberId: number
+  memberId: number,
 ): Promise<{ success: boolean; message?: string }> {
   try {
     const response = await apiFetch<{
@@ -885,10 +1017,10 @@ export type TeamMemberActivitiesApiResponse = {
  * 팀 활동 조회 API
  */
 export async function fetchTeamMemberActivities(
-  teamId: number
+  teamId: number,
 ): Promise<TeamMemberActivitiesApiResponse["data"]> {
   const response = await apiFetch<TeamMemberActivitiesApiResponse>(
-    `/rest-api/v1/teams/${teamId}/member-activities`
+    `/rest-api/v1/teams/${teamId}/member-activities`,
   );
 
   if (!response.success || !response.data) {
@@ -897,5 +1029,3 @@ export async function fetchTeamMemberActivities(
 
   return response.data;
 }
-
-
