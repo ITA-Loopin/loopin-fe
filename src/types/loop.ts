@@ -26,7 +26,7 @@ export interface LoopDetail {
   startDate?: string | null;
   endDate?: string | null;
   loopRuleId?: number;
+  teamId?: number;
+  loopType?: "COMMON" | "INDIVIDUAL";
+  importance?: "HIGH" | "MEDIUM" | "LOW";
 }
-
-
-

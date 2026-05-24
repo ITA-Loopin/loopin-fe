@@ -9,7 +9,17 @@ import { TeamLoopDetailContent } from "@/components/team/TeamLoopDetailContent";
 import { LoopActionDialog } from "@/components/loop/LoopActionDialog";
 import { LoopEditSheet } from "@/components/loop/LoopEditSheet";
 import { LoopGroupEditSheet } from "@/components/loop/LoopGroupEditSheet";
-import { fetchTeamLoops, fetchTeamLoopChecklists, fetchTeamLoopMyDetail, fetchTeamLoopAllDetail, createTeamLoopChecklist, toggleTeamLoopChecklist, deleteTeamLoopChecklist, completeTeamLoop, type TeamLoopApiItem } from "@/lib/team";
+import {
+  fetchTeamLoops,
+  fetchTeamLoopChecklists,
+  fetchTeamLoopMyDetail,
+  fetchTeamLoopAllDetail,
+  createTeamLoopChecklist,
+  toggleTeamLoopChecklist,
+  deleteTeamLoopChecklist,
+  completeTeamLoop,
+  type TeamLoopApiItem,
+} from "@/lib/team";
 import type { LoopDetail } from "@/types/loop";
 import { MemberProgressDialog } from "@/components/team/MemberProgressDialog";
 
@@ -22,18 +32,24 @@ export default function TeamLoopDetailPage() {
   const view = searchParams?.get("view") || "my"; // 기본값은 "my"
 
   const [detail, setDetail] = useState<LoopDetail | null>(null);
-  const [teamLoopData, setTeamLoopData] = useState<TeamLoopApiItem | null>(null);
-  const [memberProgresses, setMemberProgresses] = useState<Array<{
-    memberId: number;
-    nickname: string;
-    status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
-    progress: number;
-  }>>([]);
+  const [teamLoopData, setTeamLoopData] = useState<TeamLoopApiItem | null>(
+    null,
+  );
+  const [memberProgresses, setMemberProgresses] = useState<
+    Array<{
+      memberId: number;
+      nickname: string;
+      status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
+      progress: number;
+    }>
+  >([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
 
-  const checklist = useChecklist(detail, setDetail, () => setReloadKey((prev) => prev + 1));
+  const checklist = useChecklist(detail, setDetail, () =>
+    setReloadKey((prev) => prev + 1),
+  );
   const actions = useLoopActions(detail);
 
   // 내 루프 탭에서 체크리스트 추가 핸들러
@@ -56,9 +72,10 @@ export default function TeamLoopDetailPage() {
       const nextChecklists = [...prev.checklists, optimisticItem];
       const total = nextChecklists.length;
       const completed = nextChecklists.filter((i) => i.completed).length;
-      const progress = total > 0
-        ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
-        : 0;
+      const progress =
+        total > 0
+          ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
+          : 0;
       return {
         ...prev,
         checklists: nextChecklists,
@@ -69,7 +86,7 @@ export default function TeamLoopDetailPage() {
 
     try {
       const result = await createTeamLoopChecklist(loopId, content);
-      
+
       // 서버에서 받은 실제 데이터로 tempId를 교체
       setDetail((prev) => {
         if (!prev) return prev;
@@ -81,13 +98,14 @@ export default function TeamLoopDetailPage() {
                 content: result.content,
                 completed: currentItem?.completed ?? result.completed ?? false,
               }
-            : item
+            : item,
         );
         const total = nextChecklists.length;
         const completed = nextChecklists.filter((i) => i.completed).length;
-        const progress = total > 0
-          ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
-          : 0;
+        const progress =
+          total > 0
+            ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
+            : 0;
         return {
           ...prev,
           checklists: nextChecklists,
@@ -99,13 +117,14 @@ export default function TeamLoopDetailPage() {
       setDetail((prev) => {
         if (!prev) return prev;
         const nextChecklists = prev.checklists.filter(
-          (item) => item.id !== tempId
+          (item) => item.id !== tempId,
         );
         const total = nextChecklists.length;
         const completed = nextChecklists.filter((i) => i.completed).length;
-        const progress = total > 0
-          ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
-          : 0;
+        const progress =
+          total > 0
+            ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
+            : 0;
         return {
           ...prev,
           checklists: nextChecklists,
@@ -164,10 +183,12 @@ export default function TeamLoopDetailPage() {
           setTeamLoopData(teamLoopData);
 
           // 팀원별 진행 상황 저장 (progress를 정수로 변환)
-          setMemberProgresses(allDetail.memberProgresses.map((member) => ({
-            ...member,
-            progress: Math.round(Math.min(Math.max(member.progress, 0), 100)),
-          })));
+          setMemberProgresses(
+            allDetail.memberProgresses.map((member) => ({
+              ...member,
+              progress: Math.round(Math.min(Math.max(member.progress, 0), 100)),
+            })),
+          );
 
           // 체크리스트 변환 (팀 루프 API는 completed 정보가 없음)
           const checklists = allDetail.checklists
@@ -183,7 +204,7 @@ export default function TeamLoopDetailPage() {
           // 진행률 계산 (API에서 받은 teamProgress는 이미 0-100 범위의 퍼센트)
           // totalChecklistCount와 체크리스트 기반으로 계산
           const normalizedProgress = Math.round(
-            Math.min(Math.max(allDetail.teamProgress, 0), 100)
+            Math.min(Math.max(allDetail.teamProgress, 0), 100),
           );
 
           // LoopDetail 형태로 변환
@@ -195,6 +216,9 @@ export default function TeamLoopDetailPage() {
             progress: normalizedProgress,
             checklists,
             loopRule: undefined,
+            teamId,
+            loopType: allDetail.type,
+            importance: allDetail.importance,
           });
         } else {
           // 내 루프 상세 정보 가져오기
@@ -232,9 +256,12 @@ export default function TeamLoopDetailPage() {
           // 진행률 계산 (실제 체크리스트 완료 상태 기반)
           const total = checklists.length;
           const completed = checklists.filter((item) => item.completed).length;
-          const normalizedProgress = total > 0
-            ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
-            : 0;
+          const normalizedProgress =
+            total > 0
+              ? Math.round(
+                  Math.min(Math.max((completed / total) * 100, 0), 100),
+                )
+              : 0;
 
           // LoopDetail 형태로 변환
           setDetail({
@@ -245,6 +272,9 @@ export default function TeamLoopDetailPage() {
             progress: normalizedProgress,
             checklists,
             loopRule: undefined,
+            teamId,
+            loopType: myDetail.type,
+            importance: myDetail.importance,
           });
         }
       } catch (err) {
@@ -272,7 +302,11 @@ export default function TeamLoopDetailPage() {
   };
 
   // 내 루프 탭에서 체크리스트 토글 핸들러
-  const handleToggleChecklist = async (updatedItem: { id: number; content: string; completed: boolean }) => {
+  const handleToggleChecklist = async (updatedItem: {
+    id: number;
+    content: string;
+    completed: boolean;
+  }) => {
     if (!detail || view !== "my") {
       return;
     }
@@ -285,13 +319,14 @@ export default function TeamLoopDetailPage() {
       const nextChecklists = prev.checklists.map((item) =>
         item.id === updatedItem.id
           ? { ...item, completed: updatedItem.completed }
-          : item
+          : item,
       );
       const total = nextChecklists.length;
       const completed = nextChecklists.filter((i) => i.completed).length;
-      const progress = total > 0
-        ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
-        : 0;
+      const progress =
+        total > 0
+          ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
+          : 0;
       return {
         ...prev,
         checklists: nextChecklists,
@@ -307,13 +342,14 @@ export default function TeamLoopDetailPage() {
         const nextChecklists = prev.checklists.map((item) =>
           item.id === updatedItem.id
             ? { ...item, completed: result.isChecked }
-            : item
+            : item,
         );
         const total = nextChecklists.length;
         const completed = nextChecklists.filter((i) => i.completed).length;
-        const progress = total > 0
-          ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
-          : 0;
+        const progress =
+          total > 0
+            ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
+            : 0;
         return {
           ...prev,
           checklists: nextChecklists,
@@ -327,13 +363,14 @@ export default function TeamLoopDetailPage() {
         const nextChecklists = prev.checklists.map((item) =>
           item.id === updatedItem.id
             ? { ...item, completed: previousCompleted }
-            : item
+            : item,
         );
         const total = nextChecklists.length;
         const completed = nextChecklists.filter((i) => i.completed).length;
-        const progress = total > 0
-          ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
-          : 0;
+        const progress =
+          total > 0
+            ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
+            : 0;
         return {
           ...prev,
           checklists: nextChecklists,
@@ -356,13 +393,14 @@ export default function TeamLoopDetailPage() {
     setDetail((prev) => {
       if (!prev) return prev;
       const nextChecklists = prev.checklists.filter(
-        (item) => item.id !== itemId
+        (item) => item.id !== itemId,
       );
       const total = nextChecklists.length;
       const completed = nextChecklists.filter((i) => i.completed).length;
-      const progress = total > 0
-        ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
-        : 0;
+      const progress =
+        total > 0
+          ? Math.round(Math.min(Math.max((completed / total) * 100, 0), 100))
+          : 0;
       return {
         ...prev,
         checklists: nextChecklists,
@@ -379,7 +417,6 @@ export default function TeamLoopDetailPage() {
       setDetail(previousState);
     }
   };
-
 
   const handleMenuClick = () => {
     setIsMenuOpen((prev) => !prev);
@@ -464,7 +501,8 @@ export default function TeamLoopDetailPage() {
     } catch (error) {
       // 에러 발생 시 이전 상태로 롤백
       setDetail(previousState);
-      const errorMessage = error instanceof Error ? error.message : "팀 루프 완료에 실패했습니다.";
+      const errorMessage =
+        error instanceof Error ? error.message : "팀 루프 완료에 실패했습니다.";
       console.error("팀 루프 완료 에러:", error);
       alert(errorMessage);
       return { success: false };
@@ -496,13 +534,16 @@ export default function TeamLoopDetailPage() {
         <main className="flex flex-col gap-6 px-4 pb-8">
           {isLoading ? (
             <div className="flex items-center justify-center min-h-[calc(100dvh-120px)]">
-              <p className="text-sm text-gray-500">루프 정보를 불러오는 중...</p>
+              <p className="text-sm text-gray-500">
+                루프 정보를 불러오는 중...
+              </p>
             </div>
           ) : errorMessage || actions.errorMessage ? (
             <div className="flex flex-col items-center justify-center gap-4 min-h-[calc(100dvh-120px)]">
-              <p className="text-sm text-red-500">{errorMessage || actions.errorMessage}</p>
+              <p className="text-sm text-red-500">
+                {errorMessage || actions.errorMessage}
+              </p>
               <button
-                 
                 className="rounded-3xl bg-gray-800 px-4 py-2 text-sm font-semibold text-white"
                 onClick={() => router.back()}
               >
@@ -516,9 +557,13 @@ export default function TeamLoopDetailPage() {
               memberProgresses={view === "team" ? memberProgresses : undefined}
               newChecklistContent={checklist.newChecklistContent}
               onNewChecklistContentChange={checklist.setNewChecklistContent}
-              onToggleChecklist={view === "my" ? handleToggleChecklist : undefined}
+              onToggleChecklist={
+                view === "my" ? handleToggleChecklist : undefined
+              }
               onAddChecklist={view === "my" ? handleAddChecklist : undefined}
-              onDeleteChecklist={view === "my" ? handleDeleteChecklist : undefined}
+              onDeleteChecklist={
+                view === "my" ? handleDeleteChecklist : undefined
+              }
               onCompleteLoop={handleCompleteTeamLoop}
               isMenuOpen={isMenuOpen}
               onMenuClick={handleMenuClick}
@@ -531,7 +576,9 @@ export default function TeamLoopDetailPage() {
             />
           ) : (
             <div className="flex items-center justify-center min-h-[calc(100dvh-120px)]">
-              <p className="text-sm text-gray-500">루프 정보를 불러오는 중...</p>
+              <p className="text-sm text-gray-500">
+                루프 정보를 불러오는 중...
+              </p>
             </div>
           )}
         </main>
@@ -586,4 +633,3 @@ export default function TeamLoopDetailPage() {
     </>
   );
 }
-

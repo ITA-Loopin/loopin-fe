@@ -3,6 +3,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { apiFetch } from "@/lib/api";
 import type { LoopDetail } from "@/types/loop";
 import { useEditChecklist } from "@/hooks/useEditChecklist";
+import { updateTeamLoop } from "@/lib/team";
 
 type EditableChecklist = {
   id: string;
@@ -57,22 +58,22 @@ export function useLoopEditForm({
         originId: item.id,
         text: item.content,
         completed: item.completed ?? false,
-      }))
+      })),
     );
     setNewChecklistItem("");
   }, [isOpen, loop, setChecklists, setNewChecklistItem]);
 
   const formattedStartDate = useMemo(
     () => (startDate ? dayjs(startDate).format("YYYY.MM.DD") : "없음"),
-    [startDate]
+    [startDate],
   );
   const formattedEndDate = useMemo(
     () => (endDate ? dayjs(endDate).format("YYYY.MM.DD") : "없음"),
-    [endDate]
+    [endDate],
   );
   const selectedStartDate = useMemo<Dayjs>(
     () => (startDate ? dayjs(startDate) : startCalendarMonth),
-    [startDate, startCalendarMonth]
+    [startDate, startCalendarMonth],
   );
 
   const handleAddChecklist = useCallback(() => {
@@ -93,16 +94,13 @@ export function useLoopEditForm({
     });
   }, [startDate]);
 
-  const handleSelectStartDate = useCallback(
-    (date: Dayjs) => {
-      const formatted = date.format("YYYY-MM-DD");
-      setStartDate(formatted);
-      setStartCalendarMonth(date);
-      setEndDate(formatted);
-      setIsStartCalendarOpen(false);
-    },
-    []
-  );
+  const handleSelectStartDate = useCallback((date: Dayjs) => {
+    const formatted = date.format("YYYY-MM-DD");
+    setStartDate(formatted);
+    setStartCalendarMonth(date);
+    setEndDate(formatted);
+    setIsStartCalendarOpen(false);
+  }, []);
 
   const handleChangeStartMonth = useCallback((offset: number) => {
     setStartCalendarMonth((prev) => prev.add(offset, "month"));
@@ -122,13 +120,13 @@ export function useLoopEditForm({
 
       const originalChecklists = loop.checklists ?? [];
       const originalMap = new Map(
-        originalChecklists.map((item) => [item.id, item])
+        originalChecklists.map((item) => [item.id, item]),
       );
 
       const keptIds = new Set(
         trimmedItems
           .map((item) => item.originId)
-          .filter((id): id is number => typeof id === "number")
+          .filter((id): id is number => typeof id === "number"),
       );
       const removedIds = originalChecklists
         .filter((item) => !keptIds.has(item.id))
@@ -146,7 +144,7 @@ export function useLoopEditForm({
       });
 
       const newItems = trimmedItems.filter(
-        (item) => typeof item.originId !== "number"
+        (item) => typeof item.originId !== "number",
       );
 
       const payload = {
@@ -157,42 +155,51 @@ export function useLoopEditForm({
 
       try {
         setIsSubmitting(true);
-        await apiFetch(`/rest-api/v1/loops/${loop.id}`, {
-          method: "PUT",
-          json: payload,
-        });
+        if (loop.teamId) {
+          await updateTeamLoop(loop.teamId, loop.id, {
+            ...payload,
+            checklists: trimmedItems.map((item) => item.text),
+            type: loop.loopType,
+            importance: loop.importance,
+          });
+        } else {
+          await apiFetch(`/rest-api/v1/loops/${loop.id}`, {
+            method: "PUT",
+            json: payload,
+          });
 
-        await Promise.all([
-          ...removedIds.map((id) =>
-            apiFetch(`/rest-api/v1/checklists/${id}`, {
-              method: "DELETE",
-            }).catch(() => {
-              // 체크리스트 삭제 실패
-            })
-          ),
-          ...updatedExistingItems.map((item) =>
-            apiFetch(`/rest-api/v1/checklists/${item.originId}`, {
-              method: "PUT",
-              json: {
-                content: item.text,
-                completed: item.completed ?? false,
-              },
-            }).catch(() => {
-              // 체크리스트 수정 실패
-            })
-          ),
-        ]);
+          await Promise.all([
+            ...removedIds.map((id) =>
+              apiFetch(`/rest-api/v1/checklists/${id}`, {
+                method: "DELETE",
+              }).catch(() => {
+                // 체크리스트 삭제 실패
+              }),
+            ),
+            ...updatedExistingItems.map((item) =>
+              apiFetch(`/rest-api/v1/checklists/${item.originId}`, {
+                method: "PUT",
+                json: {
+                  content: item.text,
+                  completed: item.completed ?? false,
+                },
+              }).catch(() => {
+                // 체크리스트 수정 실패
+              }),
+            ),
+          ]);
 
-        for (const item of newItems) {
-          try {
-            await apiFetch(`/rest-api/v1/loops/${loop.id}/checklists`, {
-              method: "POST",
-              json: {
-                content: item.text,
-              },
-            });
-          } catch (error) {
-            // 체크리스트 추가 실패
+          for (const item of newItems) {
+            try {
+              await apiFetch(`/rest-api/v1/loops/${loop.id}/checklists`, {
+                method: "POST",
+                json: {
+                  content: item.text,
+                },
+              });
+            } catch (error) {
+              // 체크리스트 추가 실패
+            }
           }
         }
 
@@ -204,14 +211,7 @@ export function useLoopEditForm({
         setIsSubmitting(false);
       }
     },
-    [
-      loop,
-      checklists,
-      title,
-      startDate,
-      onUpdated,
-      onClose,
-    ]
+    [loop, checklists, title, startDate, onUpdated, onClose],
   );
 
   return {
@@ -250,4 +250,3 @@ export function useLoopEditForm({
     },
   };
 }
-
