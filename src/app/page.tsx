@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
@@ -13,8 +13,9 @@ import {
   type MemberResponse,
 } from "@/lib/member";
 import type { User } from "@/types/auth";
-import { saveFCMTokenApi } from "@/lib/fcm";
+import { saveFCMTokenApi, setupNativeFCMTokenListener } from "@/lib/fcm";
 import { authFetch } from "@/utils/fetch";
+import { Button } from "@/components/common/Button";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +25,7 @@ function HomeContent() {
   const dispatch = useAppDispatch();
   const { isLoading, isAuthenticated } = useAppSelector((state) => state.auth);
   const [showContent, setShowContent] = useState(false);
+  const loginProcessedRef = useRef(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -85,10 +87,22 @@ function HomeContent() {
       "https://api.loopin.co.kr/oauth2/authorization/google";
   };
 
+  const handleAppleLogin = () => {
+    window.location.href =
+      "https://api.loopin.co.kr/oauth2/authorization/apple";
+  };
+
+  // 네이티브 FCM 토큰 리프레시 리스너 등록
+  useEffect(() => {
+    setupNativeFCMTokenListener(authFetch);
+  }, []);
+
   useEffect(() => {
     const status = searchParams.get("status");
 
     if (status === "LOGIN_SUCCESS") {
+      if (loginProcessedRef.current) return;
+      loginProcessedRef.current = true;
       handleLoginSuccess();
       return;
     }
@@ -115,6 +129,7 @@ function HomeContent() {
         className="flex min-h-screen items-center justify-center"
         style={{
           background:
+            // eslint-disable-next-line no-restricted-syntax
             "linear-gradient(136deg, #FF5741 54.38%, #FFE4E0 118.92%)",
         }}
       >
@@ -127,6 +142,7 @@ function HomeContent() {
     <div
       className="relative flex min-h-screen flex-col items-center overflow-hidden text-white"
       style={{
+        // eslint-disable-next-line no-restricted-syntax
         background: "linear-gradient(136deg, #FF5741 54%, #FFE4E0 100%)",
       }}
     >
@@ -140,12 +156,10 @@ function HomeContent() {
         style={{ filter: "blur(220px)" }}
       />
       <div
-        className="absolute left-[120px] -top-[96px] h-[233px] w-[403px] rounded-full opacity-40"
-        style={{ background: "#E7FFBA", filter: "blur(234px)" }}
+        className="absolute left-[120px] -top-[96px] h-[233px] w-[403px] rounded-full opacity-40 bg-sub-mint blur-[234px]"
       />
       <div
-        className="absolute left-[120px] top-[559px] h-[383px] w-[394px] rounded-full opacity-40"
-        style={{ background: "#E7FFBA", filter: "blur(194px)" }}
+        className="absolute left-[120px] top-[559px] h-[383px] w-[394px] rounded-full opacity-40 bg-sub-mint blur-[194px]"
       />
 
       {/* 로고 영역 */}
@@ -186,9 +200,12 @@ function HomeContent() {
         </p>
 
         <div className="flex items-center gap-7">
-          <button
+          <Button
+            variant="icon"
             onClick={handleKakaoLogin}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FEDC2C]"
+            aria-label="카카오 로그인"
+             
+            className="h-10 w-10 bg-brand-kakao"
           >
             <Image
               src="/kakao-icon.svg"
@@ -196,10 +213,12 @@ function HomeContent() {
               width={24}
               height={24}
             />
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="icon"
             onClick={handleGoogleLogin}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-white"
+            aria-label="구글 로그인"
+            className="h-10 w-10 bg-white"
           >
             <Image
               src="/google-simple.png"
@@ -207,10 +226,13 @@ function HomeContent() {
               width={24}
               height={24}
             />
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="icon"
             onClick={handleNaverLogin}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-[#03C75A]"
+            aria-label="네이버 로그인"
+             
+            className="h-10 w-10 bg-brand-naver"
           >
             <Image
               src="/naver-simple.png"
@@ -218,9 +240,12 @@ function HomeContent() {
               width={22}
               height={22}
             />
-          </button>
-          <button
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-black"
+          </Button>
+          <Button
+            variant="icon"
+            onClick={handleAppleLogin}
+            aria-label="애플 로그인"
+            className="h-10 w-10 bg-black"
           >
             <Image
               src="/icon-apple.png"
@@ -228,7 +253,7 @@ function HomeContent() {
               width={24}
               height={24}
             />
-          </button>
+          </Button>
         </div>
       </div>
     </div>

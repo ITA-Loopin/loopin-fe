@@ -96,8 +96,10 @@ export default function TeamLoopPage() {
 
       {/* 팀 루프 홈 타이틀 */}
       <div className="flex w-full flex-col items-start gap-[6px] px-[16px] pb-6 pt-6">
-        <h2 className="text-body-2-m text-[var(--primary-main)]">TEAM LOOP</h2>
-        <p className="text-title-2-b text-[var(--gray-black)]">
+        { }
+        <h2 className="text-body-2-m text-primary-main">TEAM LOOP</h2>
+        { }
+        <p className="text-title-2-b text-gray-black">
           팀과 함께 루프를 완성해보세요!
         </p>
       </div>
@@ -108,7 +110,8 @@ export default function TeamLoopPage() {
           <TeamListSection title="내 팀 목록" viewAllHref="/teamloop/my">
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
-                <p className="text-caption-m text-[var(--gray-500)]">
+                { }
+                <p className="text-caption-m text-gray-500">
                   로딩 중...
                 </p>
               </div>
@@ -118,7 +121,8 @@ export default function TeamLoopPage() {
               </div>
             ) : myTeams.length === 0 ? (
               <div className="flex items-center justify-center py-8">
-                <p className="text-body-2-sb font-semibold text-[var(--gray-500)] text-center">
+                { }
+                <p className="text-body-2-sb font-semibold text-gray-500 text-center">
                   아직 참여 중인 팀이 없어요 <br /> 새로운 팀을 생성해보세요!
                 </p>
               </div>
@@ -152,7 +156,8 @@ export default function TeamLoopPage() {
         >
           {isLoadingRecruiting ? (
             <div className="flex items-center justify-center py-8">
-              <p className="text-caption-m text-[var(--gray-500)]">
+              { }
+              <p className="text-caption-m text-gray-500">
                 로딩 중...
               </p>
             </div>
@@ -162,7 +167,8 @@ export default function TeamLoopPage() {
             </div>
           ) : recruitingTeams.length === 0 ? (
             <div className="flex items-center justify-center py-8">
-              <p className="text-body-2-sb font-semibold text-[var(--gray-500)] text-center">
+              { }
+              <p className="text-body-2-sb font-semibold text-gray-500 text-center">
                 모집 중인 팀이 없어요
               </p>
             </div>

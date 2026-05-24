@@ -8,7 +8,7 @@ import { TeamNameInput } from "@/components/team/TeamNameInput";
 import { TeamGoalInput } from "@/components/team/TeamGoalInput";
 import { TeamMemberSearch } from "@/components/team/TeamMemberSearch";
 import { InvitedMemberList } from "@/components/team/InvitedMemberList";
-import { PrimaryButton } from "@/components/common/PrimaryButton";
+import { Button } from "@/components/common/Button";
 import type { TeamCategoryString } from "@/components/team/types";
 import { useCreateTeam } from "@/hooks/useCreateTeam";
 
@@ -92,13 +92,18 @@ export default function CreateTeamLoopPage() {
           />
 
           <div className="flex justify-center mb-4">
-            <PrimaryButton type="submit" disabled={isSubmitting}>
+            <Button
+              variant="primary"
+              size="lg"
+              type="submit"
+              className="w-full rounded-[30px] text-body-1-sb"
+              disabled={isSubmitting}
+            >
               팀 생성하기
-            </PrimaryButton>
+            </Button>
           </div>
         </div>
       </form>
     </div>
   );
 }
-

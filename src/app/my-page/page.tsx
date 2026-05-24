@@ -44,7 +44,8 @@ export default function MyPage() {
       />
       <div className="flex-1 overflow-y-auto px-4 py-6">
         {/* 사용자 정보 섹션 */}
-        <div className="mb-8 p-4 flex flex-row items-center bg-[#F8F8F9] rounded-lg gap-2">
+        { }
+        <div className="mb-8 p-4 flex flex-row items-center bg-gray-100 rounded-lg gap-2">
           <div className="relative">
             <div className="h-8 w-8 overflow-hidden rounded-full bg-white">
               {profile?.profileImageUrl ? (
@@ -56,7 +57,7 @@ export default function MyPage() {
                   className="h-full w-full object-cover"
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center bg-[#D9D9D9]">
+                <div className="flex h-full w-full items-center justify-center bg-gray-300">
                   <span className="text-2xl text-gray-400">👤</span>
                 </div>
               )}

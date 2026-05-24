@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Modal from "@/components/common/Modal";
-import { IconButton } from "@/components/common/IconButton";
+import Image from "next/image";
+import { Dialog } from "@/components/common/Dialog";
+import { Button } from "@/components/common/Button";
 import { LoopProgress } from "@/components/home/LoopProgress";
 import { fetchTeamLoopMemberChecklist } from "@/lib/team";
 
-type MemberProgressModalProps = {
+type MemberProgressDialogProps = {
   isOpen: boolean;
   loopId: number;
   memberId: number;
@@ -14,13 +15,13 @@ type MemberProgressModalProps = {
   onClose: () => void;
 };
 
-export function MemberProgressModal({
+export function MemberProgressDialog({
   isOpen,
   loopId,
   memberId,
   memberNickname,
   onClose,
-}: MemberProgressModalProps) {
+}: MemberProgressDialogProps) {
   const [checklists, setChecklists] = useState<Array<{
     id: number;
     content: string;
@@ -62,25 +63,33 @@ export function MemberProgressModal({
   if (!isOpen) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Dialog isOpen={isOpen} onClose={onClose}>
       <div className="relative w-full max-w-[420px] rounded-[15px] bg-white p-6">
         {/* 닫기 버튼 */}
-        <IconButton
-          src="/loop/loop_delete.png"
-          alt="닫기"
-          width={20}
-          height={20}
+        <Button
+          variant="icon"
           onClick={onClose}
+          aria-label="닫기"
           className="absolute right-6 top-6"
-        />
+        >
+          <Image
+            src="/loop/loop_delete.png"
+            alt="닫기"
+            width={20}
+            height={20}
+            style={{ width: 20, height: 20 }}
+          />
+        </Button>
 
         <div className="flex flex-col items-center gap-6">
           {/* 제목 */}
-          <h2 className="text-title-2-b text-[var(--gray-black)]">{memberNickname}</h2>
+          { }
+          <h2 className="text-title-2-b text-gray-black">{memberNickname}</h2>
 
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
-              <p className="text-body-2-m text-[var(--gray-500)]">로딩 중...</p>
+              { }
+              <p className="text-body-2-m text-gray-500">로딩 중...</p>
             </div>
           ) : error ? (
             <div className="flex items-center justify-center py-8">
@@ -93,9 +102,11 @@ export function MemberProgressModal({
 
               {/* 체크리스트 */}
               <div className="w-full">
-                <h3 className="mb-4 text-title-2-b text-[var(--gray-black)]">
+                { }
+                <h3 className="mb-4 text-title-2-b text-gray-black">
                   Checklist
-                  <span className="text-center text-body-2-sb font-semibold text-[var(--gray-600)]">
+                  { }
+                  <span className="text-center text-body-2-sb font-semibold text-gray-600">
                     {" "}· {checklists.length}
                   </span>
                 </h3>
@@ -104,30 +115,42 @@ export function MemberProgressModal({
                   {checklists.map((item) => (
                     <li
                       key={item.id}
-                      className="flex w-full items-center justify-between rounded-[10px] p-4 bg-[var(--gray-white)]"
+                       
+                      className="flex w-full items-center justify-between rounded-[10px] p-4 bg-gray-white"
                     >
-                      <span className="text-body-1-sb font-semibold text-[var(--gray-800)]">
+                      { }
+                      <span className="text-body-1-sb font-semibold text-gray-800">
                         {item.content}
                       </span>
                       <div className="flex-shrink-0 ml-4">
                         {item.isChecked ? (
-                          <IconButton
-                            src="/loop/loop_btn_complete.svg"
-                            alt="완료됨"
-                            width={24}
-                            height={24}
+                          <Button
+                            variant="icon"
+                            aria-label="완료됨"
                             className="h-6 w-6"
-                            imageClassName="h-6 w-6"
-                          />
+                          >
+                            <Image
+                              src="/loop/loop_btn_complete.svg"
+                              alt="완료됨"
+                              width={24}
+                              height={24}
+                              className="h-6 w-6"
+                            />
+                          </Button>
                         ) : (
-                          <IconButton
-                            src="/loop/loop_btn.svg"
-                            alt="미완료"
-                            width={24}
-                            height={24}
+                          <Button
+                            variant="icon"
+                            aria-label="미완료"
                             className="h-6 w-6"
-                            imageClassName="h-6 w-6"
-                          />
+                          >
+                            <Image
+                              src="/loop/loop_btn.svg"
+                              alt="미완료"
+                              width={24}
+                              height={24}
+                              className="h-6 w-6"
+                            />
+                          </Button>
                         )}
                       </div>
                     </li>
@@ -138,6 +161,6 @@ export function MemberProgressModal({
           )}
         </div>
       </div>
-    </Modal>
+    </Dialog>
   );
 }

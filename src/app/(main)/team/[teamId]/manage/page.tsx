@@ -5,8 +5,9 @@ import { useRouter, useParams } from "next/navigation";
 import { toast } from "react-toastify";
 import Header from "@/components/common/header/Header";
 import { TeamMemberSearch } from "@/components/team/TeamMemberSearch";
-import { IconButton } from "@/components/common/IconButton";
-import ConfirmModal from "@/components/common/ConfirmModal";
+import Image from "next/image";
+import { Button } from "@/components/common/Button";
+import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import {
   fetchTeamDetail,
   fetchTeamMembers,
@@ -206,7 +207,8 @@ export default function TeamManagePage() {
   if (isLoading) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center">
-        <p className="text-body-2-m text-[var(--gray-500)]">로딩 중...</p>
+        { }
+        <p className="text-body-2-m text-gray-500">로딩 중...</p>
       </div>
     );
   }
@@ -233,7 +235,7 @@ export default function TeamManagePage() {
   const categoryLabel = TEAM_CATEGORY_LABELS[teamDetail.category as keyof typeof TEAM_CATEGORY_LABELS] || teamDetail.category;
 
   return (
-    <div className="flex flex-col bg-[var(--gray-white)]">
+    <div className="flex flex-col bg-gray-white">
       <Header
         left={<Header.BackButton />}
         center={
@@ -251,7 +253,8 @@ export default function TeamManagePage() {
 
       {/* 팀원 목록 */}
         <section className="mt-6 px-4">
-          <h2 className="text-caption-r text-[var(--gray-500)] mb-4">팀원 목록</h2>
+          { }
+          <h2 className="text-caption-r text-gray-500 mb-4">팀원 목록</h2>
           <div className="flex flex-col gap-2">
             {teamMembers.map((member) => (
               <div
@@ -267,7 +270,8 @@ export default function TeamManagePage() {
                       />
                     </div>
                     <div className="flex flex-col gap-1">
-                      <span className="text-body-2-m text-[var(--gray-800)]">
+                      { }
+                      <span className="text-body-2-m text-gray-800">
                         {member.nickname}
                       </span>
                     </div>
@@ -275,7 +279,8 @@ export default function TeamManagePage() {
                    <div className="flex items-center gap-2">
                      {member.memberId === teamDetail.leaderId && (
                        <>
-                         <span className="flex h-6 items-center justify-center px-2 py-0 gap-[10px] rounded-[5px] bg-[var(--primary-200)] text-caption-m text-[var(--primary-main)]">
+                         { }
+                         <span className="flex h-6 items-center justify-center px-2 py-0 gap-[10px] rounded-[5px] bg-primary-200 text-caption-m text-primary-main">
                            팀장
                          </span>
                          {/* X 버튼과 같은 너비의 빈 공간 - 리더일 때만 */}
@@ -286,17 +291,24 @@ export default function TeamManagePage() {
                      )}
                      {member.memberId !== teamDetail.leaderId && (
                        <>
-                         <span className="flex h-6 items-center justify-center px-2 py-0 gap-[10px] rounded-[5px] bg-[var(--gray-300)] text-caption-m text-[var(--gray-600)]">
+                         { }
+                         <span className="flex h-6 items-center justify-center px-2 py-0 gap-[10px] rounded-[5px] bg-gray-300 text-caption-m text-gray-600">
                            팀원
                          </span>
                          {isLeader && (
-                           <IconButton
-                             src="/loop/loop_delete.png"
-                             alt="팀원 제거"
-                             width={10}
-                             height={10}
+                           <Button
+                             variant="icon"
                              onClick={() => handleRemoveMemberClick(member.memberId, member.nickname)}
-                           />
+                             aria-label="팀원 제거"
+                           >
+                             <Image
+                               src="/loop/loop_delete.png"
+                               alt="팀원 제거"
+                               width={10}
+                               height={10}
+                               style={{ width: 10, height: 10 }}
+                             />
+                           </Button>
                          )}
                        </>
                      )}
@@ -318,24 +330,34 @@ export default function TeamManagePage() {
 
         {/* 팀 정보 */}
         <section className="mt-10 px-4">
-          <h2 className="text-caption-r text-[var(--gray-500)] mb-[13px]">팀 정보</h2>
-          <div className="flex flex-col items-start gap-[10px] p-4 rounded-[10px] bg-[var(--gray-100)]">
+          { }
+          <h2 className="text-caption-r text-gray-500 mb-[13px]">팀 정보</h2>
+          { }
+          <div className="flex flex-col items-start gap-[10px] p-4 rounded-[10px] bg-gray-100">
             <div className="flex justify-between items-center self-stretch">
-              <span className="text-body-2-m text-[var(--gray-600)]">생성일</span>
-              <span className="text-body-2-m text-[var(--gray-600)]">{createdDate}</span>
+              { }
+              <span className="text-body-2-m text-gray-600">생성일</span>
+              { }
+              <span className="text-body-2-m text-gray-600">{createdDate}</span>
             </div>
             <div className="flex justify-between items-center self-stretch">
-              <span className="text-body-2-m text-[var(--gray-600)]">팀루프 타입</span>
-              <span className="text-body-2-m text-[var(--gray-600)]">{categoryLabel}</span>
+              { }
+              <span className="text-body-2-m text-gray-600">팀루프 타입</span>
+              { }
+              <span className="text-body-2-m text-gray-600">{categoryLabel}</span>
             </div>
             <div className="flex justify-between items-center self-stretch">
-              <span className="text-body-2-m text-[var(--gray-600)]">전체 루프 수</span>
-              <span className="text-body-2-m text-[var(--gray-600)]">{teamDetail.totalLoopCount}개</span>
+              { }
+              <span className="text-body-2-m text-gray-600">전체 루프 수</span>
+              { }
+              <span className="text-body-2-m text-gray-600">{teamDetail.totalLoopCount}개</span>
             </div>
             {!isLeader && (
               <div className="flex justify-between items-center self-stretch">
-                <span className="text-body-2-m text-[var(--gray-600)]">공개여부</span>
-                <span className="text-body-2-m text-[var(--gray-600)]">
+                { }
+                <span className="text-body-2-m text-gray-600">공개여부</span>
+                { }
+                <span className="text-body-2-m text-gray-600">
                   {teamDetail.visibility === "PUBLIC" ? "공개" : "비공개"}
                 </span>
               </div>
@@ -348,12 +370,15 @@ export default function TeamManagePage() {
           <section className="mt-3 px-4">
             <div className="relative">
               <div
-                className="flex w-full h-10 px-4 py-2 items-center justify-between rounded-[10px] bg-[var(--gray-200)] cursor-pointer"
+                 
+                className="flex w-full h-10 px-4 py-2 items-center justify-between rounded-[10px] bg-gray-200 cursor-pointer"
                 onClick={() => setIsVisibilityDropdownOpen(!isVisibilityDropdownOpen)}
               >
-                <span className="text-body-2-sb text-[var(--gray-800)]">공개여부</span>
+                { }
+                <span className="text-body-2-sb text-gray-800">공개여부</span>
                 <div className="flex items-center gap-[10px]">
-                  <span className="text-body-2-m text-[var(--gray-800)]">
+                  { }
+                  <span className="text-body-2-m text-gray-800">
                     {teamDetail.visibility === "PUBLIC" ? "공개" : "비공개"}
                   </span>
                   <svg
@@ -366,7 +391,7 @@ export default function TeamManagePage() {
                   >
                     <path
                       d="M1 1L6 6L11 1"
-                      stroke="#737980"
+                      className="stroke-gray-600"
                       strokeWidth="1.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -381,17 +406,21 @@ export default function TeamManagePage() {
                     className="fixed inset-0 z-10"
                     onClick={() => setIsVisibilityDropdownOpen(false)}
                   />
-                  <div className="absolute top-full left-0 right-0 mt-1 z-20 bg-white rounded-[10px] shadow-lg border border-[var(--gray-200)] overflow-hidden">
+                  { }
+                  <div className="absolute top-full left-0 right-0 mt-1 z-20 bg-white rounded-[10px] shadow-lg border border-gray-200 overflow-hidden">
                     <button
                       type="button"
                       onClick={() => {
                         handleVisibilityChange("PRIVATE");
                         setIsVisibilityDropdownOpen(false);
                       }}
-                      className={`w-full px-4 py-3 text-left text-body-2-m hover:bg-[var(--gray-100)] transition-colors ${
+                       
+                      className={`w-full px-4 py-3 text-left text-body-2-m hover:bg-gray-100 transition-colors ${
                         teamDetail.visibility === "PRIVATE"
-                          ? "text-[var(--gray-800)] bg-[var(--gray-100)]"
-                          : "text-[var(--gray-600)]"
+                           
+                          ? "text-gray-800 bg-gray-100"
+                           
+                          : "text-gray-600"
                       }`}
                     >
                       비공개
@@ -402,10 +431,13 @@ export default function TeamManagePage() {
                         handleVisibilityChange("PUBLIC");
                         setIsVisibilityDropdownOpen(false);
                       }}
-                      className={`w-full px-4 py-3 text-left text-body-2-m hover:bg-[var(--gray-100)] transition-colors ${
+                       
+                      className={`w-full px-4 py-3 text-left text-body-2-m hover:bg-gray-100 transition-colors ${
                         teamDetail.visibility === "PUBLIC"
-                          ? "text-[var(--gray-800)] bg-[var(--gray-100)]"
-                          : "text-[var(--gray-600)]"
+                           
+                          ? "text-gray-800 bg-gray-100"
+                           
+                          : "text-gray-600"
                       }`}
                     >
                       공개
@@ -424,7 +456,8 @@ export default function TeamManagePage() {
               type="button"
               onClick={handleDeleteTeam}
               disabled={isDeleting}
-              className="inline-flex items-center justify-center py-[6px] px-2 gap-[8px] rounded-[5px] bg-[var(--primary-200)] text-body-2-sb text-red-500 disabled:opacity-50"
+               
+              className="inline-flex items-center justify-center py-[6px] px-2 gap-[8px] rounded-[5px] bg-primary-200 text-body-2-sb text-red-500 disabled:opacity-50"
             >
               <img
                 src="/loop/loop_delete.svg"
@@ -432,7 +465,8 @@ export default function TeamManagePage() {
                 width={14}
                 height={14}
               />
-              <span className="text-body-2-sb text-[var(--primary-main)]">팀 삭제하기</span>
+              { }
+              <span className="text-body-2-sb text-primary-main">팀 삭제하기</span>
             </button>
           </section>
         )}
@@ -444,7 +478,8 @@ export default function TeamManagePage() {
               type="button"
               onClick={handleLeaveTeam}
               disabled={isLeaving}
-              className="inline-flex items-center justify-center py-[6px] px-2 gap-[8px] rounded-[5px] bg-[var(--primary-200)] text-body-2-sb text-red-500 disabled:opacity-50"
+               
+              className="inline-flex items-center justify-center py-[6px] px-2 gap-[8px] rounded-[5px] bg-primary-200 text-body-2-sb text-red-500 disabled:opacity-50"
             >
               <img
                 src="/team/icon_exit.png"
@@ -452,13 +487,14 @@ export default function TeamManagePage() {
                 width={14}
                 height={14}
               />
-              <span className="text-body-2-sb text-[var(--primary-main)]">팀 나가기</span>
+              { }
+              <span className="text-body-2-sb text-primary-main">팀 나가기</span>
             </button>
           </section>
         )}
 
         {/* 팀원 삭제 확인 모달 */}
-        <ConfirmModal
+        <ConfirmDialog
           isOpen={memberToRemove !== null}
           onClose={() => setMemberToRemove(null)}
           onConfirm={handleRemoveMember}

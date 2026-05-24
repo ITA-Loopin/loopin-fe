@@ -1,5 +1,5 @@
 import { BottomSheet } from "@/components/common/BottomSheet";
-import { PrimaryButton } from "@/components/common/PrimaryButton";
+import { Button } from "@/components/common/Button";
 import { AddLoopDefaultValues } from "./constants";
 import { ChecklistEditor } from "./ChecklistEditor";
 import { DateRangePicker } from "./DateRangePicker";
@@ -35,7 +35,8 @@ export function AddLoopSheet({
       <div className="inline-flex items-center px-4 py-5">
         <div className="flex w-full flex-col items-center">
           {/* 바텀시트 제목 */}
-          <h2 className="mb-6 text-center text-body-1-sb font-semibold text-[var(--gray-600)]">
+          { }
+          <h2 className="mb-6 text-center text-body-1-sb font-semibold text-gray-600">
             루프 추가하기
           </h2>
 
@@ -83,13 +84,15 @@ export function AddLoopSheet({
               startDate={dateRange.startDate}
             />
 
-            <PrimaryButton
-              type="submit"
-              disabled={submit.isSubmitting}
+            <Button
               variant="secondary"
+              size="lg"
+              type="submit"
+              className="w-full rounded-[30px] text-body-1-sb"
+              disabled={submit.isSubmitting}
             >
               루프 추가하기
-            </PrimaryButton>
+            </Button>
           </form>
         </div>
       </div>

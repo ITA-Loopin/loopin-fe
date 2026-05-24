@@ -10,7 +10,7 @@ import { RecommendationCard } from "./components/RecommendationCard";
 import { LoopinSpeakerIndicator } from "./components/LoopinSpeakerIndicator";
 import { usePlannerChat } from "./hooks/usePlannerChat";
 import { fetchChatRooms } from "@/lib/chat";
-import { AddLoopSheet } from "@/components/common/add-loop/AddLoopSheet";
+import { AddLoopSheet } from "@/components/loop/add-loop/AddLoopSheet";
 import { LoopGroupEditSheet } from "@/components/loop/LoopGroupEditSheet";
 import {
   recommendationToAddLoopDefaults,
@@ -112,7 +112,7 @@ export default function PlannerChatPage() {
     : MESSAGE_EXTRA_SPACE;
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#F8F8F9]/40">
+    <div className="flex min-h-screen flex-col bg-gray-100/40">
       {/* Header */}
       <Header
         left={<Header.BackButton />}
@@ -159,7 +159,8 @@ export default function PlannerChatPage() {
 
               {
                 <div
-                  className={`mt-4 flex gap-2 rounded-sm ${chatRoomLoopSelect && (chatRoomCallUpdateLoop || sseCallUpdateLoop) ? "bg-[#FFE4E0]" : "bg-[#DDE0E3]"} px-4 py-3 w-fit justify-self-center`}
+                   
+                  className={`mt-4 flex gap-2 rounded-sm ${chatRoomLoopSelect && (chatRoomCallUpdateLoop || sseCallUpdateLoop) ? "bg-primary-200" : "bg-gray-200"} px-4 py-3 w-fit justify-self-center`}
                 >
                   {!(
                     chatRoomLoopSelect &&
@@ -186,7 +187,8 @@ export default function PlannerChatPage() {
                         handleRetry();
                       }
                     }}
-                    className={`text-sm font-semibold ${chatRoomLoopSelect && (chatRoomCallUpdateLoop || sseCallUpdateLoop) ? "text-[#FF543F] font-semibold" : "text-[#737980] font-semibold"}`}
+                     
+                    className={`text-sm font-semibold ${chatRoomLoopSelect && (chatRoomCallUpdateLoop || sseCallUpdateLoop) ? "text-primary-main font-semibold" : "text-gray-600 font-semibold"}`}
                   >
                     {chatRoomLoopSelect &&
                     (chatRoomCallUpdateLoop || sseCallUpdateLoop)
@@ -206,7 +208,7 @@ export default function PlannerChatPage() {
           <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center">
             <div className="pointer-events-auto w-full max-w-xl bg-white p-4 pb-6">
               {exampleLabel ? (
-                <p className="mb-2 text-xs text-[#8F8A87]">{exampleLabel}</p>
+                <p className="mb-2 text-xs text-gray-500">{exampleLabel}</p>
               ) : null}
               <form
                 onSubmit={formHandleSubmit(async (values) => {
@@ -215,7 +217,8 @@ export default function PlannerChatPage() {
                     reset({ prompt: "" });
                   }
                 })}
-                className="flex items-center rounded-2xl px-3 py-2 bg-[#F8F8F9]"
+                 
+                className="flex items-center rounded-2xl px-3 py-2 bg-gray-100"
               >
                 <textarea
                   {...register("prompt")}
@@ -225,7 +228,8 @@ export default function PlannerChatPage() {
                       : "만들고 싶은 루프를 입력해주세요."
                   }
                   rows={1}
-                  className="max-h-32 flex-1 border-none text-sm text-[#2C2C2C] outline-none resize-none"
+                   
+                  className="max-h-32 flex-1 border-none text-sm text-gray-800 outline-none resize-none"
                   aria-label="루프 생성 요청 입력란"
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {

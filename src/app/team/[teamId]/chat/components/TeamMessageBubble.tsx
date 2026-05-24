@@ -54,34 +54,39 @@ export function TeamMessageBubble({
           <div className="flex justify-end mb-4">
             <div className="flex items-end gap-1.5 max-w-[80%]">
               {time && (
-                <span className="text-xs text-[var(--gray-400)] mb-0.5">
+                <span className="text-xs text-gray-400 mb-0.5">
                   {time}
                 </span>
               )}
-              <div className="rounded-2xl bg-[#FFE4E1] px-4 py-2.5 text-sm text-[#2C2C2C] whitespace-pre-line">
+              {/* eslint-disable-next-line no-restricted-syntax */}
+              <div className="rounded-2xl bg-[#FFE4E1] px-4 py-2.5 text-sm text-gray-800 whitespace-pre-line">
                 {message.content}
               </div>
             </div>
           </div>
         </ContextMenuTrigger>
-        <ContextMenuContent className="w-32 bg-white rounded-lg shadow-lg border border-[var(--gray-200)]">
+        { }
+        <ContextMenuContent className="w-32 bg-white rounded-lg shadow-lg border border-gray-200">
           <ContextMenuItem
             onClick={handleAnnounce}
-            className="flex items-center gap-2 px-3 py-2.5 text-sm text-[#2C2C2C] cursor-pointer hover:bg-[var(--gray-100)]"
+             
+            className="flex items-center gap-2 px-3 py-2.5 text-sm text-gray-800 cursor-pointer hover:bg-gray-100"
           >
             <Image src={SearchButtonIcon} alt="공지" width={16} height={16} />
             <span>공지</span>
           </ContextMenuItem>
           <ContextMenuItem
             onClick={handleCopy}
-            className="flex items-center gap-2 px-3 py-2.5 text-sm text-[#2C2C2C] cursor-pointer hover:bg-[var(--gray-100)]"
+             
+            className="flex items-center gap-2 px-3 py-2.5 text-sm text-gray-800 cursor-pointer hover:bg-gray-100"
           >
             <Image src={FileIcon} alt="복사" width={16} height={16} />
             <span>복사</span>
           </ContextMenuItem>
           <ContextMenuItem
             onClick={handleDelete}
-            className="flex items-center gap-2 px-3 py-2.5 text-sm text-[#2C2C2C] cursor-pointer hover:bg-[var(--gray-100)]"
+             
+            className="flex items-center gap-2 px-3 py-2.5 text-sm text-gray-800 cursor-pointer hover:bg-gray-100"
           >
             <Image src={TrashIcon} alt="삭제" width={16} height={16} />
             <span>삭제</span>
@@ -105,8 +110,9 @@ export function TeamMessageBubble({
               className="rounded-full"
             />
           ) : (
-            <div className="w-8 h-8 rounded-full bg-[var(--gray-300)] flex items-center justify-center">
-              <span className="text-xs text-[var(--gray-600)]">
+            <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+              { }
+              <span className="text-xs text-gray-600">
                 {message.nickname?.[0] || "?"}
               </span>
             </div>
@@ -114,16 +120,17 @@ export function TeamMessageBubble({
         </div>
         <div className="flex flex-col">
           {message.nickname && (
-            <span className="text-xs text-[var(--gray-600)] mb-1">
+            <span className="text-xs text-gray-600 mb-1">
               {message.nickname}
             </span>
           )}
           <div className="flex items-end gap-1.5">
-            <div className="rounded-2xl bg-white px-4 py-2.5 text-sm text-[#2C2C2C] whitespace-pre-line">
+            { }
+            <div className="rounded-2xl bg-white px-4 py-2.5 text-sm text-gray-800 whitespace-pre-line">
               {message.content}
             </div>
             {time && (
-              <span className="text-xs text-[var(--gray-400)] mb-0.5">
+              <span className="text-xs text-gray-400 mb-0.5">
                 {time}
               </span>
             )}

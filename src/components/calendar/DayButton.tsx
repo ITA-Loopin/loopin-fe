@@ -29,16 +29,21 @@ export function DayButton({
       className={cn(
         "relative flex h-8 w-8 items-center justify-center justify-self-center rounded-full transition-colors",
         isDisabled && "cursor-not-allowed",
-        !isDisabled && isSelected && "bg-[var(--primary-500)]"
+         
+        !isDisabled && isSelected && "bg-primary-500"
       )}
     >
       <span
         className={cn(
           "text-center text-body-2-sb font-semibold",
-          isDisabled && "text-[var(--gray-300)]",
-          !isDisabled && isSelected && "text-[var(--gray-100)]",
-          !isDisabled && !isSelected && isCurrentMonth && "text-[var(--gray-800)]",
-          !isDisabled && !isSelected && !isCurrentMonth && "text-[var(--gray-300)]"
+           
+          isDisabled && "text-gray-300",
+           
+          !isDisabled && isSelected && "text-gray-100",
+           
+          !isDisabled && !isSelected && isCurrentMonth && "text-gray-800",
+           
+          !isDisabled && !isSelected && !isCurrentMonth && "text-gray-300"
         )}
       >
         {date.date()}
@@ -56,6 +61,7 @@ export function DayButton({
             cx="2" 
             cy="2" 
             r="2" 
+            // eslint-disable-next-line no-restricted-syntax
             fill={isCurrentMonth ? "var(--primary-500)" : "var(--gray-300)"} 
           />
         </svg>
