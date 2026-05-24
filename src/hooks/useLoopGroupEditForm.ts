@@ -8,6 +8,7 @@ import {
   DayOption,
   WEEKDAY_OPTIONS,
 } from "@/components/loop/add-loop/constants";
+import { updateTeamLoopGroup } from "@/lib/team";
 
 interface UseLoopGroupEditFormProps {
   isOpen: boolean;
@@ -68,7 +69,7 @@ export function useLoopGroupEditForm({
       (loop.checklists ?? []).map((item, index) => ({
         id: `check-${item.id ?? index}`,
         text: item.content,
-      }))
+      })),
     );
     setNewChecklistItem("");
 
@@ -84,22 +85,22 @@ export function useLoopGroupEditForm({
 
   const formattedStartDate = useMemo(
     () => (startDate ? dayjs(startDate).format("YYYY.MM.DD") : "없음"),
-    [startDate]
+    [startDate],
   );
 
   const formattedEndDate = useMemo(
     () => (endDate ? dayjs(endDate).format("YYYY.MM.DD") : "없음"),
-    [endDate]
+    [endDate],
   );
 
   const selectedStartDate = useMemo<Dayjs>(
     () => (startDate ? dayjs(startDate) : startCalendarMonth),
-    [startDate, startCalendarMonth]
+    [startDate, startCalendarMonth],
   );
 
   const selectedEndDate = useMemo<Dayjs>(
     () => (endDate ? dayjs(endDate) : endCalendarMonth),
-    [endDate, endCalendarMonth]
+    [endDate, endCalendarMonth],
   );
 
   const handleTitleChange = useCallback((value: string) => {
@@ -121,7 +122,7 @@ export function useLoopGroupEditForm({
       setIsWeeklyDropdownOpen(false);
       setDaysOfWeek([]);
     },
-    [scheduleType]
+    [scheduleType],
   );
 
   const handleDayClick = useCallback(
@@ -150,7 +151,7 @@ export function useLoopGroupEditForm({
         return next;
       });
     },
-    [daysOfWeek]
+    [daysOfWeek],
   );
 
   const handleAddChecklist = useCallback(() => {
@@ -228,6 +229,8 @@ export function useLoopGroupEditForm({
         checklists: checklists
           .map((item) => item.text.trim())
           .filter((text) => text.length > 0),
+        type: loop.loopType ?? "COMMON",
+        importance: loop.importance ?? "MEDIUM",
         ...(chatRoomId && { chatRoomId }),
       };
 
@@ -238,10 +241,14 @@ export function useLoopGroupEditForm({
         if (!ruleId) {
           throw new Error("루프 그룹 ID가 없습니다.");
         }
-        await apiFetch(`/rest-api/v1/loops/group/${ruleId}`, {
-          method: "PUT",
-          json: payload,
-        });
+        if (loop.teamId) {
+          await updateTeamLoopGroup(loop.teamId, ruleId, payload);
+        } else {
+          await apiFetch(`/rest-api/v1/loops/group/${ruleId}`, {
+            method: "PUT",
+            json: payload,
+          });
+        }
 
         // 그룹 수정 후 현재 날짜의 루프 목록을 조회해서 해당 그룹의 새 루프 ID 찾기
         const currentLoopDate = loop.loopDate ?? dayjs().format("YYYY-MM-DD");
@@ -271,7 +278,7 @@ export function useLoopGroupEditForm({
           const updatedLoop = loopsResponse?.data?.loops?.find(
             (item) =>
               item.loopRule?.ruleId === ruleId ||
-              (item.title === title && item.loopDate === searchDate)
+              (item.title === title && item.loopDate === searchDate),
           );
 
           newLoopId = updatedLoop?.id;
@@ -298,7 +305,7 @@ export function useLoopGroupEditForm({
       chatRoomId,
       onUpdated,
       onClose,
-    ]
+    ],
   );
 
   return {
