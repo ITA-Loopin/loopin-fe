@@ -2,12 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { Button } from "@/components/common/Button";
-import Header from "@/components/common/header/Header";
-import ConfirmModal from "@/components/common/ConfirmModal";
-import ActionButton from "@/components/common/ActionButton";
 import { fetchMemberProfile, type MemberProfile } from "@/lib/member";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -52,14 +49,9 @@ export default function ProfileEditPage() {
       <div className="flex h-full flex-col">
         <Header
           left={<Header.BackButton />}
-          center={
-            <h1 className="whitespace-nowrap text-body-1-sb text-gray-800">
-              프로필 편집
-            </h1>
-          }
+          center={<Header.Title>프로필 편집</Header.Title>}
         />
-        <div className="flex-1 flex flex-col overflow-y-auto px-4 py-6">
-          {/* 프로필 사진 영역 */}
+        <div className="flex flex-1 flex-col overflow-y-auto px-4 py-6">
           <div className="mb-8 flex flex-col items-center">
             <div className="relative">
               <div className="h-32 w-32 overflow-hidden rounded-full bg-gray-200">
@@ -107,7 +99,6 @@ export default function ProfileEditPage() {
             </div>
           </div>
 
-          {/* 닉네임 정보 */}
           <div className="mb-6">
             <label className="mb-2 block text-sm font-medium text-gray-600">
               닉네임
@@ -119,8 +110,7 @@ export default function ProfileEditPage() {
             </div>
           </div>
 
-          {/* 로그아웃 버튼 */}
-          <div className="mt-auto flex justify-center mb-[11px]">
+          <div className="mt-auto mb-[11px] flex justify-center">
             <Button
               variant="tonal"
               onClick={() => setIsLogoutModalOpen(true)}

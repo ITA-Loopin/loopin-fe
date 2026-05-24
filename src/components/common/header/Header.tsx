@@ -1,9 +1,10 @@
 "use client";
 
 import { ReactNode } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { IconButton } from "../IconButton";
+import { Button } from "@/components/common/Button";
 
 type HeaderProps = {
   left?: ReactNode;
@@ -21,7 +22,9 @@ const Header = ({ left, center, right, className }: HeaderProps) => {
       )}
     >
       <div className="flex flex-1 items-center justify-start">{left}</div>
-      <div className="absolute left-1/2 max-w-[40%] -translate-x-1/2 truncate">{center}</div>
+      <div className="absolute left-1/2 max-w-[40%] -translate-x-1/2 truncate">
+        {center}
+      </div>
       <div className="flex flex-1 items-center justify-end gap-1">{right}</div>
     </header>
   );
@@ -29,43 +32,82 @@ const Header = ({ left, center, right, className }: HeaderProps) => {
 
 Header.Title = function HeaderTitle({ children }: { children: ReactNode }) {
   return (
-    <h1 className="whitespace-nowrap text-body-1-sb text-gray-800">{children}</h1>
+    <h1 className="whitespace-nowrap text-body-1-sb text-gray-800">
+      {children}
+    </h1>
   );
 };
 
 Header.Logo = function HeaderLogo({ onClick }: { onClick?: () => void }) {
   return (
-    <IconButton
-      src="/header/header_logo.svg"
-      alt="Loopin 홈"
-      width={68}
-      height={30}
-      onClick={onClick}
-      imageClassName="h-8 w-auto"
-    />
+    <Button variant="icon" onClick={onClick} aria-label="Loopin 홈">
+      <Image
+        src="/header/header_logo.svg"
+        alt="Loopin 홈"
+        width={68}
+        height={30}
+        className="h-8 w-auto"
+      />
+    </Button>
   );
 };
 
-Header.BackButton = function HeaderBackButton({ onClick }: { onClick?: () => void }) {
+Header.BackButton = function HeaderBackButton({
+  onClick,
+}: {
+  onClick?: () => void;
+}) {
   const router = useRouter();
   return (
-    <IconButton
-      src="/header/header_back.svg"
-      alt="뒤로가기"
+    <Button
+      variant="icon"
       onClick={onClick ?? (() => router.back())}
-    />
+      aria-label="뒤로가기"
+    >
+      <Image
+        src="/header/header_back.svg"
+        alt="뒤로가기"
+        width={24}
+        height={24}
+        className="h-6 w-6"
+      />
+    </Button>
   );
 };
 
-Header.EditButton = function HeaderEditButton({ onClick }: { onClick?: () => void }) {
+Header.EditButton = function HeaderEditButton({
+  onClick,
+}: {
+  onClick?: () => void;
+}) {
   return (
-    <IconButton src="/header/header_edit.svg" alt="수정" onClick={onClick} />
+    <Button variant="icon" onClick={onClick} aria-label="수정">
+      <Image
+        src="/header/header_edit.svg"
+        alt="수정"
+        width={24}
+        height={24}
+        className="h-6 w-6"
+      />
+    </Button>
   );
 };
 
-Header.MenuButton = function HeaderMenuButton({ onClick }: { onClick?: () => void }) {
+Header.MenuButton = function HeaderMenuButton({
+  onClick,
+}: {
+  onClick?: () => void;
+}) {
   return (
-    <IconButton src="/header/header_menu.svg" alt="메뉴" onClick={onClick} />
+    <Button variant="icon" onClick={onClick} aria-label="메뉴">
+      <Image
+        src="/header/header_menu.svg"
+        alt="메뉴"
+        width={24}
+        height={24}
+        className="h-6 w-6"
+      />
+    </Button>
   );
 };
 
@@ -76,11 +118,19 @@ Header.NotificationButton = function HeaderNotificationButton({
 }) {
   const router = useRouter();
   return (
-    <IconButton
-      src="/header/header_bell.svg"
-      alt="알림"
+    <Button
+      variant="icon"
       onClick={onClick ?? (() => router.push("/notification"))}
-    />
+      aria-label="알림"
+    >
+      <Image
+        src="/header/header_bell.svg"
+        alt="알림"
+        width={24}
+        height={24}
+        className="h-6 w-6"
+      />
+    </Button>
   );
 };
 
@@ -91,11 +141,19 @@ Header.ProfileButton = function HeaderProfileButton({
 }) {
   const router = useRouter();
   return (
-    <IconButton
-      src="/header/header_profile.svg"
-      alt="프로필"
+    <Button
+      variant="icon"
       onClick={onClick ?? (() => router.push("/my-page"))}
-    />
+      aria-label="프로필"
+    >
+      <Image
+        src="/header/header_profile.svg"
+        alt="프로필"
+        width={24}
+        height={24}
+        className="h-6 w-6"
+      />
+    </Button>
   );
 };
 

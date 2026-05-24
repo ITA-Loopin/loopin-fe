@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
 import Header from "@/components/common/header/Header";
-import { AddLoopSheet } from "@/components/common/add-loop/AddLoopSheet";
+import { AddLoopSheet } from "@/components/loop/add-loop/AddLoopSheet";
 import { LoopList } from "@/components/home";
 import { MonthCalendar } from "@/components/calendar/MonthCalendar";
 import { Button } from "@/components/common/Button";
