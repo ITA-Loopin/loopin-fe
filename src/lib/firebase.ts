@@ -8,12 +8,12 @@ import {
 
 // Firebase 설정
 const firebaseConfig = {
-  apiKey: "AIzaSyAlcaUrp2UGYeaFxbVlPMf9wvAYJntxRtk",
-  authDomain: "loopin-474713.firebaseapp.com",
-  projectId: "loopin-474713",
-  storageBucket: "loopin-474713.firebasestorage.app",
-  messagingSenderId: "761645347613",
-  appId: "1:761645347613:web:59f8017b1b861e6e9d27f4",
+  apiKey: "AIzaSyAMXhC0uRgQA6e0j5NWDiUK6LfAyyVn_Ro",
+  authDomain: "loopin-2b31a.firebaseapp.com",
+  projectId: "loopin-2b31a",
+  storageBucket: "loopin-2b31a.firebasestorage.app",
+  messagingSenderId: "241139234657",
+  appId: "1:241139234657:web:8214f4ace3a0a6029ef720"
 };
 
 let app: FirebaseApp | null = null;
