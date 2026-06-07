@@ -17,6 +17,9 @@ import { saveFCMTokenApi, setupNativeFCMTokenListener } from "@/lib/fcm";
 import { authFetch } from "@/utils/fetch";
 import { Button } from "@/components/common/Button";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { PageBackground } from "@/components/common/PageBackground";
+
+const LANDING_GRADIENT = "linear-gradient(136deg, #FF5741 54%, #FFE4E0 100%)";
 
 const API_BASE_URL = "https://api.loopin.co.kr";
 const MEMBER_URL = `${API_BASE_URL}/rest-api/v1/member`;
@@ -199,27 +202,17 @@ function HomeContent() {
 
   if (isLoading || isRestoring) {
     return (
-      <div
-        className="flex min-h-screen items-center justify-center"
-        style={{
-          background:
-            // eslint-disable-next-line no-restricted-syntax
-            "linear-gradient(136deg, #FF5741 54.38%, #FFE4E0 118.92%)",
-        }}
-      >
-        <LoadingSpinner width={96} height={96} />
-      </div>
+      <PageBackground background="linear-gradient(136deg, #FF5741 54.38%, #FFE4E0 118.92%)">
+        <div className="flex h-full items-center justify-center">
+          <LoadingSpinner width={96} height={96} />
+        </div>
+      </PageBackground>
     );
   }
 
   return (
-    <div
-      className="relative flex min-h-screen flex-col items-center overflow-hidden text-white"
-      style={{
-        // eslint-disable-next-line no-restricted-syntax
-        background: "linear-gradient(136deg, #FF5741 54%, #FFE4E0 100%)",
-      }}
-    >
+    <PageBackground background={LANDING_GRADIENT}>
+      <div className="relative flex h-full flex-col items-center overflow-hidden text-white">
       {/* 장식 Ellipse */}
       <div
         className="absolute -left-[60px] -top-[258px] h-[539px] w-[619px] rounded-full bg-white opacity-40"
@@ -330,7 +323,8 @@ function HomeContent() {
           </Button>
         </div>
       </div>
-    </div>
+      </div>
+    </PageBackground>
   );
 }
 

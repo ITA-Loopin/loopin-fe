@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import BottomTab from "@/components/navigation/BottomTab";
+import { PageBackground } from "@/components/common/PageBackground";
 
 export default function AuthLayout({
   children,
@@ -22,19 +23,9 @@ export default function AuthLayout({
   const isTeamActivity = /^\/team\/[^/]+\/activity$/.test(pathname ?? "");
   const hideBottomTab = isPlannerChat || isTeamChat || isTeamActivity;
 
-  return (
+  const layout = (
     <div
-      // eslint-disable-next-line no-restricted-syntax
       className={`relative flex h-screen flex-col overflow-hidden ${isHomePage || isAnalyticsPage || isMyPage || isTeamManagePage ? "" : "bg-[#F9FAFB]"}`}
-      style={
-        isHomePage
-          ? {
-              // eslint-disable-next-line no-restricted-syntax
-              background:
-                "linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 228, 224, 0.3) 100%)",
-            }
-          : undefined
-      }
     >
       {header}
       <div
@@ -45,4 +36,14 @@ export default function AuthLayout({
       {!hideBottomTab && <BottomTab />}
     </div>
   );
+
+  if (isHomePage) {
+    return (
+      <PageBackground background="linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 228, 224, 0.3) 100%)">
+        {layout}
+      </PageBackground>
+    );
+  }
+
+  return layout;
 }
