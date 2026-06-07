@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/common/Button";
+import { PageBackground } from "@/components/common/PageBackground";
 
 function EntryStep({ onNext }: { onNext: () => void }) {
   const [showIllust, setShowIllust] = useState(false);
@@ -19,13 +20,8 @@ function EntryStep({ onNext }: { onNext: () => void }) {
   }, []);
 
   return (
-    <div
-      className="relative flex h-full w-full flex-col items-center justify-between overflow-hidden"
-      style={{
-        // eslint-disable-next-line no-restricted-syntax
-        background: "linear-gradient(136deg, #FF5741 54%, #FFE4E0 100%)",
-      }}
-    >
+    <PageBackground background="linear-gradient(136deg, #FF5741 54%, #FFE4E0 100%)">
+      <div className="relative flex h-full w-full flex-col items-center justify-between overflow-hidden">
       {/* 장식 Ellipse - 좌상단 */}
       <div
         className="absolute -left-[60px] -top-[258px] h-[539px] w-[619px] rounded-full bg-white opacity-40"
@@ -95,7 +91,8 @@ function EntryStep({ onNext }: { onNext: () => void }) {
           루핀 시작하기
         </Button>
       </div>
-    </div>
+      </div>
+    </PageBackground>
   );
 }
 
