@@ -16,6 +16,7 @@ import type { User } from "@/types/auth";
 import { saveFCMTokenApi, setupNativeFCMTokenListener } from "@/lib/fcm";
 import { authFetch } from "@/utils/fetch";
 import { Button } from "@/components/common/Button";
+import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 
 const API_BASE_URL = "https://api.loopin.co.kr";
 const MEMBER_URL = `${API_BASE_URL}/rest-api/v1/member`;
@@ -206,7 +207,7 @@ function HomeContent() {
             "linear-gradient(136deg, #FF5741 54.38%, #FFE4E0 118.92%)",
         }}
       >
-        <div className="h-16 w-16 animate-spin rounded-full border-b-2 border-white"></div>
+        <LoadingSpinner width={96} height={96} />
       </div>
     );
   }
