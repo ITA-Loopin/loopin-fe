@@ -17,6 +17,10 @@ import { saveFCMTokenApi, setupNativeFCMTokenListener } from "@/lib/fcm";
 import { authFetch } from "@/utils/fetch";
 import { Button } from "@/components/common/Button";
 
+const API_BASE_URL = "https://api.loopin.co.kr";
+const MEMBER_URL = `${API_BASE_URL}/rest-api/v1/member`;
+const REFRESH_URL = `${API_BASE_URL}/rest-api/v1/auth/refresh-token`;
+
 export const dynamic = "force-dynamic";
 
 function HomeContent() {
@@ -25,7 +29,9 @@ function HomeContent() {
   const dispatch = useAppDispatch();
   const { isLoading, isAuthenticated } = useAppSelector((state) => state.auth);
   const [showContent, setShowContent] = useState(false);
+  const [isRestoring, setIsRestoring] = useState(false);
   const loginProcessedRef = useRef(false);
+  const restoreAttemptedRef = useRef(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -69,6 +75,63 @@ function HomeContent() {
     } catch (error) {
       console.error("로그인 처리 실패:", error);
       alert("로그인 처리 중 오류가 발생했습니다.");
+    }
+  }, [dispatch, router]);
+
+  // 쿠키 기반 세션 자동 복원. Redux 메모리 휘발(앱 강제 종료) 후에도
+  // access_token/refresh_token 쿠키가 살아있으면 그 쿠키로 사용자 정보를 다시 가져와
+  // Redux를 복원하고 /home으로 보낸다. apiFetch는 401 시 자동 "/"로 리다이렉트하기 때문에
+  // 무한 루프 방지를 위해 여기서는 직접 fetch를 사용한다.
+  const tryRestoreSession = useCallback(async () => {
+    if (restoreAttemptedRef.current) return;
+    restoreAttemptedRef.current = true;
+    setIsRestoring(true);
+
+    try {
+      let res = await fetch(MEMBER_URL, {
+        credentials: "include",
+        headers: { Accept: "application/json" },
+      });
+
+      if (res.status === 401) {
+        const refreshRes = await fetch(REFRESH_URL, {
+          credentials: "include",
+          headers: { Accept: "application/json" },
+        });
+        if (!refreshRes.ok) {
+          setIsRestoring(false);
+          return;
+        }
+        res = await fetch(MEMBER_URL, {
+          credentials: "include",
+          headers: { Accept: "application/json" },
+        });
+      }
+
+      if (!res.ok) {
+        setIsRestoring(false);
+        return;
+      }
+
+      const memberResponse: MemberResponse = await res.json();
+      const fallbackUser: User = { id: "user", nickname: "루프인" };
+      const userData = buildUserFromMemberProfile(
+        memberResponse.data,
+        fallbackUser
+      );
+
+      dispatch(setCredentials({ user: userData }));
+
+      try {
+        await saveFCMTokenApi(authFetch);
+      } catch (error) {
+        console.error("FCM 토큰 저장 실패:", error);
+      }
+
+      router.replace("/home");
+    } catch (error) {
+      console.error("세션 자동 복원 실패:", error);
+      setIsRestoring(false);
     }
   }, [dispatch, router]);
 
@@ -118,12 +181,22 @@ function HomeContent() {
       return;
     }
 
-    if (!status && isAuthenticated) {
-      router.replace("/home");
+    if (!status) {
+      if (isAuthenticated) {
+        router.replace("/home");
+      } else {
+        tryRestoreSession();
+      }
     }
-  }, [searchParams, handleLoginSuccess, router, isAuthenticated]);
+  }, [
+    searchParams,
+    handleLoginSuccess,
+    router,
+    isAuthenticated,
+    tryRestoreSession,
+  ]);
 
-  if (isLoading) {
+  if (isLoading || isRestoring) {
     return (
       <div
         className="flex min-h-screen items-center justify-center"
