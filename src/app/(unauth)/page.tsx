@@ -202,8 +202,15 @@ function HomeContent() {
 
   if (isLoading || isRestoring) {
     return (
-      <PageBackground background="linear-gradient(136deg, #FF5741 54.38%, #FFE4E0 118.92%)">
-        <div className="flex h-full items-center justify-center">
+      <PageBackground topColor="#FF5741" bottomColor="#FFE4E0">
+        <div
+          className="flex h-full items-center justify-center"
+          style={{
+            // eslint-disable-next-line no-restricted-syntax
+            background:
+              "linear-gradient(136deg, #FF5741 54.38%, #FFE4E0 118.92%)",
+          }}
+        >
           <LoadingSpinner width={96} height={96} />
         </div>
       </PageBackground>
@@ -211,8 +218,12 @@ function HomeContent() {
   }
 
   return (
-    <PageBackground background={LANDING_GRADIENT}>
-      <div className="relative flex h-full flex-col items-center overflow-hidden text-white">
+    <PageBackground topColor="#FF5741" bottomColor="#FFE4E0">
+      <div
+        className="relative flex h-full flex-col items-center overflow-hidden text-white"
+        // eslint-disable-next-line no-restricted-syntax
+        style={{ background: LANDING_GRADIENT }}
+      >
       {/* 장식 Ellipse */}
       <div
         className="absolute -left-[60px] -top-[258px] h-[539px] w-[619px] rounded-full bg-white opacity-40"
