@@ -5,6 +5,15 @@ import { usePathname } from "next/navigation";
 import BottomTab from "@/components/navigation/BottomTab";
 import { PageBackground } from "@/components/common/PageBackground";
 
+// home 페이지 그라데이션. safe-area-inset 영역엔 시작/끝 색을 단색으로 연장.
+const HOME_GRADIENT = `linear-gradient(
+  to bottom,
+  rgba(255, 255, 255, 1) 0%,
+  rgba(255, 255, 255, 1) env(safe-area-inset-top),
+  rgba(255, 228, 224, 0.3) calc(100% - env(safe-area-inset-bottom)),
+  rgba(255, 228, 224, 0.3) 100%
+)`;
+
 export default function AuthLayout({
   children,
   header,
@@ -26,15 +35,6 @@ export default function AuthLayout({
   const layout = (
     <div
       className={`relative flex h-screen flex-col overflow-hidden ${isHomePage || isAnalyticsPage || isMyPage || isTeamManagePage ? "" : "bg-[#F9FAFB]"}`}
-      style={
-        isHomePage
-          ? {
-              // eslint-disable-next-line no-restricted-syntax
-              background:
-                "linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 228, 224, 0.3) 100%)",
-            }
-          : undefined
-      }
     >
       {header}
       <div
@@ -47,14 +47,7 @@ export default function AuthLayout({
   );
 
   if (isHomePage) {
-    return (
-      <PageBackground
-        topColor="rgb(255, 255, 255)"
-        bottomColor="rgba(255, 228, 224, 0.3)"
-      >
-        {layout}
-      </PageBackground>
-    );
+    return <PageBackground background={HOME_GRADIENT}>{layout}</PageBackground>;
   }
 
   return layout;

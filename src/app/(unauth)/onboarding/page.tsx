@@ -6,6 +6,16 @@ import Image from "next/image";
 import { Button } from "@/components/common/Button";
 import { PageBackground } from "@/components/common/PageBackground";
 
+// 랜딩과 동일한 그라데이션. safe-area-inset 보정으로 main 영역에서 원래 54% stop 분포 유지.
+const ENTRY_GRADIENT = `linear-gradient(
+  136deg,
+  #FF5741 0%,
+  #FF5741 env(safe-area-inset-top),
+  #FF5741 calc(env(safe-area-inset-top) + (100% - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 0.54),
+  #FFE4E0 calc(100% - env(safe-area-inset-bottom)),
+  #FFE4E0 100%
+)`;
+
 function EntryStep({ onNext }: { onNext: () => void }) {
   const [showIllust, setShowIllust] = useState(false);
   const [showButton, setShowButton] = useState(false);
@@ -20,14 +30,8 @@ function EntryStep({ onNext }: { onNext: () => void }) {
   }, []);
 
   return (
-    <PageBackground topColor="#FF5741" bottomColor="#FFE4E0">
-      <div
-        className="relative flex h-full w-full flex-col items-center justify-between overflow-hidden"
-        style={{
-          // eslint-disable-next-line no-restricted-syntax
-          background: "linear-gradient(136deg, #FF5741 54%, #FFE4E0 100%)",
-        }}
-      >
+    <PageBackground background={ENTRY_GRADIENT}>
+      <div className="relative flex h-full w-full flex-col items-center justify-between overflow-hidden">
       {/* 장식 Ellipse - 좌상단 */}
       <div
         className="absolute -left-[60px] -top-[258px] h-[539px] w-[619px] rounded-full bg-white opacity-40"
