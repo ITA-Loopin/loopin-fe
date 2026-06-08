@@ -19,7 +19,26 @@ import { Button } from "@/components/common/Button";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { PageBackground } from "@/components/common/PageBackground";
 
-const LANDING_GRADIENT = "linear-gradient(136deg, #FF5741 54%, #FFE4E0 100%)";
+// safe-area-inset 영역엔 시작/끝 색을 단색으로 연장. main 영역(안전영역 안쪽)에서
+// 원래 54% stop이 보이도록 stop position을 보정 — viewport 전체에 깔려도 main 안에서의
+// 색 분포가 원본과 동일하게 유지됨.
+const LANDING_GRADIENT = `linear-gradient(
+  136deg,
+  #FF5741 0%,
+  #FF5741 env(safe-area-inset-top),
+  #FF5741 calc(env(safe-area-inset-top) + (100% - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 0.54),
+  #FFE4E0 calc(100% - env(safe-area-inset-bottom)),
+  #FFE4E0 100%
+)`;
+
+const LANDING_LOADING_GRADIENT = `linear-gradient(
+  136deg,
+  #FF5741 0%,
+  #FF5741 env(safe-area-inset-top),
+  #FF5741 calc(env(safe-area-inset-top) + (100% - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 0.5438),
+  #FFE4E0 calc(100% - env(safe-area-inset-bottom) + (100% - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 0.1892),
+  #FFE4E0 100%
+)`;
 
 const API_BASE_URL = "https://api.loopin.co.kr";
 const MEMBER_URL = `${API_BASE_URL}/rest-api/v1/member`;
@@ -202,15 +221,8 @@ function HomeContent() {
 
   if (isLoading || isRestoring) {
     return (
-      <PageBackground topColor="#FF5741" bottomColor="#FFE4E0">
-        <div
-          className="flex h-full items-center justify-center"
-          style={{
-            // eslint-disable-next-line no-restricted-syntax
-            background:
-              "linear-gradient(136deg, #FF5741 54.38%, #FFE4E0 118.92%)",
-          }}
-        >
+      <PageBackground background={LANDING_LOADING_GRADIENT}>
+        <div className="flex h-full items-center justify-center">
           <LoadingSpinner width={96} height={96} />
         </div>
       </PageBackground>
@@ -218,12 +230,8 @@ function HomeContent() {
   }
 
   return (
-    <PageBackground topColor="#FF5741" bottomColor="#FFE4E0">
-      <div
-        className="relative flex h-full flex-col items-center overflow-hidden text-white"
-        // eslint-disable-next-line no-restricted-syntax
-        style={{ background: LANDING_GRADIENT }}
-      >
+    <PageBackground background={LANDING_GRADIENT}>
+      <div className="relative flex h-full flex-col items-center overflow-hidden text-white">
       {/* 장식 Ellipse */}
       <div
         className="absolute -left-[60px] -top-[258px] h-[539px] w-[619px] rounded-full bg-white opacity-40"
