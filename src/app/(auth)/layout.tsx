@@ -26,6 +26,15 @@ export default function AuthLayout({
   const layout = (
     <div
       className={`relative flex h-screen flex-col overflow-hidden ${isHomePage || isAnalyticsPage || isMyPage || isTeamManagePage ? "" : "bg-[#F9FAFB]"}`}
+      style={
+        isHomePage
+          ? {
+              // eslint-disable-next-line no-restricted-syntax
+              background:
+                "linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 228, 224, 0.3) 100%)",
+            }
+          : undefined
+      }
     >
       {header}
       <div
@@ -39,7 +48,10 @@ export default function AuthLayout({
 
   if (isHomePage) {
     return (
-      <PageBackground background="linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 228, 224, 0.3) 100%)">
+      <PageBackground
+        topColor="rgb(255, 255, 255)"
+        bottomColor="rgba(255, 228, 224, 0.3)"
+      >
         {layout}
       </PageBackground>
     );
