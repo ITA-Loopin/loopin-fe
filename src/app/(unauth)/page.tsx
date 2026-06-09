@@ -231,23 +231,25 @@ function HomeContent() {
 
   return (
     <PageBackground background={LANDING_GRADIENT}>
-      <div className="relative flex h-full flex-col items-center overflow-hidden text-white">
-      {/* 장식 Ellipse */}
+      {/* 장식 Ellipse — viewport 전체에 fixed로 깔아야 status bar 영역까지 흰색 blur가 도달.
+          main 안에만 두면 main 영역만 흰색이 입혀져 그라데이션과 단색 경계가 보임. */}
       <div
-        className="absolute -left-[60px] -top-[258px] h-[539px] w-[619px] rounded-full bg-white opacity-40"
-        style={{ filter: "blur(230px)" }}
-      />
-      <div
-        className="absolute -left-[326px] top-[369px] h-[596px] w-[506px] rounded-full bg-white opacity-60"
-        style={{ filter: "blur(220px)" }}
-      />
-      <div
-        className="absolute left-[120px] -top-[96px] h-[233px] w-[403px] rounded-full opacity-40 bg-sub-mint blur-[234px]"
-      />
-      <div
-        className="absolute left-[120px] top-[559px] h-[383px] w-[394px] rounded-full opacity-40 bg-sub-mint blur-[194px]"
-      />
+        aria-hidden
+        className="pointer-events-none fixed inset-0 -z-[5] overflow-hidden"
+      >
+        <div
+          className="absolute -left-[60px] -top-[258px] h-[539px] w-[619px] rounded-full bg-white opacity-40"
+          style={{ filter: "blur(230px)" }}
+        />
+        <div
+          className="absolute -left-[326px] top-[369px] h-[596px] w-[506px] rounded-full bg-white opacity-60"
+          style={{ filter: "blur(220px)" }}
+        />
+        <div className="absolute left-[120px] -top-[96px] h-[233px] w-[403px] rounded-full opacity-40 bg-sub-mint blur-[234px]" />
+        <div className="absolute left-[120px] top-[559px] h-[383px] w-[394px] rounded-full opacity-40 bg-sub-mint blur-[194px]" />
+      </div>
 
+      <div className="relative flex h-full flex-col items-center overflow-hidden text-white">
       {/* 로고 영역 */}
       <div className="relative z-10 mt-[21%] flex items-center gap-3">
         <style>{`
