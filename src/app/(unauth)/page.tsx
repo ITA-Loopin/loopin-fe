@@ -53,8 +53,13 @@ function HomeContent() {
   const { isLoading, isAuthenticated } = useAppSelector((state) => state.auth);
   const [showContent, setShowContent] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
+  const [isAndroidApp, setIsAndroidApp] = useState(false);
   const loginProcessedRef = useRef(false);
   const restoreAttemptedRef = useRef(false);
+
+  useEffect(() => {
+    setIsAndroidApp(!!(window as any).AndroidBridge);
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -329,19 +334,21 @@ function HomeContent() {
               height={22}
             />
           </Button>
-          <Button
-            variant="icon"
-            onClick={handleAppleLogin}
-            aria-label="애플 로그인"
-            className="h-10 w-10 bg-black"
-          >
-            <Image
-              src="/icon-apple.png"
-              alt="Apple"
-              width={24}
-              height={24}
-            />
-          </Button>
+          {!isAndroidApp && (
+            <Button
+              variant="icon"
+              onClick={handleAppleLogin}
+              aria-label="애플 로그인"
+              className="h-10 w-10 bg-black"
+            >
+              <Image
+                src="/icon-apple.png"
+                alt="Apple"
+                width={24}
+                height={24}
+              />
+            </Button>
+          )}
         </div>
       </div>
       </div>
