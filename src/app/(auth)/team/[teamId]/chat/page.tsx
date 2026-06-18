@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { useTeamChat } from "@/hooks/useTeamChat";
 import { TeamMessageBubble } from "./components/TeamMessageBubble";
 import { fetchTeamDetail } from "@/lib/team";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import { ChatInput } from "@/components/common/ChatInput";
 
 const INPUT_CONTAINER_HEIGHT = 80;
@@ -99,7 +99,10 @@ export default function TeamChatPage() {
   return (
     <div className="flex min-h-screen flex-col bg-gray-100">
       {/* Header */}
-      <Header leftType="back" centerTitle={teamName} rightType="none" />
+      <Header
+        left={<Header.BackButton />}
+        center={<Header.Title> {teamName} </Header.Title>}
+      />
     
 
       {/* 메시지 리스트 */}

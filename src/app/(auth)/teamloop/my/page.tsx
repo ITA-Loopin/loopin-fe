@@ -1,14 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header/Header";
 import { TeamCard } from "@/components/team/TeamCard";
 import type { TeamItem } from "@/components/team/types";
 import { fetchMyTeamList, updateTeamOrder } from "@/lib/team";
 
 export default function MyTeamListPage() {
-  const router = useRouter();
   const [teams, setTeams] = useState<TeamItem[]>([]);
   const [originalTeams, setOriginalTeams] = useState<TeamItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -200,11 +198,17 @@ export default function MyTeamListPage() {
     <div className="flex flex-col">
       <div className="relative">
         <Header
-          leftType="back"
-          rightType={isEditMode ? "none" : "edit"}
-          onBack={() => router.back()}
-          onEditClick={handleEditClick}
-          centerTitle="내 팀 목록"
+          left={<Header.BackButton />}
+          center={
+            <h1 className="whitespace-nowrap text-body-1-sb text-gray-800">
+              내 팀 목록
+            </h1>
+          }
+          right={
+            !isEditMode ? (
+              <Header.EditButton onClick={handleEditClick} />
+            ) : null
+          }
         />
 
         {isEditMode && (

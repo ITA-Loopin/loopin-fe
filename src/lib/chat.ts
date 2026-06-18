@@ -13,6 +13,12 @@ export type ChatRecommendationDto = {
   checklists?: string[];
 };
 
+export type ChatRoomStatus =
+  | "DEFAULT"
+  | "AFTER_CREATE_LOOP"
+  | "BEFORE_CLICK_UPDATE_LOOP"
+  | "AFTER_CLICK_UPDATE_LOOP";
+
 export type ChatMessageDto = {
   id?: number;
   tempId?: string;
@@ -26,6 +32,7 @@ export type ChatMessageDto = {
   loopRuleId?: number;
   deleteMessageId?: string;
   callUpdateLoop?: boolean;
+  chatRoomStatus?: ChatRoomStatus;
   createdAt?: string;
 };
 
@@ -153,6 +160,8 @@ export type ChatRoom = {
   ownerId: number;
   title: string | null;
   loopSelect: boolean;
+  chatRoomStatus: ChatRoomStatus;
+  noticeMessageContent?: string;
   lastMessageAt?: string | null;
   lastReadAt?: string | null;
   callUpdateLoop?: boolean;
