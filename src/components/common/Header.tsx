@@ -15,7 +15,12 @@ export default function Header({
   rightType = "user",
   centerTitle,
 }: HeaderProps) {
-  const left = leftType === "back" ? <BaseHeader.BackButton /> : null;
+  const left =
+    leftType === "back" ? (
+      <BaseHeader.BackButton />
+    ) : leftType === "none" ? null : (
+      <BaseHeader.Logo />
+    );
 
   const center = centerTitle ? (
     <BaseHeader.Title>{centerTitle}</BaseHeader.Title>
