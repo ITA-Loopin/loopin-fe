@@ -47,7 +47,20 @@ export default function AuthLayout({
   );
 
   if (isHomePage) {
-    return <PageBackground background={HOME_GRADIENT}>{layout}</PageBackground>;
+    const decoration = (
+      <>
+        <div className="absolute right-0 top-0 h-[162.286px] w-[360.827px] rotate-[30.835deg] rounded-full bg-primary-300 opacity-50 blur-[67px]" />
+        <div className="absolute right-0 top-0 h-[170.615px] w-[379.346px] rotate-[7.014deg] rounded-full bg-sub-mint opacity-20 blur-[67px]" />
+        <div className="absolute bottom-0 right-0 h-[170.615px] w-[379.346px] -rotate-[42.799deg] rounded-full bg-sub-mint opacity-20 blur-[67px]" />
+        <div className="absolute left-0 top-[60%] h-[317.653px] w-[209px] rotate-[89.667deg] rounded-full bg-primary-300 opacity-[0.15] blur-[67px]" />
+      </>
+    );
+
+    return (
+      <PageBackground background={HOME_GRADIENT} decoration={decoration}>
+        {layout}
+      </PageBackground>
+    );
   }
 
   return layout;
