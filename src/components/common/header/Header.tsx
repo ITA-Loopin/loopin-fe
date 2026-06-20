@@ -17,7 +17,7 @@ const Header = ({ left, center, right, className }: HeaderProps) => {
   return (
     <header
       className={cn(
-        "relative flex items-center border border-gray-white bg-white/30 px-4 py-[15px] backdrop-blur-[7px]",
+        "relative flex min-h-14 items-center border border-gray-white bg-white/30 px-4 py-[15px] backdrop-blur-[7px]",
         className
       )}
     >
@@ -25,7 +25,7 @@ const Header = ({ left, center, right, className }: HeaderProps) => {
       <div className="absolute left-1/2 max-w-[40%] -translate-x-1/2 truncate">
         {center}
       </div>
-      <div className="flex flex-1 items-center justify-end gap-1">{right}</div>
+      <div className="flex flex-1 items-center justify-end gap-4">{right}</div>
     </header>
   );
 };

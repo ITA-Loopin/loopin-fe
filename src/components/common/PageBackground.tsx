@@ -7,18 +7,21 @@ type Props = {
    * safe-area-inset 보정이 들어간 stop position을 사용한다.
    */
   background: string;
+  decoration?: ReactNode;
   children: ReactNode;
 };
 
-export function PageBackground({ background, children }: Props) {
+export function PageBackground({ background, decoration, children }: Props) {
   return (
     <>
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10"
+        className="pointer-events-none fixed inset-y-0 left-1/2 -z-10 w-full max-w-[500px] -translate-x-1/2 overflow-hidden"
         // eslint-disable-next-line no-restricted-syntax
         style={{ background }}
-      />
+      >
+        {decoration}
+      </div>
       {children}
     </>
   );
