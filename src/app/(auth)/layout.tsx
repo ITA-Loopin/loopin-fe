@@ -26,6 +26,7 @@ export default function AuthLayout({
   const isAnalyticsPage = pathname === "/analytics";
   const isMyPage = pathname === "/my-page";
   const isTeamManagePage = pathname?.includes("/manage");
+  const isTeamCreatePage = pathname === "/teamloop/create";
 
   const isPlannerChat = /^\/planner\/[^/]+$/.test(pathname ?? "");
   const isTeamChat = /^\/team\/[^/]+\/chat$/.test(pathname ?? "");
@@ -34,7 +35,7 @@ export default function AuthLayout({
 
   const layout = (
     <div
-      className={`relative flex h-screen flex-col overflow-hidden ${isHomePage || isAnalyticsPage || isMyPage || isTeamManagePage ? "" : "bg-gray-100"}`}
+      className={`relative flex h-screen flex-col overflow-hidden ${isHomePage || isAnalyticsPage || isMyPage || isTeamManagePage ? "" : isTeamCreatePage ? "bg-gray-white" : "bg-gray-100"}`}
     >
       {header}
       <div
