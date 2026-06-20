@@ -17,7 +17,7 @@ const Header = ({ left, center, right, className }: HeaderProps) => {
   return (
     <header
       className={cn(
-        "relative flex items-center border border-gray-white bg-white/30 px-4 py-[15px] backdrop-blur-[7px]",
+        "relative flex min-h-14 items-center border border-gray-white bg-white/30 px-4 py-[15px] backdrop-blur-[7px]",
         className
       )}
     >
