@@ -34,7 +34,7 @@ export default function AuthLayout({
 
   const layout = (
     <div
-      className={`relative flex h-screen flex-col overflow-hidden ${isHomePage || isAnalyticsPage || isMyPage || isTeamManagePage ? "" : "bg-[#F9FAFB]"}`}
+      className={`relative flex h-screen flex-col overflow-hidden ${isHomePage || isAnalyticsPage || isMyPage || isTeamManagePage ? "" : "bg-gray-100"}`}
     >
       {header}
       <div
