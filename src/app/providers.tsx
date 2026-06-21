@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider } from "react-redux";
 import { store } from "@/store/store";
 import dayjs from "dayjs";
@@ -12,6 +13,16 @@ import { PushNotificationToast } from "@/components/notification/PushNotificatio
 import { useFirebaseServiceWorker } from "@/hooks/useFirebaseServiceWorker";
 
 const ROOT_PATHS = ["/home"];
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+      staleTime: 30 * 1000,
+    },
+  },
+});
 
 function NativeBackHandler() {
   const lastBackPressRef = useRef(0);
@@ -65,9 +76,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
   useFirebaseServiceWorker();
   return (
     <Provider store={store}>
-      <PushNotificationToast />
-      <NativeBackHandler />
-      {children}
+      <QueryClientProvider client={queryClient}>
+        <PushNotificationToast />
+        <NativeBackHandler />
+        {children}
+      </QueryClientProvider>
     </Provider>
   );
 }

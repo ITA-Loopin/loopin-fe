@@ -48,10 +48,10 @@ export default function TeamLoopPage() {
       try {
         setIsLoadingRecruiting(true);
         setRecruitingError(null);
-        const teams = await fetchRecruitingTeams();
+        const result = await fetchRecruitingTeams({ size: 3 });
 
         if (!cancelled) {
-          setRecruitingTeams(teams);
+          setRecruitingTeams(result.teams);
         }
       } catch (err) {
         if (!cancelled) {

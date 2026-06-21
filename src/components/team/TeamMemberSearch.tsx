@@ -22,8 +22,15 @@ export function TeamMemberSearch({
   onSearchChange,
   onInvite,
 }: TeamMemberSearchProps) {
-  const { searchResults, isSearching, searchMembers, clearSearchResults } =
-    useSearchMembers();
+  const {
+    searchResults,
+    isSearching,
+    isFetchingNextPage,
+    hasNextPage,
+    loadMore,
+    searchMembers,
+    clearSearchResults,
+  } = useSearchMembers();
   const [hasSearched, setHasSearched] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -113,6 +120,16 @@ export function TeamMemberSearch({
                 해당하는 닉네임이 없습니다
               </p>
             </div>
+          )}
+          {hasNextPage && (
+            <Button
+              variant="outline"
+              className="w-full"
+              disabled={isFetchingNextPage}
+              onClick={() => loadMore()}
+            >
+              {isFetchingNextPage ? "불러오는 중..." : "더 보기"}
+            </Button>
           )}
         </div>
       )}
