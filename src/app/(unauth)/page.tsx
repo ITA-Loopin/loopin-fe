@@ -58,7 +58,9 @@ function HomeContent() {
   const restoreAttemptedRef = useRef(false);
 
   useEffect(() => {
-    setIsAndroidApp(!!(window as any).AndroidBridge);
+    const hasAndroidBridge = !!(window as any).AndroidBridge;
+    const isAndroidUA = /Android/i.test(navigator.userAgent);
+    setIsAndroidApp(hasAndroidBridge && isAndroidUA);
   }, []);
 
   useEffect(() => {
