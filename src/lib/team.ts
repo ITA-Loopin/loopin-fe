@@ -127,6 +127,11 @@ export type RecruitingTeamListApiResponse = {
   code: string;
   message: string;
   data: RecruitingTeamApiItem[];
+  page: {
+    size: number;
+    hasNext: boolean;
+    nextCursor: string | null;
+  };
   timestamp: string;
   traceId: string;
 };
@@ -134,9 +139,26 @@ export type RecruitingTeamListApiResponse = {
 /**
  * 모집 중인 팀 리스트 조회 API
  */
-export async function fetchRecruitingTeams(): Promise<TeamItem[]> {
+export async function fetchRecruitingTeams(params?: {
+  cursor?: string | null;
+  size?: number;
+}): Promise<{
+  teams: TeamItem[];
+  pageInfo: RecruitingTeamListApiResponse["page"];
+}> {
+  const searchParams: Record<string, string | number> = {};
+  if (params?.cursor) {
+    searchParams.cursor = params.cursor;
+  }
+  if (params?.size !== undefined) {
+    searchParams.size = params.size;
+  }
+
   const response = await apiFetch<RecruitingTeamListApiResponse>(
-    "/rest-api/v1/teams/recruiting"
+    "/rest-api/v1/teams/recruiting",
+    {
+      searchParams: Object.keys(searchParams).length > 0 ? searchParams : undefined,
+    },
   );
 
   if (!response.success || !response.data) {
@@ -144,12 +166,15 @@ export async function fetchRecruitingTeams(): Promise<TeamItem[]> {
   }
 
   // category, name, goal만 사용하여 TeamItem으로 변환
-  return response.data.map((item) => ({
-    id: item.teamId,
-    category: item.category,
-    title: item.name,
-    description: item.goal,
-  }));
+  return {
+    teams: response.data.map((item) => ({
+      id: item.teamId,
+      category: item.category,
+      title: item.name,
+      description: item.goal,
+    })),
+    pageInfo: response.page,
+  };
 }
 
 /**

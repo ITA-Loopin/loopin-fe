@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useMemo } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
+import { Button } from "@/components/common/Button";
 import {
+  acceptTeamInvitation,
   fetchNotifications,
   markNotificationsAsRead,
   rejectTeamInvitation,
-  acceptTeamInvitation,
   type Notification,
 } from "@/lib/notification";
 
@@ -21,80 +23,57 @@ type NotificationGroup = {
 
 export default function NotificationPage() {
   const router = useRouter();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    refetch,
+  } = useInfiniteQuery({
+    queryKey: ["notifications"],
+    queryFn: ({ pageParam }) =>
+      fetchNotifications({ cursor: pageParam, size: 20 }),
+    initialPageParam: null as string | null,
+    getNextPageParam: (lastPage) =>
+      lastPage.page.hasNext ? lastPage.page.nextCursor : undefined,
+  });
 
-  // 알림 목록 조회
-  const loadNotifications = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const response = await fetchNotifications({
-        size: 20,
-      });
+  const notifications =
+    data?.pages.flatMap((page) => page.data) ?? [];
 
-      if (response.data) {
-        setNotifications(response.data);
-      }
-    } catch (err) {
-      console.error("알림 로드 실패:", err);
-      setError(
-        err instanceof Error ? err.message : "알림을 불러오는데 실패했습니다."
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadNotifications();
-  }, [loadNotifications]);
-
-  // 알림을 날짜별로 그룹화
   const groupedNotifications = useMemo(() => {
     const groups: NotificationGroup[] = [];
     const today = dayjs().startOf("day");
     const tenDaysAgo = dayjs().subtract(10, "day").startOf("day");
-
     const todayNotifications: Notification[] = [];
     const recentNotifications: Notification[] = [];
     const olderNotifications: Notification[] = [];
 
-    notifications.forEach((notif) => {
-      const notifDate = dayjs(notif.createdAt).startOf("day");
+    notifications.forEach((notification) => {
+      const notificationDate = dayjs(notification.createdAt).startOf("day");
 
-      if (notifDate.isSame(today)) {
-        todayNotifications.push(notif);
+      if (notificationDate.isSame(today)) {
+        todayNotifications.push(notification);
       } else if (
-        notifDate.isAfter(tenDaysAgo) ||
-        notifDate.isSame(tenDaysAgo)
+        notificationDate.isAfter(tenDaysAgo) ||
+        notificationDate.isSame(tenDaysAgo)
       ) {
-        recentNotifications.push(notif);
+        recentNotifications.push(notification);
       } else {
-        olderNotifications.push(notif);
+        olderNotifications.push(notification);
       }
     });
 
     if (todayNotifications.length > 0) {
-      groups.push({
-        label: "오늘",
-        notifications: todayNotifications,
-      });
+      groups.push({ label: "오늘", notifications: todayNotifications });
     }
-
     if (recentNotifications.length > 0) {
-      groups.push({
-        label: "최근 10일",
-        notifications: recentNotifications,
-      });
+      groups.push({ label: "최근 10일", notifications: recentNotifications });
     }
-
     if (olderNotifications.length > 0) {
-      groups.push({
-        label: "이전",
-        notifications: olderNotifications,
-      });
+      groups.push({ label: "이전", notifications: olderNotifications });
     }
 
     return groups;
@@ -104,9 +83,9 @@ export default function NotificationPage() {
     try {
       await rejectTeamInvitation(notification.objectId);
       await markNotificationsAsRead([notification.id]);
-      await loadNotifications();
-    } catch (err) {
-      console.error("알림 거절 실패:", err);
+      await refetch();
+    } catch (mutationError) {
+      console.error("알림 거절 실패:", mutationError);
     }
   };
 
@@ -114,23 +93,34 @@ export default function NotificationPage() {
     try {
       await acceptTeamInvitation(notification.objectId);
       await markNotificationsAsRead([notification.id]);
-      await loadNotifications();
+      await refetch();
       router.push(`/team/${notification.objectId}`);
-    } catch (err) {
-      console.error("팀 참여 실패:", err);
+    } catch (mutationError) {
+      console.error("팀 참여 실패:", mutationError);
     }
   };
 
+  const loadMoreButton = hasNextPage ? (
+    <Button
+      variant="outline"
+      className="w-full"
+      disabled={isFetchingNextPage}
+      onClick={() => fetchNextPage()}
+    >
+      {isFetchingNextPage ? "불러오는 중..." : "더 보기"}
+    </Button>
+  ) : null;
+
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      <div className="flex-1 px-4 py-6 overflow-y-auto">
+    <div className="flex min-h-screen flex-col bg-white">
+      <div className="flex-1 overflow-y-auto px-4 py-6">
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <p className="text-sm text-gray-500">로딩 중...</p>
           </div>
         ) : error ? (
           <div className="flex items-center justify-center py-12">
-            <p className="text-sm text-red-500">{error}</p>
+            <p className="text-sm text-red-500">{error.message}</p>
           </div>
         ) : notifications.length === 0 ? (
           <div className="flex items-center justify-center py-12">
@@ -155,6 +145,7 @@ export default function NotificationPage() {
                 </div>
               </div>
             ))}
+            {loadMoreButton}
           </div>
         )}
       </div>
@@ -174,24 +165,25 @@ function NotificationCard({
   onAccept,
 }: NotificationCardProps) {
   return (
-    <div className="rounded-lg bg-gray-50 border border-gray-100 p-4">
-      <p className="text-sm text-gray-900 mb-4 leading-relaxed">
+    <div className="rounded-lg border border-gray-100 bg-gray-50 p-4">
+      <p className="mb-4 text-sm leading-relaxed text-gray-900">
         {notification.content}
       </p>
-
       <div className="flex gap-2">
-        <button
+        <Button
+          variant="outline"
+          className="flex-1"
           onClick={() => onReject(notification)}
-          className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-lg"
         >
           거절하기
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="subtleAccent"
+          className="flex-1"
           onClick={() => onAccept(notification)}
-          className="flex-1 px-4 py-2 text-sm font-medium text-red-600 bg-white rounded-lg"
         >
           팀 참여하기
-        </button>
+        </Button>
       </div>
     </div>
   );
