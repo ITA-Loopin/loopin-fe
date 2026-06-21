@@ -211,7 +211,7 @@ export default function PlannerChatPage() {
                     reset({ prompt: "" });
                   }
                 })}
-                className="flex items-center rounded-2xl bg-gray-100 px-3 py-2"
+                className="flex min-h-11 items-center rounded-lg bg-gray-100 px-4 py-1.5"
               >
                 <textarea
                   {...register("prompt")}
@@ -221,7 +221,7 @@ export default function PlannerChatPage() {
                       : "만들고 싶은 루프를 입력해주세요."
                   }
                   rows={1}
-                  className="max-h-32 flex-1 resize-none border-none text-sm text-gray-800 outline-none"
+                  className="max-h-32 min-w-0 flex-1 resize-none border-none bg-transparent text-body-1-m text-gray-800 outline-none"
                   aria-label="루프 생성 요청 입력란"
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
@@ -236,14 +236,14 @@ export default function PlannerChatPage() {
                 <button
                   type="submit"
                   disabled={!watchedPrompt?.trim()}
-                  className="flex h-10 w-10 items-center justify-center text-white transition disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex size-5 shrink-0 items-center justify-center text-white transition disabled:cursor-not-allowed disabled:opacity-50"
                   aria-label="루프 생성 요청 보내기"
                 >
                   <Image
                     src="/ai-planner/arrows-up.svg"
                     alt="send"
-                    width={24}
-                    height={24}
+                    width={20}
+                    height={20}
                   />
                 </button>
               </form>
