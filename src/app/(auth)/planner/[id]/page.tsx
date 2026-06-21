@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { MessageBubble } from "./components/MessageBubble";
 import { LoadingMessage } from "./components/LoadingMessage";
@@ -23,6 +23,15 @@ import Header from "@/components/common/Header";
 
 const MESSAGE_EXTRA_SPACE = 32;
 const INPUT_CONTAINER_HEIGHT = 192;
+const TEXTAREA_MAX_HEIGHT = 128;
+
+function resizeTextarea(textarea: HTMLTextAreaElement) {
+  textarea.style.height = "auto";
+  const nextHeight = Math.min(textarea.scrollHeight, TEXTAREA_MAX_HEIGHT);
+  textarea.style.height = `${nextHeight}px`;
+  textarea.style.overflowY =
+    textarea.scrollHeight > TEXTAREA_MAX_HEIGHT ? "auto" : "hidden";
+}
 
 export default function PlannerChatPage() {
   const params = useParams();
@@ -37,6 +46,7 @@ export default function PlannerChatPage() {
     useState(false);
   const [selectedRecommendation, setSelectedRecommendation] =
     useState<RecommendationSchedule | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const {
     messages,
@@ -67,10 +77,31 @@ export default function PlannerChatPage() {
   });
 
   const watchedPrompt = watch("prompt", inputValue);
+  const promptField = register("prompt", {
+    onChange: (event) => {
+      resizeTextarea(event.target as HTMLTextAreaElement);
+    },
+  });
+  const promptFieldRef = useRef(promptField.ref);
+  promptFieldRef.current = promptField.ref;
+
+  const handleTextareaRef = useCallback(
+    (element: HTMLTextAreaElement | null) => {
+      promptFieldRef.current(element);
+      textareaRef.current = element;
+    },
+    [],
+  );
 
   useEffect(() => {
     handleInputChange(watchedPrompt ?? "");
   }, [watchedPrompt, handleInputChange]);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      resizeTextarea(textareaRef.current);
+    }
+  }, [watchedPrompt]);
 
   useEffect(() => {
     const fetchChatRoomInfo = async () => {
@@ -235,7 +266,7 @@ export default function PlannerChatPage() {
         {isInputVisible &&
         (showUpdateMessage || recommendations.length === 0) ? (
           <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center">
-            <div className="pointer-events-auto w-full max-w-xl bg-white p-4 pb-6">
+            <div className="pointer-events-auto w-full max-w-[500px] bg-white p-4 pb-6">
               {exampleLabel ? (
                 <p className="mb-2 text-xs text-gray-500">{exampleLabel}</p>
               ) : null}
@@ -246,19 +277,18 @@ export default function PlannerChatPage() {
                     reset({ prompt: "" });
                   }
                 })}
-                 
-                className="flex items-center rounded-2xl px-3 py-2 bg-gray-100"
+                className="flex min-h-11 items-center rounded-lg bg-gray-100 px-4 py-1.5"
               >
                 <textarea
-                  {...register("prompt")}
+                  {...promptField}
+                  ref={handleTextareaRef}
                   placeholder={
                     chatRoomLoopSelect
                       ? "수정하고 싶은 루프 내용을 입력해주세요."
                       : "만들고 싶은 루프를 입력해주세요."
                   }
                   rows={1}
-                   
-                  className="max-h-32 flex-1 border-none text-sm text-gray-800 outline-none resize-none"
+                  className="max-h-32 min-w-0 flex-1 resize-none border-none bg-transparent text-body-1-m text-gray-800 outline-none"
                   aria-label="루프 생성 요청 입력란"
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
@@ -273,14 +303,14 @@ export default function PlannerChatPage() {
                 <button
                   type="submit"
                   disabled={!watchedPrompt?.trim()}
-                  className="flex h-10 w-10 items-center justify-center text-white transition disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex size-5 shrink-0 items-center justify-center text-white transition disabled:cursor-not-allowed disabled:opacity-50"
                   aria-label="루프 생성 요청 보내기"
                 >
                   <Image
                     src="/ai-planner/arrows-up.svg"
                     alt="send"
-                    width={24}
-                    height={24}
+                    width={20}
+                    height={20}
                   />
                 </button>
               </form>
