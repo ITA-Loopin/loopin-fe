@@ -328,10 +328,10 @@ function HomeContent() {
             className="h-10 w-10 bg-brand-naver"
           >
             <Image
-              src="/naver-simple.png"
+              src="/naver-icon.svg"
               alt="Naver"
-              width={22}
-              height={22}
+              width={20}
+              height={20}
             />
           </Button>
           {!isAndroidApp && (
