@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { MessageBubble } from "./components/MessageBubble";
 import { LoadingMessage } from "./components/LoadingMessage";
@@ -23,6 +23,15 @@ import Header from "@/components/common/Header";
 
 const MESSAGE_EXTRA_SPACE = 32;
 const INPUT_CONTAINER_HEIGHT = 192;
+const TEXTAREA_MAX_HEIGHT = 128;
+
+function resizeTextarea(textarea: HTMLTextAreaElement) {
+  textarea.style.height = "auto";
+  const nextHeight = Math.min(textarea.scrollHeight, TEXTAREA_MAX_HEIGHT);
+  textarea.style.height = `${nextHeight}px`;
+  textarea.style.overflowY =
+    textarea.scrollHeight > TEXTAREA_MAX_HEIGHT ? "auto" : "hidden";
+}
 
 export default function PlannerChatPage() {
   const params = useParams();
@@ -37,6 +46,7 @@ export default function PlannerChatPage() {
     useState(false);
   const [selectedRecommendation, setSelectedRecommendation] =
     useState<RecommendationSchedule | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const {
     messages,
@@ -67,10 +77,31 @@ export default function PlannerChatPage() {
   });
 
   const watchedPrompt = watch("prompt", inputValue);
+  const promptField = register("prompt", {
+    onChange: (event) => {
+      resizeTextarea(event.target as HTMLTextAreaElement);
+    },
+  });
+  const promptFieldRef = useRef(promptField.ref);
+  promptFieldRef.current = promptField.ref;
+
+  const handleTextareaRef = useCallback(
+    (element: HTMLTextAreaElement | null) => {
+      promptFieldRef.current(element);
+      textareaRef.current = element;
+    },
+    [],
+  );
 
   useEffect(() => {
     handleInputChange(watchedPrompt ?? "");
   }, [watchedPrompt, handleInputChange]);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      resizeTextarea(textareaRef.current);
+    }
+  }, [watchedPrompt]);
 
   useEffect(() => {
     const fetchChatRoomInfo = async () => {
@@ -249,7 +280,8 @@ export default function PlannerChatPage() {
                 className="flex min-h-11 items-center rounded-lg bg-gray-100 px-4 py-1.5"
               >
                 <textarea
-                  {...register("prompt")}
+                  {...promptField}
+                  ref={handleTextareaRef}
                   placeholder={
                     chatRoomLoopSelect
                       ? "수정하고 싶은 루프 내용을 입력해주세요."
