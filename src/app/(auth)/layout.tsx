@@ -14,6 +14,10 @@ const HOME_GRADIENT = `linear-gradient(
   rgba(255, 228, 224, 0.3) 100%
 )`;
 
+// gray-100 단색. PageBackground로 깔아 safe-area 영역까지 동일 색 연장.
+// eslint-disable-next-line no-restricted-syntax
+const GRAY_100_BACKGROUND = "#F8F8F9";
+
 export default function AuthLayout({
   children,
   header,
@@ -32,6 +36,14 @@ export default function AuthLayout({
   const isTeamActivity = /^\/team\/[^/]+\/activity$/.test(pathname ?? "");
   const hideBottomTab = isPlannerChat || isTeamChat || isTeamActivity;
 
+  // 자체 배경을 처리하는 페이지(analytics: 상태별 그라데이션, my-page/team-manage: 흰색)는
+  // PageBackground 없이 통과. 그 외 회색 톤 페이지는 gray-100을 깔아 safe-area까지 연장.
+  const pageBackground = isHomePage
+    ? HOME_GRADIENT
+    : isAnalyticsPage || isMyPage || isTeamManagePage
+      ? null
+      : GRAY_100_BACKGROUND;
+
   const layout = (
     <div
       className={`relative flex h-screen flex-col overflow-hidden ${isHomePage || isAnalyticsPage || isMyPage || isTeamManagePage ? "" : "bg-gray-100"}`}
@@ -46,8 +58,8 @@ export default function AuthLayout({
     </div>
   );
 
-  if (isHomePage) {
-    return <PageBackground background={HOME_GRADIENT}>{layout}</PageBackground>;
+  if (pageBackground) {
+    return <PageBackground background={pageBackground}>{layout}</PageBackground>;
   }
 
   return layout;

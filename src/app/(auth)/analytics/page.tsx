@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { LoopReport } from "@/components/analytics/LoopReport";
+import { PageBackground } from "@/components/common/PageBackground";
 import type { LoopReportData, ReportStatus } from "@/types/report";
 import { fetchLoopReport } from "@/lib/report";
 
@@ -142,7 +143,12 @@ export default function AnalyticsPage() {
     }
   }, [status]);
 
+  // safe-area 영역까지 동일 배경이 깔리도록 PageBackground 사용. 스크롤 컨테이너 배경은
+  // 기존 useEffect가 별도로 맞춰주므로 그대로 둠.
+  const pageBg = getBackgroundStyle(status).background as string | undefined;
+
   return (
+    <PageBackground background={pageBg ?? ""}>
     <div className="relative flex flex-col min-h-full overflow-x-hidden" style={getBackgroundStyle(status)}>
       {/* NONE 상태를 제외한 모든 경우에 초록색 원형 오버레이 - 스크롤 계산에서 제외 */}
       {status !== "NONE" && (
@@ -178,5 +184,6 @@ export default function AnalyticsPage() {
         </div>
       )}
     </div>
+    </PageBackground>
   );
 }
