@@ -54,17 +54,13 @@ export default function HomePage() {
     LoopList,
   } from "@/components/home";
   import { useDailyLoops } from "@/hooks/useDailyLoops";
-  import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-  } from "@/components/ui/tooltip";
   import { useRouter } from "next/navigation";
   
   dayjs.locale("ko");
   
   export default function HomePage() {
     const [showTooltip, setShowTooltip] = useState(false);
+    const [tooltipVisible, setTooltipVisible] = useState(false);
     const [tooltipPosition, setTooltipPosition] = useState<{
       top: number;
       left: number;
@@ -91,25 +87,71 @@ export default function HomePage() {
     const isEmpty = loopList.length === 0;
   
     useEffect(() => {
-      if (!isLoading && isEmpty) {
+      if (isLoading || !isEmpty) {
+        setTooltipVisible(false);
+        const hideTimer = window.setTimeout(() => setShowTooltip(false), 300);
+        return () => window.clearTimeout(hideTimer);
+      }
+
+      const updatePosition = () => {
         const calendarIcon = document.querySelector(
           ".calendar-icon-trigger"
-        ) as HTMLElement;
-        if (calendarIcon) {
-          const rect = calendarIcon.getBoundingClientRect();
-          setTooltipPosition({
-            top: rect.top,
-            left: rect.left,
-            width: rect.width,
-            height: rect.height,
-          });
-          setShowTooltip(true);
-        }
-      } else {
-        setShowTooltip(false);
-      }
+        ) as HTMLElement | null;
+        if (!calendarIcon) return;
+        const rect = calendarIcon.getBoundingClientRect();
+        setTooltipPosition({
+          top: rect.top,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height,
+        });
+      };
+
+      const rafId = window.requestAnimationFrame(() => {
+        updatePosition();
+        setShowTooltip(true);
+        window.requestAnimationFrame(() => setTooltipVisible(true));
+      });
+
+      window.addEventListener("resize", updatePosition);
+      return () => {
+        window.cancelAnimationFrame(rafId);
+        window.removeEventListener("resize", updatePosition);
+      };
     }, [isLoading, isEmpty]);
-  
+
+    useEffect(() => {
+      if (!showTooltip) return;
+
+      let hideTimer: number | undefined;
+      const dismiss = () => {
+        setTooltipVisible(false);
+        hideTimer = window.setTimeout(() => setShowTooltip(false), 300);
+      };
+
+      // 페이드인 직후 잔여 이벤트로 즉시 닫히지 않도록 약간 지연 후 리스너 등록
+      const armId = window.setTimeout(() => {
+        document.addEventListener("touchstart", dismiss, {
+          passive: true,
+          once: true,
+        });
+        document.addEventListener("click", dismiss, { once: true });
+        document.addEventListener("scroll", dismiss, {
+          capture: true,
+          passive: true,
+          once: true,
+        });
+      }, 150);
+
+      return () => {
+        window.clearTimeout(armId);
+        if (hideTimer) window.clearTimeout(hideTimer);
+        document.removeEventListener("touchstart", dismiss);
+        document.removeEventListener("click", dismiss);
+        document.removeEventListener("scroll", dismiss, { capture: true });
+      };
+    }, [showTooltip]);
+
     return (
       <>
         {/* 고정 배경 - 스크롤해도 항상 보임 */}
@@ -181,50 +223,37 @@ export default function HomePage() {
         
           {showTooltip && tooltipPosition && (
             <div
-              className="absolute pointer-events-none"
+              className="fixed z-50 pointer-events-none transition-opacity duration-300"
               style={{
-                top: `${tooltipPosition.top}px`,
-                left: `${tooltipPosition.left}px`,
-                width: `${tooltipPosition.width}px`,
-                height: `${tooltipPosition.height}px`,
+                top: `${tooltipPosition.top - 18}px`,
+                left: `${tooltipPosition.left + tooltipPosition.width / 2}px`,
+                transform: "translate(-50%, -100%)",
+                opacity: tooltipVisible ? 1 : 0,
               }}
             >
-              <Tooltip
-                open={showTooltip}
-                onOpenChange={setShowTooltip}
-                delayDuration={0}
+              <div
+                className="relative bg-primary-500 text-white"
+                style={{
+                  display: "flex",
+                  padding: "7px 12px",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: "8px",
+                  // eslint-disable-next-line no-restricted-syntax
+                  boxShadow: "0 0 7px 0 rgba(0, 0, 0, 0.05)",
+                }}
               >
-                <TooltipTrigger asChild>
-                  <div className="absolute inset-0" />
-                </TooltipTrigger>
-                <TooltipContent
-                  side="top"
-                  sideOffset={20}
-                   
-                  className="bg-primary-500 border-none shadow-none p-0 m-0 text-white relative [&_svg]:hidden [&_[data-slot='tooltip-arrow']]:hidden [&>svg]:hidden"
+                <span className="text-sm font-medium text-white whitespace-nowrap">
+                  오늘의 첫 루프를 만들어보세요!
+                </span>
+                <div
+                  className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45"
                   style={{
-                    display: "flex",
-                    padding: "7px 12px",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    gap: "10px",
                     // eslint-disable-next-line no-restricted-syntax
-                    boxShadow: "0 0 7px 0 rgba(0, 0, 0, 0.05)",
-                    borderRadius: "8px",
+                    backgroundColor: "#FF7765",
                   }}
-                >
-                  <span className="text-sm font-medium text-white whitespace-nowrap">
-                    오늘의 첫 루프를 만들어보세요!
-                  </span>
-                  <div
-                    className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 z-10"
-                    style={{
-                      // eslint-disable-next-line no-restricted-syntax
-                      backgroundColor: "#FF7765",
-                    }}
-                  />
-                </TooltipContent>
-              </Tooltip>
+                />
+              </div>
             </div>
           )}
           <div className="flex-1 px-4 pb-6 flex flex-col gap-6">
