@@ -19,7 +19,6 @@ import {
 import type { RecommendationSchedule } from "./types";
 import GroupIcon from "@/../public/Group.svg";
 import RetryIcon from "@/../public/retry.svg";
-import Header from "@/components/common/Header";
 
 const MESSAGE_EXTRA_SPACE = 32;
 const INPUT_CONTAINER_HEIGHT = 192;
@@ -37,7 +36,6 @@ export default function PlannerChatPage() {
   const params = useParams();
   const router = useRouter();
   const chatRoomId = params?.id ? Number(params.id) : null;
-  const [chatRoomTitle, setChatRoomTitle] = useState<string>("채팅방 이름");
   const [chatRoomLoopSelect, setChatRoomLoopSelect] = useState<boolean>(false);
   const [chatRoomCallUpdateLoop, setChatRoomCallUpdateLoop] =
     useState<boolean>(false);
@@ -114,11 +112,6 @@ export default function PlannerChatPage() {
             (room) => room.id === chatRoomId,
           );
           if (chatRoom) {
-            if (chatRoom.title) {
-              setChatRoomTitle(chatRoom.title);
-            } else {
-              setChatRoomTitle("채팅방 이름");
-            }
             setChatRoomLoopSelect(chatRoom.loopSelect);
             setChatRoomCallUpdateLoop(chatRoom.callUpdateLoop ?? false);
           }
@@ -143,9 +136,7 @@ export default function PlannerChatPage() {
     : MESSAGE_EXTRA_SPACE;
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-100/40">
-      {/* Header */}
-      <Header leftType="back" centerTitle={chatRoomTitle} rightType="none" />
+    <div className="flex min-h-full flex-col bg-gray-100/40">
       {/* <header className="sticky top-0 z-50 flex items-center justify-between bg-white px-6 py-4 shadow-sm">
         <button
           onClick={() => router.back()}
