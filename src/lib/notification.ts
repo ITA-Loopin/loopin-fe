@@ -28,13 +28,9 @@ export type NotificationReadResponse = {
   message: string;
   data: Record<string, never>;
   page?: {
-    page: number;
     size: number;
-    totalPages: number;
-    totalElements: number;
-    first: boolean;
-    last: boolean;
     hasNext: boolean;
+    nextCursor: string | null;
   };
   timestamp?: string;
   traceId?: string;
@@ -44,13 +40,13 @@ export type NotificationReadResponse = {
  * 알림 목록 조회
  */
 export async function fetchNotifications(params?: {
-  page?: number;
+  cursor?: string | null;
   size?: number;
 }) {
   const searchParams: Record<string, string> = {};
-  
-  if (params?.page !== undefined) {
-    searchParams.page = String(params.page);
+
+  if (params?.cursor) {
+    searchParams.cursor = params.cursor;
   }
   if (params?.size !== undefined) {
     searchParams.size = String(params.size);

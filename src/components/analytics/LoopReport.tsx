@@ -6,8 +6,8 @@ import { ReportHeader } from "./ReportHeader";
 import { ProgressStatsCard } from "./ProgressStatsCard";
 import { CalendarView } from "./CalendarView";
 import { LoopStatusList } from "./LoopStatusList";
-import { PrimaryButton } from "@/components/common/PrimaryButton";
-import { AddLoopSheet } from "@/components/common/add-loop/AddLoopSheet";
+import { Button } from "@/components/common/Button";
+import { AddLoopSheet } from "@/components/loop/add-loop/AddLoopSheet";
 
 import type { LoopReportData, ReportStatus } from "@/types/report";
 
@@ -37,12 +37,14 @@ export function LoopReport({
       {/* NONE 상태일 때만 루프 추가하기 버튼 표시 */}
       {status === "NONE" && (
         <div className="flex justify-center px-6 mb-4">
-          <PrimaryButton
+          <Button
             variant="secondary"
+            size="lg"
+            className="w-full rounded-[30px] text-body-1-sb"
             onClick={() => setIsAddLoopSheetOpen(true)}
           >
             루프 추가하기
-          </PrimaryButton>
+          </Button>
         </div>
       )}
 

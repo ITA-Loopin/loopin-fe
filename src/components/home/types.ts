@@ -17,13 +17,9 @@ export type LoopsResponse = {
     loops: LoopItem[];
   };
   page?: {
-    page: number;
     size: number;
-    totalPages: number;
-    totalElements: number;
-    first: boolean;
-    last: boolean;
     hasNext: boolean;
+    nextCursor: string | null;
   };
   timestamp: string;
   traceId: string;

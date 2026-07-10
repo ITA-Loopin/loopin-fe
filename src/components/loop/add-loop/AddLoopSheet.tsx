@@ -1,0 +1,101 @@
+import { BottomSheet } from "@/components/common/BottomSheet";
+import { Button } from "@/components/common/Button";
+import { AddLoopDefaultValues } from "./constants";
+import { ChecklistEditor } from "./ChecklistEditor";
+import { DateRangePicker } from "./DateRangePicker";
+import { ScheduleSelector } from "./ScheduleSelector";
+import { TitleInput } from "./TitleInput";
+import { useAddLoopForm } from "@/hooks/useAddLoopForm";
+
+type AddLoopSheetProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  defaultValues?: AddLoopDefaultValues;
+  onCreated?: () => void;
+  chatRoomId?: number | null;
+};
+
+export function AddLoopSheet({
+  isOpen,
+  onClose,
+  defaultValues,
+  onCreated,
+  chatRoomId,
+}: AddLoopSheetProps) {
+  const { title, schedule, dateRange, checklist, submit, onFormPointerDown } =
+    useAddLoopForm({ isOpen, onClose, defaultValues, onCreated, chatRoomId });
+
+  return (
+    <BottomSheet
+      isOpen={isOpen}
+      onClose={onClose}
+      className="max-h-[80vh] overflow-y-auto"
+      title="루프 추가하기"
+    >
+      <div className="inline-flex items-center px-4 py-5">
+        <div className="flex w-full flex-col items-center">
+          {/* 바텀시트 제목 */}
+          { }
+          <h2 className="mb-6 text-center text-body-1-sb font-semibold text-gray-600">
+            루프 추가하기
+          </h2>
+
+          {/* 루프 추가 폼 */}
+          <form
+            className="w-full space-y-10"
+            onSubmit={submit.onSubmit}
+            onPointerDownCapture={onFormPointerDown}
+          >
+            <TitleInput value={title.value} onChange={title.onChange} />
+
+            <ChecklistEditor
+              checklists={checklist.checklists}
+              onChangeChecklist={checklist.onChangeChecklist}
+              onRemoveChecklist={checklist.onRemoveChecklist}
+              newChecklistItem={checklist.newChecklistItem}
+              onChangeNewChecklist={checklist.onChangeNewChecklist}
+              onAddChecklist={checklist.onAddChecklist}
+            />
+
+            <ScheduleSelector
+              scheduleType={schedule.scheduleType}
+              isWeeklyDropdownOpen={schedule.isWeeklyDropdownOpen}
+              daysOfWeek={schedule.daysOfWeek}
+              onSelectSchedule={schedule.onSelectSchedule}
+              onToggleDay={schedule.onToggleDay}
+            />
+
+            <DateRangePicker
+              formattedStartDate={dateRange.formattedStartDate}
+              formattedEndDate={dateRange.formattedEndDate}
+              isStartCalendarOpen={dateRange.isStartCalendarOpen}
+              isEndCalendarOpen={dateRange.isEndCalendarOpen}
+              startCalendarMonth={dateRange.startCalendarMonth}
+              endCalendarMonth={dateRange.endCalendarMonth}
+              selectedStartDate={dateRange.selectedStartDate}
+              selectedEndDate={dateRange.selectedEndDate}
+              onToggleStartCalendar={dateRange.onToggleStartCalendar}
+              onToggleEndCalendar={dateRange.onToggleEndCalendar}
+              onSelectStartDate={dateRange.onSelectStartDate}
+              onSelectEndDate={dateRange.onSelectEndDate}
+              onChangeStartMonth={dateRange.onChangeStartMonth}
+              onChangeEndMonth={dateRange.onChangeEndMonth}
+              disableEndDate={schedule.scheduleType === "NONE"}
+              startDate={dateRange.startDate}
+            />
+
+            <Button
+              variant="secondary"
+              size="lg"
+              type="submit"
+              className="w-full rounded-[30px] text-body-1-sb"
+              disabled={submit.isSubmitting}
+            >
+              루프 추가하기
+            </Button>
+          </form>
+        </div>
+      </div>
+    </BottomSheet>
+  );
+}

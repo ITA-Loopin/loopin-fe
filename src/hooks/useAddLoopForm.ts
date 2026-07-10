@@ -5,7 +5,7 @@ import {
   Checklist,
   REPEAT_OPTIONS,
   RepeatValue,
-} from "@/components/common/add-loop/constants";
+} from "@/components/loop/add-loop/constants";
 import { useLoopTitle } from "./useLoopTitle";
 import { useLoopSchedule } from "./useLoopSchedule";
 import { useLoopDateRange } from "./useLoopDateRange";

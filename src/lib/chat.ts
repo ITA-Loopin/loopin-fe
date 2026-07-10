@@ -13,6 +13,12 @@ export type ChatRecommendationDto = {
   checklists?: string[];
 };
 
+export type ChatRoomStatus =
+  | "DEFAULT"
+  | "AFTER_CREATE_LOOP"
+  | "BEFORE_CLICK_UPDATE_LOOP"
+  | "AFTER_CLICK_UPDATE_LOOP";
+
 export type ChatMessageDto = {
   id?: number;
   tempId?: string;
@@ -26,6 +32,7 @@ export type ChatMessageDto = {
   loopRuleId?: number;
   deleteMessageId?: string;
   callUpdateLoop?: boolean;
+  chatRoomStatus?: ChatRoomStatus;
   createdAt?: string;
 };
 
@@ -37,7 +44,7 @@ export type ChatRoomMessagesResponse = {
 };
 
 type PageInfo = {
-  page?: number;
+  cursor?: string | null;
   size?: number;
 };
 
@@ -53,26 +60,21 @@ export type CurrentUserQuery = {
 };
 
 type BuildParamsOptions = {
-  page?: number;
+  cursor?: string | null;
   size?: number;
   currentUser?: CurrentUserQuery;
   chatRoomId?: number;
 };
 
 function buildQueryParams(options: BuildParamsOptions = {}) {
-  const { page, size, currentUser, chatRoomId } = options;
+  const { cursor, size, currentUser, chatRoomId } = options;
   const params: Record<string, Primitive> = {};
 
-  const requestPayload: Record<string, Primitive> = {};
-  if (page !== undefined) {
-    requestPayload.page = page;
+  if (cursor) {
+    params.cursor = cursor;
   }
   if (size !== undefined) {
-    requestPayload.size = size;
-  }
-
-  if (Object.keys(requestPayload).length > 0) {
-    params.request = JSON.stringify(requestPayload);
+    params.size = size;
   }
 
   if (currentUser) {
@@ -102,7 +104,7 @@ export type FetchChatMessagesParams = PageInfo & {
 
 export async function fetchChatMessages({
   chatRoomId,
-  page,
+  cursor,
   size,
   currentUser,
 }: FetchChatMessagesParams) {
@@ -110,7 +112,7 @@ export async function fetchChatMessages({
     `/rest-api/v1/chat-message/ai/${chatRoomId}`,
     {
       searchParams: buildQueryParams({
-        page,
+        cursor,
         size,
         currentUser,
       }),
@@ -158,6 +160,8 @@ export type ChatRoom = {
   ownerId: number;
   title: string | null;
   loopSelect: boolean;
+  chatRoomStatus: ChatRoomStatus;
+  noticeMessageContent?: string;
   lastMessageAt?: string | null;
   lastReadAt?: string | null;
   callUpdateLoop?: boolean;
@@ -171,13 +175,9 @@ export type ChatRoomListResponse = {
     chatRooms?: ChatRoom[];
   };
   page?: {
-    page?: number;
     size?: number;
-    totalPages?: number;
-    totalElements?: number;
-    first?: boolean;
-    last?: boolean;
     hasNext?: boolean;
+    nextCursor?: string | null;
   };
   timestamp?: string;
   traceId?: string;
@@ -230,13 +230,9 @@ export type TeamChatRoomResponse = {
     lastReadAt?: string | null;
   };
   page?: {
-    page?: number;
     size?: number;
-    totalPages?: number;
-    totalElements?: number;
-    first?: boolean;
-    last?: boolean;
     hasNext?: boolean;
+    nextCursor?: string | null;
   };
   timestamp?: string;
   traceId?: string;
@@ -285,13 +281,9 @@ export type TeamChatMessagesResponse = {
   message?: string;
   data?: TeamChatMessageDto[];
   page?: {
-    page?: number;
     size?: number;
-    totalPages?: number;
-    totalElements?: number;
-    first?: boolean;
-    last?: boolean;
     hasNext?: boolean;
+    nextCursor?: string | null;
   };
   timestamp?: string;
   traceId?: string;
@@ -302,7 +294,7 @@ export type TeamChatMessagesResponse = {
  */
 export type FetchTeamChatMessagesParams = {
   chatRoomId: number;
-  page?: number;
+  cursor?: string | null;
   size?: number;
 };
 
@@ -311,21 +303,16 @@ export type FetchTeamChatMessagesParams = {
  */
 export async function fetchTeamChatMessages({
   chatRoomId,
-  page,
+  cursor,
   size,
 }: FetchTeamChatMessagesParams) {
   const params: Record<string, Primitive> = {};
 
-  const requestPayload: Record<string, Primitive> = {};
-  if (page !== undefined) {
-    requestPayload.page = page;
+  if (cursor) {
+    params.cursor = cursor;
   }
   if (size !== undefined) {
-    requestPayload.size = size;
-  }
-
-  if (Object.keys(requestPayload).length > 0) {
-    params.request = JSON.stringify(requestPayload);
+    params.size = size;
   }
 
   return apiFetch<TeamChatMessagesResponse>(
@@ -374,7 +361,7 @@ export function createChatSocket({
   onOpen,
 }: CreateSSEOptions): EventSource {
   const baseUrl = resolveSseBaseUrl();
-  let url = `${baseUrl}/rest-api/v1/sse/subscribe/${chatRoomId}`;
+  const url = `${baseUrl}/rest-api/v1/sse/subscribe/${chatRoomId}`;
 
   // EventSource는 커스텀 헤더를 설정할 수 없으므로,
   // Last-Event-ID가 필요한 경우 fetch를 사용해야 하지만,

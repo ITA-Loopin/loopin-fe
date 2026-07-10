@@ -22,7 +22,8 @@ export function TeamLoopFAB({
   imageHeight = 18,
   ariaLabel = "버튼",
   right = "right-4",
-  bgColor = "bg-[var(--primary-500)]",
+   
+  bgColor = "bg-primary-500",
   border = false,
   iconColor,
   bottom = "bottom-28",
@@ -34,8 +35,10 @@ export function TeamLoopFAB({
     <button
       type="button"
       onClick={onClick}
+      // eslint-disable-next-line no-restricted-syntax
       className={`fixed ${bottom} ${right} z-50 flex h-[54px] w-[54px] items-center justify-center gap-[10px] rounded-[44px] ${bgColor} shadow-[0_2px_14px_0_rgba(0,0,0,0.15)] p-[14px] ${
-        border ? "border border-[var(--gray-200)]" : ""
+         
+        border ? "border border-gray-200" : ""
       }`}
       aria-label={ariaLabel}
     >

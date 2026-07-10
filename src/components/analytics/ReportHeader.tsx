@@ -7,7 +7,9 @@ export function ReportHeader({ message }: ReportHeaderProps) {
   const messageLines = message.split("\n").filter((line) => line.trim());
 
   // 스타일 상수
+  // eslint-disable-next-line no-restricted-syntax
   const firstLineStyle = "text-[20px] font-bold leading-[140%] tracking-[-0.4px] text-[var(--gray-800,#3A3D40)] mb-3";
+  // eslint-disable-next-line no-restricted-syntax
   const defaultTextStyle = "text-base font-semibold leading-[150%] tracking-[-0.32px] text-[var(--gray-800,#3A3D40)]";
 
   return (

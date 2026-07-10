@@ -16,13 +16,9 @@ export type TeamListApiResponse = {
   message: string;
   data: TeamApiItem[];
   page: {
-    page: number;
     size: number;
-    totalPages: number;
-    totalElements: number;
-    first: boolean;
-    last: boolean;
     hasNext: boolean;
+    nextCursor: string | null;
   };
   timestamp: string;
   traceId: string;
@@ -43,16 +39,24 @@ function mapTeamApiItemToTeamItem(apiItem: TeamApiItem): TeamItem {
  * 나의 팀 리스트 조회 API
  */
 export async function fetchMyTeamList(params?: {
-  page?: number;
+  cursor?: string | null;
   size?: number;
 }): Promise<{
   teams: TeamItem[];
   pageInfo: TeamListApiResponse["page"];
 }> {
+  const searchParams: Record<string, string | number> = {};
+  if (params?.cursor) {
+    searchParams.cursor = params.cursor;
+  }
+  if (params?.size !== undefined) {
+    searchParams.size = params.size;
+  }
+
   const response = await apiFetch<TeamListApiResponse>(
     "/rest-api/v1/teams/my",
     {
-      searchParams: params,
+      searchParams: Object.keys(searchParams).length > 0 ? searchParams : undefined,
     }
   );
 
@@ -123,6 +127,11 @@ export type RecruitingTeamListApiResponse = {
   code: string;
   message: string;
   data: RecruitingTeamApiItem[];
+  page: {
+    size: number;
+    hasNext: boolean;
+    nextCursor: string | null;
+  };
   timestamp: string;
   traceId: string;
 };
@@ -130,9 +139,26 @@ export type RecruitingTeamListApiResponse = {
 /**
  * 모집 중인 팀 리스트 조회 API
  */
-export async function fetchRecruitingTeams(): Promise<TeamItem[]> {
+export async function fetchRecruitingTeams(params?: {
+  cursor?: string | null;
+  size?: number;
+}): Promise<{
+  teams: TeamItem[];
+  pageInfo: RecruitingTeamListApiResponse["page"];
+}> {
+  const searchParams: Record<string, string | number> = {};
+  if (params?.cursor) {
+    searchParams.cursor = params.cursor;
+  }
+  if (params?.size !== undefined) {
+    searchParams.size = params.size;
+  }
+
   const response = await apiFetch<RecruitingTeamListApiResponse>(
-    "/rest-api/v1/teams/recruiting"
+    "/rest-api/v1/teams/recruiting",
+    {
+      searchParams: Object.keys(searchParams).length > 0 ? searchParams : undefined,
+    },
   );
 
   if (!response.success || !response.data) {
@@ -140,12 +166,15 @@ export async function fetchRecruitingTeams(): Promise<TeamItem[]> {
   }
 
   // category, name, goal만 사용하여 TeamItem으로 변환
-  return response.data.map((item) => ({
-    id: item.teamId,
-    category: item.category,
-    title: item.name,
-    description: item.goal,
-  }));
+  return {
+    teams: response.data.map((item) => ({
+      id: item.teamId,
+      category: item.category,
+      title: item.name,
+      description: item.goal,
+    })),
+    pageInfo: response.page,
+  };
 }
 
 /**
@@ -228,13 +257,9 @@ export type TeamLoopListApiResponse = {
   message: string;
   data: TeamLoopApiItem[];
   page: {
-    page: number;
     size: number;
-    totalPages: number;
-    totalElements: number;
-    first: boolean;
-    last: boolean;
     hasNext: boolean;
+    nextCursor: string | null;
   };
   timestamp: string;
   traceId: string;
@@ -289,13 +314,9 @@ export type TeamCalendarLoopsApiResponse = {
     days: TeamCalendarLoopDay[];
   };
   page: {
-    page: number;
     size: number;
-    totalPages: number;
-    totalElements: number;
-    first: boolean;
-    last: boolean;
     hasNext: boolean;
+    nextCursor: string | null;
   };
   timestamp: string;
   traceId: string;
@@ -350,13 +371,9 @@ export type TeamMemberListApiResponse = {
   message: string;
   data: TeamMember[];
   page: {
-    page: number;
     size: number;
-    totalPages: number;
-    totalElements: number;
-    first: boolean;
-    last: boolean;
     hasNext: boolean;
+    nextCursor: string | null;
   };
   timestamp: string;
   traceId: string;
@@ -473,13 +490,9 @@ export type TeamLoopMyDetailApiResponse = {
     }>;
   };
   page: {
-    page: number;
     size: number;
-    totalPages: number;
-    totalElements: number;
-    first: boolean;
-    last: boolean;
     hasNext: boolean;
+    nextCursor: string | null;
   };
   timestamp: string;
   traceId: string;
@@ -532,13 +545,9 @@ export type TeamLoopAllDetailApiResponse = {
     }>;
   };
   page: {
-    page: number;
     size: number;
-    totalPages: number;
-    totalElements: number;
-    first: boolean;
-    last: boolean;
     hasNext: boolean;
+    nextCursor: string | null;
   };
   timestamp: string;
   traceId: string;
@@ -674,13 +683,9 @@ export type TeamLoopMemberChecklistApiResponse = {
     }>;
   };
   page: {
-    page: number;
     size: number;
-    totalPages: number;
-    totalElements: number;
-    first: boolean;
-    last: boolean;
     hasNext: boolean;
+    nextCursor: string | null;
   };
   timestamp: string;
   traceId: string;
@@ -893,13 +898,9 @@ export type TeamMemberActivitiesApiResponse = {
     }>;
   };
   page?: {
-    page: number;
     size: number;
-    totalPages: number;
-    totalElements: number;
-    first: boolean;
-    last: boolean;
     hasNext: boolean;
+    nextCursor: string | null;
   };
   timestamp: string;
   traceId?: string;

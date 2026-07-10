@@ -48,13 +48,13 @@ export function getProgressStatus(progress: number): "완료됨" | "진행중" |
 export function getStatusColor(status: "완료됨" | "진행중" | "시작전"): string {
   switch (status) {
     case "완료됨":
-      return "bg-[#E1FF9B] text-[var(--gray-600)]";
+      return "bg-primary-500 text-gray-white";
     case "진행중":
-      return "bg-[var(--primary-500)] text-[var(--gray-white)]";
+      return "bg-primary-200 text-primary-main";
     case "시작전":
-      return "bg-[var(--gray-400)] text-[var(--gray-white)]";
+      return "bg-gray-400 text-gray-white";
     default:
-      return "bg-[var(--gray-400)] text-[var(--gray-white)]";
+      return "bg-gray-400 text-gray-white";
   }
 }
 

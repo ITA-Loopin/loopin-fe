@@ -5,7 +5,7 @@ import {
   ScheduleType,
   Weekday,
   WEEKDAY_OPTIONS,
-} from "@/components/common/add-loop/constants";
+} from "@/components/loop/add-loop/constants";
 
 interface UseLoopScheduleProps {
   isOpen: boolean;

@@ -32,7 +32,7 @@ export function ChatInput<T extends FieldValues>({
   const [isComposing, setIsComposing] = useState(false);
 
   return (
-    <div className="flex items-center gap-2 rounded-2xl bg-[#F8F8F9] px-3 py-2">
+    <div className="flex items-center gap-2 rounded-2xl bg-gray-100 px-3 py-2">
       {showAttachmentButton && (
         <button
           type="button"
@@ -48,7 +48,7 @@ export function ChatInput<T extends FieldValues>({
           >
             <path
               d="M12 5V19M5 12H19"
-              stroke="#737980"
+              className="stroke-gray-600"
               strokeWidth="2"
               strokeLinecap="round"
             />
@@ -64,7 +64,8 @@ export function ChatInput<T extends FieldValues>({
             ref={field.ref}
             placeholder={placeholder}
             rows={1}
-            className="flex-1 h-10 border-none bg-transparent text-sm text-[#2C2C2C] outline-none resize-none"
+             
+            className="flex-1 h-10 border-none bg-transparent text-sm text-gray-800 outline-none resize-none"
             style={{ 
               lineHeight: "20px",
               paddingTop: "10px",

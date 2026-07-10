@@ -92,13 +92,12 @@ export function useTeamChat(teamId: number | null) {
   useEffect(() => {
     if (!chatRoomId) return;
 
-    let cancelled = false;
+    const cancelled = false;
 
     const loadHistory = async () => {
       try {
         const response = await fetchTeamChatMessages({
           chatRoomId,
-          page: 0,
           size: 50,
         });
 

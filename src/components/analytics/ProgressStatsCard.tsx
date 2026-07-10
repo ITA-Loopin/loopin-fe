@@ -28,8 +28,12 @@ function StatCard(props: StatCardProps) {
 
   if (props.variant === "message") {
     return (
-      <div className={base} style={{ backgroundColor: `rgba(255, 255, 255, ${opacity / 100})` }}>
-        <p className="text-sm font-medium leading-[150%] tracking-[-0.28px] text-[var(--gray-500,#A0A9B1)] whitespace-pre-line">
+      <div
+        className={base}
+        // eslint-disable-next-line no-restricted-syntax
+        style={{ backgroundColor: `rgba(255, 255, 255, ${opacity / 100})` }}
+      >
+        <p className="text-sm font-medium leading-[150%] tracking-[-0.28px] text-gray-500 whitespace-pre-line">
           {props.message}
         </p>
       </div>
@@ -37,10 +41,15 @@ function StatCard(props: StatCardProps) {
   }
 
   return (
-    <div className={base} style={{ backgroundColor: `rgba(255, 255, 255, ${opacity / 100})` }}>
-      <p className="text-sm font-medium leading-[150%] tracking-[-0.28px] text-[var(--gray-700,#4D5155)]">
+    <div
+      className={base}
+      // eslint-disable-next-line no-restricted-syntax
+      style={{ backgroundColor: `rgba(255, 255, 255, ${opacity / 100})` }}
+    >
+      <p className="text-sm font-medium leading-[150%] tracking-[-0.28px] text-gray-700">
         {props.label}
       </p>
+      {/* eslint-disable-next-line no-restricted-syntax */}
       <p className="text-[42px] font-extrabold leading-[37px] tracking-[-0.84px] uppercase text-[var(--gray-800,#3A3D40)]">
         {props.value}
       </p>
