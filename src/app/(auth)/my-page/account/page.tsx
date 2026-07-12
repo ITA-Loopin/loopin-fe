@@ -47,26 +47,7 @@ export default function AccountPage() {
     <>
       <div className="flex h-full flex-col">
         <div className="flex-1 flex flex-col overflow-y-auto px-4 py-6">
-          {/* 프로필 영역 */}
           <div className="mb-8 flex flex-col items-center">
-            <div className="relative mb-6">
-              <div className="h-32 w-32 overflow-hidden rounded-full bg-gray-200">
-                {profile?.profileImageUrl ? (
-                  <Image
-                    src={profile.profileImageUrl}
-                    alt="프로필"
-                    width={128}
-                    height={128}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-gray-200">
-                    <span className="text-4xl text-gray-400">👤</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
             {/* 닉네임 정보 */}
             <div className="mb-4 w-full max-w-md">
               <label className="mb-2 block text-sm font-medium text-gray-600">
