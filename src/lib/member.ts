@@ -53,3 +53,4 @@ export function buildUserFromMemberProfile(
 export async function fetchMemberProfile() {
   return apiFetch<MemberResponse>("/rest-api/v1/member");
 }
+
