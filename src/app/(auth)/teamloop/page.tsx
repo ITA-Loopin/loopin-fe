@@ -110,6 +110,10 @@ export default function TeamLoopPage() {
                   아직 참여 중인 팀이 없어요 <br /> 새로운 팀을 생성해보세요!
                 </p>
               </div>
+            ) : myTeams.length === 1 ? (
+              <div className="w-full">
+                <TeamCard team={myTeams[0]} variant="my" />
+              </div>
             ) : (
               // main의 좌우 padding(16px)을 이 섹션에서만 상쇄
               <div className="-mx-4">
