@@ -79,7 +79,7 @@ export default function PlannerListPage() {
   };
 
   return (
-    <div className="flex h-full flex-col bg-gray-100">
+    <div className="flex min-h-full flex-col bg-gray-100">
       {/* Content */}
       <main className="flex-1 px-6 py-6">
         {isLoading ? (
