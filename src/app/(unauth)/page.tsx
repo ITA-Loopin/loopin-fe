@@ -326,14 +326,13 @@ function HomeContent() {
             variant="icon"
             onClick={handleNaverLogin}
             aria-label="네이버 로그인"
-             
-            className="h-10 w-10 bg-brand-naver"
+            className="h-10 w-10"
           >
             <Image
-              src="/naver-simple.png"
+              src="/naver-icon.svg"
               alt="Naver"
-              width={22}
-              height={22}
+              width={40}
+              height={40}
             />
           </Button>
           {!isAndroidApp && (
