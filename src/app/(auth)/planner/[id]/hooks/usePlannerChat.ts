@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { EXAMPLE_PROMPTS } from "../constants";
 import type { ChatMessage, RecommendationSchedule } from "../types";
 import { generateId } from "../utils";
 import { useAppSelector } from "@/store/hooks";
@@ -127,11 +126,6 @@ export function usePlannerChat(
     hasSentBeforeUpdateLoopRef.current = false;
     setCallUpdateLoop(false);
   }, [plannerChatRoomId]);
-
-  const exampleLabel = useMemo(() => {
-    if (!isInputVisible || inputValue) return null;
-    return `ex. ${EXAMPLE_PROMPTS.join(" / ")}`;
-  }, [inputValue, isInputVisible]);
 
   const appendNewMessages = useCallback(
     (rawMessages?: unknown) => {
@@ -643,7 +637,6 @@ export function usePlannerChat(
     isInputVisible,
     recommendations,
     updateRecommendation,
-    exampleLabel,
     messageListRef,
     handleInputChange,
     handleSubmit,
