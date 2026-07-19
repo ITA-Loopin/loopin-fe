@@ -9,6 +9,7 @@ import { LoadingMessage } from "./components/LoadingMessage";
 import { RecommendationCard } from "./components/RecommendationCard";
 import { LoopinSpeakerIndicator } from "./components/LoopinSpeakerIndicator";
 import { usePlannerChat } from "./hooks/usePlannerChat";
+import { EXAMPLE_PROMPTS } from "./constants";
 import { fetchChatRooms } from "@/lib/chat";
 import { AddLoopSheet } from "@/components/loop/add-loop/AddLoopSheet";
 import { LoopGroupEditSheet } from "@/components/loop/LoopGroupEditSheet";
@@ -53,7 +54,6 @@ export default function PlannerChatPage() {
     isInputVisible,
     recommendations,
     updateRecommendation,
-    exampleLabel,
     messageListRef,
     handleInputChange,
     handleSubmit,
@@ -258,9 +258,13 @@ export default function PlannerChatPage() {
         (showUpdateMessage || recommendations.length === 0) ? (
           <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center">
             <div className="pointer-events-auto w-full max-w-[500px] bg-white p-4 pb-6">
-              {exampleLabel ? (
-                <p className="mb-2 text-xs text-gray-500">{exampleLabel}</p>
-              ) : null}
+              <p
+                className={`mb-2 text-xs text-gray-500 ${
+                  watchedPrompt?.trim() ? "invisible" : ""
+                }`}
+              >
+                {`ex. ${EXAMPLE_PROMPTS.join(" / ")}`}
+              </p>
               <form
                 onSubmit={formHandleSubmit(async (values) => {
                   if (values.prompt?.trim()) {
