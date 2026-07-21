@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import {
   acceptTeamInvitation,
   rejectTeamInvitation,
-} from "@/lib/notification";
+} from "@/services/notification";
 
 interface ForegroundNotification {
   id: number;

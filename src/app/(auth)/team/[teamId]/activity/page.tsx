@@ -9,14 +9,14 @@ import {
   fetchTeamLoopAllDetail,
   fetchTeamMemberActivities,
   type TeamLoopApiItem,
-} from "@/lib/team";
+} from "@/services/team";
 import {
   formatImportance,
   formatLoopType,
   getProgressStatus,
   getStatusColor,
 } from "@/lib/teamUtils";
-import { fetchMemberProfile } from "@/lib/member";
+import { fetchMemberProfile } from "@/services/member";
 import type { TeamItem } from "@/components/team/types";
 
 type TeamDetail = TeamItem & {
@@ -118,11 +118,11 @@ export default function TeamActivityPage() {
         // 현재 사용자 ID 가져오기 (내 활동 구분을 위해)
         try {
           const memberResponse = await fetchMemberProfile();
-          if (memberResponse.data?.id) {
+          if (memberResponse?.id) {
             const memberId =
-              typeof memberResponse.data.id === "string"
-                ? Number(memberResponse.data.id)
-                : memberResponse.data.id;
+              typeof memberResponse.id === "string"
+                ? Number(memberResponse.id)
+                : memberResponse.id;
             setCurrentMemberId(memberId);
           }
         } catch (err) {

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Header from "@/components/common/Header";
 import { TeamCard } from "@/components/team/TeamCard";
 import type { TeamItem } from "@/components/team/types";
-import { fetchMyTeamList, updateTeamOrder } from "@/lib/team";
+import { fetchMyTeamList, updateTeamOrder } from "@/services/team";
 
 export default function MyTeamListPage() {
   const router = useRouter();

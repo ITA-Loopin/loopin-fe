@@ -10,7 +10,7 @@ import { RecommendationCard } from "./components/RecommendationCard";
 import { LoopinSpeakerIndicator } from "./components/LoopinSpeakerIndicator";
 import { usePlannerChat } from "./hooks/usePlannerChat";
 import { EXAMPLE_PROMPTS } from "./constants";
-import { fetchChatRooms } from "@/lib/chat";
+import { fetchChatRooms } from "@/services/chat";
 import { AddLoopSheet } from "@/components/loop/add-loop/AddLoopSheet";
 import { LoopGroupEditSheet } from "@/components/loop/LoopGroupEditSheet";
 import {

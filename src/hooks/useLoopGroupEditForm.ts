@@ -1,6 +1,6 @@
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
-import { apiFetch } from "@/lib/api";
+import { api } from "@/lib/http";
 import type { LoopDetail } from "@/types/loop";
 import { useEditChecklist } from "@/hooks/useEditChecklist";
 import {
@@ -238,7 +238,7 @@ export function useLoopGroupEditForm({
         if (!ruleId) {
           throw new Error("루프 그룹 ID가 없습니다.");
         }
-        await apiFetch(`/rest-api/v1/loops/group/${ruleId}`, {
+        await api(`/rest-api/v1/loops/group/${ruleId}`, {
           method: "PUT",
           json: payload,
         });
@@ -253,22 +253,19 @@ export function useLoopGroupEditForm({
 
         let newLoopId: number | undefined;
         try {
-          const loopsResponse = await apiFetch<{
-            success?: boolean;
-            data?: {
-              loops?: Array<{
-                id: number;
-                title: string;
-                loopDate: string;
-                loopRule?: {
-                  ruleId: number;
-                };
-              }>;
-            };
+          const loopsData = await api<{
+            loops?: Array<{
+              id: number;
+              title: string;
+              loopDate: string;
+              loopRule?: {
+                ruleId: number;
+              };
+            }>;
           }>(`/rest-api/v1/loops/date/${searchDate}`);
 
           // 같은 ruleId를 가진 루프 찾기 (또는 제목으로 매칭)
-          const updatedLoop = loopsResponse?.data?.loops?.find(
+          const updatedLoop = loopsData?.loops?.find(
             (item) =>
               item.loopRule?.ruleId === ruleId ||
               (item.title === title && item.loopDate === searchDate)

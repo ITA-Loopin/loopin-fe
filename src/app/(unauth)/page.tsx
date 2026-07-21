@@ -6,15 +6,13 @@ import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { setCredentials } from "@/store/slices/authSlice";
-import { apiFetch } from "@/lib/api";
 import {
   buildUserFromMemberProfile,
   fetchMemberProfile,
   type MemberResponse,
-} from "@/lib/member";
+} from "@/services/member";
 import type { User } from "@/types/auth";
-import { saveFCMTokenApi, setupNativeFCMTokenListener } from "@/lib/fcm";
-import { authFetch } from "@/utils/fetch";
+import { saveFCMTokenApi, setupNativeFCMTokenListener } from "@/services/fcm";
 import { Button } from "@/components/common/Button";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { PageBackground } from "@/components/common/PageBackground";
@@ -73,7 +71,7 @@ function HomeContent() {
 
   const handleLoginSuccess = useCallback(async () => {
     try {
-      const memberResponse = await fetchMemberProfile();
+      const memberProfile = await fetchMemberProfile();
 
 
       const fallbackUser: User = {
@@ -83,7 +81,7 @@ function HomeContent() {
 
 
       const userData = buildUserFromMemberProfile(
-        memberResponse.data,
+        memberProfile,
         fallbackUser
       );
 
@@ -95,7 +93,7 @@ function HomeContent() {
 
       // 로그인 성공 후 FCM 토큰 저장
       try {
-        await saveFCMTokenApi(authFetch);
+        await saveFCMTokenApi();
       } catch (error) {
         console.error("FCM 토큰 저장 실패:", error);
         // FCM 토큰 저장 실패는 로그인 플로우를 중단하지 않음
@@ -153,7 +151,7 @@ function HomeContent() {
       dispatch(setCredentials({ user: userData }));
 
       try {
-        await saveFCMTokenApi(authFetch);
+        await saveFCMTokenApi();
       } catch (error) {
         console.error("FCM 토큰 저장 실패:", error);
       }
@@ -187,7 +185,7 @@ function HomeContent() {
 
   // 네이티브 FCM 토큰 리프레시 리스너 등록
   useEffect(() => {
-    setupNativeFCMTokenListener(authFetch);
+    setupNativeFCMTokenListener();
   }, []);
 
   useEffect(() => {

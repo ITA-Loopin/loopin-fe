@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { apiFetch } from "@/lib/api";
-import type { ApiPageResponse } from "@/interfaces/response/ApiResponse";
+import { apiPage } from "@/lib/http";
 
 type MemberSearchItem = {
   id: number;
@@ -18,7 +17,7 @@ export function useSearchMembers() {
   const query = useInfiniteQuery({
     queryKey: ["members", "search", keyword],
     queryFn: ({ pageParam }) =>
-      apiFetch<ApiPageResponse<MemberSearchItem>>(
+      apiPage<MemberSearchItem>(
         "/rest-api/v1/member/search",
         {
           searchParams: {
@@ -36,7 +35,7 @@ export function useSearchMembers() {
 
   const searchResults: TeamMember[] =
     query.data?.pages.flatMap((page) =>
-      page.data.map(({ id, nickname, email }) => ({
+      page.items.map(({ id, nickname, email }) => ({
         id,
         nickname,
         email: email || "",

@@ -4,13 +4,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Dialog } from "@/components/common/Dialog";
-import { apiFetch } from "@/lib/api";
+import { api, httpJson } from "@/lib/http";
 import { useAppDispatch } from "@/store/hooks";
 import { setCredentials } from "@/store/slices/authSlice";
 import type { User } from "@/types/auth";
-import { buildUserFromMemberProfile, fetchMemberProfile } from "@/lib/member";
-import { saveFCMTokenApi } from "@/lib/fcm";
-import { authFetch } from "@/utils/fetch";
+import { buildUserFromMemberProfile, fetchMemberProfile } from "@/services/member";
+import { saveFCMTokenApi } from "@/services/fcm";
 
 type SignupSession = {
   ticket: string;
@@ -86,17 +85,16 @@ export default function OnboardingPage() {
     setModalError(null);
 
     try {
-      const data = await apiFetch<{
-        success?: boolean;
-        data?: { available?: boolean };
-      }>("/rest-api/v1/member/available", {
-        searchParams: { nickname },
-        skipCredentials: true, // 인증이 필요 없는 공개 엔드포인트
-      });
+      const result = await api<{ available?: boolean }>(
+        "/rest-api/v1/member/available",
+        {
+          searchParams: { nickname },
+          skipCredentials: true, // 인증이 필요 없는 공개 엔드포인트
+        }
+      );
 
       const isAvailable =
-        data?.success !== false &&
-        (data?.data?.available === undefined || data?.data?.available === true);
+        result?.available === undefined || result?.available === true;
 
       if (isAvailable) {
         setAlert({ type: "success", message: AVAILABLE_MESSAGE });
@@ -130,7 +128,7 @@ export default function OnboardingPage() {
     setModalError(null);
 
     try {
-      const data = await apiFetch<{
+      const data = await httpJson<{
         user?: User;
       }>("/rest-api/v1/auth/signup-login", {
         method: "POST",
@@ -157,7 +155,7 @@ export default function OnboardingPage() {
 
       try {
         const memberResponse = await fetchMemberProfile();
-        finalUser = buildUserFromMemberProfile(memberResponse.data, {
+        finalUser = buildUserFromMemberProfile(memberResponse, {
           ...baseUser,
           id: baseUser.id || "user",
         });
@@ -173,7 +171,7 @@ export default function OnboardingPage() {
 
       // 회원가입/로그인 성공 후 FCM 토큰 저장
       try {
-        await saveFCMTokenApi(authFetch);
+        await saveFCMTokenApi();
       } catch (error) {
         console.error("FCM 토큰 저장 실패:", error);
         // FCM 토큰 저장 실패는 회원가입 플로우를 중단하지 않음

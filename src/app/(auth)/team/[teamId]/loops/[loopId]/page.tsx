@@ -8,7 +8,7 @@ import { TeamLoopDetailContent } from "@/components/team/TeamLoopDetailContent";
 import { LoopActionDialog } from "@/components/loop/LoopActionDialog";
 import { LoopEditSheet } from "@/components/loop/LoopEditSheet";
 import { LoopGroupEditSheet } from "@/components/loop/LoopGroupEditSheet";
-import { fetchTeamLoops, fetchTeamLoopChecklists, fetchTeamLoopMyDetail, fetchTeamLoopAllDetail, createTeamLoopChecklist, toggleTeamLoopChecklist, deleteTeamLoopChecklist, completeTeamLoop, type TeamLoopApiItem } from "@/lib/team";
+import { fetchTeamLoops, fetchTeamLoopChecklists, fetchTeamLoopMyDetail, fetchTeamLoopAllDetail, createTeamLoopChecklist, toggleTeamLoopChecklist, deleteTeamLoopChecklist, completeTeamLoop, type TeamLoopApiItem } from "@/services/team";
 import type { LoopDetail } from "@/types/loop";
 import { MemberProgressDialog } from "@/components/team/MemberProgressDialog";
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { fetchTeamMembers, type TeamMember } from "@/lib/team";
+import { fetchTeamMembers, type TeamMember } from "@/services/team";
 
 type UseTeamMemberSelectionProps = {
   isOpen: boolean;

@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import Header from "@/components/common/Header";
 import { Button } from "@/components/common/Button";
-import { fetchChatRooms } from "@/lib/chat";
+import { fetchChatRooms } from "@/services/chat";
 
 export default function PlannerChatHeader() {
   const params = useParams<{ id: string }>();

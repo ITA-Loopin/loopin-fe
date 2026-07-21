@@ -9,7 +9,7 @@ import {
   fetchChatMessages,
   sendChatMessage,
   type ChatMessageDto,
-} from "@/lib/chat";
+} from "@/services/chat";
 
 type AppendStatus = "none" | "assistant" | "recommendations";
 

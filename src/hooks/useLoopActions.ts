@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { LoopDetail } from "@/types/loop";
-import { apiFetch } from "@/lib/api";
+import { api } from "@/lib/http";
 
 interface UseLoopActionsResult {
   isDeleting: boolean;
@@ -27,7 +27,7 @@ export function useLoopActions(
 
     try {
       setIsDeleting(true);
-      await apiFetch(`/rest-api/v1/loops/${detail.id}`, {
+      await api(`/rest-api/v1/loops/${detail.id}`, {
         method: "DELETE",
       });
       router.back();
@@ -48,7 +48,7 @@ export function useLoopActions(
 
     try {
       setIsDeletingGroup(true);
-      await apiFetch(`/rest-api/v1/loops/group/${detail.id}`, {
+      await api(`/rest-api/v1/loops/group/${detail.id}`, {
         method: "DELETE",
       });
       router.back();

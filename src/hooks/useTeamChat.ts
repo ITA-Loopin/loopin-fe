@@ -6,7 +6,7 @@ import {
   fetchTeamChatRoom,
   fetchTeamChatMessages,
   type TeamChatMessageDto,
-} from "@/lib/chat";
+} from "@/services/chat";
 import { v4 as uuidv4 } from "uuid";
 
 export type TeamChatMessage = {

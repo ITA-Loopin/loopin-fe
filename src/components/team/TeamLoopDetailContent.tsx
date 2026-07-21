@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import type { LoopDetail, LoopChecklist } from "@/types/loop";
-import type { TeamLoopApiItem } from "@/lib/team";
+import type { TeamLoopApiItem } from "@/services/team";
 import { LoopProgress } from "@/components/home/LoopProgress";
 import { Checklist } from "@/components/loop/Checklist";
 import Image from "next/image";

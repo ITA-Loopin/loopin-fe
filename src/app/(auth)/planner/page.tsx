@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { fetchChatRooms, type ChatRoom } from "@/lib/chat";
+import { fetchChatRooms, type ChatRoom } from "@/services/chat";
 import LoopIcon from "@/../public/ai-planner/loop-icon.svg";
 import { Button } from "@/components/common/Button";
 
@@ -55,7 +55,7 @@ export default function PlannerListPage() {
 
   const handleStartNewLoop = async () => {
     try {
-      const { createChatRoom } = await import("@/lib/chat");
+      const { createChatRoom } = await import("@/services/chat");
       const response = await createChatRoom({
         title: "새 루프",
         loopSelect: true,

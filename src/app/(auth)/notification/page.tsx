@@ -12,7 +12,7 @@ import {
   markNotificationsAsRead,
   rejectTeamInvitation,
   type Notification,
-} from "@/lib/notification";
+} from "@/services/notification";
 
 dayjs.locale("ko");
 
@@ -41,7 +41,7 @@ export default function NotificationPage() {
   });
 
   const notifications =
-    data?.pages.flatMap((page) => page.data) ?? [];
+    data?.pages.flatMap((page) => page.items) ?? [];
 
   const groupedNotifications = useMemo(() => {
     const groups: NotificationGroup[] = [];

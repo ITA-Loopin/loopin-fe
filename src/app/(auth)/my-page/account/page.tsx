@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { Button } from "@/components/common/Button";
-import { fetchMemberProfile, type MemberProfile } from "@/lib/member";
+import { fetchMemberProfile, type MemberProfile } from "@/services/member";
 import { useAccount } from "@/hooks/useAccount";
 
 export default function AccountPage() {
@@ -17,8 +17,8 @@ export default function AccountPage() {
     const loadProfile = async () => {
       try {
         const response = await fetchMemberProfile();
-        if (response.data) {
-          setProfile(response.data);
+        if (response) {
+          setProfile(response);
         }
       } catch (error) {
         console.error("프로필 로드 실패:", error);

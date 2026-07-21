@@ -16,7 +16,7 @@ import {
   fetchTeamLoops,
   fetchTeamCalendarLoops,
   type TeamLoopApiItem,
-} from "@/lib/team";
+} from "@/services/team";
 import type { TeamItem } from "@/components/team/types";
 
 type TeamDetail = TeamItem & {

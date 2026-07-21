@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Dialog } from "@/components/common/Dialog";
 import { Button } from "@/components/common/Button";
 import { LoopProgress } from "@/components/home/LoopProgress";
-import { fetchTeamLoopMemberChecklist } from "@/lib/team";
+import { fetchTeamLoopMemberChecklist } from "@/services/team";
 
 type MemberProgressDialogProps = {
   isOpen: boolean;

@@ -16,8 +16,8 @@ import {
   leaveTeam,
   inviteTeamMember,
   type TeamMember,
-} from "@/lib/team";
-import { fetchMemberProfile } from "@/lib/member";
+} from "@/services/team";
+import { fetchMemberProfile } from "@/services/member";
 import { TEAM_CATEGORY_LABELS } from "@/components/team/types";
 import { useAppSelector } from "@/store/hooks";
 import dayjs from "dayjs";
@@ -62,10 +62,10 @@ export default function TeamManagePage() {
         let memberId: number | null = null;
         try {
           const memberResponse = await fetchMemberProfile();
-          if (memberResponse.data?.id) {
-            memberId = typeof memberResponse.data.id === 'string' 
-              ? Number(memberResponse.data.id) 
-              : memberResponse.data.id;
+          if (memberResponse?.id) {
+            memberId = typeof memberResponse.id === 'string' 
+              ? Number(memberResponse.id) 
+              : memberResponse.id;
           }
         } catch (err) {
           console.error("멤버 프로필 조회 실패:", err);
