@@ -106,9 +106,9 @@ export default function PlannerChatPage() {
       if (!chatRoomId) return;
 
       try {
-        const response = await fetchChatRooms("AI");
-        if (response.data?.chatRooms) {
-          const chatRoom = response.data.chatRooms.find(
+        const rooms = await fetchChatRooms("AI");
+        if (rooms?.chatRooms) {
+          const chatRoom = rooms.chatRooms.find(
             (room) => room.id === chatRoomId,
           );
           if (chatRoom) {

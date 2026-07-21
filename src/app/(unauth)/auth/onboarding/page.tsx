@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Dialog } from "@/components/common/Dialog";
-import { api, httpJson } from "@/lib/http";
+import { api } from "@/lib/http";
 import { useAppDispatch } from "@/store/hooks";
 import { setCredentials } from "@/store/slices/authSlice";
 import type { User } from "@/types/auth";
@@ -128,15 +128,13 @@ export default function OnboardingPage() {
     setModalError(null);
 
     try {
-      const data = await httpJson<{
-        user?: User;
-      }>("/rest-api/v1/auth/signup-login", {
+      // signup-login은 ApiResponse<Void> (data 없음) → 성공 여부만 확인, 실패 시 throw
+      await api("/rest-api/v1/auth/signup-login", {
         method: "POST",
         json: {
           nickname,
           ticket: signupData.ticket,
         },
-        skipCredentials: false, // 회원가입 시에는 쿠키가 아직 없음
       });
 
       const fallbackUser: User = {
@@ -144,20 +142,13 @@ export default function OnboardingPage() {
         nickname,
       };
 
-      const baseUser: User = data.user
-        ? {
-            ...data.user,
-            id: data.user.id || "user",
-          }
-        : fallbackUser;
-
-      let finalUser = baseUser;
+      let finalUser: User = fallbackUser;
 
       try {
-        const memberResponse = await fetchMemberProfile();
-        finalUser = buildUserFromMemberProfile(memberResponse, {
-          ...baseUser,
-          id: baseUser.id || "user",
+        const memberProfile = await fetchMemberProfile();
+        finalUser = buildUserFromMemberProfile(memberProfile, {
+          ...fallbackUser,
+          id: fallbackUser.id || "user",
         });
       } catch (memberError) {
         console.error("회원 정보 동기화 실패", memberError);

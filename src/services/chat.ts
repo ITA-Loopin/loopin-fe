@@ -1,4 +1,4 @@
-import { httpJson } from "@/lib/http";
+import { api } from "@/lib/http";
 
 type Primitive = string | number | boolean | null | undefined;
 
@@ -101,7 +101,7 @@ export async function fetchChatMessages({
   size,
   currentUser,
 }: FetchChatMessagesParams) {
-  return httpJson<ChatRoomMessagesResponse>(
+  return api<ChatMessageDto[]>(
     `/rest-api/v1/chat-message/ai/${chatRoomId}`,
     {
       searchParams: buildQueryParams({
@@ -135,7 +135,7 @@ export async function sendChatMessage({
   content,
   messageType,
 }: SendChatMessageParams) {
-  return httpJson<{ success: boolean; message?: string }>(
+  return api<void>(
     `/rest-api/v1/chat-message/${chatRoomId}/chat`,
     {
       method: "POST",
@@ -177,7 +177,7 @@ export type ChatRoomListResponse = {
 export async function fetchChatRooms(
   chatRoomType: "ALL" | "TEAM" | "AI" = "AI",
 ) {
-  return httpJson<ChatRoomListResponse>("/rest-api/v1/chat-room", {
+  return api<{ chatRooms?: ChatRoom[] }>("/rest-api/v1/chat-room", {
     searchParams: {
       chatRoomType,
     },
@@ -199,7 +199,7 @@ export type CreateChatRoomParams = {
 };
 
 export async function createChatRoom(params: CreateChatRoomParams) {
-  return httpJson<CreateChatRoomResponse>("/rest-api/v1/chat-room/create", {
+  return api<ChatRoom>("/rest-api/v1/chat-room/create", {
     method: "POST",
     json: params,
   });
@@ -233,7 +233,7 @@ export type TeamChatRoomResponse = {
  * 팀 채팅방 조회 API
  */
 export async function fetchTeamChatRoom(teamId: number) {
-  return httpJson<TeamChatRoomResponse>(
+  return api<TeamChatRoomResponse["data"]>(
     `/rest-api/v1/chat-room/team/${teamId}`,
   );
 }
@@ -306,7 +306,7 @@ export async function fetchTeamChatMessages({
     params.size = size;
   }
 
-  return httpJson<TeamChatMessagesResponse>(
+  return api<TeamChatMessageDto[]>(
     `/rest-api/v1/chat-message/team/${chatRoomId}`,
     {
       searchParams: params,

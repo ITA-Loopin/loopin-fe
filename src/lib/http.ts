@@ -5,7 +5,8 @@ import type { PageMeta } from "@/interfaces/response/PageMeta";
  * 프로젝트의 단일 HTTP 코어.
  *
  * - URL 빌드 / 자격증명(쿠키) / 401 리프레시-재시도 / 응답 파싱을 이곳 한 곳에서만 구현한다.
- * - envelope가 필요하면 `http<T>()`, unwrap+throw가 필요하면 `httpJson<T>()`를 쓴다.
+ * - 표준 클라이언트: api<T>()(data 언랩) / apiPage<T>()(페이지). 실패 시 ApiError throw.
+ *   원본 Response가 필요한 특수 케이스만 저수준 request()를 쓴다.
  * - 현재는 서버/클라이언트 공용(isomorphic)이다. 서버 전용(cookies() 부착) 분리는
  *   화면을 RSC/BFF로 이전하는 단계에서 별도로 진행한다.
  */
@@ -108,24 +109,6 @@ export const ensureRefreshed = (): Promise<boolean> => {
   return refreshPromise;
 };
 
-// ---------------------------------------------------------------------------
-// 응답 파싱: JSON이면 ApiResponse<T>로, 아니면 상태 기반으로 합성
-// ---------------------------------------------------------------------------
-export const parseApiResponse = async <T>(
-  res: Response,
-): Promise<ApiResponse<T>> => {
-  const contentType = res.headers.get("content-type") ?? "";
-  if (contentType.includes("application/json")) {
-    return (await res.json()) as ApiResponse<T>;
-  }
-  const text = await res.text();
-  return {
-    success: res.ok,
-    code: res.ok ? "SUCCESS" : `HTTP_${res.status}`,
-    message: text || res.statusText,
-  } as ApiResponse<T>;
-};
-
 /**
  * 저수준 요청 실행기. URL 빌드 → 자격증명 → (401 시) 리프레시 후 1회 재시도까지 수행하고
  * 원본 Response를 반환한다. 비즈니스 에러 처리/로그아웃 정책은 호출측(어댑터)이 결정한다.
@@ -182,94 +165,6 @@ export const request = async (
 
   return res;
 };
-
-export interface HttpJsonOptions extends RequestInit {
-  /** 쿼리 파라미터. null/undefined 값은 제외된다. */
-  searchParams?: Record<string, SearchParamValue>;
-  /** JSON 바디를 간편 전달. 자동 직렬화 + 헤더 설정. */
-  json?: unknown;
-  /** false면 응답을 그대로(Response) 반환한다. */
-  parseJson?: boolean;
-  /** true면 쿠키를 포함하지 않는다(기본값 false = 쿠키 포함). */
-  skipCredentials?: boolean;
-}
-
-/**
- * @deprecated 신규 코드는 `api()`/`apiPage()`를 사용하세요. (구 `apiFetch`의 역할)
- * unwrap + throw 방식이나 본문 전체(envelope)를 반환한다는 점이 `api()`와 다르다.
- * 마이그레이션 중 호출부 호환을 위해 유지한다. 401 리프레시 실패 시 onUnauthorized 실행.
- */
-export async function httpJson<T = unknown>(
-  input: string,
-  options: HttpJsonOptions = {},
-): Promise<T> {
-  const {
-    headers,
-    searchParams,
-    json,
-    parseJson = true,
-    skipCredentials = false,
-    ...restOptions
-  } = options;
-
-  const requestInput = appendSearchParams(buildUrl(input), searchParams);
-
-  const headerMap = new Headers(headers ?? {});
-  if (!headerMap.has("Accept")) headerMap.set("Accept", "application/json");
-
-  const fetchOptions: RequestInit = {
-    ...restOptions,
-    headers: headerMap,
-    credentials: skipCredentials ? "omit" : "include",
-  };
-
-  if (json !== undefined) {
-    if (!headerMap.has("Content-Type")) {
-      headerMap.set("Content-Type", "application/json");
-    }
-    fetchOptions.body = JSON.stringify(json);
-  }
-
-  let response = await fetch(requestInput, fetchOptions);
-
-  if (response.status === 401 && !skipCredentials) {
-    const refreshSuccess = await ensureRefreshed();
-    if (refreshSuccess) {
-      response = await fetch(requestInput, fetchOptions);
-    } else {
-      // 세션 만료 → 전역 로그아웃 정책 실행
-      onUnauthorized?.();
-      let errorBody: Record<string, unknown> = {};
-      try {
-        errorBody = await response.json();
-      } catch {
-        // JSON 파싱 실패 시 무시
-      }
-      throw new Error(
-        typeof errorBody.message === "string"
-          ? errorBody.message
-          : "인증이 만료되었습니다. 다시 로그인해주세요.",
-      );
-    }
-  }
-
-  if (!response.ok) {
-    let errorBody: Record<string, unknown> = {};
-    try {
-      errorBody = await response.json();
-    } catch {
-      // JSON 파싱 실패 시 무시
-    }
-    throw new Error(
-      typeof errorBody.message === "string" ? errorBody.message : "API 요청 실패",
-    );
-  }
-
-  if (!parseJson) return response as unknown as T;
-  if (response.status === 204) return {} as T;
-
-  return response.json() as Promise<T>;
-}
 
 // ===========================================================================
 // 수렴형 표준 클라이언트: api() / apiPage() / ApiError

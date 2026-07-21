@@ -2,7 +2,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   buildUrl,
   appendSearchParams,
-  httpJson,
   api,
   apiPage,
   ApiError,
@@ -100,26 +99,6 @@ describe("api() — 요청 구성", () => {
 
     const [, init] = fetchMock.mock.calls[0];
     expect(init.credentials).toBe("omit");
-  });
-});
-
-describe("httpJson() — unwrap + throw", () => {
-  it("본문을 그대로 반환한다", async () => {
-    fetchMock.mockResolvedValueOnce(
-      jsonResponse({ success: true, data: { id: 7 } }),
-    );
-    const data = await httpJson<{ success: boolean; data: { id: number } }>("/rest-api/v1/x");
-    expect(data.data.id).toBe(7);
-  });
-
-  it("!ok면 message로 throw한다", async () => {
-    fetchMock.mockResolvedValueOnce(jsonResponse({ message: "터짐" }, { status: 500 }));
-    await expect(httpJson("/rest-api/v1/x")).rejects.toThrow("터짐");
-  });
-
-  it("204는 빈 객체를 반환한다", async () => {
-    fetchMock.mockResolvedValueOnce(new Response(null, { status: 204 }));
-    await expect(httpJson("/rest-api/v1/x")).resolves.toEqual({});
   });
 });
 
@@ -271,24 +250,12 @@ describe("전역 unauthorized 핸들러", () => {
     expect(handler).toHaveBeenCalledTimes(1);
   });
 
-  it("httpJson: refresh 실패 시 핸들러 실행 + throw", async () => {
-    const handler = vi.fn();
-    setUnauthorizedHandler(handler);
-
-    fetchMock
-      .mockResolvedValueOnce(jsonResponse({ message: "no" }, { status: 401 }))
-      .mockResolvedValueOnce(jsonResponse({ success: false }, { status: 401 }));
-
-    await expect(httpJson("/rest-api/v1/x")).rejects.toThrow();
-    expect(handler).toHaveBeenCalledTimes(1);
-  });
-
   it("skipCredentials면 401이어도 refresh/핸들러를 건너뛴다", async () => {
     const handler = vi.fn();
     setUnauthorizedHandler(handler);
     fetchMock.mockResolvedValueOnce(jsonResponse({ message: "no" }, { status: 401 }));
 
-    await expect(httpJson("/x", { skipCredentials: true })).rejects.toThrow();
+    await expect(api("/x", { skipCredentials: true })).rejects.toThrow();
     expect(fetchMock).toHaveBeenCalledTimes(1); // 재시도 없음
     expect(handler).not.toHaveBeenCalled();
   });

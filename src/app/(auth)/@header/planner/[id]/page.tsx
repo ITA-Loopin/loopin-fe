@@ -20,8 +20,8 @@ export default function PlannerChatHeader() {
       if (!chatRoomId) return;
 
       try {
-        const response = await fetchChatRooms("AI");
-        const chatRoom = response.data?.chatRooms?.find(
+        const rooms = await fetchChatRooms("AI");
+        const chatRoom = rooms?.chatRooms?.find(
           (room) => room.id === chatRoomId,
         );
 

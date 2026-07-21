@@ -66,9 +66,9 @@ export function useTeamChat(teamId: number | null) {
     const loadChatRoom = async () => {
       try {
         setIsLoading(true);
-        const response = await fetchTeamChatRoom(teamId);
-        if (!cancelled && response.success && response.data?.id) {
-          setChatRoomId(response.data.id);
+        const room = await fetchTeamChatRoom(teamId);
+        if (!cancelled && room?.id) {
+          setChatRoomId(room.id);
         }
       } catch (error) {
         if (!cancelled) {
@@ -96,13 +96,13 @@ export function useTeamChat(teamId: number | null) {
 
     const loadHistory = async () => {
       try {
-        const response = await fetchTeamChatMessages({
+        const history = await fetchTeamChatMessages({
           chatRoomId,
           size: 50,
         });
 
-        if (!cancelled && response.data) {
-          const historyMessages: TeamChatMessage[] = response.data
+        if (!cancelled && history) {
+          const historyMessages: TeamChatMessage[] = history
             .map((msg: TeamChatMessageDto) => ({
               id: msg.id,
               memberId: msg.memberId,

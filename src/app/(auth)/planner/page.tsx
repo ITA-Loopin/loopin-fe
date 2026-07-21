@@ -38,9 +38,9 @@ export default function PlannerListPage() {
   useEffect(() => {
     const fetchChatLoops = async () => {
       try {
-        const response = await fetchChatRooms();
-        if (response.data?.chatRooms) {
-          const loops = response.data.chatRooms.map(mapChatRoomToChatLoop);
+        const rooms = await fetchChatRooms();
+        if (rooms?.chatRooms) {
+          const loops = rooms.chatRooms.map(mapChatRoomToChatLoop);
           setChatLoops(loops);
         }
       } catch (error) {
@@ -61,8 +61,8 @@ export default function PlannerListPage() {
         loopSelect: true,
       });
 
-      if (response.data?.id) {
-        router.push(`/planner/${response.data.id}?new=true`);
+      if (response?.id) {
+        router.push(`/planner/${response.id}?new=true`);
       } else {
         console.error("채팅방 생성 실패: 응답에 ID가 없습니다", response);
       }
