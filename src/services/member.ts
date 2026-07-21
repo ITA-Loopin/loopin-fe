@@ -1,4 +1,4 @@
-import { apiFetch } from "@/lib/api";
+import { api } from "@/lib/http";
 import type { User } from "@/types/auth";
 
 export type MemberProfile = {
@@ -50,7 +50,7 @@ export function buildUserFromMemberProfile(
   };
 }
 
-export async function fetchMemberProfile() {
-  return apiFetch<MemberResponse>("/rest-api/v1/member");
+export async function fetchMemberProfile(): Promise<MemberProfile | undefined> {
+  return api<MemberProfile>("/rest-api/v1/member");
 }
 

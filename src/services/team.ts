@@ -1,4 +1,4 @@
-import { apiFetch } from "./api";
+import { api, apiPage } from "@/lib/http";
 import type { TeamItem, TeamCategoryString } from "@/components/team/types";
 
 // API 응답 타입
@@ -53,20 +53,13 @@ export async function fetchMyTeamList(params?: {
     searchParams.size = params.size;
   }
 
-  const response = await apiFetch<TeamListApiResponse>(
-    "/rest-api/v1/teams/my",
-    {
-      searchParams: Object.keys(searchParams).length > 0 ? searchParams : undefined,
-    }
-  );
-
-  if (!response.success || !response.data) {
-    throw new Error(response.message || "팀 리스트 조회에 실패했습니다");
-  }
+  const { items, page } = await apiPage<TeamApiItem>("/rest-api/v1/teams/my", {
+    searchParams: Object.keys(searchParams).length > 0 ? searchParams : undefined,
+  });
 
   return {
-    teams: response.data.map(mapTeamApiItemToTeamItem),
-    pageInfo: response.page,
+    teams: items.map(mapTeamApiItemToTeamItem),
+    pageInfo: page,
   };
 }
 
@@ -86,29 +79,8 @@ export type CreateTeamRequest = {
 export async function createTeam(
   data: CreateTeamRequest
 ): Promise<{ success: boolean; message?: string }> {
-
-  try {
-    const response = await apiFetch<{
-      success: boolean;
-      code: string;
-      message: string;
-      data?: unknown;
-    }>("/rest-api/v1/teams/", {
-      method: "POST",
-      json: data,
-    });
-
-    if (!response.success) {
-      throw new Error(response.message || "팀 생성에 실패했습니다");
-    }
-
-    return {
-      success: true,
-      message: response.message,
-    };
-  } catch (error) {
-    throw error;
-  }
+  await api<void>("/rest-api/v1/teams/", { method: "POST", json: data });
+  return { success: true };
 }
 
 /**
@@ -154,26 +126,22 @@ export async function fetchRecruitingTeams(params?: {
     searchParams.size = params.size;
   }
 
-  const response = await apiFetch<RecruitingTeamListApiResponse>(
+  const { items, page } = await apiPage<RecruitingTeamApiItem>(
     "/rest-api/v1/teams/recruiting",
     {
       searchParams: Object.keys(searchParams).length > 0 ? searchParams : undefined,
     },
   );
 
-  if (!response.success || !response.data) {
-    throw new Error(response.message || "모집 중인 팀 리스트 조회에 실패했습니다");
-  }
-
   // category, name, goal만 사용하여 TeamItem으로 변환
   return {
-    teams: response.data.map((item) => ({
+    teams: items.map((item) => ({
       id: item.teamId,
       category: item.category,
       title: item.name,
       description: item.goal,
     })),
-    pageInfo: response.page,
+    pageInfo: page,
   };
 }
 
@@ -198,27 +166,16 @@ export type TeamDetailApiResponse = {
 /**
  * 팀 상세 정보 조회 API
  */
-export async function fetchTeamDetail(teamId: number): Promise<TeamItem & { 
-  myTotalProgress: number; 
+export async function fetchTeamDetail(teamId: number): Promise<TeamItem & {
+  myTotalProgress: number;
   teamTotalProgress: number;
   leaderId: number;
   createdAt: string;
   visibility: "PUBLIC" | "PRIVATE";
   totalLoopCount: number;
 }> {
-  const response = await apiFetch<{
-    success: boolean;
-    code: string;
-    message: string;
-    data: TeamDetailApiResponse;
-    timestamp: string;
-  }>(`/rest-api/v1/teams/${teamId}`);
+  const data = await api<TeamDetailApiResponse>(`/rest-api/v1/teams/${teamId}`);
 
-  if (!response.success || !response.data) {
-    throw new Error(response.message || "팀 정보 조회에 실패했습니다");
-  }
-
-  const data = response.data;
   return {
     id: data.teamId,
     category: data.category,
@@ -274,27 +231,21 @@ export async function fetchTeamLoops(
   status?: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED"
 ): Promise<TeamLoopApiItem[]> {
   const searchParams = new URLSearchParams();
-  
+
   if (date) {
     searchParams.append("date", date);
   }
-  
+
   if (status) {
     searchParams.append("status", status);
   }
-  
+
   const queryString = searchParams.toString();
   const url = queryString
     ? `/rest-api/v1/teams/${teamId}/loops?${queryString}`
     : `/rest-api/v1/teams/${teamId}/loops`;
-  
-  const response = await apiFetch<TeamLoopListApiResponse>(url);
 
-  if (!response.success || !response.data) {
-    throw new Error(response.message || "팀 루프 리스트 조회에 실패했습니다");
-  }
-
-  return response.data;
+  return api<TeamLoopApiItem[]>(url);
 }
 
 /**
@@ -330,7 +281,7 @@ export async function fetchTeamCalendarLoops(
   year: number,
   month: number
 ): Promise<Map<string, boolean>> {
-  const response = await apiFetch<TeamCalendarLoopsApiResponse>(
+  const data = await api<TeamCalendarLoopsApiResponse["data"]>(
     `/rest-api/v1/teams/${teamId}/loops/calendar`,
     {
       searchParams: {
@@ -341,12 +292,8 @@ export async function fetchTeamCalendarLoops(
     }
   );
 
-  if (!response.success || !response.data) {
-    throw new Error(response.message || "팀 루프 캘린더 조회에 실패했습니다");
-  }
-
   const loopMap = new Map<string, boolean>();
-  response.data.days.forEach((day) => {
+  data.days.forEach((day) => {
     loopMap.set(day.date, day.hasTeamLoop);
   });
 
@@ -383,15 +330,7 @@ export type TeamMemberListApiResponse = {
  * 팀원 목록 조회 API
  */
 export async function fetchTeamMembers(teamId: number): Promise<TeamMember[]> {
-  const response = await apiFetch<TeamMemberListApiResponse>(
-    `/rest-api/v1/teams/${teamId}/members`
-  );
-
-  if (!response.success || !response.data) {
-    throw new Error(response.message || "팀원 목록 조회에 실패했습니다");
-  }
-
-  return response.data;
+  return api<TeamMember[]>(`/rest-api/v1/teams/${teamId}/members`);
 }
 
 /**
@@ -417,15 +356,9 @@ export type TeamLoopChecklistApiResponse = {
 export async function fetchTeamLoopChecklists(
   loopId: number
 ): Promise<TeamLoopChecklistApiItem[]> {
-  const response = await apiFetch<TeamLoopChecklistApiResponse>(
+  return api<TeamLoopChecklistApiItem[]>(
     `/rest-api/v1/teams/loops/${loopId}/checklists`
   );
-
-  if (!response.success || !response.data) {
-    throw new Error(response.message || "팀 루프 체크리스트 조회에 실패했습니다");
-  }
-
-  return response.data;
 }
 
 /**
@@ -442,28 +375,8 @@ export type UpdateTeamOrderRequest = {
 export async function updateTeamOrder(
   data: UpdateTeamOrderRequest
 ): Promise<{ success: boolean; message?: string }> {
-  try {
-    const response = await apiFetch<{
-      success: boolean;
-      code: string;
-      message: string;
-      data?: unknown;
-    }>("/rest-api/v1/teams/order", {
-      method: "PUT",
-      json: data,
-    });
-
-    if (!response.success) {
-      throw new Error(response.message || "팀 순서 변경에 실패했습니다");
-    }
-
-    return {
-      success: true,
-      message: response.message,
-    };
-  } catch (error) {
-    throw error;
-  }
+  await api<void>("/rest-api/v1/teams/order", { method: "PUT", json: data });
+  return { success: true };
 }
 
 /**
@@ -505,15 +418,9 @@ export async function fetchTeamLoopMyDetail(
   teamId: number,
   loopId: number
 ): Promise<TeamLoopMyDetailApiResponse["data"]> {
-  const response = await apiFetch<TeamLoopMyDetailApiResponse>(
+  return api<TeamLoopMyDetailApiResponse["data"]>(
     `/rest-api/v1/teams/${teamId}/loops/${loopId}/my`
   );
-
-  if (!response.success || !response.data) {
-    throw new Error(response.message || "팀 루프 상세 정보 조회에 실패했습니다");
-  }
-
-  return response.data;
 }
 
 /**
@@ -560,15 +467,9 @@ export async function fetchTeamLoopAllDetail(
   teamId: number,
   loopId: number
 ): Promise<TeamLoopAllDetailApiResponse["data"]> {
-  const response = await apiFetch<TeamLoopAllDetailApiResponse>(
+  return api<TeamLoopAllDetailApiResponse["data"]>(
     `/rest-api/v1/teams/${teamId}/loops/${loopId}/all`
   );
-
-  if (!response.success || !response.data) {
-    throw new Error(response.message || "팀 루프 상세 정보 조회에 실패했습니다");
-  }
-
-  return response.data;
 }
 
 /**
@@ -578,31 +479,10 @@ export async function createTeamLoopChecklist(
   loopId: number,
   content: string
 ): Promise<{ id: number; content: string; completed: boolean }> {
-  try {
-    const response = await apiFetch<{
-      success: boolean;
-      code: string;
-      message: string;
-      data: {
-        id: number;
-        content: string;
-        completed: boolean;
-      };
-    }>(`/rest-api/v1/teams/loops/${loopId}/checklists`, {
-      method: "POST",
-      json: { content },
-    });
-
-    if (!response.success || !response.data) {
-      throw new Error(response.message || "체크리스트 추가에 실패했습니다");
-    }
-
-    return response.data;
-  } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "체크리스트 추가에 실패했습니다";
-    throw new Error(errorMessage);
-  }
+  return api<{ id: number; content: string; completed: boolean }>(
+    `/rest-api/v1/teams/loops/${loopId}/checklists`,
+    { method: "POST", json: { content } }
+  );
 }
 
 /**
@@ -611,30 +491,10 @@ export async function createTeamLoopChecklist(
 export async function toggleTeamLoopChecklist(
   checklistId: number
 ): Promise<{ id: number; content: string; isChecked: boolean }> {
-  try {
-    const response = await apiFetch<{
-      success: boolean;
-      code: string;
-      message: string;
-      data: {
-        id: number;
-        content: string;
-        isChecked: boolean;
-      };
-    }>(`/rest-api/v1/teams/loops/checklists/${checklistId}/check`, {
-      method: "PATCH",
-    });
-
-    if (!response.success || !response.data) {
-      throw new Error(response.message || "체크리스트 상태 변경에 실패했습니다");
-    }
-
-    return response.data;
-  } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "체크리스트 상태 변경에 실패했습니다";
-    throw new Error(errorMessage);
-  }
+  return api<{ id: number; content: string; isChecked: boolean }>(
+    `/rest-api/v1/teams/loops/checklists/${checklistId}/check`,
+    { method: "PATCH" }
+  );
 }
 
 /**
@@ -643,26 +503,10 @@ export async function toggleTeamLoopChecklist(
 export async function deleteTeamLoopChecklist(
   checklistId: number
 ): Promise<{ success: boolean; message?: string }> {
-  try {
-    const response = await apiFetch<{
-      success: boolean;
-      code: string;
-      message: string;
-      data?: unknown;
-    }>(`/rest-api/v1/teams/loops/checklists/${checklistId}`, {
-      method: "DELETE",
-    });
-
-    if (!response.success) {
-      throw new Error(response.message || "체크리스트 삭제에 실패했습니다");
-    }
-
-    return { success: true };
-  } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "체크리스트 삭제에 실패했습니다";
-    throw new Error(errorMessage);
-  }
+  await api<void>(`/rest-api/v1/teams/loops/checklists/${checklistId}`, {
+    method: "DELETE",
+  });
+  return { success: true };
 }
 
 /**
@@ -701,14 +545,8 @@ export async function fetchTeamLoopMemberChecklist(
   const url = memberId
     ? `/rest-api/v1/teams/loops/${loopId}/checklists?memberId=${memberId}`
     : `/rest-api/v1/teams/loops/${loopId}/checklists`;
-  
-  const response = await apiFetch<TeamLoopMemberChecklistApiResponse>(url);
 
-  if (!response.success || !response.data) {
-    throw new Error(response.message || "팀원 체크리스트 조회에 실패했습니다");
-  }
-
-  return response.data;
+  return api<TeamLoopMemberChecklistApiResponse["data"]>(url);
 }
 
 
@@ -719,27 +557,10 @@ export async function completeTeamLoop(
   teamId: number,
   loopId: number
 ): Promise<{ success: boolean; message?: string }> {
-  try {
-    const response = await apiFetch<{
-      success: boolean;
-      code: string;
-      message: string;
-      data?: unknown;
-    }>(`/rest-api/v1/teams/${teamId}/loops/${loopId}/complete`, {
-      method: "POST",
-    });
-
-    if (!response.success) {
-      throw new Error(response.message || "팀 루프 완료에 실패했습니다");
-    }
-
-    return {
-      success: true,
-      message: response.message,
-    };
-  } catch (error) {
-    throw error;
-  }
+  await api<void>(`/rest-api/v1/teams/${teamId}/loops/${loopId}/complete`, {
+    method: "POST",
+  });
+  return { success: true };
 }
 
 /**
@@ -748,27 +569,8 @@ export async function completeTeamLoop(
 export async function deleteTeam(
   teamId: number
 ): Promise<{ success: boolean; message?: string }> {
-  try {
-    const response = await apiFetch<{
-      success: boolean;
-      code: string;
-      message: string;
-      data?: unknown;
-    }>(`/rest-api/v1/teams/${teamId}`, {
-      method: "DELETE",
-    });
-
-    if (!response.success) {
-      throw new Error(response.message || "팀 삭제에 실패했습니다");
-    }
-
-    return {
-      success: true,
-      message: response.message,
-    };
-  } catch (error) {
-    throw error;
-  }
+  await api<void>(`/rest-api/v1/teams/${teamId}`, { method: "DELETE" });
+  return { success: true };
 }
 
 /**
@@ -778,27 +580,10 @@ export async function removeTeamMember(
   teamId: number,
   memberId: number
 ): Promise<{ success: boolean; message?: string }> {
-  try {
-    const response = await apiFetch<{
-      success: boolean;
-      code: string;
-      message: string;
-      data?: unknown;
-    }>(`/rest-api/v1/teams/${teamId}/members/${memberId}`, {
-      method: "DELETE",
-    });
-
-    if (!response.success) {
-      throw new Error(response.message || "팀원 삭제에 실패했습니다");
-    }
-
-    return {
-      success: true,
-      message: response.message,
-    };
-  } catch (error) {
-    throw error;
-  }
+  await api<void>(`/rest-api/v1/teams/${teamId}/members/${memberId}`, {
+    method: "DELETE",
+  });
+  return { success: true };
 }
 
 /**
@@ -807,27 +592,8 @@ export async function removeTeamMember(
 export async function leaveTeam(
   teamId: number
 ): Promise<{ success: boolean; message?: string }> {
-  try {
-    const response = await apiFetch<{
-      success: boolean;
-      code: string;
-      message: string;
-      data?: unknown;
-    }>(`/rest-api/v1/teams/${teamId}/leave`, {
-      method: "POST",
-    });
-
-    if (!response.success) {
-      throw new Error(response.message || "팀 나가기에 실패했습니다");
-    }
-
-    return {
-      success: true,
-      message: response.message,
-    };
-  } catch (error) {
-    throw error;
-  }
+  await api<void>(`/rest-api/v1/teams/${teamId}/leave`, { method: "POST" });
+  return { success: true };
 }
 
 /**
@@ -837,28 +603,11 @@ export async function inviteTeamMember(
   teamId: number,
   memberId: number
 ): Promise<{ success: boolean; message?: string }> {
-  try {
-    const response = await apiFetch<{
-      success: boolean;
-      code: string;
-      message: string;
-      data?: unknown;
-    }>(`/rest-api/v1/teams/${teamId}/invitations`, {
-      method: "POST",
-      json: { inviteeIds: [memberId] },
-    });
-
-    if (!response.success) {
-      throw new Error(response.message || "팀원 초대에 실패했습니다");
-    }
-
-    return {
-      success: true,
-      message: response.message,
-    };
-  } catch (error) {
-    throw error;
-  }
+  await api<void>(`/rest-api/v1/teams/${teamId}/invitations`, {
+    method: "POST",
+    json: { inviteeIds: [memberId] },
+  });
+  return { success: true };
 }
 
 /**
@@ -912,15 +661,7 @@ export type TeamMemberActivitiesApiResponse = {
 export async function fetchTeamMemberActivities(
   teamId: number
 ): Promise<TeamMemberActivitiesApiResponse["data"]> {
-  const response = await apiFetch<TeamMemberActivitiesApiResponse>(
+  return api<TeamMemberActivitiesApiResponse["data"]>(
     `/rest-api/v1/teams/${teamId}/member-activities`
   );
-
-  if (!response.success || !response.data) {
-    throw new Error(response.message || "팀 활동 조회에 실패했습니다");
-  }
-
-  return response.data;
 }
-
-

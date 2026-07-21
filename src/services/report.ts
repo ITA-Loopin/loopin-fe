@@ -1,4 +1,4 @@
-import { apiFetch } from "./api";
+import { api } from "@/lib/http";
 import type { LoopReportData, ReportStatus, ReportLoopItem } from "@/types/report";
 
 // API 응답 타입
@@ -126,13 +126,12 @@ export async function fetchLoopReport(): Promise<{
   status: ReportStatus;
   data: LoopReportData;
 }> {
-  const response = await apiFetch<ReportApiResponse>("/rest-api/v1/report");
+  const data = await api<ReportApiResponse["data"]>("/rest-api/v1/report");
 
-  if (!response?.data) {
+  if (!data) {
     throw new Error("루프 리포트 데이터가 없습니다");
   }
 
-  const { data } = response;
   const weekReport = data.weekReportDto;
   const monthReport = data.monthReportDto;
 
