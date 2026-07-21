@@ -1,0 +1,36 @@
+name: Auto Assign
+
+on:
+  pull_request:
+    types:
+      - opened
+
+permissions:
+  issues: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  assign-author:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Assign PR to author
+        uses: actions/github-script@v9
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const author = context.payload.pull_request.user.login;
+            const pullNumber = context.payload.pull_request.number;
+
+            try {
+              await github.rest.issues.addAssignees({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pullNumber,
+                assignees: [author],
+              });
+            } catch (error) {
+              core.warning(`PR 작성자를 할당하지 못했습니다: ${error.message}`);
+            }
