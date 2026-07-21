@@ -30,6 +30,17 @@ export default defineConfig({
           setupFiles: ['.storybook/vitest.setup.ts'],
         },
       },
+      // Node 환경 유닛 테스트 (라이브러리/유틸/서비스 코어). `npm test`로 실행.
+      {
+        resolve: {
+          alias: { '@': path.join(dirname, 'src') },
+        },
+        test: {
+          name: 'unit',
+          environment: 'node',
+          include: ['src/**/*.test.ts'],
+        },
+      },
     ],
   },
 });

@@ -10,7 +10,9 @@
     "start": "next start",
     "lint": "eslint",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "test": "vitest run --project unit",
+    "test:watch": "vitest --project unit"
   },
   "dependencies": {
     "@radix-ui/react-context-menu": "^2.2.16",
