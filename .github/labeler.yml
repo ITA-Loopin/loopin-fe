@@ -1,0 +1,52 @@
+version: 1
+labels:
+  - label: "FEAT"
+    title: "(?i)^\\[?feat\\]?([(:\\s]|$)"
+  - label: "FEAT"
+    branch: "(?i)^feat/"
+
+  - label: "FIX"
+    title: "(?i)^\\[?fix\\]?([(:\\s]|$)"
+  - label: "FIX"
+    branch: "(?i)^fix/"
+
+  - label: "HOTFIX"
+    title: "(?i)^\\[?hotfix\\]?([(:\\s]|$)"
+  - label: "HOTFIX"
+    branch: "(?i)^hotfix/"
+
+  - label: "DESIGN"
+    title: "(?i)^\\[?design\\]?([(:\\s]|$)"
+  - label: "DESIGN"
+    branch: "(?i)^design/"
+
+  - label: "STYLE"
+    title: "(?i)^\\[?style\\]?([(:\\s]|$)"
+  - label: "STYLE"
+    branch: "(?i)^style/"
+
+  - label: "REFACTOR"
+    title: "(?i)^\\[?refactor\\]?([(:\\s]|$)"
+  - label: "REFACTOR"
+    branch: "(?i)^refactor/"
+
+  - label: "DOCS"
+    title: "(?i)^\\[?docs?\\]?([(:\\s]|$)"
+  - label: "DOCS"
+    branch: "(?i)^docs?/"
+
+  - label: "CHORE"
+    title: "(?i)^\\[?chore\\]?([(:\\s]|$)"
+  - label: "CHORE"
+    branch: "(?i)^chore/"
+
+  - label: "CI"
+    title: "(?i)^\\[?ci\\]?([(:\\s]|$)"
+  - label: "CI"
+    branch: "(?i)^ci/"
+
+  - label: "🍒 채원"
+    authors: ["chaewon41"]
+
+  - label: "🍀 정한"
+    authors: ["topeanut"]
