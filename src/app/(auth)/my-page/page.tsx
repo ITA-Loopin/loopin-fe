@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { fetchMemberProfile, type MemberProfile } from "@/lib/member";
 
 export default function MyPage() {
@@ -39,33 +38,13 @@ export default function MyPage() {
     <div className="flex h-full flex-col">
       <div className="flex-1 overflow-y-auto px-4 py-6">
         {/* 사용자 정보 섹션 */}
-        { }
-        <div className="mb-8 p-4 flex flex-row items-center bg-gray-100 rounded-lg gap-2">
-          <div className="relative">
-            <div className="h-8 w-8 overflow-hidden rounded-full bg-white">
-              {profile?.profileImageUrl ? (
-                <Image
-                  src={profile.profileImageUrl}
-                  alt="프로필"
-                  width={96}
-                  height={96}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center bg-gray-300">
-                  <span className="text-2xl text-gray-400">👤</span>
-                </div>
-              )}
-            </div>
-          </div>
+        <div className="mb-8 p-4 flex flex-col bg-gray-100 rounded-lg gap-1">
           <p className="text-lg font-semibold text-gray-800">
             {profile?.nickname || "닉네임"}
           </p>
-          <div className="">
-            <p className="text-sm text-gray-600">
-              {profile?.email || "이메일"}
-            </p>
-          </div>
+          <p className="text-sm text-gray-600">
+            {profile?.email || "이메일"}
+          </p>
         </div>
 
         {/* 메뉴 리스트 */}

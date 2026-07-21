@@ -52,8 +52,9 @@ export function CalendarView({
   // 현재 뷰의 시작/끝(필터 범위) + 표시할 dates를 한 번에 계산
   const { dates, rangeStartKey, rangeEndKey } = useMemo(() => {
     if (viewType === "week") {
-      const startOfWeek = today.startOf("week");
-      const endOfWeek = startOfWeek.add(6, "day");
+      // 오늘을 마지막날로 최근 7일
+      const endOfWeek = today;
+      const startOfWeek = endOfWeek.subtract(6, "day");
       const ds = generateCalendarDays(startOfWeek, endOfWeek);
 
       return {
