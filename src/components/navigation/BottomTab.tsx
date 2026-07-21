@@ -53,8 +53,7 @@ export function BottomTab() {
         bottom: `calc(24px)`,
       }}
     >
-      {/* eslint-disable-next-line no-restricted-syntax */}
-      <div className="pointer-events-auto relative z-10 flex h-[70px] w-full max-w-[420px] items-center justify-between rounded-[38px] border border-white/40 bg-white/90 px-6 shadow-[0px_16px_32px_rgba(32,32,32,0.16)] backdrop-blur-md">
+      <div className="pointer-events-auto relative z-10 flex h-[70px] w-full max-w-[420px] items-center justify-between rounded-[38px] border border-white/40 bg-white/90 px-6 shadow-bottom-tab backdrop-blur-md">
         {TAB_ITEMS.map((item) => {
           const isActive =
             pathname === item.href ||
