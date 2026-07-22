@@ -232,11 +232,7 @@ export default function PlannerChatPage() {
         (showUpdateMessage || recommendations.length === 0) ? (
           <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center">
             <div className="pointer-events-auto w-full max-w-[500px] bg-white p-4 pb-6">
-              <p
-                className={`mb-2 text-xs text-gray-500 ${
-                  watchedPrompt?.trim() ? "invisible" : ""
-                }`}
-              >
+              <p className="mb-2 text-xs text-gray-500">
                 {`ex. ${EXAMPLE_PROMPTS.join(" / ")}`}
               </p>
               <form
