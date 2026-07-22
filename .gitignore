@@ -50,4 +50,4 @@ storybook-static
 # IDE/도구 설정
 .cursorignore
 skills-lock.json
-.claude/
+.claude/settings.local.json

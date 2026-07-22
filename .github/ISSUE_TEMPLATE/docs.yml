@@ -1,0 +1,30 @@
+name: 문서 작업
+description: README, 가이드, 주석 등 문서를 추가하거나 수정합니다.
+title: "[DOCS] "
+labels:
+  - DOCS
+body:
+  - type: textarea
+    id: content
+    attributes:
+      label: 작업 내용
+      description: 어떤 문서를 추가하거나 수정하는지 작성해주세요.
+    validations:
+      required: true
+
+  - type: textarea
+    id: purpose
+    attributes:
+      label: 작업 목적
+      description: 이 문서 작업이 왜 필요한지 작성해주세요.
+    validations:
+      required: true
+
+  - type: textarea
+    id: target
+    attributes:
+      label: 대상 문서
+      description: 작업 대상 파일이나 문서 링크를 나열해주세요.
+      placeholder: |
+        - README.md
+        - AGENTS.md

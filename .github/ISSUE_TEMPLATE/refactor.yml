@@ -1,0 +1,39 @@
+name: 리팩토링
+description: 기능 변경 없이 코드 구조나 품질을 개선합니다.
+title: "[REFACTOR] "
+labels:
+  - REFACTOR
+body:
+  - type: textarea
+    id: purpose
+    attributes:
+      label: 리팩토링 목적
+      description: 무엇을 왜 개선하려는지 한 줄로 작성해주세요.
+      placeholder: 예) data fetching 계층을 전송(http)과 API 클라이언트(api)로 분리합니다.
+    validations:
+      required: true
+
+  - type: textarea
+    id: target
+    attributes:
+      label: 대상 범위
+      description: 리팩토링할 컴포넌트, 모듈, 레이어 등을 나열해주세요.
+      placeholder: |
+        - src/services/*
+        - src/lib/http/*
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: 현재 문제점
+      description: 현재 코드의 어떤 점이 문제인지, 개선이 필요한 이유를 작성해주세요.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 기대 효과
+      description: 리팩토링 후 개선되는 점을 작성해주세요. (가독성, 성능, 유지보수성 등)
