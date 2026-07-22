@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { api } from "@/lib/http";
+import { api } from "@/lib/api";
 import type { Checklist } from "@/components/loop/add-loop/constants";
 import type { Dayjs } from "dayjs";
 

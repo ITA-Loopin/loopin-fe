@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { LoopItem } from "@/components/home";
-import { api } from "@/lib/http";
+import { api } from "@/lib/api";
 
 interface UseDailyLoopsParams {
   date: string;

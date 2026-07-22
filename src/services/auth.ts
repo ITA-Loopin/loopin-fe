@@ -1,4 +1,4 @@
-import { api } from "@/lib/http";
+import { api } from "@/lib/api";
 import { OAuthLoginRequest } from "@/interfaces/OAuthLoginRequest";
 
 // 회원가입 후 로그인

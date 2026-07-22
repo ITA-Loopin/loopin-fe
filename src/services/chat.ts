@@ -1,4 +1,4 @@
-import { api } from "@/lib/http";
+import { api } from "@/lib/api";
 
 type Primitive = string | number | boolean | null | undefined;
 

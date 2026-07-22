@@ -1,4 +1,4 @@
-import { api, apiPage, type Page } from "@/lib/http";
+import { api, apiPage, type Page } from "@/lib/api";
 import type { PageResponse } from "@/interfaces/response/ApiResponse";
 
 export type NotificationTargetObject = "Follow" | "TeamInvite" | string;

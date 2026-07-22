@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Dialog } from "@/components/common/Dialog";
-import { api } from "@/lib/http";
+import { api } from "@/lib/api";
 import { useAppDispatch } from "@/store/hooks";
 import { setCredentials } from "@/store/slices/authSlice";
 import type { User } from "@/types/auth";

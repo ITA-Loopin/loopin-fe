@@ -1,12 +1,11 @@
 import { ApiResponse } from "@/interfaces/response/ApiResponse";
-import type { PageMeta } from "@/interfaces/response/PageMeta";
 
 /**
- * 프로젝트의 단일 HTTP 코어.
+ * 전송(transport) 계층: 순수 HTTP 코어.
  *
- * - URL 빌드 / 자격증명(쿠키) / 401 리프레시-재시도 / 응답 파싱을 이곳 한 곳에서만 구현한다.
- * - 표준 클라이언트: api<T>()(data 언랩) / apiPage<T>()(페이지). 실패 시 ApiError throw.
- *   원본 Response가 필요한 특수 케이스만 저수준 request()를 쓴다.
+ * - URL 빌드 / 자격증명(쿠키) / 401 리프레시-재시도까지만 담당하고, 원본 Response를 반환한다.
+ * - 백엔드 응답 봉투({ success, data, code, ... }) 규약은 알지 못한다.
+ *   봉투 해석/언랩은 상위 클라이언트 계층(api.ts)이 담당한다.
  * - 현재는 서버/클라이언트 공용(isomorphic)이다. 서버 전용(cookies() 부착) 분리는
  *   화면을 RSC/BFF로 이전하는 단계에서 별도로 진행한다.
  */
@@ -31,11 +30,6 @@ export interface HttpOptions {
   credentials?: RequestCredentials;
   signal?: AbortSignal;
 }
-
-// isSuccess: 현재 프로젝트는 success(boolean) 기반
-export const isSuccess = <T>(
-  response: ApiResponse<T> | null | undefined,
-): boolean => response?.success === true;
 
 // ---------------------------------------------------------------------------
 // 인증 만료(리프레시 실패) 시 실행할 전역 핸들러.
@@ -165,130 +159,3 @@ export const request = async (
 
   return res;
 };
-
-// ===========================================================================
-// 수렴형 표준 클라이언트: api() / apiPage() / ApiError
-// - 백엔드는 에러를 HTTP 상태코드(4xx/5xx) + { success:false, code, message, data?, traceId? }로 내려준다.
-//   따라서 !res.ok 를 신뢰 가능한 실패 신호로 사용한다.
-// - 성공 시 envelope.data(T)를 자동 언랩. React Query / RSC / Server Action의
-//   throw 기반 에러 처리와 맞물린다.
-// ===========================================================================
-
-/** API 실패를 나타내는 타입드 에러. 비즈니스 code로 분기하거나 traceId로 추적할 수 있다. */
-export class ApiError extends Error {
-  readonly status: number;
-  readonly code: string;
-  /** 검증 실패 시 필드맵 등 서버가 실어 보낸 errorData */
-  readonly data?: unknown;
-  readonly traceId?: string;
-
-  constructor(args: {
-    status: number;
-    code: string;
-    message: string;
-    data?: unknown;
-    traceId?: string;
-  }) {
-    super(args.message);
-    this.name = "ApiError";
-    this.status = args.status;
-    this.code = args.code;
-    this.data = args.data;
-    this.traceId = args.traceId;
-  }
-}
-
-export interface ApiOptions {
-  method?: HttpMethod;
-  searchParams?: Record<string, SearchParamValue>;
-  json?: unknown;
-  body?: BodyInit;
-  headers?: HeadersInit;
-  signal?: AbortSignal;
-  /** true면 쿠키 미포함(인증 불필요 공개 엔드포인트). 기본값 false. */
-  skipCredentials?: boolean;
-}
-
-export interface Page<T> {
-  items: T[];
-  page: PageMeta;
-}
-
-const toHttpOptions = (options: ApiOptions): HttpOptions => ({
-  method: options.method,
-  searchParams: options.searchParams,
-  json: options.json,
-  body: options.body,
-  headers: options.headers,
-  signal: options.signal,
-  credentials: options.skipCredentials ? "omit" : "include",
-});
-
-const toApiError = async (res: Response): Promise<ApiError> => {
-  let body: Partial<ApiResponse<unknown>> = {};
-  try {
-    body = (await res.json()) as Partial<ApiResponse<unknown>>;
-  } catch {
-    // 비 JSON 에러 바디는 무시하고 상태 기반으로 합성
-  }
-  return new ApiError({
-    status: res.status,
-    code: body.code ?? `HTTP_${res.status}`,
-    message: body.message || res.statusText || "요청에 실패했습니다.",
-    data: body.data,
-    traceId: body.traceId,
-  });
-};
-
-/**
- * 프로젝트 표준 클라이언트. 성공 시 `data`(T)를 언랩해 반환하고,
- * 실패(HTTP 4xx/5xx 또는 success:false) 시 {@link ApiError}를 throw한다.
- * 데이터가 없는 성공 응답(void)에서는 undefined를 반환한다.
- */
-export async function api<T>(path: string, options: ApiOptions = {}): Promise<T> {
-  const res = await request(path, toHttpOptions(options));
-  if (!res.ok) throw await toApiError(res);
-  if (res.status === 204) return undefined as T;
-
-  const text = await res.text();
-  if (!text) return undefined as T;
-
-  const body = JSON.parse(text) as ApiResponse<T>;
-  if (body.success === false) {
-    throw new ApiError({
-      status: res.status,
-      code: body.code,
-      message: body.message,
-      data: body.data,
-      traceId: body.traceId,
-    });
-  }
-  return body.data as T;
-}
-
-/**
- * 페이지네이션 응답 전용. 성공 시 `{ items, page }`를 반환한다.
- * 백엔드는 페이지 응답에서 `data`=리스트, `page`={size,hasNext,nextCursor}로 내려준다.
- */
-export async function apiPage<T>(
-  path: string,
-  options: ApiOptions = {},
-): Promise<Page<T>> {
-  const res = await request(path, toHttpOptions(options));
-  if (!res.ok) throw await toApiError(res);
-
-  const body = (await res.json()) as ApiResponse<T[]>;
-  if (body.success === false) {
-    throw new ApiError({
-      status: res.status,
-      code: body.code,
-      message: body.message,
-      data: body.data,
-      traceId: body.traceId,
-    });
-  }
-  return {
-    items: body.data ?? [],
-    page: body.page ?? { size: 0, hasNext: false, nextCursor: null },
-  };
-}

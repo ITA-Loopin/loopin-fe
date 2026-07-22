@@ -1,4 +1,4 @@
-import { api } from "@/lib/http";
+import { api } from "@/lib/api";
 import { ChatRoomType } from "@/interfaces/enums/ChatRoomType";
 import { ChatRoom } from "@/services/chat";
 

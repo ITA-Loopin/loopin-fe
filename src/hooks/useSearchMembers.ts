@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { apiPage } from "@/lib/http";
+import { apiPage } from "@/lib/api";
 
 type MemberSearchItem = {
   id: number;

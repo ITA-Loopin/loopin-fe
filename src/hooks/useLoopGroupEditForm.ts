@@ -1,6 +1,6 @@
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
-import { api } from "@/lib/http";
+import { api } from "@/lib/api";
 import type { LoopDetail } from "@/types/loop";
 import { useEditChecklist } from "@/hooks/useEditChecklist";
 import {

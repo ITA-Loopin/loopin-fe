@@ -1,4 +1,4 @@
-import { api } from "@/lib/http";
+import { api } from "@/lib/api";
 
 // 회원탈퇴
 export const deleteMemberApi = async (): Promise<boolean> => {

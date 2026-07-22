@@ -2,12 +2,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   buildUrl,
   appendSearchParams,
-  api,
-  apiPage,
-  ApiError,
   setUnauthorizedHandler,
   API_BASE_URL,
 } from "@/lib/http";
+import { api, apiPage, ApiError } from "@/lib/api";
 
 // ---------------------------------------------------------------------------
 // 테스트 헬퍼

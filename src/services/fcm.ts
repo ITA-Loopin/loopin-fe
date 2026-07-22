@@ -1,4 +1,4 @@
-import { api } from "@/lib/http";
+import { api } from "@/lib/api";
 import { getFCMToken } from "@/lib/firebase";
 
 // FCM 토큰 저장 요청 타입

@@ -1,4 +1,4 @@
-import { api, apiPage } from "@/lib/http";
+import { api, apiPage } from "@/lib/api";
 import type { TeamItem, TeamCategoryString } from "@/components/team/types";
 
 // API 응답 타입

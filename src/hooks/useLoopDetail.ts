@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import type { LoopDetail } from "@/types/loop";
-import { api } from "@/lib/http";
+import { api } from "@/lib/api";
 
 interface UseLoopDetailResult {
   detail: LoopDetail | null;

@@ -1,4 +1,4 @@
-import { api } from "@/lib/http";
+import { api } from "@/lib/api";
 import type { User } from "@/types/auth";
 
 export type MemberProfile = {

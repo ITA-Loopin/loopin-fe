@@ -1,7 +1,7 @@
 import { useCallback, useState, useRef, useEffect } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import type { LoopDetail, LoopChecklist } from "@/types/loop";
-import { api } from "@/lib/http";
+import { api } from "@/lib/api";
 
 interface UseChecklistResult {
   detail: LoopDetail | null;

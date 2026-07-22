@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { LoopDetail } from "@/types/loop";
-import { api } from "@/lib/http";
+import { api } from "@/lib/api";
 
 interface UseLoopActionsResult {
   isDeleting: boolean;

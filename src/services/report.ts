@@ -1,4 +1,4 @@
-import { api } from "@/lib/http";
+import { api } from "@/lib/api";
 import type { LoopReportData, ReportStatus, ReportLoopItem } from "@/types/report";
 
 // API 응답 타입
