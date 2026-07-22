@@ -37,8 +37,10 @@ export default defineConfig({
         },
         test: {
           name: 'unit',
+          // 기본은 node(services 테스트). 훅 테스트(.test.tsx)는 파일 상단
+          // `// @vitest-environment jsdom` docblock으로 개별 override 한다.
           environment: 'node',
-          include: ['src/**/*.test.ts'],
+          include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
           setupFiles: ['src/test/setup.ts'],
         },
       },
