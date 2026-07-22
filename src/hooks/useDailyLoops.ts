@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { LoopItem } from "@/components/home";
-import { apiFetch } from "@/lib/api";
+import { api } from "@/lib/api";
 
 interface UseDailyLoopsParams {
   date: string;
@@ -29,15 +29,14 @@ export function useDailyLoops({ date, refreshKey }: UseDailyLoopsParams): UseDai
           setIsLoading(true);
         }
         const apiUrl = `/rest-api/v1/loops/date/${date}`;
-        const result = await apiFetch<{
-          success?: boolean;
-          data?: { loops?: LoopItem[]; totalProgress?: number };
-        }>(apiUrl);
+        const data = await api<{ loops?: LoopItem[]; totalProgress?: number }>(
+          apiUrl
+        );
 
         if (!cancelled) {
-          if (result?.success !== false && result?.data) {
-            setLoopList(result.data.loops ?? []);
-            const apiProgress = result.data.totalProgress;
+          if (data) {
+            setLoopList(data.loops ?? []);
+            const apiProgress = data.totalProgress;
             setTotalProgress(
               typeof apiProgress === "number"
                 ? Math.round(Math.min(Math.max(apiProgress, 0), 100))

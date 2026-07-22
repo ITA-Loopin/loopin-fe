@@ -1,5 +1,5 @@
-import { apiFetch } from "@/lib/api";
-import type { ApiPageResponse } from "@/interfaces/response/ApiResponse";
+import { api, apiPage, type Page } from "@/lib/api";
+import type { PageResponse } from "@/interfaces/response/ApiResponse";
 
 export type NotificationTargetObject = "Follow" | "TeamInvite" | string;
 
@@ -16,7 +16,7 @@ export type Notification = {
   createdAt: string;
 };
 
-export type NotificationListResponse = ApiPageResponse<Notification>;
+export type NotificationListResponse = PageResponse<Notification>;
 
 export type NotificationReadRequest = {
   notificationIdList: number[];
@@ -42,7 +42,7 @@ export type NotificationReadResponse = {
 export async function fetchNotifications(params?: {
   cursor?: string | null;
   size?: number;
-}) {
+}): Promise<Page<Notification>> {
   const searchParams: Record<string, string> = {};
 
   if (params?.cursor) {
@@ -52,7 +52,7 @@ export async function fetchNotifications(params?: {
     searchParams.size = String(params.size);
   }
 
-  return apiFetch<NotificationListResponse>(
+  return apiPage<Notification>(
     "/rest-api/v1/notification",
     {
       method: "GET",
@@ -64,8 +64,8 @@ export async function fetchNotifications(params?: {
 /**
  * 알림 읽음 처리
  */
-export async function markNotificationsAsRead(notificationIds: number[]) {
-  return apiFetch<NotificationReadResponse>(
+export async function markNotificationsAsRead(notificationIds: number[]): Promise<void> {
+  await api<void>(
     "/rest-api/v1/notification",
     {
       method: "PATCH",
@@ -79,8 +79,8 @@ export async function markNotificationsAsRead(notificationIds: number[]) {
 /**
  * 팀 초대 거절
  */
-export async function rejectTeamInvitation(invitationId: number) {
-  return apiFetch<NotificationReadResponse>(
+export async function rejectTeamInvitation(invitationId: number): Promise<void> {
+  await api<void>(
     `/rest-api/v1/teams/invitations/${invitationId}/reject`,
     {
       method: "POST",
@@ -91,8 +91,8 @@ export async function rejectTeamInvitation(invitationId: number) {
 /**
  * 팀 초대 수락
  */
-export async function acceptTeamInvitation(invitationId: number) {
-  return apiFetch<NotificationReadResponse>(
+export async function acceptTeamInvitation(invitationId: number): Promise<void> {
+  await api<void>(
     `/rest-api/v1/teams/invitations/${invitationId}/accept`,
     {
       method: "POST",

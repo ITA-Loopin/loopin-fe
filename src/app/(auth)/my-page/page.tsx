@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { fetchMemberProfile, type MemberProfile } from "@/lib/member";
+import { fetchMemberProfile, type MemberProfile } from "@/services/member";
 
 export default function MyPage() {
   const router = useRouter();
@@ -13,8 +13,8 @@ export default function MyPage() {
     const loadProfile = async () => {
       try {
         const response = await fetchMemberProfile();
-        if (response.data) {
-          setProfile(response.data);
+        if (response) {
+          setProfile(response);
         }
       } catch (error) {
         console.error("프로필 로드 실패:", error);

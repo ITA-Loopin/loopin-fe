@@ -9,7 +9,7 @@ import {
   fetchChatMessages,
   sendChatMessage,
   type ChatMessageDto,
-} from "@/lib/chat";
+} from "@/services/chat";
 
 type AppendStatus = "none" | "assistant" | "recommendations";
 
@@ -407,13 +407,13 @@ export function usePlannerChat(
 
     const loadHistory = async () => {
       try {
-        const response = await fetchChatMessages({
+        const messages = await fetchChatMessages({
           chatRoomId: plannerChatRoomId,
           size: 20,
         });
 
         if (!isCancelled) {
-          appendNewMessages(response.data);
+          appendNewMessages(messages);
         }
       } catch (error) {
         if (!isCancelled) {

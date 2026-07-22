@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import type { TeamLoopApiItem } from "@/lib/team";
+import type { TeamLoopApiItem } from "@/services/team";
 import { formatImportance, formatLoopType, getProgressStatus, getStatusColor } from "@/lib/teamUtils";
 
 type TeamLoopListProps = {

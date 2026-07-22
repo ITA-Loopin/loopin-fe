@@ -1,6 +1,6 @@
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
-import { apiFetch } from "@/lib/api";
+import { api } from "@/lib/api";
 import type { LoopDetail } from "@/types/loop";
 import { useEditChecklist } from "@/hooks/useEditChecklist";
 
@@ -157,21 +157,21 @@ export function useLoopEditForm({
 
       try {
         setIsSubmitting(true);
-        await apiFetch(`/rest-api/v1/loops/${loop.id}`, {
+        await api(`/rest-api/v1/loops/${loop.id}`, {
           method: "PUT",
           json: payload,
         });
 
         await Promise.all([
           ...removedIds.map((id) =>
-            apiFetch(`/rest-api/v1/checklists/${id}`, {
+            api(`/rest-api/v1/checklists/${id}`, {
               method: "DELETE",
             }).catch(() => {
               // 체크리스트 삭제 실패
             })
           ),
           ...updatedExistingItems.map((item) =>
-            apiFetch(`/rest-api/v1/checklists/${item.originId}`, {
+            api(`/rest-api/v1/checklists/${item.originId}`, {
               method: "PUT",
               json: {
                 content: item.text,
@@ -185,7 +185,7 @@ export function useLoopEditForm({
 
         for (const item of newItems) {
           try {
-            await apiFetch(`/rest-api/v1/loops/${loop.id}/checklists`, {
+            await api(`/rest-api/v1/loops/${loop.id}/checklists`, {
               method: "POST",
               json: {
                 content: item.text,

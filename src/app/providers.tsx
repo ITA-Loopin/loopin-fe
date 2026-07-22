@@ -4,11 +4,22 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider } from "react-redux";
 import { store } from "@/store/store";
+import { logout } from "@/store/slices/authSlice";
+import { setUnauthorizedHandler } from "@/lib/http";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
 
 // 전역 dayjs locale 설정
 dayjs.locale("ko");
+
+// 인증 만료(리프레시 실패) 시 전역 로그아웃 정책 등록.
+// http.ts는 이 핸들러만 호출하고, 실제 Redux/리다이렉트는 여기서 처리한다.
+setUnauthorizedHandler(() => {
+  store.dispatch(logout());
+  if (typeof window !== "undefined") {
+    window.location.href = "/";
+  }
+});
 import { PushNotificationToast } from "@/components/notification/PushNotificationToast";
 import { useFirebaseServiceWorker } from "@/hooks/useFirebaseServiceWorker";
 

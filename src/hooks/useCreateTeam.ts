@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createTeam } from "@/lib/team";
+import { createTeam } from "@/services/team";
 import type { TeamCategoryString } from "@/components/team/types";
 
 type TeamMember = {

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTeamChat } from "@/hooks/useTeamChat";
 import { TeamMessageBubble } from "./components/TeamMessageBubble";
-import { fetchTeamDetail } from "@/lib/team";
+import { fetchTeamDetail } from "@/services/team";
 import Header from "@/components/common/Header";
 import { ChatInput } from "@/components/common/ChatInput";
 

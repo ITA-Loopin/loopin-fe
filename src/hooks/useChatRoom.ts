@@ -1,9 +1,7 @@
 import {useCallback, useState} from "react";
 import {ChatRoomType} from "@/interfaces/enums/ChatRoomType";
-import {ApiResponse} from "@/interfaces/response/ApiResponse";
-import {ChatRoomListResponse} from "@/lib/chat";
-import {getChatRoomsApi} from "@/lib/chatRoom";
-import {authFetch, isSuccess} from "@/utils/fetch";
+import {ChatRoom} from "@/services/chat";
+import {getChatRoomsApi} from "@/services/chatRoom";
 import {toast} from "react-toastify";
 
 export const useChatRoom = () => {
@@ -13,11 +11,11 @@ export const useChatRoom = () => {
     const getChatRooms = useCallback(
         async (
             chatRoomType: ChatRoomType = ChatRoomType.AI
-        ): Promise<ApiResponse<ChatRoomListResponse> | null> => {
+        ): Promise<{ chatRooms?: ChatRoom[] } | null> => {
             setLoading(true);
             try {
-                const response = await getChatRoomsApi(authFetch, chatRoomType);
-                if (!response || !isSuccess(response)) {
+                const response = await getChatRoomsApi(chatRoomType);
+                if (!response) {
                     toast.error("채팅방 목록 조회에 실패했습니다.");
                     return null;
                 }

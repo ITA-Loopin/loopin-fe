@@ -1,6 +1,5 @@
-import { AuthFetch, isSuccess } from "@/utils/fetch";
-import { ApiResponse } from "@/interfaces/response/ApiResponse";
-import { getFCMToken } from "./firebase";
+import { api } from "@/lib/api";
+import { getFCMToken } from "@/lib/firebase";
 
 // FCM 토큰 저장 요청 타입
 interface SaveFCMTokenRequest {
@@ -24,9 +23,7 @@ function getNativeFCMToken(): string | null {
 }
 
 // FCM 토큰 저장 API
-export const saveFCMTokenApi = async (
-  authFetch: AuthFetch
-): Promise<boolean> => {
+export const saveFCMTokenApi = async (): Promise<boolean> => {
   try {
     let token: string | null = null;
 
@@ -48,14 +45,11 @@ export const saveFCMTokenApi = async (
       return false;
     }
 
-    const response = await authFetch<ApiResponse<unknown>>(
+    await api<void>(
       "/rest-api/v1/fcm",
-      { fcmToken: token },
-      "POST"
+      { method: "POST", json: { fcmToken: token } }
     );
-
-    console.log("FCM 토큰 저장 응답:", response);
-    return isSuccess(response);
+    return true;
   } catch (err) {
     console.error("FCM 토큰 저장 중 오류 발생:", err);
     return false;
@@ -63,7 +57,7 @@ export const saveFCMTokenApi = async (
 };
 
 // 네이티브 FCM 토큰 리프레시 리스너 등록
-export function setupNativeFCMTokenListener(authFetch: AuthFetch) {
+export function setupNativeFCMTokenListener() {
   if (typeof window === "undefined" || !isNativeWebView()) {
     return;
   }
@@ -71,7 +65,7 @@ export function setupNativeFCMTokenListener(authFetch: AuthFetch) {
   (window as any).__onNativeFCMToken = async (token: string) => {
     try {
       (window as any).__NATIVE_FCM_TOKEN__ = token;
-      await saveFCMTokenApi(authFetch);
+      await saveFCMTokenApi();
     } catch (err) {
       console.error("네이티브 FCM 토큰 재등록 실패:", err);
     }
@@ -79,18 +73,13 @@ export function setupNativeFCMTokenListener(authFetch: AuthFetch) {
 }
 
 // FCM 토큰 삭제 API
-export const deleteFCMTokenApi = async (
-  authFetch: AuthFetch
-): Promise<boolean> => {
+export const deleteFCMTokenApi = async (): Promise<boolean> => {
   try {
-    const response = await authFetch<ApiResponse<unknown>>(
+    await api<void>(
       "/rest-api/v1/fcm",
-      undefined,
-      "DELETE"
+      { method: "DELETE" }
     );
-
-    console.log("FCM 토큰 삭제 응답:", response);
-    return isSuccess(response);
+    return true;
   } catch (err) {
     console.error("FCM 토큰 삭제 중 오류 발생:", err);
     return false;

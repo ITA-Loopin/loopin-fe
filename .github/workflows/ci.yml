@@ -1,0 +1,52 @@
+name: CI
+
+# PR 검증 게이트: 타입체크 · 유닛 테스트 · 빌드(패키징 검증)까지 통과해야 머지.
+# lint는 기존 코드 부채(35건)로 아직 전체 통과 못 해, 변경파일 한정(ratchet) 게이트로 별도 도입 예정 — 지금은 제외.
+# 통합 브랜치(main·develop)로 향하는 PR에서만 돈다. 머지 후 push 검증은 Vercel 배포와
+# 무관한 중복 실행이라 두지 않으며, 배포(CD)는 Vercel이 main push를 감지해 자동 수행한다.
+on:
+  pull_request:
+    branches: [main, develop]
+
+# 같은 브랜치에서 새 커밋이 오면 진행 중인 실행을 취소해 러너를 아낀다.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: typecheck · test · build
+    runs-on: ubuntu-latest
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # packageManager 필드(pnpm@10.18.0)에서 버전을 읽어 설치한다.
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Build를 먼저 실행해 next-env.d.ts와 .next/types(typedRoutes 등)를 생성해야
+      # 이어지는 tsc가 정적 에셋(*.svg)·라우트 타입을 해석할 수 있다(fresh 체크아웃엔 없음).
+      # next build 자체도 타입/컴파일/번들 무결성을 검증하는 패키징 게이트다.
+      - name: Build
+        run: pnpm build
+
+      - name: Typecheck
+        run: pnpm exec tsc --noEmit
+
+      - name: Unit tests
+        run: pnpm test

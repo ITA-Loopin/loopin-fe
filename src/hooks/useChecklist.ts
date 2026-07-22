@@ -1,7 +1,7 @@
 import { useCallback, useState, useRef, useEffect } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import type { LoopDetail, LoopChecklist } from "@/types/loop";
-import { apiFetch } from "@/lib/api";
+import { api } from "@/lib/api";
 
 interface UseChecklistResult {
   detail: LoopDetail | null;
@@ -68,7 +68,7 @@ export function useChecklist(
         if (realId) {
           // 매핑이 있으면 바로 API 호출
           try {
-            await apiFetch(`/rest-api/v1/checklists/${realId}`, {
+            await api(`/rest-api/v1/checklists/${realId}`, {
               method: "PUT",
               json: {
                 completed: updatedItem.completed,
@@ -106,7 +106,7 @@ export function useChecklist(
           if (realIdFromMap) {
             // 매핑을 찾았으므로 API 호출
             try {
-              await apiFetch(`/rest-api/v1/checklists/${realIdFromMap}`, {
+              await api(`/rest-api/v1/checklists/${realIdFromMap}`, {
                 method: "PUT",
                 json: {
                   completed: updatedItem.completed,
@@ -157,7 +157,7 @@ export function useChecklist(
 
       try {
         // 체크리스트 완료 상태만 변경
-        await apiFetch(`/rest-api/v1/checklists/${updatedItem.id}`, {
+        await api(`/rest-api/v1/checklists/${updatedItem.id}`, {
           method: "PUT",
           json: {
             completed: updatedItem.completed,
@@ -218,25 +218,18 @@ export function useChecklist(
     setNewChecklistContent("");
 
     try {
-      const response = await apiFetch<{
-        success?: boolean;
-        data?: { id: number; content: string; completed: boolean };
-      }>(`/rest-api/v1/loops/${detail.id}/checklists`, {
-        method: "POST",
-        json: { content },
-      });
+      const added = await api<{ id: number; content: string; completed: boolean }>(
+        `/rest-api/v1/loops/${detail.id}/checklists`,
+        {
+          method: "POST",
+          json: { content },
+        }
+      );
 
-      // (1) add 성공 응답이 어떤 모양인지
-      console.log("ADD keys:", Object.keys(response ?? {}));
-      console.log("ADD data:", (response as any)?.data);
-      console.log("ADD stringify:", JSON.stringify(response));
-
-      if (response?.data) {
+      if (added) {
         // tempId -> 실제 ID 매핑 저장
-        tempIdToRealIdMapRef.current.set(tempId, response.data.id);
-        // (2) map에 실제로 저장되는지
-        console.log("MAP SET:", tempId, "->", response.data.id);
-        
+        tempIdToRealIdMapRef.current.set(tempId, added.id);
+
         // 서버에서 받은 실제 데이터로 tempId를 교체
         // 단, 사용자가 이미 토글한 경우 현재 상태의 completed 값을 보존
         setDetail((prev) => {
@@ -245,10 +238,10 @@ export function useChecklist(
           const nextChecklists = prev.checklists.map((item) =>
             item.id === tempId
               ? {
-                  id: response.data!.id,
-                  content: response.data!.content,
+                  id: added.id,
+                  content: added.content,
                   // 현재 상태의 completed 값을 보존 (사용자가 이미 토글했을 수 있음)
-                  completed: currentItem?.completed ?? response.data!.completed ?? false,
+                  completed: currentItem?.completed ?? added.completed ?? false,
                 }
               : item
           );
@@ -301,7 +294,7 @@ export function useChecklist(
       });
 
       try {
-        await apiFetch(`/rest-api/v1/checklists/${itemId}`, {
+        await api(`/rest-api/v1/checklists/${itemId}`, {
           method: "DELETE",
         });
       } catch (error) {
@@ -338,7 +331,7 @@ export function useChecklist(
     });
 
     try {
-      await apiFetch(`/rest-api/v1/loops/${detail.id}/completion`, {
+      await api(`/rest-api/v1/loops/${detail.id}/completion`, {
         method: "PATCH",
         json: {
           completed: true,

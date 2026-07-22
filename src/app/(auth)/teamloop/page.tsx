@@ -6,7 +6,7 @@ import { TeamListSection } from "@/components/team/TeamListSection";
 import { TeamCard } from "@/components/team/TeamCard";
 import { TeamLoopFAB } from "@/components/team/TeamLoopFAB";
 import type { TeamItem } from "@/components/team/types";
-import { fetchMyTeamList, fetchRecruitingTeams } from "@/lib/team";
+import { fetchMyTeamList, fetchRecruitingTeams } from "@/services/team";
 
 export default function TeamLoopPage() {
   const router = useRouter();

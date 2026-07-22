@@ -4,9 +4,8 @@ import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
-import { authFetch } from "@/utils/fetch";
-import { deleteMemberApi } from "@/lib/account";
-import { deleteFCMTokenApi } from "@/lib/fcm";
+import { deleteMemberApi } from "@/services/account";
+import { deleteFCMTokenApi } from "@/services/fcm";
 
 export const useAccount = () => {
     const router = useRouter();
@@ -18,13 +17,13 @@ export const useAccount = () => {
         try {
             // 회원탈퇴 전에 FCM 토큰 삭제
             try {
-                await deleteFCMTokenApi(authFetch);
+                await deleteFCMTokenApi();
             } catch (error) {
                 console.error("FCM 토큰 삭제 실패:", error);
                 // FCM 토큰 삭제 실패는 회원탈퇴 플로우를 중단하지 않음
             }
             
-            const ok = await deleteMemberApi(authFetch);
+            const ok = await deleteMemberApi();
             if (!ok) {
                 toast.error("회원탈퇴에 실패했습니다.");
                 return false;

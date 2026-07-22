@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { fetchChatRooms, type ChatRoom } from "@/lib/chat";
+import { fetchChatRooms, type ChatRoom } from "@/services/chat";
 import LoopIcon from "@/../public/ai-planner/loop-icon.svg";
 import { Button } from "@/components/common/Button";
 
@@ -38,9 +38,9 @@ export default function PlannerListPage() {
   useEffect(() => {
     const fetchChatLoops = async () => {
       try {
-        const response = await fetchChatRooms();
-        if (response.data?.chatRooms) {
-          const loops = response.data.chatRooms.map(mapChatRoomToChatLoop);
+        const rooms = await fetchChatRooms();
+        if (rooms?.chatRooms) {
+          const loops = rooms.chatRooms.map(mapChatRoomToChatLoop);
           setChatLoops(loops);
         }
       } catch (error) {
@@ -55,14 +55,14 @@ export default function PlannerListPage() {
 
   const handleStartNewLoop = async () => {
     try {
-      const { createChatRoom } = await import("@/lib/chat");
+      const { createChatRoom } = await import("@/services/chat");
       const response = await createChatRoom({
         title: "새 루프",
         loopSelect: true,
       });
 
-      if (response.data?.id) {
-        router.push(`/planner/${response.data.id}?new=true`);
+      if (response?.id) {
+        router.push(`/planner/${response.id}?new=true`);
       } else {
         console.error("채팅방 생성 실패: 응답에 ID가 없습니다", response);
       }

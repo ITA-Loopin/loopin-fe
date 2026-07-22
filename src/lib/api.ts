@@ -1,216 +1,138 @@
-"use client";
+import { ApiResponse } from "@/interfaces/response/ApiResponse";
+import type { PageMeta } from "@/interfaces/response/PageMeta";
+import {
+  request,
+  type HttpMethod,
+  type HttpOptions,
+  type SearchParamValue,
+} from "@/lib/http";
 
-import { store } from "@/store/store";
-import { setCredentials, logout } from "@/store/slices/authSlice";
-import { fetchMemberProfile, buildUserFromMemberProfile } from "./member";
-import type { User } from "@/types/auth";
+/**
+ * 클라이언트(API) 계층: 백엔드 응답 봉투 규약을 아는 표준 클라이언트.
+ *
+ * - 전송은 http.ts의 request()에 위임하고, 여기서는 봉투 해석/언랩과 에러 변환만 한다.
+ * - 백엔드는 에러를 HTTP 상태코드(4xx/5xx) + { success:false, code, message, data?, traceId? }로 내려준다.
+ *   따라서 !res.ok 를 신뢰 가능한 실패 신호로 사용한다.
+ * - 성공 시 envelope.data(T)를 자동 언랩. React Query / RSC / Server Action의
+ *   throw 기반 에러 처리와 맞물린다.
+ * - 원본 Response가 필요한 특수 케이스만 http.ts의 저수준 request()를 직접 쓴다.
+ */
 
-type ApiFetchInput = RequestInfo | URL;
+/** API 실패를 나타내는 타입드 에러. 비즈니스 code로 분기하거나 traceId로 추적할 수 있다. */
+export class ApiError extends Error {
+  readonly status: number;
+  readonly code: string;
+  /** 검증 실패 시 필드맵 등 서버가 실어 보낸 errorData */
+  readonly data?: unknown;
+  readonly traceId?: string;
 
-type SearchParamValue = string | number | boolean | null | undefined;
+  constructor(args: {
+    status: number;
+    code: string;
+    message: string;
+    data?: unknown;
+    traceId?: string;
+  }) {
+    super(args.message);
+    this.name = "ApiError";
+    this.status = args.status;
+    this.code = args.code;
+    this.data = args.data;
+    this.traceId = args.traceId;
+  }
+}
 
-interface ApiFetchOptions extends RequestInit {
-  /**
-   * 쿼리 파라미터를 객체 형태로 전달할 수 있습니다.
-   */
+export interface ApiOptions {
+  method?: HttpMethod;
   searchParams?: Record<string, SearchParamValue>;
-  /**
-   * JSON 바디를 간편하게 전달하기 위한 옵션입니다. 자동으로 직렬화하고 헤더를 설정합니다.
-   */
   json?: unknown;
-  /**
-   * false로 설정하면 응답을 그대로 반환(Response)합니다.
-   */
-  parseJson?: boolean;
-  /**
-   * true로 설정하면 쿠키를 포함하지 않습니다. 기본값은 true (쿠키 포함)
-   */
+  body?: BodyInit;
+  headers?: HeadersInit;
+  signal?: AbortSignal;
+  /** true면 쿠키 미포함(인증 불필요 공개 엔드포인트). 기본값 false. */
   skipCredentials?: boolean;
 }
 
-const API_BASE_URL = "https://api.loopin.co.kr";
+export interface Page<T> {
+  items: T[];
+  page: PageMeta;
+}
 
-// 리프레시 토큰 재인증 진행 중인지 추적
-let isRefreshing = false;
-let refreshPromise: Promise<boolean> | null = null;
+const toHttpOptions = (options: ApiOptions): HttpOptions => ({
+  method: options.method,
+  searchParams: options.searchParams,
+  json: options.json,
+  body: options.body,
+  headers: options.headers,
+  signal: options.signal,
+  credentials: options.skipCredentials ? "omit" : "include",
+});
+
+const toApiError = async (res: Response): Promise<ApiError> => {
+  let body: Partial<ApiResponse<unknown>> = {};
+  try {
+    body = (await res.json()) as Partial<ApiResponse<unknown>>;
+  } catch {
+    // 비 JSON 에러 바디는 무시하고 상태 기반으로 합성
+  }
+  return new ApiError({
+    status: res.status,
+    code: body.code ?? `HTTP_${res.status}`,
+    message: body.message || res.statusText || "요청에 실패했습니다.",
+    data: body.data,
+    traceId: body.traceId,
+  });
+};
 
 /**
- * 리프레시 토큰으로 재인증 시도
+ * 프로젝트 표준 클라이언트. 성공 시 `data`(T)를 언랩해 반환하고,
+ * 실패(HTTP 4xx/5xx 또는 success:false) 시 {@link ApiError}를 throw한다.
+ * 데이터가 없는 성공 응답(void)에서는 undefined를 반환한다.
  */
-async function attemptTokenRefresh(): Promise<boolean> {
-  if (isRefreshing && refreshPromise) {
-    return refreshPromise;
+export async function api<T>(path: string, options: ApiOptions = {}): Promise<T> {
+  const res = await request(path, toHttpOptions(options));
+  if (!res.ok) throw await toApiError(res);
+  if (res.status === 204) return undefined as T;
+
+  const text = await res.text();
+  if (!text) return undefined as T;
+
+  const body = JSON.parse(text) as ApiResponse<T>;
+  if (body.success === false) {
+    throw new ApiError({
+      status: res.status,
+      code: body.code,
+      message: body.message,
+      data: body.data,
+      traceId: body.traceId,
+    });
   }
-
-  isRefreshing = true;
-  refreshPromise = (async () => {
-    try {
-      const refreshResponse = await fetch(
-        `${API_BASE_URL}/rest-api/v1/auth/refresh-token`,
-        {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            Accept: "application/json",
-          },
-        }
-      );
-      if (!refreshResponse.ok) {
-        return false;
-      }
-      return true;
-    } catch (error) {
-      return false;
-    } finally {
-      isRefreshing = false;
-      refreshPromise = null;
-    }
-  })();
-
-  return refreshPromise;
+  return body.data as T;
 }
 
 /**
- *  apiFetch - fetch를 확장한 커스텀 함수
- * - 쿠키 기반 인증 (자동으로 쿠키 전송)
- * - 제네릭 <T> 지원 → 응답 타입 지정 가능
- * - 응답 JSON 자동 파싱 + 타입 안전성
+ * 페이지네이션 응답 전용. 성공 시 `{ items, page }`를 반환한다.
+ * 백엔드는 페이지 응답에서 `data`=리스트, `page`={size,hasNext,nextCursor}로 내려준다.
  */
-export async function apiFetch<T = unknown>(
-  input: ApiFetchInput,
-  options: ApiFetchOptions = {}
-): Promise<T> {
-  const {
-    headers,
-    searchParams,
-    json,
-    parseJson = true,
-    skipCredentials = false,
-    ...restOptions
-  } = options;
+export async function apiPage<T>(
+  path: string,
+  options: ApiOptions = {},
+): Promise<Page<T>> {
+  const res = await request(path, toHttpOptions(options));
+  if (!res.ok) throw await toApiError(res);
 
-  const toRawUrl = (value: ApiFetchInput) => {
-    if (typeof value === "string") {
-      return value;
-    }
-    if (typeof URL !== "undefined" && value instanceof URL) {
-      return (value as URL).toString();
-    }
-    if (typeof Request !== "undefined" && value instanceof Request) {
-      return (value as Request).url;
-    }
-    return String(value);
+  const body = (await res.json()) as ApiResponse<T[]>;
+  if (body.success === false) {
+    throw new ApiError({
+      status: res.status,
+      code: body.code,
+      message: body.message,
+      data: body.data,
+      traceId: body.traceId,
+    });
+  }
+  return {
+    items: body.data ?? [],
+    page: body.page ?? { size: 0, hasNext: false, nextCursor: null },
   };
-
-  const buildApiUrl = (value: string) => {
-    // 이미 전체 URL인 경우 그대로 사용
-    if (/^https?:\/\//i.test(value)) {
-      return value;
-    }
-
-    //todo: cors 에러 안뜨면 없애기
-
-    // Next.js API Route인 경우 그대로 사용 (서버 사이드 프록시)
-    if (value.startsWith("/api/")) {
-      return value;
-    }
-
-    // 상대 경로인 경우 API 베이스 URL과 결합
-    const normalized = value.startsWith("/") ? value : `/${value}`;
-    return `${API_BASE_URL}${normalized}`;
-  };
-
-  let requestInput = buildApiUrl(toRawUrl(input));
-
-  if (searchParams && Object.keys(searchParams).length > 0) {
-    const url = new URL(requestInput);
-
-    for (const [key, value] of Object.entries(searchParams)) {
-      if (value === null || value === undefined) {
-        continue;
-      }
-      url.searchParams.set(key, String(value));
-    }
-
-    requestInput = url.toString();
-  }
-
-  // 기존 헤더 + 기본 헤더 병합
-  const headerMap = new Headers(headers ?? {});
-  if (!headerMap.has("Accept")) {
-    headerMap.set("Accept", "application/json");
-  }
-
-  const fetchOptions: RequestInit = {
-    ...restOptions,
-    headers: headerMap,
-    // 쿠키 자동 전송 (credentials: 'include')
-    // skipCredentials가 true면 쿠키를 포함하지 않음 (CORS 이슈 방지)
-    credentials: skipCredentials ? "omit" : "include",
-  };
-
-  if (json !== undefined) {
-    if (!headerMap.has("Content-Type")) {
-      headerMap.set("Content-Type", "application/json");
-    }
-    fetchOptions.body = JSON.stringify(json);
-  }
-
-  // 실제 fetch 요청
-  let response = await fetch(requestInput, fetchOptions);
-
-  // 401 에러 발생 시 리프레시 토큰으로 재인증 시도
-  if (response.status === 401 && !skipCredentials) {
-    // 리프레시 토큰 재인증
-    const refreshSuccess = await attemptTokenRefresh();
-
-    if (refreshSuccess) {
-      // 재인증 성공 시 원래 요청 재시도
-      response = await fetch(requestInput, fetchOptions);
-    } else {
-      // 재인증 실패 시 로그아웃하고 로그인 페이지로 리다이렉트
-      store.dispatch(logout());
-      if (typeof window !== "undefined") {
-        window.location.href = "/";
-      }
-      let errorBody: Record<string, unknown> = {};
-      try {
-        errorBody = await response.json();
-      } catch {
-        // JSON 파싱 실패 시 무시
-      }
-      throw new Error(
-        typeof errorBody.message === "string"
-          ? errorBody.message
-          : "인증이 만료되었습니다. 다시 로그인해주세요."
-      );
-    }
-  }
-
-  // 응답 상태 체크
-  if (!response.ok) {
-    let errorBody: Record<string, unknown> = {};
-    try {
-      errorBody = await response.json();
-    } catch {
-      // JSON 파싱 실패 시 무시
-    }
-    throw new Error(
-      typeof errorBody.message === "string"
-        ? errorBody.message
-        : "API 요청 실패"
-    );
-  }
-
-  if (!parseJson) {
-    return response as unknown as T;
-  }
-
-  // 204(No Content) 같은 경우 대비
-  if (response.status === 204) {
-    return {} as T;
-  }
-
-  // JSON 반환 + 타입 캐스팅
-  return response.json() as Promise<T>;
 }

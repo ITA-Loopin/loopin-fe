@@ -1,7 +1,6 @@
 /*"use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { apiFetch } from "@/lib/api";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { logout, setLoading } from "@/store/slices/authSlice";
 export default function HomePage() {

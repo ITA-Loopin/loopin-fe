@@ -10,7 +10,7 @@ import { RecommendationCard } from "./components/RecommendationCard";
 import { LoopinSpeakerIndicator } from "./components/LoopinSpeakerIndicator";
 import { usePlannerChat } from "./hooks/usePlannerChat";
 import { EXAMPLE_PROMPTS } from "./constants";
-import { fetchChatRooms } from "@/lib/chat";
+import { fetchChatRooms } from "@/services/chat";
 import { AddLoopSheet } from "@/components/loop/add-loop/AddLoopSheet";
 import { LoopGroupEditSheet } from "@/components/loop/LoopGroupEditSheet";
 import {
@@ -106,9 +106,9 @@ export default function PlannerChatPage() {
       if (!chatRoomId) return;
 
       try {
-        const response = await fetchChatRooms("AI");
-        if (response.data?.chatRooms) {
-          const chatRoom = response.data.chatRooms.find(
+        const rooms = await fetchChatRooms("AI");
+        if (rooms?.chatRooms) {
+          const chatRoom = rooms.chatRooms.find(
             (room) => room.id === chatRoomId,
           );
           if (chatRoom) {

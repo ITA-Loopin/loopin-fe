@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { apiFetch } from "@/lib/api";
+import { api } from "@/lib/api";
 
 interface CalendarLoopDay {
   date: string;
@@ -44,7 +44,7 @@ export function useCalendarLoops({
         if (!cancelled) {
           setIsLoading(true);
         }
-        const result = await apiFetch<CalendarLoopsApiResponse>(
+        const data = await api<CalendarLoopsApiResponse["data"]>(
           `/rest-api/v1/loops/calendar`,
           {
             searchParams: {
@@ -55,9 +55,9 @@ export function useCalendarLoops({
         );
 
         if (!cancelled) {
-          if (result?.success && result?.data?.days) {
+          if (data?.days) {
             const loopMap = new Map<string, boolean>();
-            result.data.days.forEach((day) => {
+            data.days.forEach((day) => {
               loopMap.set(day.date, day.hasLoop);
             });
             setLoopDays(loopMap);

@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { apiFetch } from "@/lib/api";
+import { api } from "@/lib/api";
 import type { Checklist } from "@/components/loop/add-loop/constants";
 import type { Dayjs } from "dayjs";
 
@@ -70,9 +70,8 @@ export function useCreateTeamLoop({
       try {
         setIsSubmitting(true);
         const apiUrl = `/rest-api/v1/teams/${teamId}/loops`;
-        await apiFetch(apiUrl, {
+        await api(apiUrl, {
           method: "POST",
-          credentials: "include",
           json: payload,
         });
         onCreated?.();

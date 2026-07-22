@@ -1,5 +1,5 @@
 import { FormEvent, useCallback, useRef, useState } from "react";
-import { apiFetch } from "@/lib/api";
+import { api } from "@/lib/api";
 import {
   AddLoopDefaultValues,
   Checklist,
@@ -100,9 +100,8 @@ export function useAddLoopForm({
         if (defaultValues?.loopRuleId) {
           searchParams.loopRuleId = defaultValues.loopRuleId;
         }
-        await apiFetch(apiUrl, {
+        await api(apiUrl, {
           method: "POST",
-          credentials: "include",
           json: requestPayload,
           ...(Object.keys(searchParams).length > 0 && { searchParams }),
         });

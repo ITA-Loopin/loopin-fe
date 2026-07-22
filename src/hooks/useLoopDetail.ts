@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import type { LoopDetail } from "@/types/loop";
-import { apiFetch } from "@/lib/api";
+import { api } from "@/lib/api";
 
 interface UseLoopDetailResult {
   detail: LoopDetail | null;
@@ -31,38 +31,33 @@ export function useLoopDetail(loopId: number): UseLoopDetailResult {
         setIsLoading(true);
         setErrorMessage(null);
 
-        const response = await apiFetch<{
-          success?: boolean;
-          data?: {
+        const data = await api<{
+          id: number;
+          title: string;
+          content?: string | null;
+          loopDate: string;
+          progress: number;
+          checklists?: Array<{
             id: number;
-            title: string;
-            content?: string | null;
-            loopDate: string;
-            progress: number;
-            checklists?: Array<{
-              id: number;
-              content: string;
-              completed: boolean;
-            }>;
-            loopRule?: {
-              ruleId: number;
-              scheduleType: string;
-              daysOfWeek?: string[];
-              startDate?: string | null;
-              endDate?: string | null;
-            };
+            content: string;
+            completed: boolean;
+          }>;
+          loopRule?: {
+            ruleId: number;
+            scheduleType: string;
+            daysOfWeek?: string[];
+            startDate?: string | null;
+            endDate?: string | null;
           };
         }>(`/rest-api/v1/loops/${loopId}`);
 
         if (cancelled) return;
 
-        if (response?.success === false || !response?.data) {
+        if (!data) {
           setErrorMessage("루프 상세 정보를 불러오지 못했습니다.");
           setDetail(null);
           return;
         }
-
-        const data = response.data;
         const checklists = (data.checklists ?? []).sort((a, b) => a.id - b.id);
         const totalChecklistCount = checklists.length;
         const completedChecklistCount = checklists.filter(

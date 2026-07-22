@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import Header from "@/components/common/Header";
 import { Button } from "@/components/common/Button";
-import { fetchChatRooms } from "@/lib/chat";
+import { fetchChatRooms } from "@/services/chat";
 
 export default function PlannerChatHeader() {
   const params = useParams<{ id: string }>();
@@ -20,8 +20,8 @@ export default function PlannerChatHeader() {
       if (!chatRoomId) return;
 
       try {
-        const response = await fetchChatRooms("AI");
-        const chatRoom = response.data?.chatRooms?.find(
+        const rooms = await fetchChatRooms("AI");
+        const chatRoom = rooms?.chatRooms?.find(
           (room) => room.id === chatRoomId,
         );
 

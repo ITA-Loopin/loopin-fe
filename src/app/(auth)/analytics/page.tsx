@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { LoopReport } from "@/components/analytics/LoopReport";
 import { PageBackground } from "@/components/common/PageBackground";
 import type { LoopReportData, ReportStatus } from "@/types/report";
-import { fetchLoopReport } from "@/lib/report";
+import { fetchLoopReport } from "@/services/report";
 
 export default function AnalyticsPage() {
   const [status, setStatus] = useState<ReportStatus>("NONE");

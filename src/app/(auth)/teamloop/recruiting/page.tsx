@@ -3,7 +3,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Button } from "@/components/common/Button";
 import { TeamCard } from "@/components/team/TeamCard";
-import { fetchRecruitingTeams } from "@/lib/team";
+import { fetchRecruitingTeams } from "@/services/team";
 
 export default function RecruitingTeamListPage() {
   const {
