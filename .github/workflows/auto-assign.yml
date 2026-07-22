@@ -7,6 +7,7 @@ on:
 
 permissions:
   issues: write
+  pull-requests: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
@@ -32,5 +33,11 @@ jobs:
                 assignees: [author],
               });
             } catch (error) {
-              core.warning(`PR 작성자를 할당하지 못했습니다: ${error.message}`);
+              // 422: 할당 대상이 아닌 사용자(외부 협업자 등) — 예상된 상황이므로 경고만 남기고 통과
+              if (error.status === 422) {
+                core.warning(`작성자를 할당할 수 없습니다(할당 대상 아님): ${author} — ${error.message}`);
+                return;
+              }
+              // 403(권한 스코프 누락) 등 그 외 오류는 설정 문제이므로 잡을 실패시켜 노출
+              core.setFailed(`PR 작성자 자동 할당 실패: ${error.message}`);
             }

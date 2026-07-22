@@ -1,7 +1,11 @@
 name: CI
 
-# PR 검증 게이트: 타입체크 · 유닛 테스트 · 빌드(패키징 검증)까지 통과해야 머지.
-# lint는 기존 코드 부채(35건)로 아직 전체 통과 못 해, 변경파일 한정(ratchet) 게이트로 별도 도입 예정 — 지금은 제외.
+# PR 검증 게이트: 아래 두 잡을 모두 통과해야 머지.
+#   - verify:       타입체크 · 유닛 테스트 · 빌드(패키징 검증)
+#   - lint-changed: 이 PR이 추가/수정한 파일만 lint(ratchet). 기존 코드 부채(error 35건)는
+#                   전체 게이트를 막으므로 별도 소각 이슈로 분리하고, 여기서는 새 부채 유입만 막는다.
+#                   eslint 기본 동작상 error는 차단·warning은 비차단이며, 변경파일에 남은
+#                   기존 error도 함께 막히므로(boy-scout) 만진 파일은 정리하고 올린다.
 # 통합 브랜치(main·develop)로 향하는 PR에서만 돈다. 머지 후 push 검증은 Vercel 배포와
 # 무관한 중복 실행이라 두지 않으며, 배포(CD)는 Vercel이 main push를 감지해 자동 수행한다.
 on:
@@ -16,6 +20,8 @@ concurrency:
 permissions:
   contents: read
 
+# 주의: 아래 잡 name들은 main 브랜치 보호의 required status checks에 등록돼 있다.
+# 이름을 바꾸면 브랜치 보호 설정도 함께 갱신해야 한다 (안 하면 머지가 영구 차단됨).
 jobs:
   verify:
     name: typecheck · test · build
@@ -50,3 +56,50 @@ jobs:
 
       - name: Unit tests
         run: pnpm test
+
+  # 변경파일 한정 lint(ratchet). build가 필요 없어 verify와 병렬로 빠르게 돌린다.
+  lint-changed:
+    name: lint (changed files)
+    runs-on: ubuntu-latest
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # base·head 두 커밋으로 diff를 계산해야 하므로 전체 히스토리를 받는다.
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint changed files (ratchet)
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # 3-dot diff(merge-base..head)로 이 PR이 실제 추가/수정(ACMR)한 소스만 고른다.
+          # base 브랜치의 무관한 변경은 포함되지 않으며, 삭제(D)는 제외한다.
+          mapfile -t FILES < <(
+            git diff --name-only --diff-filter=ACMR "$BASE_SHA...$HEAD_SHA" \
+              | grep -E '\.[mc]?[jt]sx?$' || true
+          )
+          if [ ${#FILES[@]} -eq 0 ]; then
+            echo "변경된 lint 대상 파일이 없어 건너뜁니다."
+            exit 0
+          fi
+          echo "대상 파일 (${#FILES[@]}건):"
+          printf '  %s\n' "${FILES[@]}"
+          # 파일 인자를 넘겨 변경파일만 검사한다(무인자 실행 시 전체 검사되어 기존 부채에 막힘).
+          # error는 종료코드 1로 머지 차단, warning은 로그만 남기고 통과(eslint 기본 동작).
+          pnpm exec eslint "${FILES[@]}"

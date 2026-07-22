@@ -61,14 +61,30 @@
 
 ## Phase 2: 검증
 
-CI(`.github/workflows/ci.yml`의 `verify` 잡)와 동일한 게이트를 로컬에서 선검증한다. 순서대로 실행:
+CI(`.github/workflows/ci.yml`)와 **동일한 게이트**를 로컬에서 선검증한다. CI는 두 잡으로 나뉘므로 로컬도 같은 형태로 확인한다 — 전체 검사로 대체하지 않는다.
 
-1. **타입 검사**: `pnpm exec tsc --noEmit`
-2. **린트**: `pnpm lint`
+### 게이트 A — `verify` 잡 (build · typecheck · test)
+
+순서를 지킨다. build가 tsc보다 먼저다:
+
+1. **빌드**: `pnpm build` — `next-env.d.ts`와 `.next/types`(typedRoutes 등)를 먼저 생성해야 이어지는 tsc가 정적 에셋·라우트 타입을 해석한다. **stale `.next`가 있으면 tsc가 옛 라우트 타입을 참조해 헛실패**하므로, 라우트가 바뀐 변경이면 `rm -rf .next` 후 빌드한다 (CI는 fresh 체크아웃이라 이 문제가 없다).
+2. **타입 검사**: `pnpm exec tsc --noEmit`
 3. **유닛 테스트**: `pnpm test`
-4. **빌드**: `pnpm build`
 
-- 하나라도 실패 시 → 실패 내용을 사용자에게 보고하고 **중단**한다 (자동 수정하지 않는다).
+### 게이트 B — `lint-changed` 잡 (변경 파일 한정 lint, ratchet)
+
+**전체 `pnpm lint`를 돌리지 않는다.** 저장소에는 이미 문서화된 기존 lint 부채가 있고, CI는 이를 게이트에서 제외한 채 **이 변경이 건드린 파일만** 검사한다. 전체 lint는 그 부채에 걸려 헛실패하며, 그 원인을 추적하지 말 것 — 게이트가 아니다.
+
+1. 대상 파일 = 이 배포가 `main` 대비 추가/수정한 소스(커밋 + 워킹트리)에서 lint 가능한 확장자만:
+   ```
+   { git diff --name-only --diff-filter=ACMR main...HEAD; \
+     git diff --name-only --diff-filter=ACMR HEAD; } \
+     | grep -E '\.[mc]?[jt]sx?$' | sort -u
+   ```
+2. 대상이 없으면 lint를 건너뛴다. 있으면 **파일 인자를 넘겨** 검사한다: `pnpm exec eslint <파일들>`. 무인자 실행은 전체 검사되어 기존 부채에 막히므로 금지한다.
+3. eslint 기본 동작상 **error는 차단, warning은 통과**다. 대상 파일에 error가 있으면 실패로 본다 (만진 파일은 boy-scout로 정리해 올린다).
+
+- 게이트 A·B 중 하나라도 실패 시 → 실패 내용을 사용자에게 보고하고 **중단**한다 (자동 수정하지 않는다). 원인 확인은 파일 읽기 도구로 최소한만 하고, 스크래치패드 리다이렉트·즉석 파싱 스크립트로 심층 진단하지 않는다.
 - `pnpm install --frozen-lockfile`이 필요한 상태(lockfile 변경 등)면 먼저 설치한다.
 
 ## Phase 3: 브랜치 (이슈 생성 없음)
