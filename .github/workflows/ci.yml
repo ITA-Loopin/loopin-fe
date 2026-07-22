@@ -39,13 +39,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # 빌드 전에 실행해야 .next 산출물 없이 src/ 기준으로 깔끔하게 타입 검사된다.
+      # Build를 먼저 실행해 next-env.d.ts와 .next/types(typedRoutes 등)를 생성해야
+      # 이어지는 tsc가 정적 에셋(*.svg)·라우트 타입을 해석할 수 있다(fresh 체크아웃엔 없음).
+      # next build 자체도 타입/컴파일/번들 무결성을 검증하는 패키징 게이트다.
+      - name: Build
+        run: pnpm build
+
       - name: Typecheck
         run: pnpm exec tsc --noEmit
 
       - name: Unit tests
         run: pnpm test
-
-      # next build 자체가 타입/컴파일/번들 무결성을 검증하는 패키징 게이트 역할을 한다.
-      - name: Build
-        run: pnpm build
