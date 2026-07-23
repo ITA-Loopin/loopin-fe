@@ -9,6 +9,6 @@
 
 ## Claude Code 하네스 설정 (원본 명세에 주입)
 
-- **폴링 모드**: CI·Vercel 체크 대기는 **`run_in_background: true` Bash + `while` 루프**로 실행한다. 포그라운드 `sleep` 차단·Monitor 도구 금지. 메인 세션이 직접 수행하고 서브에이전트에 위임하지 않는다. 루프 완료 시 세션이 자동 재호출된다. (`automation/pipeline.md` 「폴링 실행 규칙」의 Claude Code 모드)
+- **폴링 모드**: CI·Vercel 체크 대기는 `automation/bin/`의 폴링 스크립트(`merge-gate.sh`·`deploy-wait.sh`)를 **`run_in_background: true` Bash**로 실행한다. 포그라운드 `sleep` 차단·Monitor 도구 금지. 메인 세션이 직접 수행하고 서브에이전트에 위임하지 않는다. 스크립트 완료 시 세션이 자동 재호출된다. (`automation/pipeline.md` 「폴링 실행 규칙」의 Claude Code 모드)
 - **Co-Author 트레일러**: `automation/pipeline.md` Step 1 커밋 메시지 끝에 `Co-Authored-By: Claude Code <noreply@anthropic.com>`를 붙인다.
-- **안전 규칙**: fe에는 아직 PreToolUse 훅이 없다 — `automation/pipeline.md`의 「민감 파일 커밋 금지」를 **메인 세션이 직접 준수**한다(Codex/Gemini와 동일). be식 `.claude/hooks/validate-git-sensitive.sh` 도입은 권장 후속 작업이다.
+- **안전 규칙**: 「민감 파일 커밋 금지」는 커밋 전 `automation/bin/sensitive-gate.sh` 실행으로 기계 검사하고, PreToolUse 훅(`.claude/hooks/validate-git-sensitive.sh`)이 `git add/commit/push`를 추가로 자동 차단한다 — 이중 방어로 작동한다.

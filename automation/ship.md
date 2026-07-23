@@ -19,21 +19,24 @@
 ## Preflight
 
 1. `gh auth status` — 인증 실패 시 **중단**.
-2. 현재 브랜치 판별:
-   - **feature 브랜치** (`<prefix>/...`, `main`·`develop` 아님):
+2. `git fetch origin main` — 이후 모든 main 대비 비교(변경 유무 판정, 게이트 B 파일 목록)는 **`origin/main` 기준**이다. 로컬 `main`은 뒤처져 있을 수 있으므로 비교 기준으로 쓰지 않는다.
+3. 현재 브랜치 판별:
+   - **feature 브랜치** (`<prefix>/...`, `main` 아님):
      - 브랜치 prefix에서 타입을 파싱한다.
-     - `git log main..HEAD`와 `git diff`로 변경사항 확인 — 커밋도 변경도 없으면 **중단** ("배포할 변경사항이 없습니다").
+     - `git log origin/main..HEAD`와 `git status --porcelain`으로 변경사항 확인 — 커밋도 변경도 없으면 **중단** ("배포할 변경사항이 없습니다"). 변경 유무 판정에 `git diff`(무인자)를 쓰지 않는다 — staged 변경이 보이지 않는다.
+     - 최신 동기화: `git pull --rebase --autostash origin main` — 충돌 처리는 main 경로와 동일하다(자동 해결하지 않는다). 이 rebase로 Phase 1의 분석 diff에 main 쪽 무관한 변경이 섞이지 않고, Phase 2가 실제 push될 트리를 검증하며, `automation/pipeline.md` Step 1-2의 rebase는 사실상 no-op이 된다. 브랜치가 이미 push돼 있었어도 Step 1-3의 `--force-with-lease` push가 재작성된 커밋을 안전하게 반영한다.
      - **Phase 3(브랜치 생성)을 스킵**하고 Phase 1로 진행한다 (타입은 브랜치 prefix로 확정).
-   - **`main` / `develop`**:
-     - `git status --short` — 변경사항이 없으면 **중단** ("배포할 변경사항이 없습니다").
-     - 최신 동기화: `git stash push -u -m "ship-preflight-stash"` → `git pull origin <현재브랜치>` → `git stash pop` (충돌 시 충돌 파일을 자체 해결한 뒤 진행).
+   - **`main`**:
+     - `git log origin/main..HEAD --oneline` — **push 안 된 로컬 커밋이 있으면 중단**하고 커밋 목록과 함께 보고한다. `main` 직접 커밋은 ship가 배포하지 않는다 — 워킹트리만 보는 아래 판정이 이 커밋들을 놓치므로, 사용자가 브랜치로 옮기는 등 직접 처리해야 한다.
+     - `git status --porcelain` — 변경사항이 없으면 **중단** ("배포할 변경사항이 없습니다").
+     - 최신 동기화: `git pull --rebase --autostash origin main`. **충돌 시 자동 해결하지 않는다** — rebase 충돌은 `git rebase --abort`로 원상복구 후 보고하고 중단, autostash 재적용 충돌은 변경이 stash에 보존된 상태이므로(`git stash list`로 확인) 그대로 두고 보고하고 중단한다.
      - Phase 1로 진행한다 (Phase 3에서 feature 브랜치를 생성).
 
 ## Phase 1: 변경사항 분석
 
 > 사용자가 인자로 타입과 설명을 직접 제공한 경우 (예: `ship feat 커서 페이지네이션 추가`), 해당 값을 사용하고 사용자 확인 없이 Phase 2로 직행한다.
 
-1. `git diff`로 변경된 파일과 내용을 분석한다.
+1. `git diff origin/main`과 `git status --porcelain`(untracked 신규 파일 확인)으로 변경된 파일과 내용을 분석한다. 무인자 `git diff`를 쓰지 않는다 — staged·커밋된 변경이 보이지 않아, 변경이 모두 커밋된 feature 브랜치에서는 분석 대상이 비어 보인다. Preflight의 rebase가 선행되므로 이 diff에는 main 쪽 무관한 변경이 섞이지 않는다.
 2. 변경 성격에 맞는 타입을 결정한다. **라벨 컬럼은 labeler가 자동으로 붙이는 라벨이며 ship가 부여하지 않는다** (제목·브랜치가 컨벤션에 맞으면 자동 적용됨):
 
    | 타입 | 자동 라벨 | 브랜치 prefix | PR 제목 |
@@ -61,7 +64,7 @@
 
 ## Phase 2: 검증
 
-CI(`.github/workflows/ci.yml`)와 **동일한 게이트**를 로컬에서 선검증한다. CI는 두 잡으로 나뉘므로 로컬도 같은 형태로 확인한다 — 전체 검사로 대체하지 않는다.
+CI(`.github/workflows/ci.yml`)의 머지 게이트 잡(`verify`·`lint-changed`)과 **동일한 게이트**를 로컬에서 선검증한다 — 전체 검사로 대체하지 않는다. (CI의 `scripts` 잡은 `automation/bin` 스크립트 회귀 검증이라 스크립트를 수정한 변경이 아니면, `gitleaks` 잡은 히스토리 시크릿 스캔이라 어느 변경이든 로컬 선검증 대상이 아니다 — 머지 게이트에서 함께 검사된다.)
 
 ### 게이트 A — `verify` 잡 (build · typecheck · test)
 
@@ -75,14 +78,9 @@ CI(`.github/workflows/ci.yml`)와 **동일한 게이트**를 로컬에서 선검
 
 **전체 `pnpm lint`를 돌리지 않는다.** 저장소에는 이미 문서화된 기존 lint 부채가 있고, CI는 이를 게이트에서 제외한 채 **이 변경이 건드린 파일만** 검사한다. 전체 lint는 그 부채에 걸려 헛실패하며, 그 원인을 추적하지 말 것 — 게이트가 아니다.
 
-1. 대상 파일 = 이 배포가 `main` 대비 추가/수정한 소스(커밋 + 워킹트리)에서 lint 가능한 확장자만:
-   ```
-   { git diff --name-only --diff-filter=ACMR main...HEAD; \
-     git diff --name-only --diff-filter=ACMR HEAD; } \
-     | grep -E '\.[mc]?[jt]sx?$' | sort -u
-   ```
-2. 대상이 없으면 lint를 건너뛴다. 있으면 **파일 인자를 넘겨** 검사한다: `pnpm exec eslint <파일들>`. 무인자 실행은 전체 검사되어 기존 부채에 막히므로 금지한다.
-3. eslint 기본 동작상 **error는 차단, warning은 통과**다. 대상 파일에 error가 있으면 실패로 본다 (만진 파일은 boy-scout로 정리해 올린다).
+**`automation/bin/lint-changed.sh`를 무인자(로컬 모드)로 실행한다** — CI의 `lint-changed` 잡과 같은 스크립트를 공유하므로 대상 산출 로직이 어긋나지 않는다. 로컬 모드는 `origin/main` 대비 커밋 + 워킹트리 + untracked 신규 파일을 대상으로 한다 (Preflight의 `git fetch origin main`이 선행돼야 한다).
+
+- `LINT_CHANGED result=SKIP|PASS` → 통과. `result=FAIL`(종료코드 1) → 실패. `result=ERROR` → git 조회 실패(fail-closed) — 통과로 취급하지 않고 보고 후 중단한다. eslint 기본 동작상 **error는 차단, warning은 통과**다 — 만진 파일에 남은 기존 error도 함께 차단된다. **정리는 사용자 몫이다**: ship는 자동 수정하지 않고 보고 후 중단하며, 사용자가 boy-scout로 정리한 뒤 다시 실행한다.
 
 - 게이트 A·B 중 하나라도 실패 시 → 실패 내용을 사용자에게 보고하고 **중단**한다 (자동 수정하지 않는다). 원인 확인은 파일 읽기 도구로 최소한만 하고, 스크래치패드 리다이렉트·즉석 파싱 스크립트로 심층 진단하지 않는다.
 - `pnpm install --frozen-lockfile`이 필요한 상태(lockfile 변경 등)면 먼저 설치한다.
@@ -97,7 +95,7 @@ CI(`.github/workflows/ci.yml`)와 **동일한 게이트**를 로컬에서 선검
 
 ## Phase 4: 배포
 
-`automation/pipeline.md`를 읽고 해당 절차를 실행한다. Preflight는 스킵하고 Step 1부터 시작한다.
+`automation/pipeline.md`를 읽고 Step 1부터 실행한다.
 CI·Vercel 체크 대기 폴링은 `automation/pipeline.md`의 「폴링 실행 규칙」에 정의된 **현재 하네스의 폴링 모드**를 따른다 (진입 어댑터가 지정).
 
 전달할 컨텍스트:

@@ -9,7 +9,7 @@ body:
     attributes:
       label: 작업 내용
       description: 어떤 작업을 하는지 작성해주세요.
-      placeholder: 예) CI 워크플로 트리거를 통합 브랜치(main·develop)로 한정합니다.
+      placeholder: 예) CI 워크플로 트리거를 main으로 향하는 PR로 한정합니다.
     validations:
       required: true
 
