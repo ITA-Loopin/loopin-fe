@@ -1,16 +1,21 @@
 name: CI
 
-# PR 검증 게이트: 아래 두 잡을 모두 통과해야 머지.
+# PR 검증 게이트: 아래 잡을 모두 통과해야 머지.
 #   - verify:       타입체크 · 유닛 테스트 · 빌드(패키징 검증)
 #   - lint-changed: 이 PR이 추가/수정한 파일만 lint(ratchet). 기존 코드 부채(error 35건)는
 #                   전체 게이트를 막으므로 별도 소각 이슈로 분리하고, 여기서는 새 부채 유입만 막는다.
 #                   eslint 기본 동작상 error는 차단·warning은 비차단이며, 변경파일에 남은
 #                   기존 error도 함께 막히므로(boy-scout) 만진 파일은 정리하고 올린다.
-# 통합 브랜치(main·develop)로 향하는 PR에서만 돈다. 머지 후 push 검증은 Vercel 배포와
+#   - scripts:      automation/bin 게이트 스크립트의 shellcheck + 스모크 테스트.
+#                   lint-changed가 이 스크립트를 실행하므로, 스크립트 회귀(특히 fail-open화)를
+#                   여기서 막는다.
+#   - gitleaks:     git 히스토리 전체 시크릿 스캔. 확인된 오탐(Firebase Web API 키)은
+#                   .gitleaks.toml에서 경로 한정으로 allowlist한다.
+# main으로 향하는 PR에서만 돈다. 머지 후 push 검증은 Vercel 배포와
 # 무관한 중복 실행이라 두지 않으며, 배포(CD)는 Vercel이 main push를 감지해 자동 수행한다.
 on:
   pull_request:
-    branches: [main, develop]
+    branches: [main]
 
 # 같은 브랜치에서 새 커밋이 오면 진행 중인 실행을 취소해 러너를 아낀다.
 concurrency:
@@ -20,8 +25,10 @@ concurrency:
 permissions:
   contents: read
 
-# 주의: 아래 잡 name들은 main 브랜치 보호의 required status checks에 등록돼 있다.
+# 주의: verify·lint-changed의 잡 name은 main 브랜치 보호의 required status checks에 등록돼 있다.
 # 이름을 바꾸면 브랜치 보호 설정도 함께 갱신해야 한다 (안 하면 머지가 영구 차단됨).
+# scripts 잡은 아직 required가 아니다 — 다만 머지 게이트(automation/bin/merge-gate.sh)가
+# 모든 체크의 성공을 요구하므로 ship 경로에서는 사실상 차단 게이트로 동작한다.
 jobs:
   verify:
     name: typecheck · test · build
@@ -82,24 +89,46 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # 대상 산출·실행 로직은 로컬 선검증(ship Phase 2 게이트 B)과 공유하는 단일 스크립트에 있다.
       - name: Lint changed files (ratchet)
         shell: bash
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: automation/bin/lint-changed.sh "$BASE_SHA" "$HEAD_SHA"
+
+  # automation/bin 게이트 스크립트 검증. node·pnpm이 필요 없어 수 초 안에 끝난다.
+  # shellcheck·jq는 ubuntu-latest 러너에 기본 설치돼 있다.
+  scripts:
+    name: scripts (shellcheck · smoke)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Shellcheck
+        run: shellcheck automation/bin/*.sh
+
+      - name: Smoke test
+        run: automation/bin/smoke-test.sh
+
+  # git 히스토리 전체 시크릿 스캔. gitleaks-action은 조직 리포에서 라이선스 키가 필요하므로
+  # MIT인 바이너리를 릴리스에서 받아 직접 실행한다. 설정·allowlist는 .gitleaks.toml.
+  gitleaks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # 히스토리 전체를 스캔하므로 전체 클론이 필요하다.
+          fetch-depth: 0
+
+      - name: Install gitleaks
+        env:
+          GITLEAKS_VERSION: 8.30.1
         run: |
-          # 3-dot diff(merge-base..head)로 이 PR이 실제 추가/수정(ACMR)한 소스만 고른다.
-          # base 브랜치의 무관한 변경은 포함되지 않으며, 삭제(D)는 제외한다.
-          mapfile -t FILES < <(
-            git diff --name-only --diff-filter=ACMR "$BASE_SHA...$HEAD_SHA" \
-              | grep -E '\.[mc]?[jt]sx?$' || true
-          )
-          if [ ${#FILES[@]} -eq 0 ]; then
-            echo "변경된 lint 대상 파일이 없어 건너뜁니다."
-            exit 0
-          fi
-          echo "대상 파일 (${#FILES[@]}건):"
-          printf '  %s\n' "${FILES[@]}"
-          # 파일 인자를 넘겨 변경파일만 검사한다(무인자 실행 시 전체 검사되어 기존 부채에 막힘).
-          # error는 종료코드 1로 머지 차단, warning은 로그만 남기고 통과(eslint 기본 동작).
-          pnpm exec eslint "${FILES[@]}"
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+            | tar -xz gitleaks
+
+      - name: Scan git history
+        run: ./gitleaks git --redact --no-banner

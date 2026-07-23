@@ -1,0 +1,17 @@
+# gitleaks 설정 — CI(gitleaks 잡)와 로컬 검사가 공유한다.
+# 기본 룰셋을 그대로 쓰고, 확인된 오탐만 경로 한정으로 allowlist한다.
+
+[extend]
+useDefault = true
+
+# Firebase Web API 키는 설계상 공개되는 식별자다 (비밀이 아님 — 접근 제어는
+# Firebase Security Rules와 API 키 제한이 담당). 웹 클라이언트 코드에 포함되는 것이
+# 정상이며, firebase-messaging-sw.js는 공개 서빙이 필수인 서비스 워커다.
+# 이 두 경로의 gcp-api-key 룰만 예외 처리한다 — 다른 경로의 GCP 키는 여전히 차단된다.
+[[allowlists]]
+description = "Firebase Web API keys (public by design)"
+rules = ["gcp-api-key"]
+paths = [
+  '''src/lib/firebase\.ts''',
+  '''public/firebase-messaging-sw\.js''',
+]
