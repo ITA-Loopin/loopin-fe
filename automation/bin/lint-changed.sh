@@ -17,12 +17,18 @@ if [ $# -eq 2 ]; then
   RAW=$(git diff --name-only --diff-filter=ACMR "$1...$2") \
     || { echo "LINT_CHANGED result=ERROR"; exit 1; }
 elif [ $# -eq 0 ]; then
-  RAW=$(
-    set -e
-    git diff --name-only --diff-filter=ACMR origin/main...HEAD
-    git diff --name-only --diff-filter=ACMR HEAD
-    git ls-files --others --exclude-standard
-  ) || { echo "LINT_CHANGED result=ERROR"; exit 1; }
+  # origin/main 부재 등 git 조회 실패는 fail-closed(ERROR)로 끝낸다. 각 명령의 종료 상태를
+  # 개별로 확인한다 — `$(set -e; ...)` 명령 치환은 bash 버전에 따라 중간 실패를 삼켜(fail-open)
+  # SKIP으로 새므로(로컬 bash 3.2는 잡지만 CI bash 5.x는 놓친다) 쓰지 않는다.
+  git rev-parse --verify --quiet origin/main >/dev/null \
+    || { echo "LINT_CHANGED result=ERROR"; exit 1; }
+  d1=$(git diff --name-only --diff-filter=ACMR origin/main...HEAD) \
+    || { echo "LINT_CHANGED result=ERROR"; exit 1; }
+  d2=$(git diff --name-only --diff-filter=ACMR HEAD) \
+    || { echo "LINT_CHANGED result=ERROR"; exit 1; }
+  d3=$(git ls-files --others --exclude-standard) \
+    || { echo "LINT_CHANGED result=ERROR"; exit 1; }
+  RAW=$(printf '%s\n%s\n%s\n' "$d1" "$d2" "$d3")
 else
   echo "usage: $0 [<BASE_SHA> <HEAD_SHA>]" >&2
   exit 2

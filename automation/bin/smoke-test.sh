@@ -82,6 +82,11 @@ printf '{"mergeable":"MERGEABLE","statusCheckRollup":[%s]}' \
 check "merge-gate.jq: Vercel 부재 → PENDING (vacuous pass 방지)" \
   0 "^PENDING vercel=ABSENT" jq -r -f "$GATE_JQ" fixture.json
 
+printf '{"mergeable":"MERGEABLE","statusCheckRollup":[%s]}' \
+  "$VERCEL_OK" > fixture.json
+check "merge-gate.jq: Vercel만 있고 CI 미등록 → PENDING (조기 vacuous pass 방지)" \
+  0 "^PENDING" jq -r -f "$GATE_JQ" fixture.json
+
 printf '{"mergeable":"MERGEABLE","statusCheckRollup":[%s,%s,{"__typename":"StatusContext","context":"Vercel Preview Comments","state":"FAILURE"}]}' \
   "$CHECKRUN_OK" "$VERCEL_OK" > fixture.json
 check "merge-gate.jq: 비차단 예외 실패는 무시 → PASS" \

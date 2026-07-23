@@ -24,9 +24,12 @@ def state($x):
 # Vercel 프리뷰 배포는 존재 자체가 필수 — 체크 등록 전 공집합 통과(vacuous pass)를 막는다.
 | ([$checks[] | select(cname(.)=="Vercel")][0]) as $v
 | (if $v == null then "ABSENT" else state($v) end) as $vercel
+# Vercel 외 실제 체크(Actions 잡 등)가 최소 1개 있어야 PASS — Vercel만 먼저 등록된 순간
+# (CI 잡 미등록) "Vercel 성공 + 대기 0"으로 통과하는 조기 vacuous pass를 막는다.
+| [$checks[] | select(cname(.)!="Vercel")] as $others
 | if (($failed | length) > 0 or $m=="CONFLICTING") then
     "FAIL failed=\($failed | join(",")) mergeable=\($m)"
-  elif ($m=="MERGEABLE" and $vercel=="PASS" and ($pending | length)==0 and ($checks | length) > 0) then
+  elif ($m=="MERGEABLE" and $vercel=="PASS" and ($pending | length)==0 and ($others | length) > 0) then
     "PASS"
   else
     "PENDING vercel=\($vercel) pending=\($pending | join(",")) mergeable=\($m)"
