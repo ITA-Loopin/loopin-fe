@@ -52,3 +52,8 @@ storybook-static
 skills-lock.json
 .claude/settings.local.json
 .mcp.json
+
+### Codex ###
+.codex/*
+# 프로젝트 스코프 스킬은 리포로 공유 (config.toml 등 로컬 머신 설정은 계속 무시)
+!.codex/skills/
