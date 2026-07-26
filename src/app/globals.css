@@ -178,6 +178,18 @@
   .text-caption-10-m {
     @apply text-[10px] font-medium leading-[14px] tracking-[-0.2px];
   }
+
+  @media (hover: none) and (pointer: coarse) {
+    .planner-prompt-web:focus {
+      width: calc(100% / 0.875);
+      margin-right: calc(100% - (100% / 0.875));
+      font-size: 16px;
+      line-height: 24px;
+      letter-spacing: -0.32px;
+      transform: scale(0.875);
+      transform-origin: left center;
+    }
+  }
 }
 
 @layer base {
