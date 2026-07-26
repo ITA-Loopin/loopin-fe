@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { MessageBubble } from "./components/MessageBubble";
@@ -18,8 +18,6 @@ import {
   recommendationToLoopDetail,
 } from "./utils";
 import type { RecommendationSchedule } from "./types";
-import GroupIcon from "@/../public/Group.svg";
-import RetryIcon from "@/../public/retry.svg";
 
 const MESSAGE_EXTRA_SPACE = 32;
 const INPUT_CONTAINER_HEIGHT = 192;
@@ -37,6 +35,7 @@ export default function PlannerChatPage() {
   const params = useParams();
   const router = useRouter();
   const chatRoomId = params?.id ? Number(params.id) : null;
+  const [isAppWebView, setIsAppWebView] = useState(false);
   const [chatRoomLoopSelect, setChatRoomLoopSelect] = useState<boolean>(false);
   const [chatRoomCallUpdateLoop, setChatRoomCallUpdateLoop] =
     useState<boolean>(false);
@@ -94,6 +93,18 @@ export default function PlannerChatPage() {
   useEffect(() => {
     handleInputChange(watchedPrompt ?? "");
   }, [watchedPrompt, handleInputChange]);
+
+  useEffect(() => {
+    setIsAppWebView(
+      Boolean(
+        (
+          window as Window & {
+            ReactNativeWebView?: unknown;
+          }
+        ).ReactNativeWebView,
+      ),
+    );
+  }, []);
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -218,7 +229,9 @@ export default function PlannerChatPage() {
                     (chatRoomCallUpdateLoop || sseCallUpdateLoop)
                   ) && (
                     <Image
-                      src={chatRoomLoopSelect ? RetryIcon : GroupIcon}
+                      src={
+                        chatRoomLoopSelect ? "/retry.svg" : "/Group.svg"
+                      }
                       alt=""
                       width={12}
                       height={12}
@@ -279,7 +292,9 @@ export default function PlannerChatPage() {
                       : "만들고 싶은 루프를 입력해주세요."
                   }
                   rows={1}
-                  className="max-h-32 min-w-0 flex-1 resize-none border-none bg-transparent text-body-1-m text-gray-800 outline-none"
+                  className={`max-h-32 min-w-0 flex-1 resize-none border-none bg-transparent text-body-2-m text-gray-800 outline-none placeholder:text-gray-400 ${
+                    isAppWebView ? "" : "planner-prompt-web"
+                  }`}
                   aria-label="루프 생성 요청 입력란"
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
