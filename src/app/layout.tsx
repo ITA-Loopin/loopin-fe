@@ -17,6 +17,11 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://loopin.co.kr"),
   title: "Loopin",
   description: "Loopin",
+  verification: {
+    other: {
+      "naver-site-verification": "6a6621b3074bcca5ba6b7eb93930b6ec6759b9d3",
+    },
+  },
 };
 
 export const viewport: Viewport = {
