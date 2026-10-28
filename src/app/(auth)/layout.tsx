@@ -4,8 +4,10 @@ import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import BottomTab from "@/components/navigation/BottomTab";
 import { PageBackground } from "@/components/common/PageBackground";
+import { MobileShell } from "../mobile-shell";
 
 // home 페이지 그라데이션. safe-area-inset 영역엔 시작/끝 색을 단색으로 연장.
+// eslint-disable-next-line no-restricted-syntax
 const HOME_GRADIENT = `linear-gradient(
   to bottom,
   rgba(255, 255, 255, 1) 0%,
@@ -59,8 +61,12 @@ export default function AuthLayout({
   );
 
   if (pageBackground) {
-    return <PageBackground background={pageBackground}>{layout}</PageBackground>;
+    return (
+      <MobileShell>
+        <PageBackground background={pageBackground}>{layout}</PageBackground>
+      </MobileShell>
+    );
   }
 
-  return layout;
+  return <MobileShell>{layout}</MobileShell>;
 }
