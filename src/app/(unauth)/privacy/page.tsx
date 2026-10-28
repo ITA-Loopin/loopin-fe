@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "개인정보처리방침 | Loopin",
@@ -14,7 +15,7 @@ export default function PrivacyPage() {
       </h1>
       { }
       <p className="text-caption-m text-gray-500 mb-6">
-        시행일: 2026년 5월 3일
+        공고일: 2026년 10월 28일 · 시행일: 2026년 11월 4일
       </p>
 
       { }
@@ -39,19 +40,13 @@ export default function PrivacyPage() {
         { }
         <ul className="list-disc pl-5 mb-3 space-y-1 text-body-2-m text-gray-700">
           <li>
-            소셜 로그인(카카오·네이버·구글) 연동 시: 이메일, 닉네임,
+            소셜 로그인(카카오·네이버·구글·Apple) 연동 시: 이메일, 닉네임,
             프로필 이미지, 소셜 고유 식별자(providerID)
           </li>
           <li>
-            서비스 이용 시 자동 생성: 서비스 이용 기록, 루프 데이터,
-            팀 활동 기록
+            서비스 이용 시 생성: 서비스 이용 기록, 루프 데이터, 팀 활동 기록,
+            팀 채팅 및 AI 플래너 채팅 내용
           </li>
-        </ul>
-
-        <Label>선택 항목</Label>
-        { }
-        <ul className="list-disc pl-5 mb-4 space-y-1 text-body-2-m text-gray-700">
-          <li>전화번호, 성별, 생년월일</li>
         </ul>
 
         <SubSection title="2) 서비스 이용 과정에서 자동 수집" />
@@ -134,7 +129,59 @@ export default function PrivacyPage() {
       </Section>
 
       {/* 제5조 */}
-      <Section title="제5조. 개인정보의 파기">
+      <Section title="제5조. 개인정보 처리의 위탁">
+        <p className="text-body-2-m text-gray-700 mb-3">
+          회사는 원활한 서비스 제공을 위해 다음과 같이 개인정보 처리 업무를
+          위탁하고 있으며, 관계 법령에 따라 수탁자가 개인정보를 안전하게
+          처리하도록 관리·감독합니다.
+        </p>
+        <Table
+          headers={["수탁자", "위탁 업무"]}
+          rows={[
+            ["Oracle Corporation", "서버 운영 및 데이터 보관"],
+            ["OpenAI, L.L.C.", "AI 플래너 루틴 추천 및 채팅 응답 생성"],
+            ["Google LLC (Gemini API)", "AI 플래너 루틴 추천 및 채팅 응답 생성"],
+            ["Google LLC (Firebase Cloud Messaging)", "푸시 알림 발송"],
+          ]}
+        />
+      </Section>
+
+      {/* 제6조 */}
+      <Section title="제6조. 개인정보의 국외 이전">
+        <p className="text-body-2-m text-gray-700 mb-3">
+          회사는 AI 플래너와 푸시 알림 기능 제공을 위해 아래와 같이 개인정보를
+          국외로 이전합니다.
+        </p>
+        <Table
+          headers={["항목", "내용"]}
+          rows={[
+            ["이전받는 자", "OpenAI, L.L.C. / Google LLC"],
+            ["이전되는 국가", "미국"],
+            [
+              "이전 항목",
+              "AI 플래너 채팅 내용 및 루프 정보(OpenAI, Google Gemini), 푸시 알림 수신 토큰(Google Firebase)",
+            ],
+            [
+              "이전 일시 및 방법",
+              "AI 플래너 이용 및 알림 발송 시점에 네트워크를 통해 암호화하여 전송",
+            ],
+            ["이전 목적", "AI 플래너 응답 생성, 푸시 알림 발송"],
+            [
+              "보유 및 이용 기간",
+              "목적 달성 시 또는 각 수탁자의 정책에 따른 보관 기간 경과 시 파기",
+            ],
+            ["연락처", "OpenAI: privacy@openai.com / Google: https://support.google.com/policies"],
+          ]}
+        />
+        <p className="text-body-2-m text-gray-700 mt-3">
+          이용자는 국외 이전을 거부할 수 있으며, 이 경우 AI 플래너와 푸시 알림
+          기능을 이용할 수 없습니다. AI 플래너를 사용하지 않고 알림 수신을 끄면
+          해당 정보는 국외로 이전되지 않습니다.
+        </p>
+      </Section>
+
+      {/* 제7조 */}
+      <Section title="제7조. 개인정보의 파기">
         { }
         <p className="text-body-2-m text-gray-700 mb-3">
           회사는 개인정보 보유기간 경과, 처리목적 달성 등 개인정보가 불필요하게
@@ -147,8 +194,8 @@ export default function PrivacyPage() {
         </ul>
       </Section>
 
-      {/* 제6조 */}
-      <Section title="제6조. 이용자의 권리와 행사 방법">
+      {/* 제8조 */}
+      <Section title="제8조. 이용자의 권리와 행사 방법">
         { }
         <p className="text-body-2-m text-gray-700 mb-3">
           이용자는 회사에 대해 언제든지 다음의 권리를 행사할 수 있습니다.
@@ -163,12 +210,16 @@ export default function PrivacyPage() {
         { }
         <p className="text-body-2-m text-gray-700">
           위 권리 행사는 앱 내 설정 또는 아래 개인정보 보호 담당자에게 이메일로
-          요청하실 수 있으며, 회사는 지체 없이 조치하겠습니다.
+          요청하실 수 있으며, 회사는 지체 없이 조치하겠습니다. 계정 삭제 방법은{" "}
+          <Link href="/account-deletion" className="underline">
+            계정 삭제 안내
+          </Link>
+          에서 확인할 수 있습니다.
         </p>
       </Section>
 
-      {/* 제7조 */}
-      <Section title="제7조. 개인정보의 안전성 확보 조치">
+      {/* 제9조 */}
+      <Section title="제9조. 개인정보의 안전성 확보 조치">
         { }
         <p className="text-body-2-m text-gray-700 mb-3">
           회사는 개인정보의 안전성 확보를 위해 다음의 조치를 취하고 있습니다.
@@ -184,8 +235,8 @@ export default function PrivacyPage() {
         </ul>
       </Section>
 
-      {/* 제8조 */}
-      <Section title="제8조. 개인정보 보호 담당자">
+      {/* 제10조 */}
+      <Section title="제10조. 개인정보 보호 담당자">
         { }
         <p className="text-body-2-m text-gray-700 mb-3">
           회사는 개인정보 처리에 관한 업무를 총괄하고, 이용자의 불만 처리 및
@@ -206,8 +257,8 @@ export default function PrivacyPage() {
         </p>
       </Section>
 
-      {/* 제9조 */}
-      <Section title="제9조. 개인정보처리방침의 변경">
+      {/* 제11조 */}
+      <Section title="제11조. 개인정보처리방침의 변경">
         { }
         <p className="text-body-2-m text-gray-700">
           본 개인정보처리방침은 법령 및 방침의 변경에 따라 내용이
@@ -219,7 +270,7 @@ export default function PrivacyPage() {
 
       { }
       <p className="text-body-2-sb text-gray-800 mt-8 mb-12 text-center">
-        본 방침은 2026년 5월 3일부터 시행됩니다.
+        본 방침은 2026년 11월 4일부터 시행됩니다.
       </p>
     </div>
   );
